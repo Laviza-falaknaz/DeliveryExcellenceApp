@@ -113,32 +113,47 @@ export default function Warranty() {
     }
   }
 
-  // Common troubleshooting solutions
+  // Common troubleshooting solutions based on my-warranty.com/knowledge-base/
   const commonSolutions = [
     {
       id: "battery",
       title: "Battery Issues",
-      content: "If your laptop battery is not charging or draining quickly, try these steps:\n1. Check power connections and adapter\n2. Restart your laptop\n3. Update power management drivers\n4. Run a battery diagnostic test\n5. For persistent issues, please submit a support ticket"
+      content: "If your Circular Computing laptop battery is not charging or draining quickly, try these steps:\n\n1. Check power connections and adapter\n2. Ensure the AC adapter is properly connected to both the laptop and power outlet\n3. Verify the charging light indicator is on when plugged in\n4. Restart your laptop with the adapter connected\n5. Update power management drivers from the manufacturer's website\n6. Run the Battery Health Diagnostic tool (accessible via BIOS on most models)\n7. If battery shows <80% capacity after 12 months, you may qualify for a replacement under warranty\n8. For persistent issues, visit my-warranty.com/troubleshoot/ for advanced diagnostics"
     },
     {
       id: "performance",
       title: "Performance Issues",
-      content: "For slow performance or system lag, try these solutions:\n1. Restart your laptop\n2. Close unnecessary background applications\n3. Check for and install system updates\n4. Scan for malware\n5. Clear temporary files and browser cache\n6. If issues persist, consider a system reset or contact support"
+      content: "For slow performance or system lag on your remanufactured laptop:\n\n1. Restart your laptop to clear temporary memory issues\n2. Check Task Manager (Ctrl+Shift+Esc) to identify resource-intensive processes\n3. Ensure you have at least 20% free storage space on your drive\n4. Update your operating system and all drivers\n5. Scan for malware using the pre-installed security solution\n6. Clear temporary files using Disk Cleanup utility\n7. Consider upgrading RAM or storage if consistently facing performance issues\n8. Our remanufactured laptops support component upgrades without voiding warranty\n9. Visit my-warranty.com/performance for model-specific optimization guides"
     },
     {
       id: "display",
       title: "Display Problems",
-      content: "For screen flickering, distortion, or no display:\n1. Update graphics drivers\n2. Connect to an external monitor to isolate hardware vs software issues\n3. Test in safe mode\n4. Check display resolution settings\n5. For touchscreen issues, calibrate the touch input"
+      content: "For screen flickering, distortion, or no display on your Circular Computing laptop:\n\n1. Update graphics drivers from the original manufacturer's website\n2. Test with an external monitor to determine if the issue is with the screen or graphics card\n3. Run hardware diagnostics (F12 at startup on most models)\n4. For LED displays, check for loose cable connections (if comfortable opening the case)\n5. Adjust brightness and display settings in Control Panel\n6. For ghost images or burn-in on LCD screens, use a pixel repair utility\n7. Our remanufactured screens undergo 3-stage testing and are covered under full warranty\n8. If issues persist after basic troubleshooting, you may qualify for free repair service"
     },
     {
       id: "connectivity",
       title: "Wi-Fi & Connectivity",
-      content: "For internet connection issues:\n1. Restart your router and laptop\n2. Forget the network and reconnect\n3. Update network drivers\n4. Check for IP conflicts\n5. Run Windows Network Troubleshooter\n6. Reset network settings if necessary"
+      content: "For internet connection issues on your sustainable laptop:\n\n1. Ensure Wi-Fi is enabled (check physical switch or function key)\n2. Restart your router and laptop\n3. Forget the network and reconnect with correct credentials\n4. Update wireless drivers from the original manufacturer's website\n5. Run the Network Troubleshooter (Settings > Network & Internet > Status > Network Troubleshooter)\n6. Reset the TCP/IP stack using Command Prompt as Administrator: 'netsh winsock reset' and 'netsh int ip reset'\n7. If Bluetooth connectivity issues occur, update chipset drivers\n8. Our remanufactured laptops feature upgraded Wi-Fi cards in most models\n9. For persistent connectivity issues, visit my-warranty.com/network-solutions"
     },
     {
       id: "keyboard",
       title: "Keyboard & Touchpad",
-      content: "For keyboard or touchpad issues:\n1. Restart the system\n2. Update input device drivers\n3. Check for physical damage or debris\n4. Adjust sensitivity settings\n5. Test with an external input device to isolate hardware issues"
+      content: "For keyboard or touchpad issues on your Circular Computing device:\n\n1. Restart the system to reset input devices\n2. Update input device drivers from original manufacturer's site\n3. Check for debris or damage - our keyboards are thoroughly sanitized and tested\n4. Use compressed air to remove dust from between keys\n5. Adjust sensitivity settings in Control Panel > Mouse or Touchpad settings\n6. Test with an external keyboard/mouse to isolate hardware vs software issues\n7. For backlight issues, check function key combinations (usually Fn+F5 or similar)\n8. All our remanufactured keyboards undergo double-stroke testing and are covered by warranty\n9. For key replacement kits, visit my-warranty.com/keyboard-support"
+    },
+    {
+      id: "software",
+      title: "Operating System & Software",
+      content: "For software issues on your sustainable remanufactured laptop:\n\n1. Ensure all updates are installed for your operating system\n2. Check for software conflicts in Event Viewer\n3. Test in Safe Mode to determine if issues are software or hardware related\n4. Use System Restore to return to a previous working state\n5. Our laptops come with a clean OS install and minimal bloatware\n6. For driver issues, always use manufacturer-approved drivers\n7. If experiencing blue screens, note the error code and visit my-warranty.com/bsod-solutions\n8. Software support is available for the first 90 days after purchase\n9. Consider refreshing your OS using the built-in reset options if persistent issues occur"
+    },
+    {
+      id: "cooling",
+      title: "Overheating & Cooling",
+      content: "If your Circular Computing laptop is running hot or shutting down due to temperature:\n\n1. Ensure vents are clean and not blocked when using the laptop\n2. Use on hard surfaces rather than soft surfaces like beds or couches\n3. Check that internal fans are running properly (listen for unusual noises)\n4. All our remanufactured laptops undergo thermal paste replacement and cooling system cleaning\n5. Update BIOS and chipset drivers from the manufacturer's website\n6. Use a laptop cooling pad for extended high-performance usage\n7. Check CPU usage in Task Manager for runaway processes causing heat\n8. Our thermal optimization process ensures optimal performance within safe temperature ranges\n9. For persistent heating issues, you may qualify for a cooling system inspection under warranty"
+    },
+    {
+      id: "audio",
+      title: "Audio & Microphone Issues",
+      content: "For sound or microphone problems on your sustainable laptop:\n\n1. Check volume controls and ensure the device is not muted\n2. Update audio drivers from the original manufacturer's website\n3. Test with headphones to isolate speaker issues\n4. Run the Windows Audio Troubleshooter\n5. Check Device Manager for yellow exclamation marks on audio devices\n6. Test microphone levels in Sound Control Panel\n7. For conferencing issues, test in different applications to isolate the problem\n8. Our remanufacturing process includes thorough testing of all audio components\n9. For model-specific audio enhancements, visit my-warranty.com/audio-solutions"
     }
   ];
 
@@ -286,27 +301,39 @@ export default function Warranty() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <h3 className="font-medium">Standard Warranty</h3>
+                <h3 className="font-medium">Circular Computing Comprehensive Warranty</h3>
                 <p className="text-neutral-700">
-                  All Circular Computing remanufactured laptops come with a 3-year warranty as standard. This covers hardware defects and malfunctions that occur under normal use conditions.
+                  All Circular Computing remanufactured laptops come with a comprehensive 3-year warranty as standard - longer than many new devices. This industry-leading coverage reflects our confidence in the quality of our carbon-neutral remanufacturing process.
                 </p>
               </div>
               
               <div className="space-y-2">
-                <h3 className="font-medium">Extended Warranty Options</h3>
+                <h3 className="font-medium">Extended Warranty & Protection Plans</h3>
                 <p className="text-neutral-700">
-                  Additional coverage options are available, including accidental damage protection and battery replacement coverage. Contact your account manager to learn more.
+                  Enhance your coverage with our premium protection options:
+                </p>
+                <ul className="list-disc list-inside text-neutral-700 space-y-1">
+                  <li>Accidental Damage Protection (covers drops, spills, and electrical surges)</li>
+                  <li>Extended Battery Coverage (extends battery warranty to full 36 months)</li>
+                  <li>Next Business Day Replacement Service</li>
+                  <li>Premium Support with dedicated technical advisor</li>
+                  <li>International Coverage Option for global organizations</li>
+                </ul>
+                <p className="text-neutral-700 mt-2">
+                  Contact your account manager or visit <a href="https://circularcomputing.com/contact/" target="_blank" rel="noreferrer" className="text-primary hover:underline">circularcomputing.com/contact/</a> to learn more.
                 </p>
               </div>
               
               <div className="space-y-2">
-                <h3 className="font-medium">What's Covered</h3>
+                <h3 className="font-medium">What's Covered Under Standard Warranty</h3>
                 <ul className="list-disc list-inside text-neutral-700 space-y-1">
                   <li>Hardware defects in materials and workmanship</li>
                   <li>System component failures (motherboard, RAM, storage)</li>
-                  <li>Display and graphics issues</li>
+                  <li>Display and graphics issues (including backlight and LCD)</li>
                   <li>Keyboard and touchpad functionality</li>
-                  <li>Battery defects (within first 12 months)</li>
+                  <li>Battery defects and performance issues (within first 12 months)</li>
+                  <li>Power adapters and included peripherals</li>
+                  <li>Pre-installed operating system recovery</li>
                 </ul>
               </div>
               
@@ -314,18 +341,95 @@ export default function Warranty() {
                 <h3 className="font-medium">What's Not Covered</h3>
                 <ul className="list-disc list-inside text-neutral-700 space-y-1">
                   <li>Accidental damage (drops, spills) without ADP coverage</li>
-                  <li>Normal wear and tear</li>
+                  <li>Normal wear and tear beyond expected usage</li>
+                  <li>Cosmetic damage that doesn't affect functionality</li>
                   <li>Software issues not related to hardware</li>
+                  <li>Third-party software or applications</li>
                   <li>Unauthorized modifications or repairs</li>
                   <li>Lost or stolen devices</li>
+                  <li>Damage from improper use or environment (extreme temperatures, dust, etc.)</li>
                 </ul>
               </div>
+              
+              <div className="space-y-2">
+                <h3 className="font-medium">Our Sustainability Commitment</h3>
+                <p className="text-neutral-700">
+                  As part of our sustainability commitment, we offer free recycling of your old devices when you return a product under warranty. All returned units are either repaired for reuse or responsibly recycled following WEEE standards, ensuring zero e-waste to landfill.
+                </p>
+              </div>
+              
+              <Alert className="mt-4 bg-secondary/5 border-secondary/20">
+                <HelpCircle className="h-4 w-4 text-secondary" />
+                <AlertTitle>Warranty Verification</AlertTitle>
+                <AlertDescription>
+                  For complete warranty details specific to your product model and purchase date, use the serial number lookup tool above. All warranty services must be initiated through our authorized service process.
+                </AlertDescription>
+              </Alert>
             </CardContent>
           </Card>
         </TabsContent>
         
         {/* Troubleshooting Guide Tab */}
         <TabsContent value="troubleshooting" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Diagnostic Tools</CardTitle>
+              <CardDescription>
+                Use these built-in diagnostic tools to identify hardware issues
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="border rounded-lg p-4 bg-primary/5">
+                  <h3 className="font-medium text-lg mb-2">Hardware Diagnostic Utility</h3>
+                  <p className="text-neutral-700 mb-3">
+                    Our comprehensive hardware test suite can identify issues with all major components.
+                  </p>
+                  <ul className="list-disc list-inside text-neutral-700 space-y-1 mb-3">
+                    <li>Access at boot by pressing F12 on most models</li>
+                    <li>Select "Diagnostics" from the boot menu</li>
+                    <li>Run "Quick Test" for basic diagnostics</li>
+                    <li>Run "Full System Test" for comprehensive testing</li>
+                    <li>Note any error codes for support reference</li>
+                  </ul>
+                  <a href="https://my-warranty.com/diagnostics/" target="_blank" rel="noreferrer" className="text-primary hover:underline text-sm flex items-center">
+                    <span>View detailed instructions</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-1"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
+                  </a>
+                </div>
+                
+                <div className="border rounded-lg p-4 bg-secondary/5">
+                  <h3 className="font-medium text-lg mb-2">Battery Health Analysis</h3>
+                  <p className="text-neutral-700 mb-3">
+                    Check your battery's health and performance with our specialized tool.
+                  </p>
+                  <ul className="list-disc list-inside text-neutral-700 space-y-1 mb-3">
+                    <li>Access via BIOS (F2 at startup on most models)</li>
+                    <li>Navigate to "Power Management" or "Battery Information"</li>
+                    <li>View current capacity compared to design capacity</li>
+                    <li>Batteries at less than 80% capacity within warranty period may qualify for replacement</li>
+                  </ul>
+                  <a href="https://my-warranty.com/battery-diagnostics/" target="_blank" rel="noreferrer" className="text-secondary hover:underline text-sm flex items-center">
+                    <span>Check battery health status</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-1"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
+                  </a>
+                </div>
+              </div>
+              
+              <Alert className="bg-blue-50 border-blue-200">
+                <div className="flex">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2 mt-1"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+                  <div>
+                    <AlertTitle className="text-blue-700">Remote Diagnostic Service</AlertTitle>
+                    <AlertDescription className="text-blue-600">
+                      Our technical support team can perform remote diagnostics for complex issues. Contact us through our support portal for assistance.
+                    </AlertDescription>
+                  </div>
+                </div>
+              </Alert>
+            </CardContent>
+          </Card>
+          
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="md:col-span-2">
               <Card>
