@@ -121,7 +121,7 @@ export default function RMA() {
       
       toast({
         title: "RMA Request Submitted",
-        description: "Your return request has been submitted successfully. Our team will contact you shortly.",
+        description: "Your return request has been submitted successfully after troubleshooting. Our team will contact you shortly.",
       });
       
       rmaForm.reset();
@@ -240,7 +240,7 @@ export default function RMA() {
               </div>
               <h3 className="font-semibold text-lg mb-2">Check Warranty</h3>
               <p className="text-neutral-600 text-sm mb-4">
-                Verify your product's warranty status before submitting an RMA request.
+                Verify your product's warranty status before starting the RMA process.
               </p>
               <Button onClick={() => setIsWarrantyCheckDialogOpen(true)}>
                 Check Warranty Status
@@ -448,9 +448,17 @@ export default function RMA() {
                           </div>
                           <div>
                             <h4 className="font-medium text-green-800">Warranty Active</h4>
-                            <p className="text-sm text-green-700">
+                            <p className="text-sm text-green-700 mb-2">
                               Your product is under warranty and eligible for an RMA request.
                             </p>
+                            <a 
+                              href="https://my-warranty.com/troubleshoot/" 
+                              target="_blank" 
+                              rel="noreferrer" 
+                              className="text-sm text-green-700 underline hover:text-green-800"
+                            >
+                              Try our troubleshooting guide before starting RMA
+                            </a>
                           </div>
                         </div>
                       </div>
@@ -462,9 +470,17 @@ export default function RMA() {
                           </div>
                           <div>
                             <h4 className="font-medium text-red-800">Warranty Expired</h4>
-                            <p className="text-sm text-red-700">
+                            <p className="text-sm text-red-700 mb-2">
                               Your product's warranty has expired. You may still submit an RMA request, but repair services may incur additional charges.
                             </p>
+                            <a 
+                              href="https://my-warranty.com/troubleshoot/" 
+                              target="_blank" 
+                              rel="noreferrer" 
+                              className="text-sm text-red-700 underline hover:text-red-800"
+                            >
+                              Try our troubleshooting guide first
+                            </a>
                           </div>
                         </div>
                       </div>
@@ -481,11 +497,12 @@ export default function RMA() {
                     </Button>
                     <Button 
                       onClick={() => {
+                        window.open('https://my-warranty.com/troubleshoot/', '_blank');
                         setIsWarrantyCheckDialogOpen(false);
                         setIsNewRmaDialogOpen(true);
                       }}
                     >
-                      Continue to RMA
+                      Start RMA Process
                     </Button>
                   </DialogFooter>
                 </div>
@@ -517,9 +534,9 @@ export default function RMA() {
       <Dialog open={isNewRmaDialogOpen} onOpenChange={setIsNewRmaDialogOpen}>
         <DialogContent className="sm:max-w-[550px]">
           <DialogHeader>
-            <DialogTitle>Create RMA Request</DialogTitle>
+            <DialogTitle>Complete RMA Request</DialogTitle>
             <DialogDescription>
-              Please provide details for your return or exchange request. Our team will review your request and contact you with further instructions.
+              After reviewing the troubleshooting guide, please provide details for your return or exchange request. Our team will evaluate your request and contact you with further instructions.
             </DialogDescription>
           </DialogHeader>
 
@@ -599,7 +616,7 @@ export default function RMA() {
                 <Button type="button" variant="outline" onClick={() => setIsNewRmaDialogOpen(false)}>
                   Cancel
                 </Button>
-                <Button type="submit">Submit RMA Request</Button>
+                <Button type="submit">Complete RMA Request</Button>
               </DialogFooter>
             </form>
           </Form>
