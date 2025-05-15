@@ -17,6 +17,7 @@ import {
 import { 
   Form, 
   FormControl, 
+  FormDescription,
   FormField, 
   FormItem, 
   FormLabel, 
@@ -201,7 +202,7 @@ export default function RMA() {
               </div>
               <h3 className="font-semibold text-lg mb-2">Return Process</h3>
               <p className="text-neutral-600 text-sm mb-4">
-                Learn how our easy and environmentally friendly return process works.
+                First verify your warranty status, then submit an RMA request for your return.
               </p>
               <Button variant="outline" asChild>
                 <a href="https://www.circularcomputing.com/returns-policy/" target="_blank" rel="noreferrer">
@@ -231,6 +232,23 @@ export default function RMA() {
           </CardContent>
         </Card>
 
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex flex-col items-center text-center">
+              <div className="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center text-green-700 mb-4">
+                <i className="ri-shield-check-line text-2xl"></i>
+              </div>
+              <h3 className="font-semibold text-lg mb-2">Check Warranty</h3>
+              <p className="text-neutral-600 text-sm mb-4">
+                Verify your product's warranty status before submitting an RMA request.
+              </p>
+              <Button onClick={() => setIsWarrantyCheckDialogOpen(true)}>
+                Check Warranty Status
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+        
         <Card>
           <CardContent className="p-6">
             <div className="flex flex-col items-center text-center">
@@ -342,12 +360,158 @@ export default function RMA() {
             <p className="text-neutral-500 mt-2">
               Need to return or exchange a product? Create an RMA request to start the process.
             </p>
-            <Button className="mt-4" onClick={() => setIsNewRmaDialogOpen(true)}>
+            <Button className="mt-4" onClick={() => setIsWarrantyCheckDialogOpen(true)}>
               Create Your First RMA
             </Button>
           </div>
         )}
       </div>
+
+      {/* Warranty Check Dialog */}
+      <Dialog open={isWarrantyCheckDialogOpen} onOpenChange={setIsWarrantyCheckDialogOpen}>
+        <DialogContent className="sm:max-w-[550px]">
+          <DialogHeader>
+            <DialogTitle>Warranty Verification</DialogTitle>
+            <DialogDescription>
+              Before proceeding with an RMA request, please verify your product's warranty status.
+            </DialogDescription>
+          </DialogHeader>
+
+          {!searchPerformed ? (
+            <Form {...serialForm}>
+              <form onSubmit={serialForm.handleSubmit(onSerialSubmit)} className="space-y-4">
+                <FormField
+                  control={serialForm.control}
+                  name="serialNumber"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Serial Number</FormLabel>
+                      <div className="flex gap-2">
+                        <FormControl>
+                          <Input placeholder="e.g. CC21XG45T" {...field} />
+                        </FormControl>
+                        <Button type="submit" disabled={isSubmitting}>
+                          {isSubmitting ? "Checking..." : "Check"}
+                        </Button>
+                      </div>
+                      <FormDescription>
+                        The serial number can be found on the bottom of your laptop or in the system information.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </form>
+            </Form>
+          ) : (
+            <>
+              {warrantyInfo ? (
+                <div className="py-4">
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-lg font-semibold">Warranty Status</h3>
+                      <Badge 
+                        variant={warrantyInfo.warrantyStatus === "Active" ? "default" : "secondary"} 
+                        className={warrantyInfo.warrantyStatus === "Active" ? "bg-green-100 text-green-800 hover:bg-green-100" : "bg-red-100 text-red-800 hover:bg-red-100"}
+                      >
+                        {warrantyInfo.warrantyStatus}
+                      </Badge>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <h4 className="text-sm font-medium text-neutral-500">Product</h4>
+                        <p className="text-base">{warrantyInfo.productName}</p>
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-medium text-neutral-500">Serial Number</h4>
+                        <p className="text-base">{warrantyInfo.serialNumber}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <h4 className="text-sm font-medium text-neutral-500">Purchase Date</h4>
+                        <p className="text-base">{new Date(warrantyInfo.purchaseDate).toLocaleDateString()}</p>
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-medium text-neutral-500">Warranty End Date</h4>
+                        <p className="text-base">{new Date(warrantyInfo.warrantyEnd).toLocaleDateString()}</p>
+                      </div>
+                    </div>
+                    
+                    {warrantyInfo.warrantyStatus === "Active" ? (
+                      <div className="p-4 bg-green-50 rounded-lg border border-green-100">
+                        <div className="flex items-start">
+                          <div className="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center text-green-700 mr-3">
+                            <i className="ri-check-line"></i>
+                          </div>
+                          <div>
+                            <h4 className="font-medium text-green-800">Warranty Active</h4>
+                            <p className="text-sm text-green-700">
+                              Your product is under warranty and eligible for an RMA request.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="p-4 bg-red-50 rounded-lg border border-red-100">
+                        <div className="flex items-start">
+                          <div className="h-8 w-8 rounded-full bg-red-100 flex items-center justify-center text-red-700 mr-3">
+                            <i className="ri-close-line"></i>
+                          </div>
+                          <div>
+                            <h4 className="font-medium text-red-800">Warranty Expired</h4>
+                            <p className="text-sm text-red-700">
+                              Your product's warranty has expired. You may still submit an RMA request, but repair services may incur additional charges.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  
+                  <DialogFooter className="mt-6">
+                    <Button variant="outline" onClick={() => {
+                      setSearchPerformed(false);
+                      setWarrantyInfo(null);
+                      serialForm.reset();
+                    }}>
+                      Check Another Product
+                    </Button>
+                    <Button 
+                      onClick={() => {
+                        setIsWarrantyCheckDialogOpen(false);
+                        setIsNewRmaDialogOpen(true);
+                      }}
+                    >
+                      Continue to RMA
+                    </Button>
+                  </DialogFooter>
+                </div>
+              ) : (
+                <div className="py-6">
+                  <div className="flex flex-col items-center justify-center">
+                    <div className="h-12 w-12 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 mb-4">
+                      <i className="ri-error-warning-line"></i>
+                    </div>
+                    <h3 className="text-lg font-medium mb-2">No Warranty Information Found</h3>
+                    <p className="text-neutral-600 text-center mb-4">
+                      We couldn't find warranty information for the specified serial number. Please double-check the number and try again.
+                    </p>
+                    <Button variant="outline" onClick={() => {
+                      setSearchPerformed(false);
+                      serialForm.reset();
+                    }}>
+                      Try Again
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
 
       {/* New RMA Dialog */}
       <Dialog open={isNewRmaDialogOpen} onOpenChange={setIsNewRmaDialogOpen}>
@@ -359,10 +523,10 @@ export default function RMA() {
             </DialogDescription>
           </DialogHeader>
 
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <Form {...rmaForm}>
+            <form onSubmit={rmaForm.handleSubmit(onSubmit)} className="space-y-4">
               <FormField
-                control={form.control}
+                control={rmaForm.control}
                 name="orderId"
                 render={({ field }) => (
                   <FormItem>
@@ -396,7 +560,7 @@ export default function RMA() {
               />
 
               <FormField
-                control={form.control}
+                control={rmaForm.control}
                 name="reason"
                 render={({ field }) => (
                   <FormItem>
@@ -414,7 +578,7 @@ export default function RMA() {
               />
 
               <FormField
-                control={form.control}
+                control={rmaForm.control}
                 name="notes"
                 render={({ field }) => (
                   <FormItem>
