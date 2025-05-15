@@ -101,6 +101,13 @@ export default function Sidebar() {
           >
             Support
           </NavItem>
+          <NavItem
+            href="/warranty"
+            icon="ri-shield-check-line"
+            active={location === "/warranty"}
+          >
+            Warranty & Troubleshooting
+          </NavItem>
         </NavSection>
 
         <NavSection title="Impact">
@@ -117,6 +124,13 @@ export default function Sidebar() {
             active={location === "/impact"}
           >
             Environmental Impact
+          </NavItem>
+          <NavItem
+            href="/esg-report"
+            icon="ri-file-chart-line"
+            active={location === "/esg-report"}
+          >
+            ESG Report
           </NavItem>
           <NavItem
             href="/case-studies"

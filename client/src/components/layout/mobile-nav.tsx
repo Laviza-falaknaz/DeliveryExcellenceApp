@@ -115,6 +115,15 @@ export default function MobileNav() {
                         <span>Support</span>
                       </a>
                     </Link>
+                    <Link href="/warranty" onClick={() => setOpen(false)}>
+                      <a className={cn(
+                        "flex items-center px-2 py-2 rounded-md text-neutral-700 hover:bg-neutral-100",
+                        location === "/warranty" && "bg-primary-light/10 text-primary font-medium"
+                      )}>
+                        <i className="ri-shield-check-line text-xl mr-3"></i>
+                        <span>Warranty & Troubleshooting</span>
+                      </a>
+                    </Link>
                   </nav>
                 </div>
 
@@ -139,6 +148,15 @@ export default function MobileNav() {
                       )}>
                         <i className="ri-leaf-line text-xl mr-3"></i>
                         <span>Environmental Impact</span>
+                      </a>
+                    </Link>
+                    <Link href="/esg-report" onClick={() => setOpen(false)}>
+                      <a className={cn(
+                        "flex items-center px-2 py-2 rounded-md text-neutral-700 hover:bg-neutral-100",
+                        location === "/esg-report" && "bg-primary-light/10 text-primary font-medium"
+                      )}>
+                        <i className="ri-file-chart-line text-xl mr-3"></i>
+                        <span>ESG Report</span>
                       </a>
                     </Link>
                     <Link href="/case-studies" onClick={() => setOpen(false)}>
@@ -221,11 +239,14 @@ export default function MobileNav() {
         <NavTab href="/orders" icon="ri-truck-line" active={location === "/orders"}>
           Orders
         </NavTab>
+        <NavTab href="/warranty" icon="ri-shield-check-line" active={location === "/warranty"}>
+          Warranty
+        </NavTab>
         <NavTab href="/support" icon="ri-customer-service-2-line" active={location === "/support"}>
           Support
         </NavTab>
-        <NavTab href="/impact" icon="ri-water-flash-line" active={location === "/impact"}>
-          Impact
+        <NavTab href="/esg-report" icon="ri-file-chart-line" active={location === "/esg-report"}>
+          ESG
         </NavTab>
       </div>
     </header>

@@ -13,6 +13,8 @@ import Impact from "@/pages/impact";
 import WaterProjects from "@/pages/water-projects";
 import Profile from "@/pages/profile";
 import CaseStudies from "@/pages/case-studies";
+import Warranty from "@/pages/warranty";
+import ESGReport from "@/pages/esg-report";
 import { useEffect, useState } from "react";
 import { apiRequest } from "@/lib/queryClient";
 import Sidebar from "@/components/layout/sidebar";
@@ -96,6 +98,16 @@ function Router() {
       <Route path="/water-projects">
         <ProtectedRoute>
           <WaterProjects />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/warranty">
+        <ProtectedRoute>
+          <Warranty />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/esg-report">
+        <ProtectedRoute>
+          <ESGReport />
         </ProtectedRoute>
       </Route>
       <Route path="/profile">
