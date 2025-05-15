@@ -40,7 +40,13 @@ function SupportResource({
           className={`w-full ${buttonColor}`}
           asChild
         >
-          <Link href={href}>{buttonText}</Link>
+          {buttonText === "Contact Support" || buttonText === "Contact Sales Team" ? (
+            <a href="https://circularcomputing.com/contact/" target="_blank" rel="noreferrer">{buttonText}</a>
+          ) : buttonText === "Start RMA Process" ? (
+            <a href="https://my-warranty.com/troubleshoot/" target="_blank" rel="noreferrer">{buttonText}</a>
+          ) : (
+            <Link href={href}>{buttonText}</Link>
+          )}
         </Button>
       </CardContent>
     </Card>
