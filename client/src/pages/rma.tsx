@@ -260,7 +260,7 @@ export default function RMA() {
                 Our support team is ready to assist you with your return needs.
               </p>
               <Button variant="outline" asChild>
-                <a href="/support">Contact Support</a>
+                <a href="https://circularcomputing.com/contact/" target="_blank" rel="noreferrer">Contact Support</a>
               </Button>
             </div>
           </CardContent>
@@ -776,7 +776,7 @@ export default function RMA() {
                   Close
                 </Button>
                 <Button asChild>
-                  <a href="/support/new">Contact Support</a>
+                  <a href="https://circularcomputing.com/contact/" target="_blank" rel="noreferrer">Contact Support</a>
                 </Button>
               </DialogFooter>
             </>

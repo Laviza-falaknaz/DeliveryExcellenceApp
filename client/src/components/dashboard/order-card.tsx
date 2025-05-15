@@ -127,7 +127,7 @@ export default function OrderCard({ order, isPast = false }: OrderCardProps) {
           ) : (
             <>
               <Button variant="outline" asChild>
-                <Link href="/support/new?orderRef={order.id}">Contact Support</Link>
+                <a href="https://circularcomputing.com/contact/" target="_blank" rel="noreferrer">Contact Support</a>
               </Button>
               <Button asChild>
                 <Link href={`/orders/${order.id}`}>Track Shipment</Link>

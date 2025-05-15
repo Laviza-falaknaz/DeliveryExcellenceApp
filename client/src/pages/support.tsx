@@ -137,8 +137,10 @@ export default function Support() {
               <p className="text-neutral-600 text-sm mb-4">
                 Need help with setup or having technical issues with your laptop?
               </p>
-              <Button variant="outline" onClick={() => setIsNewTicketDialogOpen(true)}>
-                Contact Support
+              <Button variant="outline" asChild>
+                <a href="https://circularcomputing.com/contact/" target="_blank" rel="noreferrer">
+                  Contact Support
+                </a>
               </Button>
             </div>
           </CardContent>
