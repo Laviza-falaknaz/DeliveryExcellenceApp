@@ -32,6 +32,10 @@ import { useToast } from "@/hooks/use-toast";
 import { Rma, Order } from "@shared/schema";
 import { formatDate } from "@/lib/utils";
 
+const serialNumberSchema = z.object({
+  serialNumber: z.string().min(5, "Serial number must be at least 5 characters"),
+});
+
 const rmaSchema = z.object({
   orderId: z.coerce.number({
     required_error: "Order is required",
@@ -42,11 +46,16 @@ const rmaSchema = z.object({
 });
 
 type RmaFormValues = z.infer<typeof rmaSchema>;
+type SerialNumberFormValues = z.infer<typeof serialNumberSchema>;
 
 export default function RMA() {
   const [isNewRmaDialogOpen, setIsNewRmaDialogOpen] = useState(false);
   const [selectedRma, setSelectedRma] = useState<Rma | null>(null);
   const [isRmaDetailsOpen, setIsRmaDetailsOpen] = useState(false);
+  const [isWarrantyCheckDialogOpen, setIsWarrantyCheckDialogOpen] = useState(false);
+  const [warrantyInfo, setWarrantyInfo] = useState<any>(null);
+  const [searchPerformed, setSearchPerformed] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
   const { data: rmas, isLoading } = useQuery<Rma[]>({
@@ -57,7 +66,7 @@ export default function RMA() {
     queryKey: ["/api/orders"],
   });
 
-  const form = useForm<RmaFormValues>({
+  const rmaForm = useForm<RmaFormValues>({
     resolver: zodResolver(rmaSchema),
     defaultValues: {
       orderId: 0,
@@ -65,6 +74,44 @@ export default function RMA() {
       notes: "",
     },
   });
+
+  const serialForm = useForm<SerialNumberFormValues>({
+    resolver: zodResolver(serialNumberSchema),
+    defaultValues: {
+      serialNumber: "",
+    },
+  });
+
+  async function onSerialSubmit(data: SerialNumberFormValues) {
+    try {
+      setIsSubmitting(true);
+      // In a real implementation, we would call an API to fetch warranty info
+      // For demo purposes, we'll simulate a response
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Simulate warranty info for demo
+      setWarrantyInfo({
+        serialNumber: data.serialNumber,
+        productName: "Circular ThinkPad T14 Gen 2",
+        purchaseDate: "2024-01-15",
+        warrantyEnd: "2027-01-15",
+        warrantyStatus: Math.random() > 0.3 ? "Active" : "Expired", // Randomly show active or expired for demo
+        additionalCoverage: "Extended Warranty with Accidental Damage Protection",
+        registrationStatus: "Registered",
+      });
+      
+      setSearchPerformed(true);
+      
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Unable to retrieve warranty information. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
 
   async function onSubmit(data: RmaFormValues) {
     try {
@@ -76,7 +123,7 @@ export default function RMA() {
         description: "Your return request has been submitted successfully. Our team will contact you shortly.",
       });
       
-      form.reset();
+      rmaForm.reset();
       setIsNewRmaDialogOpen(false);
     } catch (error) {
       toast({
@@ -138,7 +185,7 @@ export default function RMA() {
           <p className="text-neutral-600">Manage your return merchandise authorizations</p>
         </div>
         <div className="mt-4 md:mt-0">
-          <Button onClick={() => setIsNewRmaDialogOpen(true)}>
+          <Button onClick={() => setIsWarrantyCheckDialogOpen(true)}>
             <i className="ri-add-line mr-2"></i>
             <span>New RMA Request</span>
           </Button>
