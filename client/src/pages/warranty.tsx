@@ -192,8 +192,13 @@ export default function Warranty() {
                           <FormControl>
                             <Input placeholder="e.g. CC21XG45T" {...field} />
                           </FormControl>
-                          <Button type="submit" disabled={isSubmitting}>
-                            {isSubmitting ? "Checking..." : "Check"}
+                          <Button 
+                            type="submit" 
+                            disabled={isSubmitting}
+                            variant="outline"
+                            className="bg-white border-neutral-300 text-neutral-900 hover:bg-neutral-50 hover:border-neutral-400 hover:text-neutral-900"
+                          >
+                            {isSubmitting ? "Checking..." : "Check Warranty Status"}
                           </Button>
                         </div>
                         <FormDescription>
