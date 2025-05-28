@@ -129,9 +129,9 @@ export default function Dashboard() {
       <section className="mb-8">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold font-poppins">Recent Orders</h2>
-          <Link href="/orders" className="text-sm text-primary font-medium hover:underline">
-            View all orders
-          </Link>
+          <Button variant="outline" asChild className="bg-white border hover:bg-teal-600 hover:text-white hover:border-teal-600 transition-colors">
+            <Link href="/orders">View Your Orders</Link>
+          </Button>
         </div>
 
         {isLoadingOrders ? (
