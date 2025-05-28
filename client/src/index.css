@@ -56,3 +56,25 @@
     @apply font-sans antialiased bg-background text-foreground;
   }
 }
+
+@layer components {
+  /* Global button hover effects for consistent experience */
+  .button-hover-effect {
+    @apply transition-colors duration-200;
+  }
+  
+  /* Primary button variants */
+  .btn-primary-hover {
+    @apply bg-teal-600 hover:bg-teal-700 text-white transition-colors;
+  }
+  
+  /* White button variants with teal hover */
+  .btn-white-hover {
+    @apply bg-white hover:bg-teal-600 hover:text-white transition-colors;
+  }
+  
+  /* Outline button variants */
+  .btn-outline-hover {
+    @apply border hover:bg-teal-600 hover:text-white hover:border-teal-600 transition-colors;
+  }
+}

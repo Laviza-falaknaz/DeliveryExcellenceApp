@@ -11,6 +11,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Skeleton } from "@/components/ui/skeleton";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -46,7 +47,8 @@ const caseStudySchema = z.object({
   contactPhone: z.string().optional(),
   industryType: z.string().min(1, "Industry is required"),
   employeeCount: z.coerce.number().int().positive(),
-  testimonial: z.string().optional()
+  testimonial: z.string().optional(),
+  shareStory: z.boolean().default(false)
 });
 
 type CaseStudyFormValues = z.infer<typeof caseStudySchema>;
@@ -694,11 +696,31 @@ export default function CaseStudies() {
                 )}
               />
               
+              <FormField
+                control={form.control}
+                name="shareStory"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      <FormLabel>
+                        I'd like to share our story - please get in touch.
+                      </FormLabel>
+                    </div>
+                  </FormItem>
+                )}
+              />
+              
               <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
+                <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)} className="bg-white hover:bg-gray-100 transition-colors">
                   Cancel
                 </Button>
-                <Button type="submit">Submit</Button>
+                <Button type="submit" className="bg-teal-600 hover:bg-teal-700 text-white transition-colors">Submit</Button>
               </DialogFooter>
             </form>
           </Form>
