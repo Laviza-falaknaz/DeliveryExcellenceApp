@@ -143,7 +143,7 @@ export default function WaterProjects() {
                   </div>
                   <div className="flex justify-between text-sm">
                     <span>Water Provided</span>
-                    <span className="font-semibold">{formatEnvironmentalImpact(project.waterProvided, "liters")}</span>
+                    <span className="font-semibold">{formatEnvironmentalImpact(project.waterProvided, "litres")}</span>
                   </div>
                 </div>
               </CardContent>

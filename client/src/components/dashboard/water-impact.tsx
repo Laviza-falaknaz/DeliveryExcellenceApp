@@ -30,7 +30,7 @@ export default function WaterImpact() {
   const projectCount = waterProjects.length;
   const countries = [...new Set(waterProjects.map(project => project.location))];
   
-  // Calculate progress toward next milestone (e.g., 75% of the way to the next thousand liters)
+  // Calculate progress toward next milestone (e.g., 75% of the way to the next thousand litres)
   const currentWaterProvided = impact.waterProvided;
   const nextMilestone = Math.ceil(currentWaterProvided / 1000) * 1000;
   const previousMilestone = Math.floor(currentWaterProvided / 1000) * 1000;
@@ -89,10 +89,10 @@ export default function WaterImpact() {
               <span className="text-sm font-medium text-neutral-700">Water Provided</span>
             </div>
             <p className="text-2xl font-bold mt-2">
-              {formatEnvironmentalImpact(currentWaterProvided, "liters")}
+              {formatEnvironmentalImpact(currentWaterProvided, "litres")}
             </p>
             <p className="text-xs text-success mt-1">
-              +{formatEnvironmentalImpact(impact.waterProvided, "liters")} from your orders
+              +{formatEnvironmentalImpact(impact.waterProvided, "litres")} from your orders
             </p>
           </div>
 

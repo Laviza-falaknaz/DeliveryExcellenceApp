@@ -343,7 +343,7 @@ export default function ESGReport() {
               <div>
                 <p className="text-neutral-600 text-sm">Water Impact</p>
                 <h3 className="text-2xl font-bold mt-1">
-                  {formatEnvironmentalImpact(impact.totalImpact?.waterProvided || 0, "liters")}
+                  {formatEnvironmentalImpact(impact.totalImpact?.waterProvided || 0, "litres")}
                 </h3>
                 <p className="text-xs text-blue-600 mt-1">
                   Providing clean water to {impact.totalImpact?.familiesHelped || 0} people

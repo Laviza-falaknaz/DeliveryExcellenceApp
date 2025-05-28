@@ -97,7 +97,7 @@ export default function Dashboard() {
             <ImpactCard
               title="Clean Water Provided"
               value={impact.waterProvided}
-              unit="liters"
+              unit="litres"
               icon="ri-water-flash-line"
               iconColor="text-secondary"
               iconBgColor="bg-secondary/10"
