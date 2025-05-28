@@ -63,7 +63,7 @@ export default function WaterProjects() {
                 <>
                   <div className="flex items-baseline mb-2">
                     <h3 className="text-3xl font-bold text-secondary">
-                      {formatEnvironmentalImpact(impact.waterProvided, "liters")}
+                      {formatEnvironmentalImpact(impact.waterProvided, "litres")}
                     </h3>
                     <span className="text-neutral-500 ml-2">of clean water provided</span>
                   </div>
@@ -77,7 +77,7 @@ export default function WaterProjects() {
                     </div>
                     <Progress value={progressValue} className="h-2" />
                     <p className="text-sm text-neutral-500">
-                      Just {formatEnvironmentalImpact(25000 - (impact.waterProvided || 0), "liters")} more to fund a new water point
+                      Just {formatEnvironmentalImpact(25000 - (impact.waterProvided || 0), "litres")} more to fund a new water point
                     </p>
                   </div>
                 </>

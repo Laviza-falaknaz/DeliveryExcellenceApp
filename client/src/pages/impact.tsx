@@ -121,7 +121,7 @@ export default function Impact() {
                       Clean Water Provided
                     </h3>
                     <p className="text-3xl font-bold mt-1">
-                      {formatEnvironmentalImpact(impact.waterProvided, "liters")}
+                      {formatEnvironmentalImpact(impact.waterProvided, "litres")}
                     </p>
                   </div>
                   <div className="h-12 w-12 rounded-full bg-secondary/10 flex items-center justify-center text-secondary">
@@ -320,7 +320,7 @@ export default function Impact() {
                   </li>
                   <li>
                     <span className="font-medium">Water:</span> Approximately
-                    190,000 liters of water used in new laptop production
+                    190,000 litres of water used in new laptop production
                   </li>
                   <li>
                     <span className="font-medium">E-waste:</span> Prevents
