@@ -52,7 +52,7 @@ export default function Sidebar() {
         <Link href="/">
           <a className="flex items-center">
             <img 
-              src="@assets/CC_Logo_Teal.png" 
+              src="/attached_assets/CC_Logo_Teal.png" 
               alt="Circular Computing" 
               className="h-8 w-auto"
             />

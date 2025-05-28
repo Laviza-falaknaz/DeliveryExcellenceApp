@@ -52,7 +52,7 @@ export default function MobileNav() {
             <SheetContent side="left" className="p-0">
               <div className="p-4 border-b border-neutral-200">
                 <img 
-                  src="@assets/CC_Logo_Teal.png" 
+                  src="/attached_assets/CC_Logo_Teal.png" 
                   alt="Circular Computing" 
                   className="h-8 w-auto"
                 />
@@ -188,7 +188,7 @@ export default function MobileNav() {
             </SheetContent>
           </Sheet>
           <img 
-            src="@assets/CC_Logo_Teal.png" 
+            src="/attached_assets/CC_Logo_Teal.png" 
             alt="Circular Computing" 
             className="h-8 w-auto"
           />
