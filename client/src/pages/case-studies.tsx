@@ -287,407 +287,440 @@ export default function CaseStudies() {
       <section className="mb-8">
         <h2 className="text-lg font-semibold font-poppins mb-4">Featured Case Studies</h2>
         
-        <Tabs defaultValue="education">
-          <TabsList className="mb-4">
-            <TabsTrigger value="education">Education</TabsTrigger>
-            <TabsTrigger value="corporate">Corporate</TabsTrigger>
-            <TabsTrigger value="government">Government</TabsTrigger>
-          </TabsList>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           
-          <TabsContent value="education">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card>
-                <div className="h-48 overflow-hidden">
-                  <img
-                    src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&h=300"
-                    alt="University campus with sustainable technology"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <CardHeader>
-                  <CardTitle>Oxford University</CardTitle>
-                  <CardDescription>Higher Education</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-neutral-700 mb-4">
-                    Oxford University deployed 2,500 remanufactured laptops across their campus, saving over 750,000 kg of carbon emissions and providing clean water to 12,500 people in developing countries.
-                  </p>
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-neutral-500">Carbon Saved:</span>
-                      <span className="font-medium">750,000 kg</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-neutral-500">Water Impact:</span>
-                      <span className="font-medium">12,500 people helped</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-neutral-500">Cost Savings:</span>
-                      <span className="font-medium">£625,000</span>
-                    </div>
-                  </div>
-                </CardContent>
-                <CardFooter>
-                  <Button variant="outline" className="w-full" asChild>
-                    <a href="https://www.circularcomputing.com/case-studies/" target="_blank" rel="noreferrer">
-                      Read Full Case Study
-                    </a>
-                  </Button>
-                </CardFooter>
-              </Card>
-              
-              <Card>
-                <div className="h-48 overflow-hidden">
-                  <img
-                    src="https://images.unsplash.com/photo-1546410531-bb4caa6b424d?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&h=300"
-                    alt="School classroom with students using laptops"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <CardHeader>
-                  <CardTitle>Brighton College</CardTitle>
-                  <CardDescription>K-12 Education</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-neutral-700 mb-4">
-                    Brighton College replaced 1,200 computers with remanufactured models, reducing their carbon footprint while educating students about sustainability and global water scarcity issues.
-                  </p>
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-neutral-500">Carbon Saved:</span>
-                      <span className="font-medium">379,200 kg</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-neutral-500">Water Impact:</span>
-                      <span className="font-medium">6,000 people helped</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-neutral-500">Cost Savings:</span>
-                      <span className="font-medium">£300,000</span>
-                    </div>
-                  </div>
-                </CardContent>
-                <CardFooter>
-                  <Button variant="outline" className="w-full" asChild>
-                    <a href="https://www.circularcomputing.com/case-studies/" target="_blank" rel="noreferrer">
-                      Read Full Case Study
-                    </a>
-                  </Button>
-                </CardFooter>
-              </Card>
+          {/* WWF Case Study */}
+          <Card>
+            <div className="h-48 overflow-hidden">
+              <img
+                src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&h=300"
+                alt="Environmental conservation and wildlife"
+                className="w-full h-full object-cover"
+              />
             </div>
-          </TabsContent>
-          
-          <TabsContent value="corporate">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card>
-                <div className="h-48 overflow-hidden">
-                  <img
-                    src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&h=300"
-                    alt="Corporate office with sustainable technology"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <CardHeader>
-                  <CardTitle>Deloitte UK</CardTitle>
-                  <CardDescription>Professional Services</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-neutral-700 mb-4">
-                    Deloitte UK implemented a sustainable IT policy and deployed 5,000 remanufactured laptops, aligning with their carbon reduction goals and corporate social responsibility initiatives.
-                  </p>
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-neutral-500">Carbon Saved:</span>
-                      <span className="font-medium">1.58 million kg</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-neutral-500">Water Impact:</span>
-                      <span className="font-medium">25,000 people helped</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-neutral-500">Cost Savings:</span>
-                      <span className="font-medium">£1.25 million</span>
-                    </div>
-                  </div>
-                </CardContent>
-                <CardFooter>
-                  <Button variant="outline" className="w-full" asChild>
-                    <a href="https://www.circularcomputing.com/case-studies/" target="_blank" rel="noreferrer">
-                      Read Full Case Study
-                    </a>
-                  </Button>
-                </CardFooter>
-              </Card>
-              
-              <Card>
-                <div className="h-48 overflow-hidden">
-                  <img
-                    src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&h=300"
-                    alt="Eco-friendly office space"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <CardHeader>
-                  <CardTitle>Patagonia Europe</CardTitle>
-                  <CardDescription>Retail & Apparel</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-neutral-700 mb-4">
-                    Patagonia extended their environmental commitment to IT equipment by choosing remanufactured laptops for all European offices, reducing e-waste and supporting clean water initiatives.
-                  </p>
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-neutral-500">Carbon Saved:</span>
-                      <span className="font-medium">284,400 kg</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-neutral-500">Water Impact:</span>
-                      <span className="font-medium">4,500 people helped</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-neutral-500">Cost Savings:</span>
-                      <span className="font-medium">€225,000</span>
-                    </div>
-                  </div>
-                </CardContent>
-                <CardFooter>
-                  <Button variant="outline" className="w-full" asChild>
-                    <a href="https://www.circularcomputing.com/case-studies/" target="_blank" rel="noreferrer">
-                      Read Full Case Study
-                    </a>
-                  </Button>
-                </CardFooter>
-              </Card>
+            <CardHeader>
+              <CardTitle>WWF</CardTitle>
+              <CardDescription>Environmental Conservation</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-neutral-700 mb-4">
+                WWF chose remanufactured technology to align with their mission of environmental conservation and sustainable practices.
+              </p>
+            </CardContent>
+            <CardFooter>
+              <Button variant="outline" className="w-full bg-white hover:bg-teal-600 hover:text-white transition-colors" asChild>
+                <a href="https://circularcomputing.com/case-studies/wwf/" target="_blank" rel="noreferrer">
+                  Read Full Case Study
+                </a>
+              </Button>
+            </CardFooter>
+          </Card>
+
+          {/* Royal Mint Case Study */}
+          <Card>
+            <div className="h-48 overflow-hidden">
+              <img
+                src="https://images.unsplash.com/photo-1541872703-74c5e44368f9?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&h=300"
+                alt="Government and financial institution"
+                className="w-full h-full object-cover"
+              />
             </div>
-          </TabsContent>
-          
-          <TabsContent value="government">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card>
-                <div className="h-48 overflow-hidden">
-                  <img
-                    src="https://images.unsplash.com/photo-1541872703-74c5e44368f9?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&h=300"
-                    alt="Government office building"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <CardHeader>
-                  <CardTitle>Bristol City Council</CardTitle>
-                  <CardDescription>Local Government</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-neutral-700 mb-4">
-                    Bristol City Council deployed 3,000 remanufactured laptops as part of their carbon neutrality goal, setting an example for sustainable procurement in the public sector.
-                  </p>
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-neutral-500">Carbon Saved:</span>
-                      <span className="font-medium">948,000 kg</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-neutral-500">Water Impact:</span>
-                      <span className="font-medium">15,000 people helped</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-neutral-500">Cost Savings:</span>
-                      <span className="font-medium">£750,000</span>
-                    </div>
-                  </div>
-                </CardContent>
-                <CardFooter>
-                  <Button variant="outline" className="w-full" asChild>
-                    <a href="https://www.circularcomputing.com/case-studies/" target="_blank" rel="noreferrer">
-                      Read Full Case Study
-                    </a>
-                  </Button>
-                </CardFooter>
-              </Card>
-              
-              <Card>
-                <div className="h-48 overflow-hidden">
-                  <img
-                    src="https://images.unsplash.com/photo-1589829545856-d10d557cf95f?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&h=300"
-                    alt="Government sustainable technology initiative"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <CardHeader>
-                  <CardTitle>NHS Scotland</CardTitle>
-                  <CardDescription>Healthcare</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-neutral-700 mb-4">
-                    NHS Scotland implemented a sustainable IT strategy with 8,000 remanufactured laptops, significantly reducing both their environmental impact and technology costs.
-                  </p>
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-neutral-500">Carbon Saved:</span>
-                      <span className="font-medium">2.53 million kg</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-neutral-500">Water Impact:</span>
-                      <span className="font-medium">40,000 people helped</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-neutral-500">Cost Savings:</span>
-                      <span className="font-medium">£2 million</span>
-                    </div>
-                  </div>
-                </CardContent>
-                <CardFooter>
-                  <Button variant="outline" className="w-full" asChild>
-                    <a href="https://www.circularcomputing.com/case-studies/" target="_blank" rel="noreferrer">
-                      Read Full Case Study
-                    </a>
-                  </Button>
-                </CardFooter>
-              </Card>
+            <CardHeader>
+              <CardTitle>Royal Mint</CardTitle>
+              <CardDescription>Government & Financial Services</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-neutral-700 mb-4">
+                The Royal Mint implemented remanufactured technology solutions as part of their commitment to sustainable operations.
+              </p>
+            </CardContent>
+            <CardFooter>
+              <Button variant="outline" className="w-full bg-white hover:bg-teal-600 hover:text-white transition-colors" asChild>
+                <a href="https://circularcomputing.com/case-studies/royal-mint/" target="_blank" rel="noreferrer">
+                  Read Full Case Study
+                </a>
+              </Button>
+            </CardFooter>
+          </Card>
+
+          {/* East England Ambulance Service Case Study */}
+          <Card>
+            <div className="h-48 overflow-hidden">
+              <img
+                src="https://images.unsplash.com/photo-1589829545856-d10d557cf95f?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&h=300"
+                alt="Healthcare emergency services"
+                className="w-full h-full object-cover"
+              />
             </div>
-          </TabsContent>
-        </Tabs>
+            <CardHeader>
+              <CardTitle>East England Ambulance Service</CardTitle>
+              <CardDescription>Healthcare & Emergency Services</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-neutral-700 mb-4">
+                East England Ambulance Service adopted remanufactured technology to support their critical healthcare operations whilst reducing environmental impact.
+              </p>
+            </CardContent>
+            <CardFooter>
+              <Button variant="outline" className="w-full bg-white hover:bg-teal-600 hover:text-white transition-colors" asChild>
+                <a href="https://circularcomputing.com/case-studies/east-england-ambulance-service/" target="_blank" rel="noreferrer">
+                  Read Full Case Study
+                </a>
+              </Button>
+            </CardFooter>
+          </Card>
+
+          {/* Chichester High School Case Study */}
+          <Card>
+            <div className="h-48 overflow-hidden">
+              <img
+                src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&h=300"
+                alt="Educational technology in schools"
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <CardHeader>
+              <CardTitle>Chichester High School</CardTitle>
+              <CardDescription>Education</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-neutral-700 mb-4">
+                Chichester High School integrated remanufactured laptops to provide students with quality technology whilst teaching sustainability.
+              </p>
+            </CardContent>
+            <CardFooter>
+              <Button variant="outline" className="w-full bg-white hover:bg-teal-600 hover:text-white transition-colors" asChild>
+                <a href="https://circularcomputing.com/case-studies/chichester-high-school/" target="_blank" rel="noreferrer">
+                  Read Full Case Study
+                </a>
+              </Button>
+            </CardFooter>
+          </Card>
+
+          {/* The Pensions Authority Case Study */}
+          <Card>
+            <div className="h-48 overflow-hidden">
+              <img
+                src="https://images.unsplash.com/photo-1560472354-b33ff0c44a43?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&h=300"
+                alt="Professional services office environment"
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <CardHeader>
+              <CardTitle>The Pensions Authority</CardTitle>
+              <CardDescription>Government & Public Services</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-neutral-700 mb-4">
+                The Pensions Authority chose remanufactured technology as part of their sustainable procurement strategy.
+              </p>
+            </CardContent>
+            <CardFooter>
+              <Button variant="outline" className="w-full bg-white hover:bg-teal-600 hover:text-white transition-colors" asChild>
+                <a href="https://circularcomputing.com/case-studies/the-pensions-authority/" target="_blank" rel="noreferrer">
+                  Read Full Case Study
+                </a>
+              </Button>
+            </CardFooter>
+          </Card>
+
+          {/* London Borough of Barking and Dagenham Case Study */}
+          <Card>
+            <div className="h-48 overflow-hidden">
+              <img
+                src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&h=300"
+                alt="Local government offices"
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <CardHeader>
+              <CardTitle>London Borough of Barking and Dagenham</CardTitle>
+              <CardDescription>Local Government</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-neutral-700 mb-4">
+                London Borough of Barking and Dagenham implemented remanufactured technology solutions to support their environmental goals.
+              </p>
+            </CardContent>
+            <CardFooter>
+              <Button variant="outline" className="w-full bg-white hover:bg-teal-600 hover:text-white transition-colors" asChild>
+                <a href="https://circularcomputing.com/case-studies/london-borough-of-barking-and-dagenham/" target="_blank" rel="noreferrer">
+                  Read Full Case Study
+                </a>
+              </Button>
+            </CardFooter>
+          </Card>
+
+          {/* Together for Mental Wellbeing Case Study */}
+          <Card>
+            <div className="h-48 overflow-hidden">
+              <img
+                src="https://images.unsplash.com/photo-1559757148-5c350d0d3c56?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&h=300"
+                alt="Mental health and wellbeing services"
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <CardHeader>
+              <CardTitle>Together for Mental Wellbeing</CardTitle>
+              <CardDescription>Mental Health & Charity</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-neutral-700 mb-4">
+                Together for Mental Wellbeing chose remanufactured laptops to support their mission whilst reducing costs and environmental impact.
+              </p>
+            </CardContent>
+            <CardFooter>
+              <Button variant="outline" className="w-full bg-white hover:bg-teal-600 hover:text-white transition-colors" asChild>
+                <a href="https://circularcomputing.com/case-studies/together-for-mental-wellbeing/" target="_blank" rel="noreferrer">
+                  Read Full Case Study
+                </a>
+              </Button>
+            </CardFooter>
+          </Card>
+
+          {/* Google Cloud and Formula E Hackathon Case Study */}
+          <Card>
+            <div className="h-48 overflow-hidden">
+              <img
+                src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&h=300"
+                alt="Technology hackathon and innovation"
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <CardHeader>
+              <CardTitle>Google Cloud and Formula E Hackathon</CardTitle>
+              <CardDescription>Technology & Innovation</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-neutral-700 mb-4">
+                Google Cloud and Formula E Hackathon showcased sustainable technology practices by using remanufactured equipment for their innovation event.
+              </p>
+            </CardContent>
+            <CardFooter>
+              <Button variant="outline" className="w-full bg-white hover:bg-teal-600 hover:text-white transition-colors" asChild>
+                <a href="https://circularcomputing.com/case-studies/google-cloud-and-formula-e-hackathon/" target="_blank" rel="noreferrer">
+                  Read Full Case Study
+                </a>
+              </Button>
+            </CardFooter>
+          </Card>
+
+          {/* Kent County Council Case Study */}
+          <Card>
+            <div className="h-48 overflow-hidden">
+              <img
+                src="https://images.unsplash.com/photo-1494412651409-8963ce7935a7?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&h=300"
+                alt="County council offices and public services"
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <CardHeader>
+              <CardTitle>Kent County Council</CardTitle>
+              <CardDescription>Local Government</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-neutral-700 mb-4">
+                Kent County Council adopted remanufactured technology as part of their sustainable procurement strategy and commitment to environmental responsibility.
+              </p>
+            </CardContent>
+            <CardFooter>
+              <Button variant="outline" className="w-full bg-white hover:bg-teal-600 hover:text-white transition-colors" asChild>
+                <a href="https://circularcomputing.com/case-studies/kent-county_council/" target="_blank" rel="noreferrer">
+                  Read Full Case Study
+                </a>
+              </Button>
+            </CardFooter>
+          </Card>
+
+          {/* Kings College Hospital Foundation Case Study */}
+          <Card>
+            <div className="h-48 overflow-hidden">
+              <img
+                src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&h=300"
+                alt="Hospital and healthcare foundation"
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <CardHeader>
+              <CardTitle>Kings College Hospital Foundation</CardTitle>
+              <CardDescription>Healthcare Foundation</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-neutral-700 mb-4">
+                Kings College Hospital Foundation integrated remanufactured technology to support their healthcare mission whilst reducing environmental impact.
+              </p>
+            </CardContent>
+            <CardFooter>
+              <Button variant="outline" className="w-full bg-white hover:bg-teal-600 hover:text-white transition-colors" asChild>
+                <a href="https://circularcomputing.com/case-studies/kings-college-hospital-foundation/" target="_blank" rel="noreferrer">
+                  Read Full Case Study
+                </a>
+              </Button>
+            </CardFooter>
+          </Card>
+
+          {/* Balfour Beatty Case Study */}
+          <Card>
+            <div className="h-48 overflow-hidden">
+              <img
+                src="https://images.unsplash.com/photo-1504307651254-35680f356dfd?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&h=300"
+                alt="Construction and infrastructure company"
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <CardHeader>
+              <CardTitle>Balfour Beatty</CardTitle>
+              <CardDescription>Construction & Infrastructure</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-neutral-700 mb-4">
+                Balfour Beatty chose remanufactured technology solutions to align with their sustainability goals and reduce environmental impact across their operations.
+              </p>
+            </CardContent>
+            <CardFooter>
+              <Button variant="outline" className="w-full bg-white hover:bg-teal-600 hover:text-white transition-colors" asChild>
+                <a href="https://circularcomputing.com/case-studies/balfour-beatty/" target="_blank" rel="noreferrer">
+                  Read Full Case Study
+                </a>
+              </Button>
+            </CardFooter>
+          </Card>
+        </div>
       </section>
 
-
-
-      {/* Case Study Dialog */}
+      {/* Case Study Form Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[525px]">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Join Our Case Study Program</DialogTitle>
+            <DialogTitle>Share Your Impact Story</DialogTitle>
             <DialogDescription>
-              Share your sustainable success story to inspire other organizations. Fill out the details below to get started.
+              Tell us about your organisation's sustainability journey with remanufactured technology. Your story could inspire others to make a positive environmental impact.
             </DialogDescription>
           </DialogHeader>
-          
+
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <FormField
                 control={form.control}
-                name="companyName"
+                name="organisationName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Company Name</FormLabel>
+                    <FormLabel>Organisation Name *</FormLabel>
                     <FormControl>
-                      <Input placeholder="Your company name" {...field} />
+                      <Input placeholder="Your organisation name" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={form.control}
                 name="contactName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Contact Name</FormLabel>
+                    <FormLabel>Your Name *</FormLabel>
                     <FormControl>
-                      <Input placeholder="Your name" {...field} />
+                      <Input placeholder="Your full name" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="contactEmail"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email</FormLabel>
-                      <FormControl>
-                        <Input placeholder="your.email@example.com" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="contactPhone"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Phone (optional)</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Your phone number" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="industryType"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Industry</FormLabel>
-                      <Select 
-                        onValueChange={field.onChange} 
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select industry" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {industries.map(industry => (
-                            <SelectItem key={industry} value={industry}>
-                              {industry}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="employeeCount"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Company Size</FormLabel>
-                      <Select 
-                        onValueChange={(value) => field.onChange(parseInt(value))} 
-                        defaultValue={field.value.toString()}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select company size" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {employeeCounts.map((size, index) => (
-                            <SelectItem key={size} value={(index + 1).toString()}>
-                              {size}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-              
+
               <FormField
                 control={form.control}
-                name="testimonial"
+                name="contactEmail"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Brief Testimonial (optional)</FormLabel>
+                    <FormLabel>Email Address *</FormLabel>
+                    <FormControl>
+                      <Input type="email" placeholder="your.email@organisation.com" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="industry"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Industry Sector *</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select your industry" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="education">Education</SelectItem>
+                        <SelectItem value="healthcare">Healthcare</SelectItem>
+                        <SelectItem value="government">Government</SelectItem>
+                        <SelectItem value="finance">Finance</SelectItem>
+                        <SelectItem value="technology">Technology</SelectItem>
+                        <SelectItem value="nonprofit">Non-profit</SelectItem>
+                        <SelectItem value="manufacturing">Manufacturing</SelectItem>
+                        <SelectItem value="retail">Retail</SelectItem>
+                        <SelectItem value="other">Other</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="numberOfDevices"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Number of Devices Deployed *</FormLabel>
+                    <FormControl>
+                      <Input 
+                        type="number" 
+                        placeholder="e.g., 500" 
+                        {...field}
+                        onChange={(e) => field.onChange(Number(e.target.value))}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="impactStory"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Your Impact Story *</FormLabel>
                     <FormControl>
                       <Textarea 
-                        placeholder="Share your experience with our remanufactured laptops"
-                        className="min-h-[100px]"
+                        placeholder="Tell us about your experience with remanufactured technology. What motivated your decision? What impact have you seen? How has it supported your sustainability goals?"
+                        className="min-h-[120px]"
+                        {...field} 
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Share details about your sustainability goals, environmental impact, cost savings, or any other benefits you've experienced.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="challengesOvercome"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Challenges Overcome</FormLabel>
+                    <FormControl>
+                      <Textarea 
+                        placeholder="Were there any initial concerns or challenges? How were they addressed?"
+                        className="min-h-[80px]"
                         {...field} 
                       />
                     </FormControl>
@@ -695,10 +728,64 @@ export default function CaseStudies() {
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={form.control}
-                name="shareStory"
+                name="keyBenefits"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Key Benefits Achieved</FormLabel>
+                    <FormControl>
+                      <Textarea 
+                        placeholder="What have been the main benefits? (e.g., cost savings, environmental impact, performance, reliability)"
+                        className="min-h-[80px]"
+                        {...field} 
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="futureGoals"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Future Sustainability Goals</FormLabel>
+                    <FormControl>
+                      <Textarea 
+                        placeholder="What are your organisation's future sustainability plans or goals?"
+                        className="min-h-[80px]"
+                        {...field} 
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="additionalComments"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Additional Comments</FormLabel>
+                    <FormControl>
+                      <Textarea 
+                        placeholder="Any additional information you'd like to share?"
+                        className="min-h-[80px]"
+                        {...field} 
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="allowContact"
                 render={({ field }) => (
                   <FormItem className="flex flex-row items-start space-x-3 space-y-0">
                     <FormControl>
@@ -709,19 +796,33 @@ export default function CaseStudies() {
                     </FormControl>
                     <div className="space-y-1 leading-none">
                       <FormLabel>
-                        I'd like to share our story - please get in touch.
+                        I'd like to share our story - please get in touch
                       </FormLabel>
+                      <FormDescription>
+                        We may contact you to feature your story on our website and in our marketing materials.
+                      </FormDescription>
                     </div>
                   </FormItem>
                 )}
               />
-              
-              <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)} className="bg-white hover:bg-gray-100 transition-colors">
+
+              <div className="flex gap-3 pt-4">
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={() => setIsDialogOpen(false)}
+                  className="flex-1"
+                >
                   Cancel
                 </Button>
-                <Button type="submit" className="bg-teal-600 hover:bg-teal-700 text-white transition-colors">Submit</Button>
-              </DialogFooter>
+                <Button 
+                  type="submit" 
+                  disabled={submitMutation.isPending}
+                  className="flex-1 bg-white hover:bg-teal-600 hover:text-white transition-colors"
+                >
+                  {submitMutation.isPending ? "Submitting..." : "Submit Case Study"}
+                </Button>
+              </div>
             </form>
           </Form>
         </DialogContent>
