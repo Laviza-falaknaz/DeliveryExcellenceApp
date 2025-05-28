@@ -546,38 +546,7 @@ export default function CaseStudies() {
         </Tabs>
       </section>
 
-      {/* CTA Section */}
-      <section>
-        <Card className="bg-primary/5 border-primary/20">
-          <CardContent className="p-6">
-            <div className="flex flex-col md:flex-row items-center">
-              <div className="flex-1">
-                <h3 className="text-xl font-semibold text-primary mb-2">Ready to Make an Impact?</h3>
-                <p className="text-neutral-700 mb-4">
-                  Join these organizations in making a positive impact on the environment and communities worldwide. Start your sustainable IT journey with Circular Computing today.
-                </p>
-                <div className="flex flex-wrap gap-3">
-                  <Button asChild>
-                    <a href="/orders/new">Purchase Remanufactured Laptops</a>
-                  </Button>
-                  {!hasSubmitted && (
-                    <Button variant="outline" onClick={() => setIsDialogOpen(true)}>
-                      Share Your Story
-                    </Button>
-                  )}
-                </div>
-              </div>
-              <div className="mt-6 md:mt-0 md:ml-6 flex-shrink-0">
-                <img
-                  src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=300"
-                  alt="Sustainable laptop and office setup"
-                  className="rounded-lg shadow-sm"
-                />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </section>
+
 
       {/* Case Study Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
