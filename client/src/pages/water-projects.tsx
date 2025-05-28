@@ -285,38 +285,7 @@ export default function WaterProjects() {
         </Tabs>
       </div>
 
-      {/* CTA Section */}
-      <Card className="bg-secondary/5 border-secondary/20">
-        <CardContent className="p-6">
-          <div className="flex flex-col md:flex-row items-center">
-            <div className="flex-1">
-              <h3 className="text-xl font-semibold text-secondary mb-2">
-                Together, We Can Make a Difference
-              </h3>
-              <p className="text-neutral-700 mb-4">
-                Every remanufactured laptop you purchase helps provide clean water to communities in need while also reducing environmental impact. It's a win-win for people and the planet.
-              </p>
-              <div className="flex flex-wrap gap-3">
-                <Button asChild>
-                  <a href="/orders/new">Purchase Laptops</a>
-                </Button>
-                <Button variant="outline" className="border-secondary text-secondary" asChild>
-                  <a href="https://www.charitywater.org/donate" target="_blank" rel="noreferrer">
-                    Donate Directly
-                  </a>
-                </Button>
-              </div>
-            </div>
-            <div className="mt-6 md:mt-0 md:ml-6 flex-shrink-0">
-              <img
-                src="https://circularcomputing.com/wp-content/uploads/2023/10/charity-water-hands-1024x683.jpg"
-                alt="Hands receiving clean water - charity: water partnership"
-                className="rounded-lg shadow-sm max-w-[300px] h-auto"
-              />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+
     </div>
   );
 }
