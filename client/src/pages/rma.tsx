@@ -224,7 +224,7 @@ export default function RMA() {
                 Our circular process ensures that returned laptops are properly remanufactured or recycled.
               </p>
               <Button variant="outline" asChild>
-                <a href="https://www.circularcomputing.com/sustainability/" target="_blank" rel="noreferrer">
+                <a href="https://circularcomputing.com/sustainable-it/" target="_blank" rel="noreferrer">
                   Learn More
                 </a>
               </Button>
