@@ -196,7 +196,7 @@ export default function Warranty() {
                             type="submit" 
                             disabled={isSubmitting}
                             variant="outline"
-                            className="bg-white border-neutral-300 text-neutral-900 hover:bg-neutral-50 hover:border-neutral-400 hover:text-neutral-900"
+                            className="bg-white border-neutral-300 text-neutral-900 hover:bg-primary hover:border-primary hover:text-white transition-all duration-200"
                           >
                             {isSubmitting ? "Checking..." : "Check Warranty Status"}
                           </Button>
