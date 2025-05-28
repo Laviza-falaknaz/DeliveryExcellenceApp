@@ -205,7 +205,7 @@ export default function RMA() {
                 First verify your warranty status, then submit an RMA request for your return.
               </p>
               <Button variant="outline" asChild>
-                <a href="https://my-warranty.com/troubleshoot/" target="_blank" rel="noreferrer">
+                <a href="https://circularcomputing.com/warranty/uk/" target="_blank" rel="noreferrer">
                   View Return Policy
                 </a>
               </Button>
