@@ -27,7 +27,7 @@ export default function WaterProjects() {
             Projects by charity: water
           </h1>
           <p className="text-neutral-600">
-            See how your laptop purchases help provide clean water to communities in need
+            See how your laptop purchases help provide clean water to communities in need.
           </p>
         </div>
         <div className="mt-4 md:mt-0 flex flex-wrap gap-4">
