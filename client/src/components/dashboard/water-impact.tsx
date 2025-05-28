@@ -54,19 +54,24 @@ export default function WaterImpact() {
         </div>
 
         {featuredProject && (
-          <div className="mt-4 relative overflow-hidden rounded-lg">
+          <a 
+            href="https://circularcomputing.com/sustainability-projects/" 
+            target="_blank" 
+            rel="noreferrer"
+            className="block mt-4 relative overflow-hidden rounded-lg hover:opacity-90 transition-opacity"
+          >
             <img
-              src={featuredProject.imageUrl}
-              alt={featuredProject.name}
+              src="https://circularcomputing.com/wp-content/uploads/2023/10/charity-water-partnership-1024x576.jpg"
+              alt="Charity Water Partnership - Circular Computing"
               className="w-full h-48 object-cover"
             />
             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent text-white p-4">
-              <h4 className="font-medium">{featuredProject.name}</h4>
+              <h4 className="font-medium">charity: water Partnership</h4>
               <p className="text-sm text-white/80">
-                Your contribution is helping {featuredProject.peopleImpacted} families access clean water
+                Your purchase helps fund clean water projects in developing countries
               </p>
             </div>
-          </div>
+          </a>
         )}
 
         <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
