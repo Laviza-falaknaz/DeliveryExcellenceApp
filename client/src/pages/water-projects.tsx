@@ -116,7 +116,7 @@ export default function WaterProjects() {
       </Card>
 
       {/* Water Project Gallery */}
-      <h2 className="text-xl font-semibold text-neutral-900 mb-4">Our Water Projects</h2>
+      <h2 className="text-xl font-semibold text-neutral-900 mb-4">Projects by charity: water</h2>
       
       {isLoadingProjects ? (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
