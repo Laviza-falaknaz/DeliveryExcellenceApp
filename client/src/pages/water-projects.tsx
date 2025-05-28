@@ -302,9 +302,9 @@ export default function WaterProjects() {
             </div>
             <div className="mt-6 md:mt-0 md:ml-6 flex-shrink-0">
               <img
-                src="https://images.unsplash.com/photo-1551525580-01f0d1a8b648?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=300"
-                alt="Child smiling with clean water"
-                className="rounded-lg shadow-sm"
+                src="https://circularcomputing.com/wp-content/uploads/2023/10/charity-water-hands-1024x683.jpg"
+                alt="Hands receiving clean water - charity: water partnership"
+                className="rounded-lg shadow-sm max-w-[300px] h-auto"
               />
             </div>
           </div>
