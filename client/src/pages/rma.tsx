@@ -186,9 +186,11 @@ export default function RMA() {
           <p className="text-neutral-600">Manage your return merchandise authorizations</p>
         </div>
         <div className="mt-4 md:mt-0">
-          <Button onClick={() => setIsWarrantyCheckDialogOpen(true)}>
-            <i className="ri-add-line mr-2"></i>
-            <span>New RMA Request</span>
+          <Button asChild>
+            <a href="https://my-warranty.com/troubleshoot/" target="_blank" rel="noreferrer">
+              <i className="ri-add-line mr-2"></i>
+              <span>New RMA Request</span>
+            </a>
           </Button>
         </div>
       </div>
@@ -360,8 +362,10 @@ export default function RMA() {
             <p className="text-neutral-500 mt-2">
               Need to return or exchange a product? Create an RMA request to start the process.
             </p>
-            <Button className="mt-4" onClick={() => setIsWarrantyCheckDialogOpen(true)}>
-              Create Your First RMA
+            <Button className="mt-4" asChild>
+              <a href="https://my-warranty.com/troubleshoot/" target="_blank" rel="noreferrer">
+                Create Your First RMA
+              </a>
             </Button>
           </div>
         )}
