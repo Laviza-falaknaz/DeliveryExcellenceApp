@@ -190,9 +190,9 @@ export default function WaterProjects() {
                   </div>
                   <div className="flex items-center justify-center">
                     <img
-                      src="https://images.unsplash.com/photo-1594935975218-a5234e20bc22?ixlib=rb-4.0.3&auto=format&fit=crop&w=450&h=300"
-                      alt="Children drinking clean water"
-                      className="rounded-lg"
+                      src="https://www.charitywater.org/assets/images/global/logos/charity-water-logo-main.svg"
+                      alt="charity: water logo"
+                      className="rounded-lg max-w-[300px] h-auto"
                     />
                   </div>
                 </div>
