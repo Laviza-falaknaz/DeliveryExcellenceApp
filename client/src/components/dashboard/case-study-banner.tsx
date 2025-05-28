@@ -109,10 +109,10 @@ export default function CaseStudyBanner() {
             </p>
 
             <div className="mt-4 flex flex-wrap gap-3">
-              <Button onClick={() => setIsDialogOpen(true)}>
+              <Button onClick={() => setIsDialogOpen(true)} className="bg-teal-600 hover:bg-teal-700 text-white transition-colors">
                 Join Case Study
               </Button>
-              <Button variant="outline" asChild>
+              <Button variant="outline" asChild className="bg-white border hover:bg-teal-600 hover:text-white hover:border-teal-600 transition-colors">
                 <a href="https://www.circularcomputing.com/case-studies/" target="_blank" rel="noreferrer">
                   Learn More
                 </a>
