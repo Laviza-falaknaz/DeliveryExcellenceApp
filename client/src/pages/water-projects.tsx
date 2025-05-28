@@ -24,7 +24,7 @@ export default function WaterProjects() {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold font-poppins text-neutral-900">
-            Water Projects
+            Projects by charity: water
           </h1>
           <p className="text-neutral-600">
             See how your laptop purchases help provide clean water to communities in need
