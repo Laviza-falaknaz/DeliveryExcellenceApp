@@ -141,7 +141,11 @@ export default function CaseStudies() {
         </div>
         <div className="mt-4 md:mt-0">
           {!hasSubmitted && (
-            <Button onClick={() => setIsDialogOpen(true)}>
+            <Button 
+              variant="outline" 
+              className="bg-white border-neutral-300 text-neutral-900 hover:bg-teal-600 hover:text-white hover:border-teal-600 transition-colors"
+              onClick={() => setIsDialogOpen(true)}
+            >
               <i className="ri-add-line mr-2"></i>
               <span>Join Case Study Program</span>
             </Button>
@@ -189,7 +193,11 @@ export default function CaseStudies() {
                   </div>
                 </div>
                 {!hasSubmitted && (
-                  <Button onClick={() => setIsDialogOpen(true)}>
+                  <Button 
+                    variant="outline" 
+                    className="bg-white border-neutral-300 text-neutral-900 hover:bg-teal-600 hover:text-white hover:border-teal-600 transition-colors"
+                    onClick={() => setIsDialogOpen(true)}
+                  >
                     Join Case Study Program
                   </Button>
                 )}
