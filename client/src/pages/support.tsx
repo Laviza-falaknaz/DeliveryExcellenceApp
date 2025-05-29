@@ -343,7 +343,7 @@ export default function Support() {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="">No related order</SelectItem>
+                        <SelectItem value="none">No related order</SelectItem>
                         {orders?.map((order) => (
                           <SelectItem key={order.id} value={order.id.toString()}>
                             #{order.orderNumber} ({formatDate(order.orderDate)})

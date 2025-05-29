@@ -26,7 +26,7 @@ export default function Orders() {
       const matchesSearch = searchTerm === "" || 
         order.orderNumber.toLowerCase().includes(searchTerm.toLowerCase());
       
-      const matchesStatus = statusFilter === null || order.status === statusFilter;
+      const matchesStatus = statusFilter === null || statusFilter === "all" || order.status === statusFilter;
       
       return matchesSearch && matchesStatus;
     });

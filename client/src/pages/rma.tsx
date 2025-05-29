@@ -569,7 +569,7 @@ export default function RMA() {
                             </SelectItem>
                           ))
                         ) : (
-                          <SelectItem value="" disabled>
+                          <SelectItem value="none" disabled>
                             No eligible orders found
                           </SelectItem>
                         )}
