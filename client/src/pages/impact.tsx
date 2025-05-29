@@ -418,7 +418,7 @@ export default function Impact() {
                   className="bg-white text-neutral-900 border-neutral-200 hover:bg-secondary hover:text-white hover:border-secondary transition-all duration-200"
                   asChild
                 >
-                  <Link href="/case-studies">Join Case Study Programme</Link>
+                  <Link href="/case-studies?share=true">Join Case Study Programme</Link>
                 </Button>
                 <Button variant="outline" asChild>
                   <Link href="/case-studies">Explore Case Studies</Link>
