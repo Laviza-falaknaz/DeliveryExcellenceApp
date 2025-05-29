@@ -325,7 +325,7 @@ export default function Warranty() {
                   <li>International Coverage Option for global organizations</li>
                 </ul>
                 <p className="text-neutral-700 mt-2">
-                  Contact your account manager or visit <a href="https://circularcomputing.com/contact/" target="_blank" rel="noreferrer" className="text-primary hover:underline">circularcomputing.com/contact/</a> to learn more.
+                  Contact your account manager or visit <a href="https://circularcomputing.com/warranty/" target="_blank" rel="noreferrer" className="text-primary hover:underline">circularcomputing.com/warranty/</a> to learn more.
                 </p>
               </div>
               
