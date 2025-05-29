@@ -427,8 +427,8 @@ export default function Impact() {
             </div>
             <div className="mt-6 md:mt-0 md:ml-6 flex-shrink-0">
               <img
-                src="https://images.unsplash.com/photo-1616077169586-7e36212c6e83?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=300"
-                alt="Eco-friendly technology"
+                src="/attached_assets/CC.png"
+                alt="Circular Computing remanufactured laptop"
                 className="rounded-lg shadow-sm"
               />
             </div>
