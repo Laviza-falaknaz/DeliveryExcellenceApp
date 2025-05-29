@@ -157,9 +157,9 @@ export default function Support() {
                 Browse our knowledge base for answers to common questions.
               </p>
               <Button variant="outline" asChild>
-                <a href="https://www.circularcomputing.com/faqs/" target="_blank" rel="noreferrer">
+                <Link href="/warranty">
                   View FAQs
-                </a>
+                </Link>
               </Button>
             </div>
           </CardContent>
