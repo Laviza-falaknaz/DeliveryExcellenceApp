@@ -451,63 +451,8 @@ export default function Warranty() {
 
             </div>
             
-            {/* Knowledge Base Resources and Troubleshooting Request */}
+            {/* Troubleshooting Request */}
             <div className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Knowledge Base Resources</CardTitle>
-                  <CardDescription>
-                    Explore our technical documentation
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="rounded-md border">
-                    <div className="flex p-4">
-                      <div className="mr-4 flex-shrink-0 self-start">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
-                      </div>
-                      <div>
-                        <h4 className="font-medium">Official Manuals</h4>
-                        <p className="text-sm text-neutral-600 mb-2">Access detailed guides for your specific model</p>
-                        <a href="https://my-warranty.com/kbtopic/manuals-downloads/" target="_blank" rel="noreferrer" className="text-sm text-primary hover:underline inline-flex items-center">
-                          <span>Browse manuals</span>
-                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-1"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
-                        </a>
-                      </div>
-                    </div>
-                    <div className="border-t"></div>
-                    <div className="flex p-4">
-                      <div className="mr-4 flex-shrink-0 self-start">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-secondary"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
-                      </div>
-                      <div>
-                        <h4 className="font-medium">FAQs</h4>
-                        <p className="text-sm text-neutral-600 mb-2">Find answers to commonly asked questions</p>
-                        <a href="https://my-warranty.com/faqs/" target="_blank" rel="noreferrer" className="text-sm text-secondary hover:underline inline-flex items-center">
-                          <span>View FAQs</span>
-                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-1"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
-                        </a>
-                      </div>
-                    </div>
-                    <div className="border-t"></div>
-                    <div className="flex p-4">
-                      <div className="mr-4 flex-shrink-0 self-start">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-accent"><path d="M18 3a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3H6a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3h12a3 3 0 0 0 3-3 3 3 0 0 0-3-3z"></path></svg>
-                      </div>
-                      <div>
-                        <h4 className="font-medium">Video Tutorials</h4>
-                        <p className="text-sm text-neutral-600 mb-2">Step-by-step video guides for common procedures</p>
-                        <a href="https://my-warranty.com/videos/" target="_blank" rel="noreferrer" className="text-sm text-accent hover:underline inline-flex items-center">
-                          <span>Watch tutorials</span>
-                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-1"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-                  
-
-                </CardContent>
-              </Card>
               
               <Card>
                 <CardHeader>
