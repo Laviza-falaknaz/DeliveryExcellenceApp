@@ -100,40 +100,39 @@ export default function WaterProjects() {
               >
                 <svg width="250" height="250" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
                   {/* Background circle */}
-                  <circle cx="100" cy="100" r="95" fill="#E3F2FD" stroke="#0288D1" strokeWidth="2" />
+                  <circle cx="100" cy="100" r="95" fill="#FFF9C4" stroke="#F57F17" strokeWidth="2" />
                   
-                  {/* Water well structure */}
-                  <rect x="75" y="120" width="50" height="60" fill="#8D6E63" stroke="#5D4037" strokeWidth="2" rx="3" />
+                  {/* Jerry can main body */}
+                  <path d="M60 70 L60 150 Q60 160, 70 160 L130 160 Q140 160, 140 150 L140 70 Q140 60, 130 60 L70 60 Q60 60, 60 70 Z" fill="#FBC02D" stroke="#F57F17" strokeWidth="2" />
                   
-                  {/* Well opening */}
-                  <circle cx="100" cy="125" r="15" fill="#1976D2" stroke="#0D47A1" strokeWidth="2" />
+                  {/* Jerry can spout/neck */}
+                  <rect x="120" y="50" width="25" height="20" fill="#FBC02D" stroke="#F57F17" strokeWidth="2" rx="3" />
                   
-                  {/* Hand pump */}
-                  <rect x="95" y="100" width="10" height="25" fill="#424242" rx="2" />
-                  <circle cx="100" cy="105" r="6" fill="#616161" stroke="#424242" strokeWidth="1" />
+                  {/* Jerry can cap */}
+                  <circle cx="132.5" cy="55" r="8" fill="#F57F17" stroke="#E65100" strokeWidth="2" />
+                  <circle cx="132.5" cy="55" r="4" fill="#FF8F00" />
                   
-                  {/* Pump handle */}
-                  <rect x="85" y="102" width="30" height="6" fill="#424242" rx="3" />
+                  {/* Handle */}
+                  <path d="M50 80 Q45 85, 45 95 Q45 105, 50 110" stroke="#F57F17" strokeWidth="4" fill="none" strokeLinecap="round" />
+                  <rect x="48" y="85" width="12" height="20" fill="#FBC02D" stroke="#F57F17" strokeWidth="2" rx="2" />
                   
-                  {/* Water drops */}
-                  <path d="M115 130 C115 125, 120 125, 120 130 C120 135, 115 135, 115 130 Z" fill="#2196F3" />
-                  <path d="M125 135 C125 130, 130 130, 130 135 C130 140, 125 140, 125 135 Z" fill="#2196F3" />
-                  <path d="M110 140 C110 135, 115 135, 115 140 C115 145, 110 145, 110 140 Z" fill="#2196F3" />
+                  {/* Water level inside jerry can */}
+                  <path d="M65 75 L65 145 Q65 155, 75 155 L125 155 Q135 155, 135 145 L135 75 Z" fill="#2196F3" fillOpacity="0.7" />
                   
-                  {/* Bucket */}
-                  <ellipse cx="135" cy="160" rx="12" ry="8" fill="#616161" stroke="#424242" strokeWidth="2" />
-                  <rect x="123" y="155" width="24" height="10" fill="#757575" stroke="#424242" strokeWidth="2" rx="2" />
+                  {/* Water surface ripples */}
+                  <path d="M70 80 Q85 75, 100 80 Q115 85, 130 80" stroke="#1976D2" strokeWidth="2" fill="none" strokeLinecap="round" />
+                  <path d="M70 85 Q85 80, 100 85 Q115 90, 130 85" stroke="#1976D2" strokeWidth="1" fill="none" strokeLinecap="round" />
                   
-                  {/* Bucket handle */}
-                  <path d="M125 155 Q135 145, 145 155" stroke="#424242" strokeWidth="2" fill="none" />
+                  {/* Jerry can ridges/details */}
+                  <line x1="75" y1="70" x2="125" y2="70" stroke="#F57F17" strokeWidth="1" />
+                  <line x1="75" y1="140" x2="125" y2="140" stroke="#F57F17" strokeWidth="1" />
                   
-                  {/* Ground line */}
-                  <line x1="30" y1="180" x2="170" y2="180" stroke="#8D6E63" strokeWidth="3" />
+                  {/* Water drops near spout */}
+                  <path d="M130 45 C130 40, 135 40, 135 45 C135 50, 130 50, 130 45 Z" fill="#2196F3" />
+                  <path d="M140 40 C140 35, 145 35, 145 40 C145 45, 140 45, 140 40 Z" fill="#2196F3" />
                   
-                  {/* Small plants/grass */}
-                  <path d="M45 180 L50 170 L55 180" stroke="#4CAF50" strokeWidth="2" fill="none" />
-                  <path d="M160 180 L165 170 L170 180" stroke="#4CAF50" strokeWidth="2" fill="none" />
-                  <path d="M40 180 L43 175 L46 180" stroke="#4CAF50" strokeWidth="1" fill="none" />
+                  {/* Ground/base line */}
+                  <ellipse cx="100" cy="170" rx="50" ry="8" fill="#E0E0E0" fillOpacity="0.5" />
                 </svg>
               </motion.div>
             </div>
