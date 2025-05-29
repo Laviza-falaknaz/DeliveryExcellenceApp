@@ -120,9 +120,12 @@ export default function Support() {
           <p className="text-neutral-600">Get assistance with your remanufactured laptops</p>
         </div>
         <div className="mt-4 md:mt-0">
-          <Button onClick={() => setIsNewTicketDialogOpen(true)}>
+          <Button 
+            onClick={() => setIsNewTicketDialogOpen(true)}
+            className="bg-white text-neutral-900 border border-neutral-300 hover:bg-teal-600 hover:text-white hover:border-teal-600 transition-colors"
+          >
             <i className="ri-add-line mr-2"></i>
-            <span>New Support Ticket</span>
+            <span>New RMA Request</span>
           </Button>
         </div>
       </div>
@@ -185,7 +188,7 @@ export default function Support() {
       </div>
 
       <div className="mb-8">
-        <h2 className="text-lg font-semibold font-poppins mb-4">Your Support Tickets</h2>
+        <h2 className="text-lg font-semibold font-poppins mb-4">Your RMA's</h2>
 
         {isLoading ? (
           <div className="space-y-4">
@@ -232,8 +235,11 @@ export default function Support() {
                   </div>
                   <h3 className="text-lg font-medium text-neutral-700">No active tickets</h3>
                   <p className="text-neutral-500 mt-2">You don't have any active support tickets at the moment.</p>
-                  <Button className="mt-4" onClick={() => setIsNewTicketDialogOpen(true)}>
-                    Create New Ticket
+                  <Button 
+                    className="mt-4 bg-white text-neutral-900 border border-neutral-300 hover:bg-teal-600 hover:text-white hover:border-teal-600 transition-colors" 
+                    onClick={() => setIsNewTicketDialogOpen(true)}
+                  >
+                    Raise RMA
                   </Button>
                 </div>
               )}
@@ -281,8 +287,11 @@ export default function Support() {
             <p className="text-neutral-500 mt-2">
               Need help with your remanufactured laptops? Create a support ticket and our team will assist you.
             </p>
-            <Button className="mt-4" onClick={() => setIsNewTicketDialogOpen(true)}>
-              Create Your First Ticket
+            <Button 
+              className="mt-4 bg-white text-neutral-900 border border-neutral-300 hover:bg-teal-600 hover:text-white hover:border-teal-600 transition-colors" 
+              onClick={() => setIsNewTicketDialogOpen(true)}
+            >
+              Raise RMA
             </Button>
           </div>
         )}
