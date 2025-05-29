@@ -55,6 +55,7 @@ type CaseStudyFormValues = z.infer<typeof caseStudySchema>;
 
 export default function CaseStudies() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
   const { data: caseStudies, isLoading } = useQuery<CaseStudy[]>({
@@ -83,6 +84,7 @@ export default function CaseStudies() {
   });
 
   async function onSubmit(data: CaseStudyFormValues) {
+    setIsSubmitting(true);
     try {
       await apiRequest("POST", "/api/case-studies", data);
       
@@ -99,6 +101,8 @@ export default function CaseStudies() {
         description: "There was a problem submitting your request. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
@@ -817,10 +821,10 @@ export default function CaseStudies() {
                 </Button>
                 <Button 
                   type="submit" 
-                  disabled={submitMutation.isPending}
+                  disabled={isSubmitting}
                   className="flex-1 bg-white hover:bg-teal-600 hover:text-white transition-colors"
                 >
-                  {submitMutation.isPending ? "Submitting..." : "Submit Case Study"}
+                  {isSubmitting ? "Submitting..." : "Submit Case Study"}
                 </Button>
               </div>
             </form>
