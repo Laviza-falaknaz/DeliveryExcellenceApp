@@ -414,7 +414,7 @@ export default function Warranty() {
                     <li>View current capacity compared to design capacity</li>
                     <li>Batteries at less than 80% capacity within warranty period may qualify for replacement</li>
                   </ul>
-                  <a href="https://my-warranty.com/battery-diagnostics/" target="_blank" rel="noreferrer" className="text-secondary hover:underline text-sm flex items-center">
+                  <a href="https://my-warranty.com/kb/battery-capacity-how-its-tested/" target="_blank" rel="noreferrer" className="text-secondary hover:underline text-sm flex items-center">
                     <span>Check battery health status</span>
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-1"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
                   </a>
