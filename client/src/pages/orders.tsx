@@ -45,7 +45,11 @@ export default function Orders() {
           </p>
         </div>
         <div className="mt-4 md:mt-0">
-          <Button onClick={() => setIsOrderDialogOpen(true)}>
+          <Button 
+            onClick={() => setIsOrderDialogOpen(true)}
+            variant="outline"
+            className="bg-white border-neutral-300 text-neutral-900 hover:bg-teal-600 hover:text-white hover:border-teal-600 transition-colors"
+          >
             <i className="ri-add-line mr-2"></i>
             <span>New Order</span>
           </Button>
@@ -149,9 +153,6 @@ export default function Orders() {
           </div>
           <h3 className="text-lg font-medium text-neutral-700">No orders yet</h3>
           <p className="text-neutral-500 mt-2">Start by placing your first order to track your sustainable impact.</p>
-          <Button className="mt-4" onClick={() => setIsOrderDialogOpen(true)}>
-            Place Your First Order
-          </Button>
         </div>
       )}
 
