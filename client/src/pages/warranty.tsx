@@ -505,19 +505,7 @@ export default function Warranty() {
                     </div>
                   </div>
                   
-                  <div className="bg-secondary/10 p-4 rounded-lg">
-                    <h4 className="font-medium flex items-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-                      Driver Downloads
-                    </h4>
-                    <p className="text-sm text-neutral-600 my-2">
-                      Our remanufactured laptops use original manufacturer drivers for optimal performance. Access the latest updates for your specific model.
-                    </p>
-                    <a href="https://my-warranty.com/drivers/" target="_blank" rel="noreferrer" className="text-sm text-secondary hover:underline inline-flex items-center">
-                      <span>Download drivers</span>
-                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-1"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
-                    </a>
-                  </div>
+
                 </CardContent>
               </Card>
               
