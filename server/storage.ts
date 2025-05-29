@@ -139,7 +139,7 @@ export class MemStorage implements IStorage {
         description: "Implementing rainwater harvesting systems to collect and store clean water for communities in drought-prone regions of Uganda.",
         peopleImpacted: 730,
         waterProvided: 1450000,
-        imageUrl: "https://images.unsplash.com/photo-1535992165812-68d1861aa71e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1280&h=400",
+        imageUrl: "/attached_assets/Uganda.png",
       }
     ];
 
