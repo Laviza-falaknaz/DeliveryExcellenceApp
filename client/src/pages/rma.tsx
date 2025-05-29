@@ -199,14 +199,14 @@ export default function RMA() {
         <Card>
           <CardContent className="p-6">
             <div className="flex flex-col items-center text-center">
-              <div className="h-12 w-12 rounded-full bg-accent/10 flex items-center justify-center text-accent mb-4">
+              <div className="icon-circle mb-4">
                 <i className="ri-refresh-line text-2xl"></i>
               </div>
               <h3 className="font-semibold text-lg mb-2">Return Process</h3>
               <p className="text-neutral-600 text-sm mb-4">
                 First verify your warranty status, then submit an RMA request for your return.
               </p>
-              <Button variant="outline" asChild>
+              <Button variant="outline" className="btn-outline-hover" asChild>
                 <a href="https://circularcomputing.com/warranty/uk/" target="_blank" rel="noreferrer">
                   View Return Policy
                 </a>
@@ -218,33 +218,14 @@ export default function RMA() {
         <Card>
           <CardContent className="p-6">
             <div className="flex flex-col items-center text-center">
-              <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-4">
-                <i className="ri-recycle-line text-2xl"></i>
-              </div>
-              <h3 className="font-semibold text-lg mb-2">Sustainable Returns</h3>
-              <p className="text-neutral-600 text-sm mb-4">
-                Our circular process ensures that returned laptops are properly remanufactured or recycled.
-              </p>
-              <Button variant="outline" asChild>
-                <a href="https://circularcomputing.com/sustainable-it/" target="_blank" rel="noreferrer">
-                  Learn More
-                </a>
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex flex-col items-center text-center">
-              <div className="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center text-green-700 mb-4">
+              <div className="icon-circle mb-4">
                 <i className="ri-shield-check-line text-2xl"></i>
               </div>
               <h3 className="font-semibold text-lg mb-2">Check Warranty</h3>
               <p className="text-neutral-600 text-sm mb-4">
                 Verify your product's warranty status before starting the RMA process.
               </p>
-              <Button variant="outline" onClick={() => setIsWarrantyCheckDialogOpen(true)} className="bg-white border hover:bg-teal-600 hover:text-white hover:border-teal-600 transition-colors">
+              <Button variant="outline" onClick={() => setIsWarrantyCheckDialogOpen(true)} className="btn-outline-hover">
                 Check Warranty Status
               </Button>
             </div>
@@ -254,14 +235,14 @@ export default function RMA() {
         <Card>
           <CardContent className="p-6">
             <div className="flex flex-col items-center text-center">
-              <div className="h-12 w-12 rounded-full bg-secondary/10 flex items-center justify-center text-secondary mb-4">
+              <div className="icon-circle mb-4">
                 <i className="ri-customer-service-2-line text-2xl"></i>
               </div>
               <h3 className="font-semibold text-lg mb-2">Need Help?</h3>
               <p className="text-neutral-600 text-sm mb-4">
                 Our support team is ready to assist you with your return needs.
               </p>
-              <Button variant="outline" asChild>
+              <Button variant="outline" className="btn-outline-hover" asChild>
                 <a href="https://circularcomputing.com/contact/" target="_blank" rel="noreferrer">Contact Support</a>
               </Button>
             </div>
@@ -362,9 +343,9 @@ export default function RMA() {
             <p className="text-neutral-500 mt-2">
               Need to return or exchange a product? Create an RMA request to start the process.
             </p>
-            <Button className="mt-4" asChild>
+            <Button className="mt-4 btn-white-hover" asChild>
               <a href="https://my-warranty.com/troubleshoot/" target="_blank" rel="noreferrer">
-                Create Your First RMA
+                Create RMA
               </a>
             </Button>
           </div>
