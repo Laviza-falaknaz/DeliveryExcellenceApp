@@ -72,9 +72,6 @@ export default function Login() {
               className="h-16 w-auto"
             />
           </div>
-          <h1 className="text-2xl font-bold font-poppins text-neutral-900">
-            Circular Computing
-          </h1>
           <p className="text-neutral-600">
             Track your sustainable laptop journey
           </p>
