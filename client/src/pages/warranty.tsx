@@ -455,120 +455,35 @@ export default function Warranty() {
             <div className="space-y-6">
               
               <Card>
-                <CardHeader>
-                  <CardTitle>Need Help?</CardTitle>
-                  <CardDescription>
-                    Submit your issue for technical assistance
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Form {...troubleshootingForm}>
-                    <form onSubmit={troubleshootingForm.handleSubmit(onTroubleshootingSubmit)} className="space-y-4">
-                      <FormField
-                        control={troubleshootingForm.control}
-                        name="issueType"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Issue Type</FormLabel>
-                            <Select
-                              onValueChange={field.onChange}
-                              defaultValue={field.value}
-                            >
-                              <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Select an issue type" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                <SelectItem value="hardware">Hardware Problem</SelectItem>
-                                <SelectItem value="software">Software Problem</SelectItem>
-                                <SelectItem value="battery">Battery Issue</SelectItem>
-                                <SelectItem value="display">Display Problem</SelectItem>
-                                <SelectItem value="connectivity">Connectivity Issue</SelectItem>
-                                <SelectItem value="keyboard">Keyboard/Touchpad Problem</SelectItem>
-                                <SelectItem value="other">Other</SelectItem>
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      
-                      <FormField
-                        control={troubleshootingForm.control}
-                        name="description"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Describe Your Issue</FormLabel>
-                            <FormControl>
-                              <Textarea
-                                placeholder="Please provide details about the problem you're experiencing"
-                                className="resize-none"
-                                rows={4}
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      
-                      <FormField
-                        control={troubleshootingForm.control}
-                        name="stepsTaken"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Steps Already Taken</FormLabel>
-                            <FormControl>
-                              <Textarea
-                                placeholder="What solutions have you already tried?"
-                                className="resize-none"
-                                rows={3}
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormDescription>
-                              This helps our technicians provide more targeted assistance
-                            </FormDescription>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      
-                      <Button type="submit" className="w-full" disabled={isSubmitting}>
-                        {isSubmitting ? "Submitting..." : "Submit Request"}
+                <CardContent className="pt-6">
+                  <div className="flex flex-col items-center text-center">
+                    <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-4">
+                      <HelpCircle className="h-6 w-6" />
+                    </div>
+                    <h3 className="font-medium mb-2">Still Need Help?</h3>
+                    <p className="text-neutral-600 mb-4">
+                      Contact our technical support team directly for immediate assistance
+                    </p>
+                    <div className="space-y-2 w-full">
+                      <Button variant="outline" className="w-full">
+                        <i className="ri-phone-line mr-2"></i>
+                        Call Support
                       </Button>
-                    </form>
-                  </Form>
+                      <Button variant="outline" className="w-full">
+                        <i className="ri-chat-1-line mr-2"></i>
+                        Live Chat
+                      </Button>
+                      <Button variant="outline" className="w-full" asChild>
+                        <a href="https://my-warranty.com/troubleshoot/" target="_blank" rel="noreferrer">
+                          <i className="ri-tools-line mr-2"></i>
+                          Start RMA
+                        </a>
+                      </Button>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
-              
-              <div className="mt-6">
-                <Card>
-                  <CardContent className="pt-6">
-                    <div className="flex flex-col items-center text-center">
-                      <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-4">
-                        <HelpCircle className="h-6 w-6" />
-                      </div>
-                      <h3 className="font-medium mb-2">Still Need Help?</h3>
-                      <p className="text-neutral-600 mb-4">
-                        Contact our technical support team directly for immediate assistance
-                      </p>
-                      <div className="space-y-2 w-full">
-                        <Button variant="outline" className="w-full">
-                          <i className="ri-phone-line mr-2"></i>
-                          Call Support
-                        </Button>
-                        <Button variant="outline" className="w-full">
-                          <i className="ri-chat-1-line mr-2"></i>
-                          Live Chat
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-              
+
               <Card>
                 <CardHeader>
                   <CardTitle>OEM Diagnostic Tools</CardTitle>
