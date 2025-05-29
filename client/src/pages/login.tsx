@@ -10,6 +10,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { z } from "zod";
 import { Link } from "wouter";
+import ccLogoPath from "@assets/CC_Logo_Teal.png";
 
 const loginSchema = z.object({
   username: z.string().min(3, "Username must be at least 3 characters"),
@@ -65,26 +66,11 @@ export default function Login() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="flex justify-center mb-4">
-            <svg
-              width="120"
-              height="40"
-              viewBox="0 0 240 80"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-10"
-            >
-              <path
-                d="M40 20C51.0457 20 60 28.9543 60 40C60 51.0457 51.0457 60 40 60C28.9543 60 20 51.0457 20 40C20 28.9543 28.9543 20 40 20Z"
-                fill="#2E7D32"
-              />
-              <path
-                d="M40 24C48.8366 24 56 31.1634 56 40C56 48.8366 48.8366 56 40 56C31.1634 56 24 48.8366 24 40C24 31.1634 31.1634 24 40 24Z"
-                fill="#4CAF50"
-                fillOpacity="0.5"
-              />
-              <path d="M80 30H220V36H80V30Z" fill="#2E7D32" />
-              <path d="M80 44H180V50H80V44Z" fill="#2E7D32" />
-            </svg>
+            <img 
+              src={ccLogoPath} 
+              alt="Circular Computing Logo" 
+              className="h-16 w-auto"
+            />
           </div>
           <h1 className="text-2xl font-bold font-poppins text-neutral-900">
             Circular Computing
