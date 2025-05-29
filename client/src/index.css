@@ -65,17 +65,31 @@
   
   /* Primary button variants */
   .btn-primary-hover {
-    @apply bg-teal-600 hover:bg-teal-700 text-white transition-colors;
+    @apply text-white transition-colors;
+    background-color: #08ABAB;
+  }
+  
+  .btn-primary-hover:hover {
+    background-color: #067878 !important;
   }
   
   /* White button variants with teal hover */
   .btn-white-hover {
-    @apply bg-white hover:bg-teal-600 hover:text-white transition-colors;
+    @apply bg-white hover:text-white transition-colors;
+  }
+  
+  .btn-white-hover:hover {
+    background-color: #08ABAB !important;
   }
   
   /* Outline button variants */
   .btn-outline-hover {
-    @apply border hover:bg-teal-600 hover:text-white hover:border-teal-600 transition-colors;
+    @apply border hover:text-white transition-colors;
+  }
+  
+  .btn-outline-hover:hover {
+    background-color: #08ABAB !important;
+    border-color: #08ABAB !important;
   }
   
   /* Circular icon styling */
