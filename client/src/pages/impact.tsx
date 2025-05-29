@@ -342,103 +342,19 @@ export default function Impact() {
               </div>
               <div className="md:w-1/3 mt-4 md:mt-0 flex items-center justify-center">
                 <motion.div
-                  className="relative w-48 h-48"
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{
+                    duration: 1,
+                    ease: "easeOut"
+                  }}
+                  className="relative w-72 h-72"
                 >
-                  <svg
-                    viewBox="0 0 200 200"
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="w-full h-full"
-                  >
-                    {/* Background circle */}
-                    <circle cx="100" cy="100" r="90" fill="#f8f9fa" stroke="#e0e0e0" strokeWidth="2" />
-                    
-                    {/* Animated building recycling arrows */}
-                    <g transform="translate(100, 100)">
-                      {/* First arrow - builds up from 0 to 100% */}
-                      <motion.g
-                        initial={{ pathLength: 0, opacity: 0 }}
-                        animate={{ pathLength: 1, opacity: 1 }}
-                        transition={{
-                          duration: 2,
-                          delay: 0,
-                          repeat: Infinity,
-                          repeatDelay: 1,
-                          ease: "easeInOut"
-                        }}
-                        transform="rotate(0)"
-                      >
-                        <motion.path 
-                          d="M-15,-40 Q-15,-50 -5,-50 Q5,-50 15,-40 L12,-37 Q7,-43 -5,-43 Q-8,-43 -8,-40 L-1,-33 L-4,-30 L-15,-40 Z" 
-                          fill="none" 
-                          stroke="#4caf50" 
-                          strokeWidth="4"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </motion.g>
-                      
-                      {/* Second arrow - builds up with delay */}
-                      <motion.g
-                        initial={{ pathLength: 0, opacity: 0 }}
-                        animate={{ pathLength: 1, opacity: 1 }}
-                        transition={{
-                          duration: 2,
-                          delay: 0.7,
-                          repeat: Infinity,
-                          repeatDelay: 1,
-                          ease: "easeInOut"
-                        }}
-                        transform="rotate(120)"
-                      >
-                        <motion.path 
-                          d="M-15,-40 Q-15,-50 -5,-50 Q5,-50 15,-40 L12,-37 Q7,-43 -5,-43 Q-8,-43 -8,-40 L-1,-33 L-4,-30 L-15,-40 Z" 
-                          fill="none" 
-                          stroke="#4caf50" 
-                          strokeWidth="4"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </motion.g>
-                      
-                      {/* Third arrow - builds up with more delay */}
-                      <motion.g
-                        initial={{ pathLength: 0, opacity: 0 }}
-                        animate={{ pathLength: 1, opacity: 1 }}
-                        transition={{
-                          duration: 2,
-                          delay: 1.4,
-                          repeat: Infinity,
-                          repeatDelay: 1,
-                          ease: "easeInOut"
-                        }}
-                        transform="rotate(240)"
-                      >
-                        <motion.path 
-                          d="M-15,-40 Q-15,-50 -5,-50 Q5,-50 15,-40 L12,-37 Q7,-43 -5,-43 Q-8,-43 -8,-40 L-1,-33 L-4,-30 L-15,-40 Z" 
-                          fill="none" 
-                          stroke="#4caf50" 
-                          strokeWidth="4"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </motion.g>
-                      
-                      {/* Center pulsing circle */}
-                      <motion.circle 
-                        r="12" 
-                        fill="#4caf50" 
-                        initial={{ scale: 0.8, opacity: 0.6 }}
-                        animate={{ scale: 1.2, opacity: 1 }}
-                        transition={{
-                          duration: 2,
-                          repeat: Infinity,
-                          repeatType: "reverse",
-                          ease: "easeInOut"
-                        }}
-                      />
-                      <circle r="8" fill="#fff" />
-                    </g>
-                  </svg>
+                  <img
+                    src="/attached_assets/placing_it_into_the_circular_economy_header-1.png"
+                    alt="Circular Computing circular economy diagram showing Deploy, Use, Remanufacture, and Computers lifecycle"
+                    className="w-full h-full object-contain"
+                  />
                 </motion.div>
               </div>
             </div>
