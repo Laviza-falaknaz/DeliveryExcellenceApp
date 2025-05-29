@@ -37,9 +37,7 @@ export default function ImpactCard({
               {formattedValue}
             </h3>
           </div>
-          <div 
-            className={`h-10 w-10 rounded-full ${iconBgColor} flex items-center justify-center ${iconColor}`}
-          >
+          <div className="icon-circle">
             <i className={`${icon} text-xl`}></i>
           </div>
         </div>

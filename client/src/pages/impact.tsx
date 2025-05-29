@@ -95,7 +95,7 @@ export default function Impact() {
                       {formatEnvironmentalImpact(impact.carbonSaved, "g")}
                     </p>
                   </div>
-                  <div className="h-12 w-12 rounded-full bg-success/10 flex items-center justify-center text-success">
+                  <div className="icon-circle">
                     <i className="ri-plant-line text-2xl"></i>
                   </div>
                 </div>
@@ -131,7 +131,7 @@ export default function Impact() {
                       {formatEnvironmentalImpact(impact.waterProvided, "litres")}
                     </p>
                   </div>
-                  <div className="h-12 w-12 rounded-full bg-secondary/10 flex items-center justify-center text-secondary">
+                  <div className="icon-circle">
                     <i className="ri-water-flash-line text-2xl"></i>
                   </div>
                 </div>
@@ -160,7 +160,7 @@ export default function Impact() {
                       {formatEnvironmentalImpact(impact.mineralsSaved, "g")}
                     </p>
                   </div>
-                  <div className="h-12 w-12 rounded-full bg-accent/10 flex items-center justify-center text-accent">
+                  <div className="icon-circle">
                     <i className="ri-recycle-line text-2xl"></i>
                   </div>
                 </div>

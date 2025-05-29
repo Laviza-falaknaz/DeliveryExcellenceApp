@@ -77,4 +77,17 @@
   .btn-outline-hover {
     @apply border hover:bg-teal-600 hover:text-white hover:border-teal-600 transition-colors;
   }
+  
+  /* Circular icon styling */
+  .icon-circle {
+    @apply w-12 h-12 rounded-full bg-teal-100 flex items-center justify-center text-teal-600;
+  }
+  
+  .icon-circle-sm {
+    @apply w-8 h-8 rounded-full bg-teal-100 flex items-center justify-center text-teal-600;
+  }
+  
+  .icon-circle-lg {
+    @apply w-16 h-16 rounded-full bg-teal-100 flex items-center justify-center text-teal-600;
+  }
 }
