@@ -13,11 +13,11 @@
 --card-foreground: 20 14.3% 4.1%;
 --border: 20 5.9% 90%;
 --input: 20 5.9% 90%;
---primary: 174 72% 56%;
+--primary: 180 94% 36%;
 --primary-foreground: 0 0% 100%;
---secondary: 174 72% 56%;
+--secondary: 180 94% 36%;
 --secondary-foreground: 0 0% 100%;
---accent: 174 45% 45%;
+--accent: 180 94% 36%;
 --accent-foreground: 0 0% 100%;
 --destructive: 0 84.2% 60.2%;
 --destructive-foreground: 60 9.1% 97.8%;
@@ -35,11 +35,11 @@
 --card-foreground: 0 0% 98%;
 --border: 240 3.7% 15.9%;
 --input: 240 3.7% 15.9%;
---primary: 174 72% 56%;
+--primary: 180 94% 36%;
 --primary-foreground: 0 0% 100%;
---secondary: 174 72% 56%;
+--secondary: 180 94% 36%;
 --secondary-foreground: 0 0% 100%;
---accent: 174 45% 45%;
+--accent: 180 94% 36%;
 --accent-foreground: 0 0% 100%;
 --destructive: 0 62.8% 30.6%;
 --destructive-foreground: 0 0% 98%;
@@ -80,14 +80,20 @@
   
   /* Circular icon styling */
   .icon-circle {
-    @apply w-12 h-12 rounded-full bg-teal-100 flex items-center justify-center text-teal-600;
+    @apply w-12 h-12 rounded-full flex items-center justify-center;
+    background-color: #e0f2f2;
+    color: #08ABAB;
   }
   
   .icon-circle-sm {
-    @apply w-8 h-8 rounded-full bg-teal-100 flex items-center justify-center text-teal-600;
+    @apply w-8 h-8 rounded-full flex items-center justify-center;
+    background-color: #e0f2f2;
+    color: #08ABAB;
   }
   
   .icon-circle-lg {
-    @apply w-16 h-16 rounded-full bg-teal-100 flex items-center justify-center text-teal-600;
+    @apply w-16 h-16 rounded-full flex items-center justify-center;
+    background-color: #e0f2f2;
+    color: #08ABAB;
   }
 }
