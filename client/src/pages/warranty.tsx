@@ -423,68 +423,30 @@ export default function Warranty() {
             </CardContent>
           </Card>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="md:col-span-2">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Common Troubleshooting Solutions</CardTitle>
-                  <CardDescription>
-                    Find solutions for frequently encountered issues
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Accordion type="single" collapsible className="w-full">
-                    {commonSolutions.map((solution) => (
-                      <AccordionItem key={solution.id} value={solution.id}>
-                        <AccordionTrigger>{solution.title}</AccordionTrigger>
-                        <AccordionContent>
-                          <div className="whitespace-pre-line text-neutral-700">
-                            {solution.content}
-                          </div>
-                        </AccordionContent>
-                      </AccordionItem>
-                    ))}
-                  </Accordion>
-                </CardContent>
-              </Card>
-              
-
-            </div>
-            
-            {/* Troubleshooting Request */}
-            <div className="space-y-6">
-              
-              <Card>
-                <CardContent className="pt-6">
-                  <div className="flex flex-col items-center text-center">
-                    <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-4">
-                      <HelpCircle className="h-6 w-6" />
-                    </div>
-                    <h3 className="font-medium mb-2">Still Need Help?</h3>
-                    <p className="text-neutral-600 mb-4">
-                      Contact our technical support team directly for immediate assistance
-                    </p>
-                    <div className="space-y-2 w-full">
-                      <Button variant="outline" className="w-full">
-                        <i className="ri-phone-line mr-2"></i>
-                        Call Support
-                      </Button>
-                      <Button variant="outline" className="w-full">
-                        <i className="ri-chat-1-line mr-2"></i>
-                        Live Chat
-                      </Button>
-                      <Button variant="outline" className="w-full" asChild>
-                        <a href="https://my-warranty.com/troubleshoot/" target="_blank" rel="noreferrer">
-                          <i className="ri-tools-line mr-2"></i>
-                          Start RMA
-                        </a>
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>Common Troubleshooting Solutions</CardTitle>
+              <CardDescription>
+                Find solutions for frequently encountered issues
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Accordion type="single" collapsible className="w-full">
+                {commonSolutions.map((solution) => (
+                  <AccordionItem key={solution.id} value={solution.id}>
+                    <AccordionTrigger>{solution.title}</AccordionTrigger>
+                    <AccordionContent>
+                      <div className="whitespace-pre-line text-neutral-700">
+                        {solution.content}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
+            </CardContent>
+          </Card>
+          
+          <Card>
                 <CardHeader>
                   <CardTitle>OEM Diagnostic Tools</CardTitle>
                   <CardDescription>
@@ -549,8 +511,36 @@ export default function Warranty() {
                   </div>
                 </CardContent>
               </Card>
-            </div>
-          </div>
+              
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="flex flex-col items-center text-center">
+                    <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-4">
+                      <HelpCircle className="h-6 w-6" />
+                    </div>
+                    <h3 className="font-medium mb-2">Still Need Help?</h3>
+                    <p className="text-neutral-600 mb-4">
+                      Contact our technical support team directly for immediate assistance
+                    </p>
+                    <div className="space-y-2 w-full">
+                      <Button variant="outline" className="w-full">
+                        <i className="ri-phone-line mr-2"></i>
+                        Call Support
+                      </Button>
+                      <Button variant="outline" className="w-full">
+                        <i className="ri-chat-1-line mr-2"></i>
+                        Live Chat
+                      </Button>
+                      <Button variant="outline" className="w-full" asChild>
+                        <a href="https://my-warranty.com/troubleshoot/" target="_blank" rel="noreferrer">
+                          <i className="ri-tools-line mr-2"></i>
+                          Start RMA
+                        </a>
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
         </TabsContent>
       </Tabs>
     </div>
