@@ -19,6 +19,19 @@ import { z } from "zod";
 import { formatDate } from "@/lib/utils";
 import { CaseStudy } from "@shared/schema";
 
+// Import case study images
+import wwfImage from "@assets/WWF.png";
+import royalMintImage from "@assets/The Royal Mint .png";
+import ambulanceImage from "@assets/East of England Ambulance Service .png";
+import chichesterImage from "@assets/Chichester High School.png";
+import pensionsImage from "@assets/The Pensions Authority .png";
+import barkingImage from "@assets/London Borough of Barking and Dagenham .png";
+import mentalWellbeingImage from "@assets/Together For Mental Wellbeing .png";
+import googleFormulaEImage from "@assets/Goolge and Formula E Hackathon.png";
+import kentImage from "@assets/Kent County Council .png";
+import kingsCollegeImage from "@assets/Kings College Hospital Foundation.png";
+import balfourBeattyImage from "@assets/Balfour Beatty.png";
+
 const industries = [
   "Education",
   "Healthcare",
@@ -297,8 +310,8 @@ export default function CaseStudies() {
           <Card>
             <div className="h-48 overflow-hidden">
               <img
-                src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&h=300"
-                alt="Environmental conservation and wildlife"
+                src={wwfImage}
+                alt="WWF panda in natural habitat"
                 className="w-full h-full object-cover"
               />
             </div>
@@ -324,8 +337,8 @@ export default function CaseStudies() {
           <Card>
             <div className="h-48 overflow-hidden">
               <img
-                src="https://images.unsplash.com/photo-1541872703-74c5e44368f9?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&h=300"
-                alt="Government and financial institution"
+                src={royalMintImage}
+                alt="Royal Mint craftsman working with precious metals"
                 className="w-full h-full object-cover"
               />
             </div>
@@ -351,8 +364,8 @@ export default function CaseStudies() {
           <Card>
             <div className="h-48 overflow-hidden">
               <img
-                src="https://images.unsplash.com/photo-1589829545856-d10d557cf95f?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&h=300"
-                alt="Healthcare emergency services"
+                src={ambulanceImage}
+                alt="East England Ambulance Service emergency response operator"
                 className="w-full h-full object-cover"
               />
             </div>
@@ -378,8 +391,8 @@ export default function CaseStudies() {
           <Card>
             <div className="h-48 overflow-hidden">
               <img
-                src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&h=300"
-                alt="Educational technology in schools"
+                src={chichesterImage}
+                alt="Students learning with technology at Chichester High School"
                 className="w-full h-full object-cover"
               />
             </div>
@@ -405,8 +418,8 @@ export default function CaseStudies() {
           <Card>
             <div className="h-48 overflow-hidden">
               <img
-                src="https://images.unsplash.com/photo-1560472354-b33ff0c44a43?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&h=300"
-                alt="Professional services office environment"
+                src={pensionsImage}
+                alt="The Pensions Authority building"
                 className="w-full h-full object-cover"
               />
             </div>
