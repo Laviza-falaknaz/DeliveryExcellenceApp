@@ -356,47 +356,40 @@ export default function Impact() {
                     xmlns="http://www.w3.org/2000/svg"
                     className="w-full h-full"
                   >
-                    <path
-                      d="M100,10 A90,90 0 1,1 100,190 A90,90 0 1,1 100,10"
-                      fill="none"
-                      stroke="#e0e0e0"
-                      strokeWidth="5"
-                    />
-                    <path
-                      d="M100,10 A90,90 0 1,1 100,190 A90,90 0 1,1 100,10"
-                      fill="none"
-                      stroke="#4caf50"
+                    {/* Outer ring */}
+                    <circle cx="100" cy="100" r="90" fill="none" stroke="#e0e0e0" strokeWidth="5" />
+                    <circle 
+                      cx="100" 
+                      cy="100" 
+                      r="90" 
+                      fill="none" 
+                      stroke="#4caf50" 
                       strokeWidth="10"
                       strokeDasharray="565.2"
                       strokeDashoffset="141.3"
                     />
+                    {/* Center background */}
+                    <circle cx="100" cy="100" r="70" fill="#f8f9fa" />
+                    
+                    {/* Sustainability leaf icon */}
                     <g transform="translate(100, 100)">
-                      <circle r="70" fill="#f5f5f5" />
-                      <g transform="translate(-35, -35)">
-                        <svg
-                          width="70"
-                          height="70"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
+                      <g transform="translate(-30, -30)">
+                        <svg width="60" height="60" viewBox="0 0 24 24" fill="none">
                           <path
-                            d="M12 3C7.58172 3 4 6.58172 4 11V15.0858L3.29289 15.7929C3.10536 15.9804 3 16.2348 3 16.5V18.5C3 19.0523 3.44772 19.5 4 19.5H5.5C6.05228 19.5 6.5 19.0523 6.5 18.5V17H17.5V18.5C17.5 19.0523 17.9477 19.5 18.5 19.5H20C20.5523 19.5 21 19.0523 21 18.5V16.5C21 16.2348 20.8946 15.9804 20.7071 15.7929L20 15.0858V11C20 6.58172 16.4183 3 12 3Z"
+                            d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"
                             fill="#4caf50"
-                          />
-                          <path
-                            d="M10.5 20.5C10.5 21.6046 11.3954 22.5 12.5 22.5C13.6046 22.5 14.5 21.6046 14.5 20.5H10.5Z"
-                            fill="#4caf50"
-                          />
-                          <path
-                            d="M8 10.5C8.82843 10.5 9.5 9.82843 9.5 9C9.5 8.17157 8.82843 7.5 8 7.5C7.17157 7.5 6.5 8.17157 6.5 9C6.5 9.82843 7.17157 10.5 8 10.5Z"
-                            fill="#2e7d32"
-                          />
-                          <path
-                            d="M16 10.5C16.8284 10.5 17.5 9.82843 17.5 9C17.5 8.17157 16.8284 7.5 16 7.5C15.1716 7.5 14.5 8.17157 14.5 9C14.5 9.82843 15.1716 10.5 16 10.5Z"
-                            fill="#2e7d32"
                           />
                         </svg>
+                      </g>
+                      {/* Recycling arrows around the center */}
+                      <g transform="rotate(0)">
+                        <path d="M-85,0 L-75,5 L-75,-5 Z" fill="#2e7d32" />
+                      </g>
+                      <g transform="rotate(120)">
+                        <path d="M-85,0 L-75,5 L-75,-5 Z" fill="#2e7d32" />
+                      </g>
+                      <g transform="rotate(240)">
+                        <path d="M-85,0 L-75,5 L-75,-5 Z" fill="#2e7d32" />
                       </g>
                     </g>
                   </svg>
