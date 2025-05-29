@@ -146,10 +146,7 @@ export default function Dashboard() {
               <i className="ri-inbox-line text-2xl"></i>
             </div>
             <h3 className="text-lg font-medium text-neutral-700">No orders yet</h3>
-            <p className="text-neutral-500 mt-2">Start by placing your first order to track your sustainable impact.</p>
-            <Button className="mt-4" asChild>
-              <Link href="/orders/new">Place Your First Order</Link>
-            </Button>
+            <p className="text-neutral-500 mt-2">Your recent orders will appear here once you start ordering.</p>
           </div>
         )}
       </section>

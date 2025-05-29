@@ -17,15 +17,15 @@ interface NavTabProps {
 function NavTab({ href, icon, children, active }: NavTabProps) {
   return (
     <Link href={href}>
-      <a
+      <div
         className={cn(
-          "flex flex-col items-center py-2 px-4 text-neutral-500",
+          "flex flex-col items-center py-2 px-4 text-neutral-500 cursor-pointer",
           active && "text-primary border-b-2 border-primary"
         )}
       >
         <i className={`${icon} text-xl`}></i>
         <span className="text-xs mt-1">{children}</span>
-      </a>
+      </div>
     </Link>
   );
 }
@@ -65,49 +65,49 @@ export default function MobileNav() {
                   </h3>
                   <nav className="space-y-1">
                     <Link href="/" onClick={() => setOpen(false)}>
-                      <a className={cn(
-                        "flex items-center px-2 py-2 rounded-md text-neutral-700 hover:bg-neutral-100",
+                      <div className={cn(
+                        "flex items-center px-2 py-2 rounded-md text-neutral-700 hover:bg-neutral-100 cursor-pointer",
                         location === "/" && "bg-primary-light/10 text-primary font-medium"
                       )}>
                         <i className="ri-dashboard-line text-xl mr-3"></i>
                         <span>Dashboard</span>
-                      </a>
+                      </div>
                     </Link>
                     <Link href="/orders" onClick={() => setOpen(false)}>
-                      <a className={cn(
-                        "flex items-center px-2 py-2 rounded-md text-neutral-700 hover:bg-neutral-100",
+                      <div className={cn(
+                        "flex items-center px-2 py-2 rounded-md text-neutral-700 hover:bg-neutral-100 cursor-pointer",
                         location === "/orders" && "bg-primary-light/10 text-primary font-medium"
                       )}>
                         <i className="ri-truck-line text-xl mr-3"></i>
                         <span>Orders</span>
-                      </a>
+                      </div>
                     </Link>
                     <Link href="/rma" onClick={() => setOpen(false)}>
-                      <a className={cn(
-                        "flex items-center px-2 py-2 rounded-md text-neutral-700 hover:bg-neutral-100",
+                      <div className={cn(
+                        "flex items-center px-2 py-2 rounded-md text-neutral-700 hover:bg-neutral-100 cursor-pointer",
                         location === "/rma" && "bg-primary-light/10 text-primary font-medium"
                       )}>
                         <i className="ri-refresh-line text-xl mr-3"></i>
                         <span>RMA Tracking</span>
-                      </a>
+                      </div>
                     </Link>
                     <Link href="/support" onClick={() => setOpen(false)}>
-                      <a className={cn(
-                        "flex items-center px-2 py-2 rounded-md text-neutral-700 hover:bg-neutral-100",
+                      <div className={cn(
+                        "flex items-center px-2 py-2 rounded-md text-neutral-700 hover:bg-neutral-100 cursor-pointer",
                         location === "/support" && "bg-primary-light/10 text-primary font-medium"
                       )}>
                         <i className="ri-customer-service-2-line text-xl mr-3"></i>
                         <span>Support</span>
-                      </a>
+                      </div>
                     </Link>
                     <Link href="/warranty" onClick={() => setOpen(false)}>
-                      <a className={cn(
-                        "flex items-center px-2 py-2 rounded-md text-neutral-700 hover:bg-neutral-100",
+                      <div className={cn(
+                        "flex items-center px-2 py-2 rounded-md text-neutral-700 hover:bg-neutral-100 cursor-pointer",
                         location === "/warranty" && "bg-primary-light/10 text-primary font-medium"
                       )}>
                         <i className="ri-shield-check-line text-xl mr-3"></i>
                         <span>Warranty & Troubleshooting</span>
-                      </a>
+                      </div>
                     </Link>
                   </nav>
                 </div>
@@ -118,40 +118,40 @@ export default function MobileNav() {
                   </h3>
                   <nav className="space-y-1">
                     <Link href="/water-projects" onClick={() => setOpen(false)}>
-                      <a className={cn(
-                        "flex items-center px-2 py-2 rounded-md text-neutral-700 hover:bg-neutral-100",
+                      <div className={cn(
+                        "flex items-center px-2 py-2 rounded-md text-neutral-700 hover:bg-neutral-100 cursor-pointer",
                         location === "/water-projects" && "bg-primary-light/10 text-primary font-medium"
                       )}>
                         <i className="ri-water-flash-line text-xl mr-3"></i>
                         <span>Water Projects</span>
-                      </a>
+                      </div>
                     </Link>
                     <Link href="/impact" onClick={() => setOpen(false)}>
-                      <a className={cn(
-                        "flex items-center px-2 py-2 rounded-md text-neutral-700 hover:bg-neutral-100",
+                      <div className={cn(
+                        "flex items-center px-2 py-2 rounded-md text-neutral-700 hover:bg-neutral-100 cursor-pointer",
                         location === "/impact" && "bg-primary-light/10 text-primary font-medium"
                       )}>
                         <i className="ri-leaf-line text-xl mr-3"></i>
                         <span>Environmental Impact</span>
-                      </a>
+                      </div>
                     </Link>
                     <Link href="/esg-report" onClick={() => setOpen(false)}>
-                      <a className={cn(
-                        "flex items-center px-2 py-2 rounded-md text-neutral-700 hover:bg-neutral-100",
+                      <div className={cn(
+                        "flex items-center px-2 py-2 rounded-md text-neutral-700 hover:bg-neutral-100 cursor-pointer",
                         location === "/esg-report" && "bg-primary-light/10 text-primary font-medium"
                       )}>
                         <i className="ri-file-chart-line text-xl mr-3"></i>
                         <span>ESG Report</span>
-                      </a>
+                      </div>
                     </Link>
                     <Link href="/case-studies" onClick={() => setOpen(false)}>
-                      <a className={cn(
-                        "flex items-center px-2 py-2 rounded-md text-neutral-700 hover:bg-neutral-100",
+                      <div className={cn(
+                        "flex items-center px-2 py-2 rounded-md text-neutral-700 hover:bg-neutral-100 cursor-pointer",
                         location === "/case-studies" && "bg-primary-light/10 text-primary font-medium"
                       )}>
                         <i className="ri-file-text-line text-xl mr-3"></i>
                         <span>Case Studies</span>
-                      </a>
+                      </div>
                     </Link>
                   </nav>
                 </div>

@@ -14,15 +14,15 @@ interface NavItemProps {
 function NavItem({ href, icon, children, active }: NavItemProps) {
   return (
     <Link href={href}>
-      <a
+      <div
         className={cn(
-          "flex items-center px-3 py-2 rounded-lg mb-1 text-neutral-700 hover:bg-neutral-100",
+          "flex items-center px-3 py-2 rounded-lg mb-1 text-neutral-700 hover:bg-neutral-100 cursor-pointer",
           active && "bg-primary-light/10 text-primary font-medium"
         )}
       >
         <i className={`${icon} text-xl mr-3`}></i>
         <span>{children}</span>
-      </a>
+      </div>
     </Link>
   );
 }
@@ -50,13 +50,13 @@ export default function Sidebar() {
     <aside className="hidden md:flex md:flex-col md:w-64 md:min-w-64 bg-white border-r border-neutral-200 shadow-sm">
       <div className="p-4 border-b border-neutral-200">
         <Link href="/">
-          <a className="flex items-center">
+          <div className="flex items-center cursor-pointer">
             <img 
               src="/attached_assets/CC_Logo_Teal.png" 
               alt="Circular Computing" 
               className="h-8 w-auto"
             />
-          </a>
+          </div>
         </Link>
       </div>
 
