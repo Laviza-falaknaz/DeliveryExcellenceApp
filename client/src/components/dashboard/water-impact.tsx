@@ -122,7 +122,7 @@ export default function WaterImpact() {
           <Button variant="outline" className="border-secondary text-secondary">
             Share Impact
           </Button>
-          <Button className="bg-secondary text-white" asChild>
+          <Button variant="outline" className="border-secondary text-secondary" asChild>
             <Link href="/water-projects">
               View Water Projects
             </Link>
