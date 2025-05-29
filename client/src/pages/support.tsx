@@ -237,9 +237,11 @@ export default function Support() {
                   <p className="text-neutral-500 mt-2">You don't have any active support tickets at the moment.</p>
                   <Button 
                     className="mt-4 bg-white text-neutral-900 border border-neutral-300 hover:bg-teal-600 hover:text-white hover:border-teal-600 transition-colors" 
-                    onClick={() => setIsNewTicketDialogOpen(true)}
+                    asChild
                   >
-                    Raise RMA
+                    <a href="https://my-warranty.com/troubleshoot/" target="_blank" rel="noreferrer">
+                      Raise RMA
+                    </a>
                   </Button>
                 </div>
               )}
@@ -289,9 +291,11 @@ export default function Support() {
             </p>
             <Button 
               className="mt-4 bg-white text-neutral-900 border border-neutral-300 hover:bg-teal-600 hover:text-white hover:border-teal-600 transition-colors" 
-              onClick={() => setIsNewTicketDialogOpen(true)}
+              asChild
             >
-              Raise RMA
+              <a href="https://my-warranty.com/troubleshoot/" target="_blank" rel="noreferrer">
+                Raise RMA
+              </a>
             </Button>
           </div>
         )}
