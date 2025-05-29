@@ -244,7 +244,7 @@ export default function RMA() {
               <p className="text-neutral-600 text-sm mb-4">
                 Verify your product's warranty status before starting the RMA process.
               </p>
-              <Button onClick={() => setIsWarrantyCheckDialogOpen(true)}>
+              <Button variant="outline" onClick={() => setIsWarrantyCheckDialogOpen(true)} className="bg-white border hover:bg-teal-600 hover:text-white hover:border-teal-600 transition-colors">
                 Check Warranty Status
               </Button>
             </div>
