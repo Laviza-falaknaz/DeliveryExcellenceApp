@@ -32,23 +32,13 @@ export default function Dashboard() {
   
   return (
     <div className="py-6 px-4 md:px-8 max-w-7xl mx-auto">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-bold font-poppins text-neutral-900">
-            Welcome back, {user?.name?.split(' ')[0] || 'User'}!
-          </h1>
-          <p className="text-neutral-600">
-            Here's your latest sustainable impact and order status
-          </p>
-        </div>
-        <div className="mt-4 md:mt-0">
-          <Button asChild>
-            <Link href="/orders/new">
-              <i className="ri-add-line mr-2"></i>
-              <span>New Order</span>
-            </Link>
-          </Button>
-        </div>
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold font-poppins text-neutral-900">
+          Welcome back, {user?.name?.split(' ')[0] || 'User'}!
+        </h1>
+        <p className="text-neutral-600">
+          Here's your latest sustainable impact and order status
+        </p>
       </div>
 
       {orderForNotification && notificationVisible && (
