@@ -116,20 +116,7 @@ export default function WaterImpact() {
           </div>
         </div>
 
-        <div className="mt-6">
-          <div className="p-4 border border-neutral-200 rounded-lg">
-            <h4 className="font-medium mb-2">Your Next Milestone</h4>
-            <div className="flex items-center">
-              <div className="flex-1 mr-4">
-                <Progress value={progressPercentage} className="h-2" />
-              </div>
-              <span className="text-sm font-medium">{Math.round(progressPercentage)}%</span>
-            </div>
-            <p className="text-sm text-neutral-600 mt-2">
-              You're close to funding a new water point in Rwanda! Just {laptopsNeeded} more laptops will help us reach this goal.
-            </p>
-          </div>
-        </div>
+
 
         <div className="mt-6 flex justify-between items-center">
           <Button variant="outline" className="border-secondary text-secondary">
