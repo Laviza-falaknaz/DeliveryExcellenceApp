@@ -186,6 +186,8 @@ export default function WaterProjects() {
                       ? "https://www.charitywater.org/our-projects/uganda"
                       : project.name === "Rwanda Clean Water Project"
                       ? "https://www.charitywater.org/our-projects/rwanda"
+                      : project.name === "Ethiopia Clean Water Initiative"
+                      ? "https://www.charitywater.org/our-projects/ethiopia"
                       : "https://www.charitywater.org/our-projects"
                   } target="_blank" rel="noreferrer">
                     Learn More

@@ -123,7 +123,7 @@ export class MemStorage implements IStorage {
         description: "This project is providing clean water access to rural communities in Ethiopia, focusing on sustainable well construction and community education on water management.",
         peopleImpacted: 1200,
         waterProvided: 3000000,
-        imageUrl: "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1280&h=400",
+        imageUrl: "/attached_assets/Ethiopia.png",
       },
       {
         name: "Rwanda Clean Water Project",
