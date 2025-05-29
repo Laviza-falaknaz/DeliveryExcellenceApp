@@ -445,8 +445,8 @@ export default function CaseStudies() {
           <Card>
             <div className="h-48 overflow-hidden">
               <img
-                src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&h=300"
-                alt="Local government offices"
+                src={barkingImage}
+                alt="London Borough of Barking and Dagenham Travelodge building"
                 className="w-full h-full object-cover"
               />
             </div>
@@ -472,8 +472,8 @@ export default function CaseStudies() {
           <Card>
             <div className="h-48 overflow-hidden">
               <img
-                src="https://images.unsplash.com/photo-1559757148-5c350d0d3c56?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&h=300"
-                alt="Mental health and wellbeing services"
+                src={mentalWellbeingImage}
+                alt="Together for Mental Wellbeing team at community event"
                 className="w-full h-full object-cover"
               />
             </div>
@@ -499,8 +499,8 @@ export default function CaseStudies() {
           <Card>
             <div className="h-48 overflow-hidden">
               <img
-                src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&h=300"
-                alt="Technology hackathon and innovation"
+                src={googleFormulaEImage}
+                alt="Google Cloud and Formula E Hackathon participants at work"
                 className="w-full h-full object-cover"
               />
             </div>
@@ -526,8 +526,8 @@ export default function CaseStudies() {
           <Card>
             <div className="h-48 overflow-hidden">
               <img
-                src="https://images.unsplash.com/photo-1494412651409-8963ce7935a7?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&h=300"
-                alt="County council offices and public services"
+                src={kentImage}
+                alt="Kent County Council Sessions House building"
                 className="w-full h-full object-cover"
               />
             </div>
@@ -553,8 +553,8 @@ export default function CaseStudies() {
           <Card>
             <div className="h-48 overflow-hidden">
               <img
-                src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&h=300"
-                alt="Hospital and healthcare foundation"
+                src={kingsCollegeImage}
+                alt="Kings College Hospital Foundation healthcare professional"
                 className="w-full h-full object-cover"
               />
             </div>
@@ -580,8 +580,8 @@ export default function CaseStudies() {
           <Card>
             <div className="h-48 overflow-hidden">
               <img
-                src="https://images.unsplash.com/photo-1504307651254-35680f356dfd?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&h=300"
-                alt="Construction and infrastructure company"
+                src={balfourBeattyImage}
+                alt="Balfour Beatty engineer working on telecommunications infrastructure"
                 className="w-full h-full object-cover"
               />
             </div>
