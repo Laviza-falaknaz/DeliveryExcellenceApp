@@ -230,7 +230,7 @@ export default function WaterProjects() {
                   </div>
                   <div className="flex items-center justify-center">
                     <img
-                      src="https://www.charitywater.org/assets/images/global/logos/charity-water-logo-main.svg"
+                      src="/attached_assets/charity-water-logo.jpeg"
                       alt="charity: water logo"
                       className="rounded-lg max-w-[300px] h-auto"
                     />
