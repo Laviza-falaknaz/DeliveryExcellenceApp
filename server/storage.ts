@@ -131,7 +131,7 @@ export class MemStorage implements IStorage {
         description: "Building sustainable water infrastructure in rural Rwanda to provide clean drinking water and improve sanitation facilities.",
         peopleImpacted: 850,
         waterProvided: 1850000,
-        imageUrl: "https://images.unsplash.com/photo-1603546589131-2ded58c22ff1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1280&h=400",
+        imageUrl: "/attached_assets/Rwanda.png",
       },
       {
         name: "Uganda Rainwater Harvesting",

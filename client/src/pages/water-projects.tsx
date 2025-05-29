@@ -184,6 +184,8 @@ export default function WaterProjects() {
                   <a href={
                     project.name === "Uganda Rainwater Harvesting" 
                       ? "https://www.charitywater.org/our-projects/uganda"
+                      : project.name === "Rwanda Clean Water Project"
+                      ? "https://www.charitywater.org/our-projects/rwanda"
                       : "https://www.charitywater.org/our-projects"
                   } target="_blank" rel="noreferrer">
                     Learn More
