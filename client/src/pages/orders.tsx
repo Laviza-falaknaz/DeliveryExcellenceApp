@@ -46,12 +46,12 @@ export default function Orders() {
         </div>
         <div className="mt-4 md:mt-0">
           <Button 
-            onClick={() => setIsOrderDialogOpen(true)}
+            onClick={() => window.open('https://circularcomputing.com/contact/', '_blank')}
             variant="outline"
             className="bg-white border-neutral-300 text-neutral-900 hover:bg-teal-600 hover:text-white hover:border-teal-600 transition-colors"
           >
-            <i className="ri-add-line mr-2"></i>
-            <span>New Order</span>
+            <i className="ri-phone-line mr-2"></i>
+            <span>Contact Us</span>
           </Button>
         </div>
       </div>
