@@ -181,7 +181,11 @@ export default function WaterProjects() {
               </CardContent>
               <CardFooter>
                 <Button variant="outline" className="w-full" asChild>
-                  <a href="https://www.charitywater.org/our-projects" target="_blank" rel="noreferrer">
+                  <a href={
+                    project.name === "Uganda Rainwater Harvesting" 
+                      ? "https://www.charitywater.org/our-projects/uganda"
+                      : "https://www.charitywater.org/our-projects"
+                  } target="_blank" rel="noreferrer">
                     Learn More
                   </a>
                 </Button>
