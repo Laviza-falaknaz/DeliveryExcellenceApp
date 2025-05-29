@@ -386,19 +386,19 @@ export default function Warranty() {
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="border rounded-lg p-4 bg-primary/5">
-                  <h3 className="font-medium text-lg mb-2">Hardware Diagnostic Utility</h3>
+                  <h3 className="font-medium text-lg mb-2">Official Manuals</h3>
                   <p className="text-neutral-700 mb-3">
-                    Our comprehensive hardware test suite can identify issues with all major components.
+                    Access comprehensive documentation and user guides for your remanufactured laptop from the original manufacturers.
                   </p>
                   <ul className="list-disc list-inside text-neutral-700 space-y-1 mb-3">
-                    <li>Access at boot by pressing F12 on most models</li>
-                    <li>Select "Diagnostics" from the boot menu</li>
-                    <li>Run "Quick Test" for basic diagnostics</li>
-                    <li>Run "Full System Test" for comprehensive testing</li>
-                    <li>Note any error codes for support reference</li>
+                    <li>Dell laptops: Complete service manuals and troubleshooting guides</li>
+                    <li>Lenovo laptops: Official documentation and support resources</li>
+                    <li>HP laptops: Comprehensive user manuals and technical specifications</li>
+                    <li>Model-specific guides for optimal performance and maintenance</li>
+                    <li>Installation and setup instructions for all components</li>
                   </ul>
-                  <a href="https://my-warranty.com/diagnostics/" target="_blank" rel="noreferrer" className="text-primary hover:underline text-sm flex items-center">
-                    <span>View detailed instructions</span>
+                  <a href="https://my-warranty.com/kbtopic/manuals-downloads/" target="_blank" rel="noreferrer" className="text-primary hover:underline text-sm flex items-center">
+                    <span>Browse official manuals</span>
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-1"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
                   </a>
                 </div>
