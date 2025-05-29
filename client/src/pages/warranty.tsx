@@ -420,18 +420,6 @@ export default function Warranty() {
                   </a>
                 </div>
               </div>
-              
-              <Alert className="bg-blue-50 border-blue-200">
-                <div className="flex">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2 mt-1"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
-                  <div>
-                    <AlertTitle className="text-blue-700">Remote Diagnostic Service</AlertTitle>
-                    <AlertDescription className="text-blue-600">
-                      Our technical support team can perform remote diagnostics for complex issues. Contact us through our support portal for assistance.
-                    </AlertDescription>
-                  </div>
-                </div>
-              </Alert>
             </CardContent>
           </Card>
           
