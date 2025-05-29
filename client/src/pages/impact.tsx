@@ -371,26 +371,25 @@ export default function Impact() {
                     {/* Center background */}
                     <circle cx="100" cy="100" r="70" fill="#f8f9fa" />
                     
-                    {/* Sustainability leaf icon */}
+                    {/* Classic recycling symbol */}
                     <g transform="translate(100, 100)">
-                      <g transform="translate(-30, -30)">
-                        <svg width="60" height="60" viewBox="0 0 24 24" fill="none">
-                          <path
-                            d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"
-                            fill="#4caf50"
-                          />
-                        </svg>
-                      </g>
-                      {/* Recycling arrows around the center */}
+                      {/* First arrow (top right) */}
                       <g transform="rotate(0)">
-                        <path d="M-85,0 L-75,5 L-75,-5 Z" fill="#2e7d32" />
+                        <path d="M-8,-25 Q-8,-35 2,-35 Q12,-35 18,-25 L15,-22 Q10,-28 2,-28 Q-1,-28 -1,-25 L6,-18 L3,-15 L-8,-25 Z" fill="#4caf50" />
                       </g>
+                      
+                      {/* Second arrow (bottom) */}
                       <g transform="rotate(120)">
-                        <path d="M-85,0 L-75,5 L-75,-5 Z" fill="#2e7d32" />
+                        <path d="M-8,-25 Q-8,-35 2,-35 Q12,-35 18,-25 L15,-22 Q10,-28 2,-28 Q-1,-28 -1,-25 L6,-18 L3,-15 L-8,-25 Z" fill="#4caf50" />
                       </g>
+                      
+                      {/* Third arrow (top left) */}
                       <g transform="rotate(240)">
-                        <path d="M-85,0 L-75,5 L-75,-5 Z" fill="#2e7d32" />
+                        <path d="M-8,-25 Q-8,-35 2,-35 Q12,-35 18,-25 L15,-22 Q10,-28 2,-28 Q-1,-28 -1,-25 L6,-18 L3,-15 L-8,-25 Z" fill="#4caf50" />
                       </g>
+                      
+                      {/* Center circle */}
+                      <circle r="8" fill="#fff" stroke="#4caf50" strokeWidth="2" />
                     </g>
                   </svg>
                 </motion.div>
