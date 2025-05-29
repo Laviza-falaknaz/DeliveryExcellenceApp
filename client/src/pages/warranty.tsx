@@ -568,6 +568,72 @@ export default function Warranty() {
                   </CardContent>
                 </Card>
               </div>
+              
+              <Card>
+                <CardHeader>
+                  <CardTitle>OEM Diagnostic Tools</CardTitle>
+                  <CardDescription>
+                    Official diagnostic software from original equipment manufacturers
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="border rounded-lg p-4">
+                      <div className="flex items-start">
+                        <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mr-3">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                        </div>
+                        <div>
+                          <h3 className="font-medium">Lenovo Vantage</h3>
+                          <p className="text-sm text-neutral-600 mt-1 mb-3">
+                            Comprehensive system management and diagnostic tool for Lenovo devices
+                          </p>
+                          <a href="https://www.lenovo.com/us/en/software/vantage?msockid=360b390aad6b67251ad52acbac8f66c9" target="_blank" rel="noreferrer" className="text-sm text-blue-600 hover:underline inline-flex items-center">
+                            <span>Download Lenovo Vantage</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-1"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="border rounded-lg p-4">
+                      <div className="flex items-start">
+                        <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center text-green-600 mr-3">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                        </div>
+                        <div>
+                          <h3 className="font-medium">HP Support Assistant</h3>
+                          <p className="text-sm text-neutral-600 mt-1 mb-3">
+                            Built-in troubleshooting and maintenance tool for HP laptops
+                          </p>
+                          <a href="https://support.hp.com/us-en/help/hp-support-assistant" target="_blank" rel="noreferrer" className="text-sm text-green-600 hover:underline inline-flex items-center">
+                            <span>Get HP Support Assistant</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-1"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="border rounded-lg p-4">
+                      <div className="flex items-start">
+                        <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-800 mr-3">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                        </div>
+                        <div>
+                          <h3 className="font-medium">Dell SupportAssist</h3>
+                          <p className="text-sm text-neutral-600 mt-1 mb-3">
+                            Automated support technology for proactive system maintenance
+                          </p>
+                          <a href="https://www.dell.com/support/contents/en-uk/category/product-support/self-support-knowledgebase/software-and-downloads/support-assist?msockid=360b390aad6b67251ad52acbac8f66c9" target="_blank" rel="noreferrer" className="text-sm text-blue-800 hover:underline inline-flex items-center">
+                            <span>Download SupportAssist</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-1"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </TabsContent>
