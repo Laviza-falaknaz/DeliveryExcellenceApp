@@ -268,8 +268,8 @@ export default function WaterProjects() {
                   </div>
                   <div className="flex items-center justify-center">
                     <img
-                      src="https://images.unsplash.com/photo-1580310614729-ccd69652491d?ixlib=rb-4.0.3&auto=format&fit=crop&w=450&h=300"
-                      alt="Woman collecting clean water from a well"
+                      src="/attached_assets/Impact.png"
+                      alt="Children accessing clean water"
                       className="rounded-lg"
                     />
                   </div>
