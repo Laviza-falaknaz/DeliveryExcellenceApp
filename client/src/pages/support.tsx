@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
+import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -158,7 +159,7 @@ export default function Support() {
               </p>
               <Button variant="outline" asChild>
                 <Link href="/warranty">
-                  View FAQs
+                  Troubleshooting
                 </Link>
               </Button>
             </div>
