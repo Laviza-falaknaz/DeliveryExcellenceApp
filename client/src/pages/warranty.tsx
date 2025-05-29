@@ -552,7 +552,7 @@ export default function Warranty() {
                       <div>
                         <h4 className="font-medium">Official Manuals</h4>
                         <p className="text-sm text-neutral-600 mb-2">Access detailed guides for your specific model</p>
-                        <a href="https://my-warranty.com/manuals/" target="_blank" rel="noreferrer" className="text-sm text-primary hover:underline inline-flex items-center">
+                        <a href="https://my-warranty.com/kbtopic/manuals-downloads/" target="_blank" rel="noreferrer" className="text-sm text-primary hover:underline inline-flex items-center">
                           <span>Browse manuals</span>
                           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-1"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
                         </a>
