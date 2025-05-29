@@ -6,6 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { formatEnvironmentalImpact } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 import { WaterProject } from "@shared/schema";
+import charityWaterImage from "@assets/Charity Water.png";
 
 export default function WaterImpact() {
   const { data: impact, isLoading: isImpactLoading } = useQuery({
@@ -61,7 +62,7 @@ export default function WaterImpact() {
             className="block mt-4 relative overflow-hidden rounded-lg hover:opacity-90 transition-opacity"
           >
             <img
-              src="/attached_assets/Charity Water.png"
+              src={charityWaterImage}
               alt="Families celebrating access to clean water through charity: water partnership"
               className="w-full h-48 object-cover"
             />
