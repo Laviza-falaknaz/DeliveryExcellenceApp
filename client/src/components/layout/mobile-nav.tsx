@@ -162,13 +162,13 @@ export default function MobileNav() {
                   </h3>
                   <nav className="space-y-1">
                     <Link href="/profile" onClick={() => setOpen(false)}>
-                      <a className={cn(
-                        "flex items-center px-2 py-2 rounded-md text-neutral-700 hover:bg-neutral-100",
+                      <div className={cn(
+                        "flex items-center px-2 py-2 rounded-md text-neutral-700 hover:bg-neutral-100 cursor-pointer",
                         location === "/profile" && "bg-primary-light/10 text-primary font-medium"
                       )}>
                         <i className="ri-user-settings-line text-xl mr-3"></i>
                         <span>Profile Settings</span>
-                      </a>
+                      </div>
                     </Link>
                   </nav>
                 </div>

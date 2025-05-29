@@ -61,8 +61,8 @@ export default function WaterImpact() {
             className="block mt-4 relative overflow-hidden rounded-lg hover:opacity-90 transition-opacity"
           >
             <img
-              src="https://circularcomputing.com/wp-content/uploads/2023/10/charity-water-partnership-1024x576.jpg"
-              alt="Charity Water Partnership - Circular Computing"
+              src="/attached_assets/Charity Water.png"
+              alt="Families celebrating access to clean water through charity: water partnership"
               className="w-full h-48 object-cover"
             />
             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent text-white p-4">
