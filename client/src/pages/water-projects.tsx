@@ -98,17 +98,42 @@ export default function WaterProjects() {
                 animate={{ y: [0, -10, 0] }}
                 transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
               >
-                <svg width="250" height="250" viewBox="0 0 500 500" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <circle cx="250" cy="250" r="240" fill="#E3F2FD" />
-                  <path d="M250 50C361.046 50 450 138.954 450 250C450 361.046 361.046 450 250 450C138.954 450 50 361.046 50 250C50 138.954 138.954 50 250 50Z" fill="#0288D1" fillOpacity="0.1" />
-                  <path d="M250 90C339.411 90 410 160.589 410 250C410 339.411 339.411 410 250 410C160.589 410 90 339.411 90 250C90 160.589 160.589 90 250 90Z" fill="#0288D1" fillOpacity="0.2" />
-                  <path d="M250,250 m0,-160 a160,160 0 1,0 0,320 a160,160 0 1,0 0,-320" fill="#0288D1" fillOpacity="0.1" />
-                  <path d="M250,250 m0,-120 a120,120 0 1,0 0,240 a120,120 0 1,0 0,-240" fill="#0288D1" fillOpacity="0.2" />
-                  <path d="M250,250 m0,-80 a80,80 0 1,0 0,160 a80,80 0 1,0 0,-160" fill="#0288D1" fillOpacity="0.3" />
-                  <circle cx="250" cy="250" r="40" fill="#0288D1" />
-                  <path d="M230,200 C250,150 270,200 270,160 C290,120 310,170 330,190" stroke="#0288D1" strokeWidth="8" strokeLinecap="round" />
-                  <path d="M170,220 C190,170 210,220 230,180 C250,140 270,190 290,210" stroke="#0288D1" strokeWidth="8" strokeLinecap="round" />
-                  <path d="M190,270 C210,220 230,270 250,230 C270,190 290,240 310,260" stroke="#0288D1" strokeWidth="8" strokeLinecap="round" />
+                <svg width="250" height="250" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  {/* Background circle */}
+                  <circle cx="100" cy="100" r="95" fill="#E3F2FD" stroke="#0288D1" strokeWidth="2" />
+                  
+                  {/* Water well structure */}
+                  <rect x="75" y="120" width="50" height="60" fill="#8D6E63" stroke="#5D4037" strokeWidth="2" rx="3" />
+                  
+                  {/* Well opening */}
+                  <circle cx="100" cy="125" r="15" fill="#1976D2" stroke="#0D47A1" strokeWidth="2" />
+                  
+                  {/* Hand pump */}
+                  <rect x="95" y="100" width="10" height="25" fill="#424242" rx="2" />
+                  <circle cx="100" cy="105" r="6" fill="#616161" stroke="#424242" strokeWidth="1" />
+                  
+                  {/* Pump handle */}
+                  <rect x="85" y="102" width="30" height="6" fill="#424242" rx="3" />
+                  
+                  {/* Water drops */}
+                  <path d="M115 130 C115 125, 120 125, 120 130 C120 135, 115 135, 115 130 Z" fill="#2196F3" />
+                  <path d="M125 135 C125 130, 130 130, 130 135 C130 140, 125 140, 125 135 Z" fill="#2196F3" />
+                  <path d="M110 140 C110 135, 115 135, 115 140 C115 145, 110 145, 110 140 Z" fill="#2196F3" />
+                  
+                  {/* Bucket */}
+                  <ellipse cx="135" cy="160" rx="12" ry="8" fill="#616161" stroke="#424242" strokeWidth="2" />
+                  <rect x="123" y="155" width="24" height="10" fill="#757575" stroke="#424242" strokeWidth="2" rx="2" />
+                  
+                  {/* Bucket handle */}
+                  <path d="M125 155 Q135 145, 145 155" stroke="#424242" strokeWidth="2" fill="none" />
+                  
+                  {/* Ground line */}
+                  <line x1="30" y1="180" x2="170" y2="180" stroke="#8D6E63" strokeWidth="3" />
+                  
+                  {/* Small plants/grass */}
+                  <path d="M45 180 L50 170 L55 180" stroke="#4CAF50" strokeWidth="2" fill="none" />
+                  <path d="M160 180 L165 170 L170 180" stroke="#4CAF50" strokeWidth="2" fill="none" />
+                  <path d="M40 180 L43 175 L46 180" stroke="#4CAF50" strokeWidth="1" fill="none" />
                 </svg>
               </motion.div>
             </div>
