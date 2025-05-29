@@ -41,7 +41,8 @@ export default function WaterProjects() {
             </a>
           </Button>
           <Button 
-            className="hover:bg-secondary/90 transition-all duration-200" 
+            variant="outline"
+            className="bg-white text-neutral-900 border-neutral-300 hover:bg-secondary hover:text-white hover:border-secondary transition-all duration-200" 
             asChild
           >
             <a href="https://www.charitywater.org/donate" target="_blank" rel="noreferrer">
