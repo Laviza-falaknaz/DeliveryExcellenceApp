@@ -801,11 +801,11 @@ export default function ESGReport() {
                           </div>
                           <div className="ml-4">
                             <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-                              <h4 className="font-medium">IT Asset Disposition Program Launch</h4>
+                              <h4 className="font-medium">IT Asset Disposition Programme Launch</h4>
                               <span className="text-sm text-neutral-500">Apr 15, 2024</span>
                             </div>
                             <p className="text-neutral-600 text-sm mt-1">
-                              Initiated sustainable IT lifecycle management program
+                              Initiated sustainable IT lifecycle management programme
                             </p>
                           </div>
                         </div>

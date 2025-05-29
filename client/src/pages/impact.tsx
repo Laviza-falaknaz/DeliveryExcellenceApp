@@ -372,7 +372,7 @@ export default function Impact() {
               </h3>
               <p className="text-neutral-700 mb-4">
                 Your organization's commitment to sustainable IT is making a real
-                difference. Become part of our case study program to inspire
+                difference. Become part of our case study programme to inspire
                 other organizations and showcase your environmental leadership.
               </p>
               <div className="flex flex-wrap gap-3">

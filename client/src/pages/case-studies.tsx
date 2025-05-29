@@ -147,7 +147,7 @@ export default function CaseStudies() {
               onClick={() => setIsDialogOpen(true)}
             >
               <i className="ri-add-line mr-2"></i>
-              <span>Join Case Study Program</span>
+              <span>Join Case Study Programme</span>
             </Button>
           )}
         </div>
@@ -198,7 +198,7 @@ export default function CaseStudies() {
                     className="bg-white border-neutral-300 text-neutral-900 hover:bg-teal-600 hover:text-white hover:border-teal-600 transition-colors"
                     onClick={() => setIsDialogOpen(true)}
                   >
-                    Join Case Study Program
+                    Join Case Study Programme
                   </Button>
                 )}
               </div>

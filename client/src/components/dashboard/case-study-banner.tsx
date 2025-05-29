@@ -132,7 +132,7 @@ export default function CaseStudyBanner() {
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="sm:max-w-[525px]">
           <DialogHeader>
-            <DialogTitle>Join Our Case Study Program</DialogTitle>
+            <DialogTitle>Join Our Case Study Programme</DialogTitle>
             <DialogDescription>
               Share your sustainable success story to inspire other organizations. Fill out the details below to get started.
             </DialogDescription>
