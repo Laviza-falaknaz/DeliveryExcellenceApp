@@ -194,7 +194,10 @@ export default function RMA() {
             <i className="ri-phone-line mr-2"></i>
             <span>Contact Us</span>
           </Button>
-          <Button asChild>
+          <Button 
+            asChild
+            className="bg-black text-white border-black hover:bg-teal-600 hover:border-teal-600 transition-colors"
+          >
             <a href="https://my-warranty.com/troubleshoot/" target="_blank" rel="noreferrer">
               <i className="ri-add-line mr-2"></i>
               <span>New RMA Request</span>
@@ -609,7 +612,12 @@ export default function RMA() {
                 <Button type="button" variant="outline" onClick={() => setIsNewRmaDialogOpen(false)}>
                   Cancel
                 </Button>
-                <Button type="submit">Complete RMA Request</Button>
+                <Button 
+                  type="submit"
+                  className="bg-black text-white border-black hover:bg-teal-600 hover:border-teal-600 transition-colors"
+                >
+                  Complete RMA Request
+                </Button>
               </DialogFooter>
             </form>
           </Form>
