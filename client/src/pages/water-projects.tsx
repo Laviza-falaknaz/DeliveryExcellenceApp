@@ -30,10 +30,10 @@ export default function WaterProjects() {
             See how your laptop purchases help provide clean water to communities in need.
           </p>
         </div>
-        <div className="mt-4 md:mt-0 flex flex-wrap gap-4">
+        <div className="mt-4 md:mt-0 flex gap-2">
           <Button 
             variant="outline" 
-            className="hover:bg-secondary hover:text-white hover:border-secondary transition-all duration-200" 
+            className="bg-white border-neutral-300 text-neutral-900 hover:bg-teal-600 hover:text-white hover:border-teal-600 transition-colors" 
             asChild
           >
             <a href="https://www.charitywater.org/" target="_blank" rel="noreferrer">
@@ -42,7 +42,7 @@ export default function WaterProjects() {
           </Button>
           <Button 
             variant="outline"
-            className="bg-white text-neutral-900 border-neutral-300 hover:bg-secondary hover:text-white hover:border-secondary transition-all duration-200" 
+            className="bg-white text-neutral-900 border-neutral-300 hover:bg-teal-600 hover:text-white hover:border-teal-600 transition-colors" 
             asChild
           >
             <a href="https://www.charitywater.org/donate" target="_blank" rel="noreferrer">

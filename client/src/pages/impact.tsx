@@ -56,17 +56,17 @@ export default function Impact() {
             Track the positive impact of your remanufactured laptop purchases
           </p>
         </div>
-        <div className="mt-4 md:mt-0 flex flex-wrap gap-4">
+        <div className="mt-4 md:mt-0 flex gap-2">
           <Button 
             variant="outline" 
-            className="hover:bg-secondary hover:text-white hover:border-secondary transition-all duration-200"
+            className="bg-white border-neutral-300 text-neutral-900 hover:bg-teal-600 hover:text-white hover:border-teal-600 transition-colors"
           >
             <i className="ri-download-line mr-2"></i>
             <span>Download Report</span>
           </Button>
           <Button 
             variant="outline"
-            className="bg-white text-neutral-900 border-neutral-200 hover:bg-secondary hover:text-white hover:border-secondary transition-all duration-200" 
+            className="bg-white text-neutral-900 border-neutral-300 hover:bg-teal-600 hover:text-white hover:border-teal-600 transition-colors" 
             asChild
           >
             <Link href="/water-projects">View Water Projects</Link>
