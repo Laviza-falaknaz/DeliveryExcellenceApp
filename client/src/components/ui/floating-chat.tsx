@@ -82,18 +82,7 @@ export function FloatingChat() {
                 variant="outline"
                 asChild
               >
-                <a href="https://my-warranty.com/kb/" target="_blank" rel="noreferrer">
-                  <i className="ri-book-line mr-2"></i>
-                  Knowledge Base
-                </a>
-              </Button>
-              
-              <Button 
-                className="w-full justify-start btn-outline-hover" 
-                variant="outline"
-                asChild
-              >
-                <a href="https://my-warranty.com/troubleshoot/" target="_blank" rel="noreferrer">
+                <a href="https://my-warranty.com/" target="_blank" rel="noreferrer">
                   <i className="ri-tools-line mr-2"></i>
                   Troubleshooting
                 </a>
