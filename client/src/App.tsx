@@ -19,6 +19,7 @@ import { useEffect, useState } from "react";
 import { apiRequest } from "@/lib/queryClient";
 import Sidebar from "@/components/layout/sidebar";
 import MobileNav from "@/components/layout/mobile-nav";
+import { FloatingChat } from "@/components/ui/floating-chat";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
@@ -62,6 +63,7 @@ function AppLayout({ children }: { children: React.ReactNode }) {
       <main className="flex-1 overflow-y-auto pt-16 md:pt-0">
         {children}
       </main>
+      <FloatingChat />
     </div>
   );
 }
