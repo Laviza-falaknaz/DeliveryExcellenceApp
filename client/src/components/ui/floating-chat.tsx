@@ -11,17 +11,32 @@ import {
 export function FloatingChat() {
   const [isOpen, setIsOpen] = useState(false);
 
+  console.log('FloatingChat component rendered');
+
   return (
     <>
       {/* Floating Chat Button */}
-      <div className="fixed bottom-6 right-6 z-50">
-        <Button
-          onClick={() => setIsOpen(true)}
-          className="w-14 h-14 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 btn-primary-hover"
-          aria-label="Open live chat"
-        >
-          <i className="ri-customer-service-2-line text-xl text-white"></i>
-        </Button>
+      <div 
+        className="fixed bottom-6 right-6 z-[9999]" 
+        style={{ 
+          position: 'fixed', 
+          bottom: '24px', 
+          right: '24px', 
+          zIndex: 9999,
+          backgroundColor: '#08ABAB',
+          width: '56px',
+          height: '56px',
+          borderRadius: '50%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          cursor: 'pointer',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+        }}
+        onClick={() => setIsOpen(true)}
+        data-testid="floating-chat-button"
+      >
+        <i className="ri-customer-service-2-line text-xl text-white"></i>
       </div>
 
       {/* Chat Dialog */}
