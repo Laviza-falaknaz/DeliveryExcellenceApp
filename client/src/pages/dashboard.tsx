@@ -145,9 +145,6 @@ export default function Dashboard() {
       <section className="mb-8">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold font-poppins">Your Water Impact</h2>
-          <Link href="/water-projects" className="text-sm text-primary font-medium hover:underline">
-            View all projects
-          </Link>
         </div>
         
         <WaterImpact />
