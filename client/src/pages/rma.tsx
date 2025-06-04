@@ -196,7 +196,8 @@ export default function RMA() {
           </Button>
           <Button 
             asChild
-            className="bg-black text-white border-black hover:bg-teal-600 hover:border-teal-600 transition-colors"
+            variant="outline"
+            className="bg-white text-black border-neutral-300 hover:bg-teal-600 hover:text-white hover:border-teal-600 transition-colors"
           >
             <a href="https://my-warranty.com/troubleshoot/" target="_blank" rel="noreferrer">
               <i className="ri-add-line mr-2"></i>
@@ -614,7 +615,8 @@ export default function RMA() {
                 </Button>
                 <Button 
                   type="submit"
-                  className="bg-black text-white border-black hover:bg-teal-600 hover:border-teal-600 transition-colors"
+                  variant="outline"
+                  className="bg-white text-black border-neutral-300 hover:bg-teal-600 hover:text-white hover:border-teal-600 transition-colors"
                 >
                   Complete RMA Request
                 </Button>
