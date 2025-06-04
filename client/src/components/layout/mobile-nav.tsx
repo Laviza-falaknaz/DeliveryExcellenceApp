@@ -51,11 +51,13 @@ export default function MobileNav() {
             </SheetTrigger>
             <SheetContent side="left" className="p-0">
               <div className="p-4 border-b border-neutral-200">
-                <img 
-                  src="/attached_assets/CC_Logo_Teal.png" 
-                  alt="Circular Computing" 
-                  className="h-8 w-auto"
-                />
+                <a href="https://circularcomputing.com/" target="_blank" rel="noreferrer">
+                  <img 
+                    src="/attached_assets/CC_Logo_Teal.png" 
+                    alt="Circular Computing" 
+                    className="h-8 w-auto cursor-pointer"
+                  />
+                </a>
               </div>
 
               <div className="py-4">
@@ -187,11 +189,13 @@ export default function MobileNav() {
               )}
             </SheetContent>
           </Sheet>
-          <img 
-            src="/attached_assets/CC_Logo_Teal.png" 
-            alt="Circular Computing" 
-            className="h-8 w-auto"
-          />
+          <a href="https://circularcomputing.com/" target="_blank" rel="noreferrer">
+            <img 
+              src="/attached_assets/CC_Logo_Teal.png" 
+              alt="Circular Computing" 
+              className="h-8 w-auto cursor-pointer"
+            />
+          </a>
         </div>
         <div className="flex items-center space-x-3">
           <Button variant="ghost" size="icon" className="text-neutral-700">

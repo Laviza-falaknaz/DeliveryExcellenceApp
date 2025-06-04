@@ -49,7 +49,7 @@ export default function Sidebar() {
   return (
     <aside className="hidden md:flex md:flex-col md:w-64 md:min-w-64 bg-white border-r border-neutral-200 shadow-sm">
       <div className="p-4 border-b border-neutral-200">
-        <Link href="/">
+        <a href="https://circularcomputing.com/" target="_blank" rel="noreferrer">
           <div className="flex items-center cursor-pointer">
             <img 
               src="/attached_assets/CC_Logo_Teal.png" 
@@ -57,7 +57,7 @@ export default function Sidebar() {
               className="h-8 w-auto"
             />
           </div>
-        </Link>
+        </a>
       </div>
 
       <div className="px-3 py-4 flex-1 overflow-y-auto">
