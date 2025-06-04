@@ -119,7 +119,7 @@ export default function WaterImpact() {
 
 
         <div className="mt-6 flex justify-end">
-          <Button variant="outline" className="border-secondary text-secondary" asChild>
+          <Button variant="outline" className="btn-outline-hover" asChild>
             <Link href="/water-projects">
               View Water Projects
             </Link>
