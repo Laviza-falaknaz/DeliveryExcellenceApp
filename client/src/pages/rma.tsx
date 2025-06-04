@@ -185,7 +185,15 @@ export default function RMA() {
           <h1 className="text-2xl font-bold font-poppins text-neutral-900">RMA Tracking</h1>
           <p className="text-neutral-600">Manage your return merchandise authorizations</p>
         </div>
-        <div className="mt-4 md:mt-0">
+        <div className="flex gap-3 mt-4 md:mt-0">
+          <Button 
+            onClick={() => window.open('https://circularcomputing.com/contact/', '_blank')}
+            variant="outline"
+            className="bg-white border-neutral-300 text-neutral-900 hover:bg-teal-600 hover:text-white hover:border-teal-600 transition-colors"
+          >
+            <i className="ri-phone-line mr-2"></i>
+            <span>Contact Us</span>
+          </Button>
           <Button asChild>
             <a href="https://my-warranty.com/troubleshoot/" target="_blank" rel="noreferrer">
               <i className="ri-add-line mr-2"></i>
