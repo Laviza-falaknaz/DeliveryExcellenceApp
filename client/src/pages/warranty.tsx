@@ -159,9 +159,21 @@ export default function Warranty() {
 
   return (
     <div className="py-6 px-4 md:px-8 max-w-7xl mx-auto">
-      <div className="flex flex-col mb-6">
-        <h1 className="text-2xl font-bold font-poppins text-neutral-900">Warranty & Troubleshooting</h1>
-        <p className="text-neutral-600">Check your warranty status and get support for your product</p>
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+        <div>
+          <h1 className="text-2xl font-bold font-poppins text-neutral-900">Warranty & Troubleshooting</h1>
+          <p className="text-neutral-600">Check your warranty status and get support for your product</p>
+        </div>
+        <div className="mt-4 md:mt-0">
+          <Button 
+            onClick={() => window.open('https://circularcomputing.com/contact/', '_blank')}
+            variant="outline"
+            className="bg-white border-neutral-300 text-neutral-900 hover:bg-teal-600 hover:text-white hover:border-teal-600 transition-colors"
+          >
+            <i className="ri-phone-line mr-2"></i>
+            <span>Contact Us</span>
+          </Button>
+        </div>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">

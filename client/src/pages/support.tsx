@@ -119,7 +119,15 @@ export default function Support() {
           <h1 className="text-2xl font-bold font-poppins text-neutral-900">Support</h1>
           <p className="text-neutral-600">Get assistance with your remanufactured laptops</p>
         </div>
-        <div className="mt-4 md:mt-0">
+        <div className="flex gap-3 mt-4 md:mt-0">
+          <Button 
+            onClick={() => window.open('https://circularcomputing.com/contact/', '_blank')}
+            variant="outline"
+            className="bg-white border-neutral-300 text-neutral-900 hover:bg-teal-600 hover:text-white hover:border-teal-600 transition-colors"
+          >
+            <i className="ri-phone-line mr-2"></i>
+            <span>Contact Us</span>
+          </Button>
           <Button 
             onClick={() => setIsNewTicketDialogOpen(true)}
             className="bg-white text-neutral-900 border border-neutral-300 hover:bg-teal-600 hover:text-white hover:border-teal-600 transition-colors"
