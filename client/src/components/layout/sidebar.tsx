@@ -74,7 +74,7 @@ export default function Sidebar() {
           </NavItem>
           <NavItem
             href="/delivery-timeline"
-            icon="ri-timeline-line"
+            icon="ri-time-line"
             active={location === "/delivery-timeline"}
           >
             Delivery Timeline
