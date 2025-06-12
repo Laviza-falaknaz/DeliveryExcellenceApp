@@ -33,7 +33,7 @@ export default function DeliveryTimelinePage() {
 
   const { data: timeline, isLoading } = useQuery({
     queryKey: ["/api/delivery-timeline", displayOrderId],
-    enabled: !!displayOrderId,
+    enabled: false, // Disable API call for now, show static timeline
   });
 
   const updateTimelineMutation = useMutation({
@@ -326,17 +326,17 @@ export default function DeliveryTimelinePage() {
                 <span className="font-medium">MS Diagnostics CRM</span>
               </div>
               <p className="text-sm text-muted-foreground">
-                {timeline?.customerSuccessCheckIn ? 'Connected and syncing' : 'Integration in progress'}
+                {(timeline as any)?.customerSuccessCheckIn ? 'Connected and syncing' : 'Integration in progress'}
               </p>
             </div>
             
             <div className="p-4 border rounded-lg">
               <div className="flex items-center gap-2 mb-2">
-                <div className={`w-3 h-3 rounded-full ${timeline?.orderCompleted ? 'bg-green-500' : 'bg-yellow-500'}`} />
+                <div className={`w-3 h-3 rounded-full ${(timeline as any)?.orderCompleted ? 'bg-green-500' : 'bg-yellow-500'}`} />
                 <span className="font-medium">MS Teams Deployment</span>
               </div>
               <p className="text-sm text-muted-foreground">
-                {timeline?.orderCompleted ? 'Deployment complete' : 'Deployment in progress'}
+                {(timeline as any)?.orderCompleted ? 'Deployment complete' : 'Deployment in progress'}
               </p>
             </div>
           </div>
