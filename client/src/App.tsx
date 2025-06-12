@@ -123,6 +123,11 @@ function Router() {
           <CaseStudies />
         </ProtectedRoute>
       </Route>
+      <Route path="/delivery-timeline">
+        <ProtectedRoute>
+          <DeliveryTimeline />
+        </ProtectedRoute>
+      </Route>
       <Route component={NotFound} />
     </Switch>
   );

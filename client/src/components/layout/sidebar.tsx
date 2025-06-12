@@ -73,6 +73,13 @@ export default function Sidebar() {
             Orders
           </NavItem>
           <NavItem
+            href="/delivery-timeline"
+            icon="ri-timeline-line"
+            active={location === "/delivery-timeline"}
+          >
+            Delivery Timeline
+          </NavItem>
+          <NavItem
             href="/rma"
             icon="ri-refresh-line"
             active={location === "/rma"}

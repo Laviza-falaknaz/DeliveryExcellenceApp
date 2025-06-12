@@ -181,17 +181,7 @@ export default function DeliveryTimelinePage() {
     }
   };
 
-  if (!user) {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <Card>
-          <CardContent className="pt-6">
-            <p className="text-center text-muted-foreground">Please log in to view your delivery timeline.</p>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
+
 
   if (!currentOrderId) {
     return (
@@ -334,21 +324,21 @@ export default function DeliveryTimelinePage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="p-4 border rounded-lg">
               <div className="flex items-center gap-2 mb-2">
-                <div className={`w-3 h-3 rounded-full ${timeline?.crmIntegrationCompleted ? 'bg-green-500' : 'bg-yellow-500'}`} />
+                <div className={`w-3 h-3 rounded-full ${timeline?.customerSuccessCheckIn ? 'bg-green-500' : 'bg-yellow-500'}`} />
                 <span className="font-medium">MS Diagnostics CRM</span>
               </div>
               <p className="text-sm text-muted-foreground">
-                {timeline?.crmIntegrationCompleted ? 'Connected and syncing' : 'Integration in progress'}
+                {timeline?.customerSuccessCheckIn ? 'Connected and syncing' : 'Integration in progress'}
               </p>
             </div>
             
             <div className="p-4 border rounded-lg">
               <div className="flex items-center gap-2 mb-2">
-                <div className={`w-3 h-3 rounded-full ${timeline?.msTeamsDeploymentCompleted ? 'bg-green-500' : 'bg-yellow-500'}`} />
+                <div className={`w-3 h-3 rounded-full ${timeline?.orderCompleted ? 'bg-green-500' : 'bg-yellow-500'}`} />
                 <span className="font-medium">MS Teams Deployment</span>
               </div>
               <p className="text-sm text-muted-foreground">
-                {timeline?.msTeamsDeploymentCompleted ? 'Deployment complete' : 'Deployment in progress'}
+                {timeline?.orderCompleted ? 'Deployment complete' : 'Deployment in progress'}
               </p>
             </div>
           </div>
