@@ -7,7 +7,8 @@ import {
   rmas, Rma, InsertRma,
   waterProjects, WaterProject, InsertWaterProject,
   supportTickets, SupportTicket, InsertSupportTicket,
-  caseStudies, CaseStudy, InsertCaseStudy
+  caseStudies, CaseStudy, InsertCaseStudy,
+  deliveryTimelines, DeliveryTimeline, InsertDeliveryTimeline
 } from "@shared/schema";
 
 export interface IStorage {
@@ -67,6 +68,11 @@ export interface IStorage {
   getCaseStudiesByUserId(userId: number): Promise<CaseStudy[]>;
   createCaseStudy(caseStudy: InsertCaseStudy): Promise<CaseStudy>;
   updateCaseStudy(id: number, data: Partial<CaseStudy>): Promise<CaseStudy | undefined>;
+
+  // Delivery timeline operations
+  getDeliveryTimeline(orderId: number): Promise<DeliveryTimeline | undefined>;
+  createDeliveryTimeline(timeline: InsertDeliveryTimeline): Promise<DeliveryTimeline>;
+  updateDeliveryTimeline(orderId: number, data: Partial<DeliveryTimeline>): Promise<DeliveryTimeline | undefined>;
 }
 
 export class MemStorage implements IStorage {
@@ -79,6 +85,7 @@ export class MemStorage implements IStorage {
   private waterProjects: Map<number, WaterProject>;
   private supportTickets: Map<number, SupportTicket>;
   private caseStudies: Map<number, CaseStudy>;
+  private deliveryTimelines: Map<number, DeliveryTimeline>;
 
   private currentUserId: number;
   private currentOrderId: number;
@@ -100,6 +107,7 @@ export class MemStorage implements IStorage {
     this.waterProjects = new Map();
     this.supportTickets = new Map();
     this.caseStudies = new Map();
+    this.deliveryTimelines = new Map();
 
     this.currentUserId = 1;
     this.currentOrderId = 1;
@@ -402,6 +410,36 @@ export class MemStorage implements IStorage {
     const updatedCaseStudy = { ...caseStudy, ...data };
     this.caseStudies.set(id, updatedCaseStudy);
     return updatedCaseStudy;
+  }
+
+  // Delivery timeline operations
+  async getDeliveryTimeline(orderId: number): Promise<DeliveryTimeline | undefined> {
+    return Array.from(this.deliveryTimelines.values()).find(timeline => timeline.orderId === orderId);
+  }
+
+  async createDeliveryTimeline(insertTimeline: InsertDeliveryTimeline): Promise<DeliveryTimeline> {
+    const id = this.deliveryTimelines.size + 1;
+    const createdAt = new Date();
+    const updatedAt = new Date();
+
+    const timeline: DeliveryTimeline = { 
+      ...insertTimeline, 
+      id, 
+      createdAt, 
+      updatedAt,
+      orderPlaced: true // First step is always completed when timeline is created
+    };
+    this.deliveryTimelines.set(id, timeline);
+    return timeline;
+  }
+
+  async updateDeliveryTimeline(orderId: number, data: Partial<DeliveryTimeline>): Promise<DeliveryTimeline | undefined> {
+    const timeline = await this.getDeliveryTimeline(orderId);
+    if (!timeline) return undefined;
+
+    const updatedTimeline = { ...timeline, ...data, updatedAt: new Date() };
+    this.deliveryTimelines.set(timeline.id, updatedTimeline);
+    return updatedTimeline;
   }
 }
 

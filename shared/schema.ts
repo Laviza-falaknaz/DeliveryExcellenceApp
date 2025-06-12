@@ -215,6 +215,33 @@ export const insertCaseStudySchema = createInsertSchema(caseStudies).omit({
   createdAt: true,
 });
 
+// Delivery Timeline
+export const deliveryTimelines = pgTable("delivery_timelines", {
+  id: serial("id").primaryKey(),
+  orderId: integer("order_id").references(() => orders.id).notNull(),
+  orderPlaced: boolean("order_placed").default(false),
+  customerSuccessCallBooked: boolean("customer_success_call_booked").default(false),
+  rateYourExperience: boolean("rate_your_experience").default(false),
+  customerSuccessIntroCall: boolean("customer_success_intro_call").default(false),
+  orderInProgress: boolean("order_in_progress").default(false),
+  orderBeingBuilt: boolean("order_being_built").default(false),
+  qualityChecks: boolean("quality_checks").default(false),
+  readyForDelivery: boolean("ready_for_delivery").default(false),
+  orderDelivered: boolean("order_delivered").default(false),
+  rateYourProduct: boolean("rate_your_product").default(false),
+  customerSuccessCallBookedPost: boolean("customer_success_call_booked_post").default(false),
+  customerSuccessCheckIn: boolean("customer_success_check_in").default(false),
+  orderCompleted: boolean("order_completed").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertDeliveryTimelineSchema = createInsertSchema(deliveryTimelines).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 // Types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -242,3 +269,6 @@ export type InsertSupportTicket = z.infer<typeof insertSupportTicketSchema>;
 
 export type CaseStudy = typeof caseStudies.$inferSelect;
 export type InsertCaseStudy = z.infer<typeof insertCaseStudySchema>;
+
+export type DeliveryTimeline = typeof deliveryTimelines.$inferSelect;
+export type InsertDeliveryTimeline = z.infer<typeof insertDeliveryTimelineSchema>;
