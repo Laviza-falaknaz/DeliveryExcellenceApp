@@ -83,6 +83,11 @@ function Router() {
           <Orders />
         </ProtectedRoute>
       </Route>
+      <Route path="/delivery-timeline">
+        <ProtectedRoute>
+          <DeliveryTimeline />
+        </ProtectedRoute>
+      </Route>
       <Route path="/rma">
         <ProtectedRoute>
           <RMA />
