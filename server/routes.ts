@@ -11,6 +11,7 @@ import {
   insertRmaSchema,
   insertSupportTicketSchema,
   insertCaseStudySchema,
+  insertDeliveryTimelineSchema,
   User
 } from "@shared/schema";
 import session from "express-session";
@@ -493,6 +494,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: error.errors });
       }
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Delivery timeline routes
+  app.get("/api/delivery-timeline/:orderId", isAuthenticated, async (req, res) => {
+    try {
+      const orderId = parseInt(req.params.orderId);
+      const timeline = await storage.getDeliveryTimeline(orderId);
+      
+      if (!timeline) {
+        return res.status(404).json({ message: "Timeline not found" });
+      }
+      
+      res.json(timeline);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/delivery-timeline", isAuthenticated, async (req, res) => {
+    try {
+      const timelineData = insertDeliveryTimelineSchema.parse(req.body);
+      const timeline = await storage.createDeliveryTimeline(timelineData);
+      res.status(201).json(timeline);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: error.errors });
+      }
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.patch("/api/delivery-timeline/:orderId", isAuthenticated, async (req, res) => {
+    try {
+      const orderId = parseInt(req.params.orderId);
+      const updateData = req.body;
+      
+      const timeline = await storage.updateDeliveryTimeline(orderId, updateData);
+      
+      if (!timeline) {
+        return res.status(404).json({ message: "Timeline not found" });
+      }
+      
+      res.json(timeline);
+    } catch (error) {
       res.status(500).json({ message: "Internal server error" });
     }
   });
