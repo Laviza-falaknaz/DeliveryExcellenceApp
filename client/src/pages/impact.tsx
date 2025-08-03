@@ -50,7 +50,7 @@ export default function Impact() {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold font-poppins text-neutral-900">
-            Environmental Impact
+            Your Impact
           </h1>
           <p className="text-neutral-600">
             Track the positive impact of your remanufactured laptop purchases

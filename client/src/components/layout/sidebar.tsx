@@ -115,7 +115,7 @@ export default function Sidebar() {
             icon="ri-leaf-line"
             active={location === "/impact"}
           >
-            Environmental Impact
+            Your Impact
           </NavItem>
           <NavItem
             href="/esg-report"

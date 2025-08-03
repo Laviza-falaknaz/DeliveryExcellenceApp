@@ -134,7 +134,7 @@ export default function MobileNav() {
                         location === "/impact" && "bg-primary-light/10 text-primary font-medium"
                       )}>
                         <i className="ri-leaf-line text-xl mr-3"></i>
-                        <span>Environmental Impact</span>
+                        <span>Your Impact</span>
                       </div>
                     </Link>
                     <Link href="/esg-report" onClick={() => setOpen(false)}>
