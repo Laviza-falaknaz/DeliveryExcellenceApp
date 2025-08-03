@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -15,9 +15,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Separator } from "@/components/ui/separator";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Skeleton } from "@/components/ui/skeleton";
-import { AlertCircle, CheckCircle, HelpCircle, Search } from "lucide-react";
+import { AlertCircle, CheckCircle, HelpCircle, Search, Camera, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { BrowserMultiFormatReader, NotFoundException } from "@zxing/library";
 
 const serialNumberSchema = z.object({
   serialNumber: z.string().min(5, "Serial number must be at least 5 characters"),
@@ -34,9 +35,83 @@ export default function Warranty() {
   const [activeTab, setActiveTab] = useState("warranty");
   const [searchPerformed, setSearchPerformed] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isScanning, setIsScanning] = useState(false);
+  const [scannerError, setScannerError] = useState<string | null>(null);
   
   // Mock data for warranty lookup
   const [warrantyInfo, setWarrantyInfo] = useState<any>(null);
+  
+  // Scanner refs
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const codeReader = useRef<BrowserMultiFormatReader | null>(null);
+  
+  // Initialize scanner
+  useEffect(() => {
+    codeReader.current = new BrowserMultiFormatReader();
+    return () => {
+      if (codeReader.current) {
+        codeReader.current.reset();
+      }
+    };
+  }, []);
+  
+  const startScanner = async () => {
+    if (!codeReader.current || !videoRef.current) return;
+    
+    try {
+      setIsScanning(true);
+      setScannerError(null);
+      
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: { 
+          facingMode: 'environment',
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
+        } 
+      });
+      
+      videoRef.current.srcObject = stream;
+      
+      codeReader.current.decodeFromVideoDevice(undefined, videoRef.current, (result, error) => {
+        if (result) {
+          const scannedText = result.getText();
+          // Validate if it looks like a serial number (alphanumeric)
+          if (/^[A-Za-z0-9]{5,}$/.test(scannedText)) {
+            serialForm.setValue('serialNumber', scannedText);
+            stopScanner();
+            toast({
+              title: "Serial Number Scanned",
+              description: `Successfully scanned: ${scannedText}`,
+            });
+          }
+        }
+        
+        if (error && !(error instanceof NotFoundException)) {
+          console.warn('Scanner error:', error);
+        }
+      });
+      
+    } catch (error) {
+      console.error('Failed to start scanner:', error);
+      setScannerError('Failed to access camera. Please ensure camera permissions are granted.');
+      setIsScanning(false);
+    }
+  };
+  
+  const stopScanner = () => {
+    if (codeReader.current) {
+      codeReader.current.reset();
+    }
+    
+    if (videoRef.current && videoRef.current.srcObject) {
+      const stream = videoRef.current.srcObject as MediaStream;
+      stream.getTracks().forEach(track => track.stop());
+      videoRef.current.srcObject = null;
+    }
+    
+    setIsScanning(false);
+    setScannerError(null);
+  };
   
   const { data: user, isLoading: isUserLoading } = useQuery({
     queryKey: ["/api/auth/me"],
@@ -205,16 +280,34 @@ export default function Warranty() {
                             <Input placeholder="e.g. CC21XG45T" {...field} />
                           </FormControl>
                           <Button 
+                            type="button"
+                            onClick={isScanning ? stopScanner : startScanner}
+                            variant="outline"
+                            className="bg-white border-neutral-300 text-neutral-900 hover:bg-primary hover:border-primary hover:text-white transition-all duration-200 shrink-0"
+                          >
+                            {isScanning ? (
+                              <>
+                                <X className="w-4 h-4 mr-2" />
+                                Stop Scanner
+                              </>
+                            ) : (
+                              <>
+                                <Camera className="w-4 h-4 mr-2" />
+                                Scan Serial
+                              </>
+                            )}
+                          </Button>
+                          <Button 
                             type="submit" 
                             disabled={isSubmitting}
                             variant="outline"
-                            className="bg-white border-neutral-300 text-neutral-900 hover:bg-primary hover:border-primary hover:text-white transition-all duration-200"
+                            className="bg-white border-neutral-300 text-neutral-900 hover:bg-primary hover:border-primary hover:text-white transition-all duration-200 shrink-0"
                           >
-                            {isSubmitting ? "Checking..." : "Check Warranty Status"}
+                            {isSubmitting ? "Checking..." : "Check Status"}
                           </Button>
                         </div>
                         <FormDescription>
-                          The serial number can be found on the bottom of your laptop or in the system information.
+                          You can scan the serial number from your laptop's label or enter it manually. The serial number is usually found on the bottom of your device.
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
@@ -222,6 +315,37 @@ export default function Warranty() {
                   />
                 </form>
               </Form>
+              
+              {/* Scanner Display */}
+              {isScanning && (
+                <div className="mt-4">
+                  <div className="relative bg-black rounded-lg overflow-hidden">
+                    <video
+                      ref={videoRef}
+                      autoPlay
+                      playsInline
+                      className="w-full h-64 object-cover"
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="w-48 h-32 border-2 border-primary bg-primary/10 rounded-lg flex items-center justify-center">
+                        <span className="text-primary text-sm font-medium">Position serial number here</span>
+                      </div>
+                    </div>
+                  </div>
+                  <p className="text-sm text-neutral-600 mt-2 text-center">
+                    Position your device's serial number label within the highlighted area
+                  </p>
+                </div>
+              )}
+              
+              {/* Scanner Error */}
+              {scannerError && (
+                <Alert className="mt-4" variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertTitle>Scanner Error</AlertTitle>
+                  <AlertDescription>{scannerError}</AlertDescription>
+                </Alert>
+              )}
             </CardContent>
           </Card>
 
