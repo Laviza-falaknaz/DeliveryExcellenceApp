@@ -72,7 +72,7 @@ export default function Warranty() {
       
       videoRef.current.srcObject = stream;
       
-      codeReader.current.decodeFromVideoDevice(undefined, videoRef.current, (result, error) => {
+      codeReader.current.decodeFromVideoDevice(null, videoRef.current, (result, error) => {
         if (result) {
           const scannedText = result.getText();
           // Validate if it looks like a serial number (alphanumeric)
