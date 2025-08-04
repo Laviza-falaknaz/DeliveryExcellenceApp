@@ -98,13 +98,48 @@ export default function RMA() {
       codeReader.current.decodeFromVideoDevice(null, videoRef.current, (result, error) => {
         if (result) {
           const scannedText = result.getText();
-          // Validate if it looks like a serial number (alphanumeric)
-          if (/^[A-Za-z0-9]{5,}$/.test(scannedText)) {
-            serialForm.setValue('serialNumber', scannedText);
+          // Handle both QR codes and alphanumeric serial numbers
+          // QR codes may contain URLs or JSON, extract serial number if needed
+          let serialNumber = scannedText;
+          
+          // If it's a URL, try to extract serial number from query params
+          if (scannedText.startsWith('http')) {
+            try {
+              const url = new URL(scannedText);
+              const serialFromUrl = url.searchParams.get('serial') || url.searchParams.get('sn');
+              if (serialFromUrl) {
+                serialNumber = serialFromUrl;
+              }
+            } catch (e) {
+              // If URL parsing fails, use the original text
+            }
+          }
+          
+          // If it's JSON, try to extract serial number
+          if (scannedText.startsWith('{')) {
+            try {
+              const parsed = JSON.parse(scannedText);
+              if (parsed.serial || parsed.serialNumber || parsed.sn) {
+                serialNumber = parsed.serial || parsed.serialNumber || parsed.sn;
+              }
+            } catch (e) {
+              // If JSON parsing fails, use the original text
+            }
+          }
+          
+          // Validate if it looks like a serial number (alphanumeric, at least 5 characters)
+          if (/^[A-Za-z0-9]{5,}$/.test(serialNumber)) {
+            serialForm.setValue('serialNumber', serialNumber);
             stopScanner();
             toast({
-              title: "Serial Number Scanned",
-              description: `Successfully scanned: ${scannedText}`,
+              title: "Code Scanned Successfully",
+              description: `Serial number captured: ${serialNumber}`,
+            });
+          } else {
+            toast({
+              title: "Invalid Code",
+              description: "Please scan a valid QR code or barcode containing a serial number",
+              variant: "destructive",
             });
           }
         }
@@ -479,7 +514,7 @@ export default function RMA() {
                             ) : (
                               <>
                                 <Camera className="w-4 h-4 mr-2" />
-                                Scan Serial
+                                Scan QR/Barcode
                               </>
                             )}
                           </Button>
@@ -488,7 +523,7 @@ export default function RMA() {
                           </Button>
                         </div>
                         <FormDescription>
-                          You can scan the serial number from your laptop's label or enter it manually. The serial number is usually found on the bottom of your device.
+                          Scan QR codes or barcodes containing serial numbers, or enter the serial number manually. The serial number is usually found on the bottom of your device.
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
@@ -508,12 +543,12 @@ export default function RMA() {
                     />
                     <div className="absolute inset-0 flex items-center justify-center">
                       <div className="w-48 h-32 border-2 border-primary bg-primary/10 rounded-lg flex items-center justify-center">
-                        <span className="text-primary text-sm font-medium">Position serial number here</span>
+                        <span className="text-primary text-sm font-medium">Position QR code or barcode here</span>
                       </div>
                     </div>
                   </div>
                   <p className="text-sm text-neutral-600 mt-2 text-center">
-                    Position your device's serial number label within the highlighted area
+                    Position your device's QR code, barcode, or serial number label within the highlighted area
                   </p>
                 </div>
               )}
