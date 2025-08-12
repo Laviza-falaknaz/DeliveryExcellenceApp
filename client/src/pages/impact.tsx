@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
 import { formatEnvironmentalImpact } from "@/lib/utils";
 import {
@@ -21,6 +22,7 @@ import {
   Cell,
 } from "recharts";
 import { Link } from "wouter";
+import { Copy, Share2 } from "lucide-react";
 
 // Mock data for charts - would be replaced by actual data in a real implementation
 const monthlyData = [
@@ -44,6 +46,108 @@ const COLORS = ["#4caf50", "#03a9f4", "#ffa726", "#f44336", "#9c27b0"];
 
 export default function Impact() {
   const { impact, isLoadingImpact } = useImpact();
+  const { toast } = useToast();
+
+  // Create personalized social media content
+  const generateSocialContent = (platform: string) => {
+    const data = impact || {
+      carbonSaved: 316,
+      waterProvided: 2500,
+      mineralsSaved: 580,
+      treesEquivalent: 12,
+      familiesHelped: 8
+    };
+
+    const baseContent = {
+      linkedin: `🌱 Proud to share our sustainability journey with @CircularComputing! 
+      
+Our commitment to remanufactured IT has achieved:
+✅ ${data.carbonSaved}kg CO₂ saved from the atmosphere
+💧 ${data.waterProvided}L clean water provided to communities in need
+🌍 ${data.mineralsSaved}g precious minerals conserved
+🌳 Equivalent to planting ${data.treesEquivalent} trees
+👥 Supporting ${data.familiesHelped} families with clean water access
+
+By choosing remanufactured technology, we've diverted valuable IT equipment from unnecessary landfill waste while delivering the same performance as new devices.
+
+#SustainableIT #CircularEconomy #ClimateAction #ESG #TechForGood #CircularComputing`,
+
+      x: `🌱 Making a real impact with @CircularComputing remanufactured IT!
+
+📊 Our sustainability wins:
+• ${data.carbonSaved}kg CO₂ saved ✅
+• ${data.waterProvided}L clean water provided 💧  
+• ${data.mineralsSaved}g minerals conserved 🌍
+• ${data.treesEquivalent} trees equivalent planted 🌳
+
+Keeping tech out of landfill while supporting communities! #SustainableIT #CircularEconomy`,
+
+      instagram: `🌱✨ Sustainability wins with Circular Computing! 
+
+Our remanufactured IT journey has achieved:
+🌍 ${data.carbonSaved}kg CO₂ saved
+💧 ${data.waterProvided}L clean water for communities  
+⚡ ${data.mineralsSaved}g precious minerals conserved
+🌳 Like planting ${data.treesEquivalent} trees!
+
+Choosing remanufactured means high performance + low environmental impact. We're keeping valuable technology out of landfill while supporting families with clean water access through @charitywater partnerships.
+
+#SustainableIT #CircularEconomy #TechForGood #ClimateAction #ESG #Sustainability #RemanufacturedTech`,
+
+      facebook: `🌱 Excited to share our sustainability achievements with Circular Computing!
+
+Our organization has made a real environmental impact by choosing remanufactured IT equipment:
+
+🌍 Environmental Impact:
+• ${data.carbonSaved}kg of CO₂ saved from the atmosphere
+• ${data.mineralsSaved}g of precious minerals conserved  
+• Equivalent to planting ${data.treesEquivalent} trees
+• Diverted technology from unnecessary landfill waste
+
+💧 Community Impact:
+• ${data.waterProvided}L of clean water provided to communities in need
+• Supporting ${data.familiesHelped} families with sustainable water access
+
+By choosing remanufactured laptops, we get the same performance as new devices while making a positive difference for both our planet and communities worldwide. 
+
+Learn more about sustainable IT solutions: circularcomputing.com
+
+#SustainableIT #CircularEconomy #ClimateAction #ESG #TechForGood`
+    };
+
+    return baseContent[platform as keyof typeof baseContent];
+  };
+
+  const shareContent = (platform: string, content: string) => {
+    const encodedContent = encodeURIComponent(content);
+    const url = encodeURIComponent('https://circularcomputing.com');
+    
+    const shareUrls = {
+      linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${url}&summary=${encodedContent}`,
+      x: `https://twitter.com/intent/tweet?text=${encodedContent}&url=${url}`,
+      instagram: content, // Instagram doesn't have direct URL sharing - return content for copying
+      facebook: `https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${encodedContent}`
+    };
+
+    if (platform === 'instagram') {
+      // Copy to clipboard for Instagram
+      navigator.clipboard.writeText(content);
+      toast({
+        title: "Content Copied!",
+        description: "Instagram post content copied to clipboard. Open Instagram to share!"
+      });
+    } else {
+      window.open(shareUrls[platform as keyof typeof shareUrls], '_blank', 'width=600,height=400');
+    }
+  };
+
+  const copyToClipboard = (content: string) => {
+    navigator.clipboard.writeText(content);
+    toast({
+      title: "Copied to Clipboard!",
+      description: "Social media content copied successfully."
+    });
+  };
 
   return (
     <div className="py-6 px-4 md:px-8 max-w-7xl mx-auto">
@@ -356,6 +460,165 @@ export default function Impact() {
                     className="w-full h-full object-contain"
                   />
                 </motion.div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </section>
+
+      {/* Share My Success Section */}
+      <section className="mb-8">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Share2 className="h-5 w-5 text-teal-600" />
+              Share My Success
+            </CardTitle>
+            <p className="text-neutral-600">
+              Showcase your sustainability achievements and inspire others to make environmentally conscious IT choices.
+            </p>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {/* LinkedIn */}
+            <div className="border rounded-lg p-4">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-8 h-8 bg-[#0077B5] rounded flex items-center justify-center">
+                  <i className="ri-linkedin-fill text-white text-lg"></i>
+                </div>
+                <h4 className="font-semibold">LinkedIn</h4>
+              </div>
+              <div className="bg-neutral-50 rounded p-3 mb-3 max-h-32 overflow-y-auto">
+                <p className="text-sm text-neutral-700 whitespace-pre-wrap">
+                  {generateSocialContent('linkedin')}
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  onClick={() => shareContent('linkedin', generateSocialContent('linkedin'))}
+                  className="bg-[#0077B5] hover:bg-[#005885] text-white"
+                >
+                  Share on LinkedIn
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => copyToClipboard(generateSocialContent('linkedin'))}
+                >
+                  <Copy className="h-4 w-4 mr-1" />
+                  Copy
+                </Button>
+              </div>
+            </div>
+
+            {/* X (Twitter) */}
+            <div className="border rounded-lg p-4">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-8 h-8 bg-black rounded flex items-center justify-center">
+                  <i className="ri-twitter-x-line text-white text-lg"></i>
+                </div>
+                <h4 className="font-semibold">X (Twitter)</h4>
+              </div>
+              <div className="bg-neutral-50 rounded p-3 mb-3 max-h-32 overflow-y-auto">
+                <p className="text-sm text-neutral-700 whitespace-pre-wrap">
+                  {generateSocialContent('x')}
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  onClick={() => shareContent('x', generateSocialContent('x'))}
+                  className="bg-black hover:bg-neutral-800 text-white"
+                >
+                  Share on X
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => copyToClipboard(generateSocialContent('x'))}
+                >
+                  <Copy className="h-4 w-4 mr-1" />
+                  Copy
+                </Button>
+              </div>
+            </div>
+
+            {/* Instagram */}
+            <div className="border rounded-lg p-4">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-8 h-8 bg-gradient-to-br from-[#833AB4] via-[#FD1D1D] to-[#F77737] rounded flex items-center justify-center">
+                  <i className="ri-instagram-line text-white text-lg"></i>
+                </div>
+                <h4 className="font-semibold">Instagram</h4>
+              </div>
+              <div className="bg-neutral-50 rounded p-3 mb-3 max-h-32 overflow-y-auto">
+                <p className="text-sm text-neutral-700 whitespace-pre-wrap">
+                  {generateSocialContent('instagram')}
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  onClick={() => shareContent('instagram', generateSocialContent('instagram'))}
+                  className="bg-gradient-to-r from-[#833AB4] via-[#FD1D1D] to-[#F77737] hover:opacity-90 text-white"
+                >
+                  Copy for Instagram
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => copyToClipboard(generateSocialContent('instagram'))}
+                >
+                  <Copy className="h-4 w-4 mr-1" />
+                  Copy
+                </Button>
+              </div>
+            </div>
+
+            {/* Facebook */}
+            <div className="border rounded-lg p-4">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-8 h-8 bg-[#1877F2] rounded flex items-center justify-center">
+                  <i className="ri-facebook-fill text-white text-lg"></i>
+                </div>
+                <h4 className="font-semibold">Facebook</h4>
+              </div>
+              <div className="bg-neutral-50 rounded p-3 mb-3 max-h-32 overflow-y-auto">
+                <p className="text-sm text-neutral-700 whitespace-pre-wrap">
+                  {generateSocialContent('facebook')}
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  onClick={() => shareContent('facebook', generateSocialContent('facebook'))}
+                  className="bg-[#1877F2] hover:bg-[#166FE5] text-white"
+                >
+                  Share on Facebook
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => copyToClipboard(generateSocialContent('facebook'))}
+                >
+                  <Copy className="h-4 w-4 mr-1" />
+                  Copy
+                </Button>
+              </div>
+            </div>
+
+            <div className="bg-teal-50 border border-teal-200 rounded-lg p-4 mt-6">
+              <div className="flex items-start gap-3">
+                <div className="w-8 h-8 bg-teal-600 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                  <img src="/attached_assets/CC_Logo_Teal.png" alt="Circular Computing" className="w-6 h-6" />
+                </div>
+                <div>
+                  <h4 className="font-semibold text-teal-900 mb-1">Circular Computing Branding</h4>
+                  <p className="text-sm text-teal-800">
+                    All social content includes Circular Computing branding and mentions to help spread awareness about sustainable IT solutions. 
+                    Feel free to customize the content while keeping our partnership attribution.
+                  </p>
+                </div>
               </div>
             </div>
           </CardContent>
