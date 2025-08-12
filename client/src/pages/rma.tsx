@@ -315,14 +315,6 @@ export default function RMA() {
             <i className="ri-phone-line mr-2"></i>
             <span>Contact Us</span>
           </Button>
-          <Button 
-            onClick={() => window.location.href = '/warranty-claim'}
-            variant="outline"
-            className="bg-white text-black border-neutral-300 hover:bg-[#08ABAB] hover:text-white hover:border-[#08ABAB] transition-colors"
-          >
-            <i className="ri-add-line mr-2"></i>
-            <span>Create RMA</span>
-          </Button>
         </div>
       </div>
 
