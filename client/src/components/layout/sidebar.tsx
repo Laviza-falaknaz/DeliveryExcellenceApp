@@ -17,7 +17,7 @@ function NavItem({ href, icon, children, active }: NavItemProps) {
       <div
         className={cn(
           "flex items-center px-3 py-2 rounded-lg mb-1 text-black hover:bg-neutral-100 cursor-pointer",
-          active && "bg-primary-light/10 text-primary font-medium"
+          active && "bg-neutral-100 text-black font-medium"
         )}
       >
         <i className={`${icon} text-xl mr-3`}></i>
