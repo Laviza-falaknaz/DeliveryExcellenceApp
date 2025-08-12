@@ -14,6 +14,7 @@ import WaterProjects from "@/pages/water-projects";
 import Profile from "@/pages/profile";
 import CaseStudies from "@/pages/case-studies";
 import Warranty from "@/pages/warranty";
+import Remanufactured from "@/pages/remanufactured";
 import ESGReport from "@/pages/esg-report";
 import DeliveryTimeline from "@/pages/delivery-timeline";
 import WarrantyClaim from "@/pages/warranty-claim";
@@ -112,6 +113,11 @@ function Router() {
       <Route path="/warranty">
         <ProtectedRoute>
           <Warranty />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/remanufactured">
+        <ProtectedRoute>
+          <Remanufactured />
         </ProtectedRoute>
       </Route>
       <Route path="/warranty-claim">

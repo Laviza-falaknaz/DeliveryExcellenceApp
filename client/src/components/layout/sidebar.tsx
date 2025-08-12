@@ -100,6 +100,13 @@ export default function Sidebar() {
           >
             Warranty & Troubleshooting
           </NavItem>
+          <NavItem
+            href="/remanufactured"
+            icon="ri-recycle-line"
+            active={location === "/remanufactured"}
+          >
+            Remanufactured Explained
+          </NavItem>
         </NavSection>
 
         <NavSection title="Impact">

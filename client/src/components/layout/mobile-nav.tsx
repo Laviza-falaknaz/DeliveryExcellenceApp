@@ -111,6 +111,15 @@ export default function MobileNav() {
                         <span>Warranty & Troubleshooting</span>
                       </div>
                     </Link>
+                    <Link href="/remanufactured" onClick={() => setOpen(false)}>
+                      <div className={cn(
+                        "flex items-center px-2 py-2 rounded-md text-neutral-700 hover:bg-neutral-100 cursor-pointer",
+                        location === "/remanufactured" && "bg-primary-light/10 text-primary font-medium"
+                      )}>
+                        <i className="ri-recycle-line text-xl mr-3"></i>
+                        <span>Remanufactured Explained</span>
+                      </div>
+                    </Link>
                   </nav>
                 </div>
 
