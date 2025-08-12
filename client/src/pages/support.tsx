@@ -293,7 +293,7 @@ export default function Support() {
             <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-neutral-100 text-neutral-400 mb-3">
               <i className="ri-inbox-line text-2xl"></i>
             </div>
-            <h3 className="text-lg font-medium text-neutral-700">No support tickets yet</h3>
+            <h3 className="text-lg font-medium text-neutral-700">No RMA's yet</h3>
             <p className="text-neutral-500 mt-2">
               Need help with your remanufactured laptops? Create a support ticket and our team will assist you.
             </p>
