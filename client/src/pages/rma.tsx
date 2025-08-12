@@ -308,14 +308,12 @@ export default function RMA() {
             <span>Contact Us</span>
           </Button>
           <Button 
-            asChild
+            onClick={() => window.location.href = '/warranty-claim'}
             variant="outline"
             className="bg-white text-black border-neutral-300 hover:bg-teal-600 hover:text-white hover:border-teal-600 transition-colors"
           >
-            <Link href="/warranty-claim">
-              <i className="ri-add-line mr-2"></i>
-              <span>Create RMA</span>
-            </Link>
+            <i className="ri-add-line mr-2"></i>
+            <span>Create RMA</span>
           </Button>
         </div>
       </div>
@@ -655,11 +653,9 @@ export default function RMA() {
                       Check Another Product
                     </Button>
                     <Button 
-                      asChild
+                      onClick={() => window.location.href = '/warranty-claim'}
                     >
-                      <Link href="/warranty-claim">
-                        Start RMA Process
-                      </Link>
+                      Start RMA Process
                     </Button>
                   </DialogFooter>
                 </div>

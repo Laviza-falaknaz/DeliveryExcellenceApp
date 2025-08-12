@@ -141,6 +141,13 @@ export default function Sidebar() {
           >
             Profile Settings
           </NavItem>
+          <NavItem
+            href="/warranty-claim"
+            icon="ri-file-text-line"
+            active={location === "/warranty-claim"}
+          >
+            Warranty Claim
+          </NavItem>
         </NavSection>
       </div>
 
