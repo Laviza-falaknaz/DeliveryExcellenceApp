@@ -39,7 +39,7 @@ export default function Orders() {
     <div className="py-6 px-4 md:px-8 max-w-7xl mx-auto">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold font-poppins text-neutral-900">Orders</h1>
+          <h1 className="text-2xl font-bold font-poppins text-neutral-900">Your Orders</h1>
           <p className="text-neutral-600">
             Track your remanufactured laptop orders and their environmental impact
           </p>

@@ -70,7 +70,7 @@ export default function Sidebar() {
             icon="ri-truck-line"
             active={location === "/orders"}
           >
-            Orders
+            Your Orders
           </NavItem>
           <NavItem
             href="/warranty-claim"

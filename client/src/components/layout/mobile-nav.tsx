@@ -81,7 +81,7 @@ export default function MobileNav() {
                         location === "/orders" && "bg-primary-light/10 text-primary font-medium"
                       )}>
                         <i className="ri-truck-line text-xl mr-3"></i>
-                        <span>Orders</span>
+                        <span>Your Orders</span>
                       </div>
                     </Link>
                     <Link href="/rma" onClick={() => setOpen(false)}>
