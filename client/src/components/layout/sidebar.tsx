@@ -80,6 +80,13 @@ export default function Sidebar() {
             Delivery Timeline
           </NavItem>
           <NavItem
+            href="/warranty-claim"
+            icon="ri-file-text-line"
+            active={location === "/warranty-claim"}
+          >
+            Start RMA
+          </NavItem>
+          <NavItem
             href="/rma"
             icon="ri-refresh-line"
             active={location === "/rma"}
@@ -140,13 +147,6 @@ export default function Sidebar() {
             active={location === "/profile"}
           >
             Profile Settings
-          </NavItem>
-          <NavItem
-            href="/warranty-claim"
-            icon="ri-file-text-line"
-            active={location === "/warranty-claim"}
-          >
-            Start RMA
           </NavItem>
         </NavSection>
       </div>
