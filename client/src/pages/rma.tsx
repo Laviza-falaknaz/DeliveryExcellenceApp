@@ -577,7 +577,7 @@ export default function RMA() {
                     <TableRow>
                       <TableCell colSpan={4} className="text-center py-12">
                         <div className="flex flex-col items-center">
-                          <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-neutral-100 text-neutral-400 mb-3">
+                          <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[#e0f2f2] text-[#08ABAB] mb-3">
                             <i className="ri-inbox-line text-2xl"></i>
                           </div>
                           <h3 className="text-lg font-medium text-neutral-700"></h3>
