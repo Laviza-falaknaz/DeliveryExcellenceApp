@@ -9,10 +9,10 @@ The application emphasizes environmental impact visualization, showing users how
 ## Recent Updates (August 2025)
 
 ### Warranty Claim System Implementation
-- **Comprehensive Warranty Claim Form**: Successfully implemented a full-featured warranty claim form at `/warranty-claim` with all requested fields including contact information, billing/delivery addresses, product details, fault descriptions, and file upload capabilities for CSV/Excel documentation.
+- **Comprehensive RMA Request Form**: Successfully implemented a full-featured warranty claim form at `/warranty-claim` with all requested fields including contact information, billing/delivery addresses, product details, fault descriptions, and file upload capabilities for CSV/Excel documentation. Updated branding from "Warranty Claim Form" to "New RMA Request" throughout the interface.
 - **RMA Integration**: Updated the RMA tracking system to redirect users to the new warranty claim form instead of external troubleshooting sites, providing a seamless internal workflow.
-- **QR Code Support**: Enhanced both Warranty & Troubleshooting and RMA pages with QR code scanning functionality supporting URLs, JSON data, and direct serial number formats.
-- **Navigation Updates**: Changed "Environmental Impact" to "Your Impact" across all navigation elements and page headings as requested.
+- **QR Code Support**: Enhanced Warranty & Troubleshooting, RMA pages, and New RMA Request form with QR code scanning functionality supporting URLs, JSON data, and direct serial number formats. Scanner automatically populates manufacturer serial number field.
+- **Navigation Updates**: Changed "Environmental Impact" to "Your Impact" across all navigation elements and page headings as requested. Updated sidebar styling to maintain black text for all navigation items including active states.
 
 ## User Preferences
 
