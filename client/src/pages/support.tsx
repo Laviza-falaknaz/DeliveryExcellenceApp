@@ -298,7 +298,7 @@ export default function Support() {
               Need help with your remanufactured laptops? Create a support ticket and our team will assist you.
             </p>
             <Button 
-              className="mt-4 bg-white text-neutral-900 border border-neutral-300 hover:bg-teal-600 hover:text-white hover:border-teal-600 transition-colors" 
+              className="mt-4 bg-white text-neutral-900 border border-neutral-300 hover:bg-[#08ABAB] hover:text-white hover:border-[#08ABAB] transition-colors" 
               asChild
             >
               <Link href="/warranty-claim">
