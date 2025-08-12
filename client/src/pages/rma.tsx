@@ -374,7 +374,7 @@ export default function RMA() {
       </div>
 
       <div className="mb-8">
-        <h2 className="text-lg font-semibold font-poppins mb-4">Your RMA Requests</h2>
+        <h2 className="text-lg font-semibold font-poppins mb-4">Start RMA Process</h2>
 
         {isLoading ? (
           <div className="space-y-4">
