@@ -14,6 +14,10 @@ The application emphasizes environmental impact visualization, showing users how
 - **QR Code Support**: Enhanced Warranty & Troubleshooting, RMA pages, and New RMA Request form with QR code scanning functionality supporting URLs, JSON data, and direct serial number formats. Scanner automatically populates manufacturer serial number field.
 - **Navigation Updates**: Changed "Environmental Impact" to "Your Impact" across all navigation elements and page headings as requested. Updated sidebar styling to maintain black text for all navigation items including active states.
 
+### Document Management & Educational Content (August 2025)
+- **Orders Table Enhancement**: Added Packing List (PDF) and Hashcodes (CSV/Excel) columns to "Your Orders" table with download functionality for account manager uploaded documents. Maintained consistent teal branding and professional styling.
+- **Remanufactured Explained Tab**: Successfully implemented comprehensive educational tab under Warranty & Troubleshooting section explaining remanufacturing process, environmental benefits, quality standards, and business advantages. Includes working external links to product catalog and contact pages.
+
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
