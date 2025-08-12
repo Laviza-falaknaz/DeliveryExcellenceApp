@@ -474,7 +474,10 @@ export default function RMA() {
             <p className="text-neutral-500 mt-2">
               Need to return or exchange a product? Create an RMA request to start the process.
             </p>
-            <Button className="mt-4 btn-white-hover" asChild>
+            <Button 
+              className="mt-4 bg-white text-neutral-900 border border-neutral-300 hover:bg-teal-600 hover:text-white hover:border-teal-600 transition-colors" 
+              asChild
+            >
               <Link href="/warranty-claim">
                 Create RMA
               </Link>
@@ -771,6 +774,7 @@ export default function RMA() {
                     </Button>
                     <Button 
                       onClick={() => window.location.href = '/warranty-claim'}
+                      className="bg-white text-neutral-900 border border-neutral-300 hover:bg-teal-600 hover:text-white hover:border-teal-600 transition-colors"
                     >
                       Create RMA
                     </Button>
