@@ -655,7 +655,7 @@ export default function RMA() {
                     <Button 
                       onClick={() => window.location.href = '/warranty-claim'}
                     >
-                      Start RMA Process
+                      Create RMA
                     </Button>
                   </DialogFooter>
                 </div>

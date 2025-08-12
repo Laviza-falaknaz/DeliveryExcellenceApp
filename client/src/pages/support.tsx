@@ -188,7 +188,7 @@ export default function Support() {
                 Need to return or replace a product? Start the RMA process.
               </p>
               <Button variant="outline" asChild>
-                <a href="https://my-warranty.com/troubleshoot/" target="_blank" rel="noreferrer">Start RMA Process</a>
+                <a href="https://my-warranty.com/troubleshoot/" target="_blank" rel="noreferrer">Create RMA</a>
               </Button>
             </div>
           </CardContent>

@@ -42,7 +42,7 @@ function SupportResource({
         >
           {buttonText === "Contact Support" || buttonText === "Contact Sales Team" ? (
             <a href="https://circularcomputing.com/contact/" target="_blank" rel="noreferrer">{buttonText}</a>
-          ) : buttonText === "Start RMA Process" ? (
+          ) : buttonText === "Create RMA" ? (
             <a href="https://my-warranty.com/troubleshoot/" target="_blank" rel="noreferrer">{buttonText}</a>
           ) : (
             <Link href={href}>{buttonText}</Link>
@@ -72,7 +72,7 @@ export default function SupportResources() {
         iconBgColor="bg-accent/10"
         title="Returns & RMA"
         description="Need to return or replace a product?"
-        buttonText="Start RMA Process"
+        buttonText="Create RMA"
         buttonColor="bg-white border hover:bg-teal-600 hover:text-white hover:border-teal-600 transition-colors"
         href="/rma/new"
       />
