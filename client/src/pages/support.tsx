@@ -133,7 +133,7 @@ export default function Support() {
             className="bg-white text-neutral-900 border border-neutral-300 hover:bg-teal-600 hover:text-white hover:border-teal-600 transition-colors"
           >
             <i className="ri-add-line mr-2"></i>
-            <span>New RMA Request</span>
+            <span>Create RMA</span>
           </Button>
         </div>
       </div>
