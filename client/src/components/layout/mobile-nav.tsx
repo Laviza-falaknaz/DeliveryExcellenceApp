@@ -84,6 +84,15 @@ export default function MobileNav() {
                         <span>Your Orders</span>
                       </div>
                     </Link>
+                    <Link href="/warranty-claim" onClick={() => setOpen(false)}>
+                      <div className={cn(
+                        "flex items-center px-2 py-2 rounded-md text-neutral-700 hover:bg-neutral-100 cursor-pointer",
+                        location === "/warranty-claim" && "bg-primary-light/10 text-primary font-medium"
+                      )}>
+                        <i className="ri-alert-line text-xl mr-3"></i>
+                        <span>Create RMA</span>
+                      </div>
+                    </Link>
                     <Link href="/rma" onClick={() => setOpen(false)}>
                       <div className={cn(
                         "flex items-center px-2 py-2 rounded-md text-neutral-700 hover:bg-neutral-100 cursor-pointer",

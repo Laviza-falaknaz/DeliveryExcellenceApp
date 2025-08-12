@@ -74,7 +74,7 @@ export default function Sidebar() {
           </NavItem>
           <NavItem
             href="/warranty-claim"
-            icon="ri-file-text-line"
+            icon="ri-alert-line"
             active={location === "/warranty-claim"}
           >
             Create RMA
