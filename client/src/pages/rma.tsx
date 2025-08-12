@@ -581,11 +581,6 @@ export default function RMA() {
                           <p className="text-neutral-500 mt-1">
                             You don't have any active return requests at the moment.
                           </p>
-                          <Button className="mt-4 btn-white-hover" asChild>
-                            <Link href="/warranty-claim">
-                              Create RMA
-                            </Link>
-                          </Button>
                         </div>
                       </TableCell>
                     </TableRow>
