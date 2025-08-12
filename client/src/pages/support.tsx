@@ -247,9 +247,9 @@ export default function Support() {
                     className="mt-4 bg-white text-neutral-900 border border-neutral-300 hover:bg-teal-600 hover:text-white hover:border-teal-600 transition-colors" 
                     asChild
                   >
-                    <a href="https://my-warranty.com/troubleshoot/" target="_blank" rel="noreferrer">
-                      Raise RMA
-                    </a>
+                    <Link href="/warranty-claim">
+                      Create RMA
+                    </Link>
                   </Button>
                 </div>
               )}
@@ -301,9 +301,9 @@ export default function Support() {
               className="mt-4 bg-white text-neutral-900 border border-neutral-300 hover:bg-teal-600 hover:text-white hover:border-teal-600 transition-colors" 
               asChild
             >
-              <a href="https://my-warranty.com/troubleshoot/" target="_blank" rel="noreferrer">
-                Raise RMA
-              </a>
+              <Link href="/warranty-claim">
+                Create RMA
+              </Link>
             </Button>
           </div>
         )}
