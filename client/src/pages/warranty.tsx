@@ -705,7 +705,7 @@ export default function Warranty() {
                       <Button variant="outline" className="w-full" asChild>
                         <a href="https://my-warranty.com/troubleshoot/" target="_blank" rel="noreferrer">
                           <i className="ri-tools-line mr-2"></i>
-                          Start RMA
+                          Create RMA
                         </a>
                       </Button>
                     </div>
