@@ -118,7 +118,7 @@ export default function WarrantyClaim() {
     <div className="py-6 px-4 md:px-8 max-w-4xl mx-auto">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold font-poppins text-neutral-900">Warranty Claim Form</h1>
+          <h1 className="text-2xl font-bold font-poppins text-neutral-900">New RMA Request</h1>
           <p className="text-neutral-600">Submit a warranty claim for your Circular Computing product</p>
         </div>
         <div className="mt-4 md:mt-0">
@@ -135,9 +135,9 @@ export default function WarrantyClaim() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Warranty Claim Details</CardTitle>
+          <CardTitle>RMA Request Details</CardTitle>
           <CardDescription>
-            Please fill out all required fields to submit your warranty claim
+            Please fill out all required fields to submit your RMA request
           </CardDescription>
         </CardHeader>
         <CardContent>
