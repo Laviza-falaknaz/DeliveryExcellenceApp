@@ -310,7 +310,7 @@ export default function RMA() {
           <Button 
             onClick={() => window.open('https://circularcomputing.com/contact/', '_blank')}
             variant="outline"
-            className="bg-white border-neutral-300 text-neutral-900 hover:bg-teal-600 hover:text-white hover:border-teal-600 transition-colors"
+            className="bg-white border-neutral-300 text-neutral-900 hover:bg-[#08ABAB] hover:text-white hover:border-[#08ABAB] transition-colors"
           >
             <i className="ri-phone-line mr-2"></i>
             <span>Contact Us</span>
@@ -318,7 +318,7 @@ export default function RMA() {
           <Button 
             onClick={() => window.location.href = '/warranty-claim'}
             variant="outline"
-            className="bg-white text-black border-neutral-300 hover:bg-teal-600 hover:text-white hover:border-teal-600 transition-colors"
+            className="bg-white text-black border-neutral-300 hover:bg-[#08ABAB] hover:text-white hover:border-[#08ABAB] transition-colors"
           >
             <i className="ri-add-line mr-2"></i>
             <span>Create RMA</span>
@@ -475,7 +475,7 @@ export default function RMA() {
               Need to return or exchange a product? Create an RMA request to start the process.
             </p>
             <Button 
-              className="mt-4 bg-white text-neutral-900 border border-neutral-300 hover:bg-teal-600 hover:text-white hover:border-teal-600 transition-colors" 
+              className="mt-4 bg-white text-neutral-900 border border-neutral-300 hover:bg-[#08ABAB] hover:text-white hover:border-[#08ABAB] transition-colors" 
               asChild
             >
               <Link href="/warranty-claim">
@@ -774,7 +774,7 @@ export default function RMA() {
                     </Button>
                     <Button 
                       onClick={() => window.location.href = '/warranty-claim'}
-                      className="bg-white text-neutral-900 border border-neutral-300 hover:bg-teal-600 hover:text-white hover:border-teal-600 transition-colors"
+                      className="bg-white text-neutral-900 border border-neutral-300 hover:bg-[#08ABAB] hover:text-white hover:border-[#08ABAB] transition-colors"
                     >
                       Create RMA
                     </Button>
