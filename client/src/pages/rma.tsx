@@ -311,9 +311,9 @@ export default function RMA() {
             variant="outline"
             className="bg-white text-black border-neutral-300 hover:bg-teal-600 hover:text-white hover:border-teal-600 transition-colors"
           >
-            <a href="https://my-warranty.com/troubleshoot/" target="_blank" rel="noreferrer">
+            <a href="/warranty-claim">
               <i className="ri-add-line mr-2"></i>
-              <span>New RMA Request</span>
+              <span>Create RMA</span>
             </a>
           </Button>
         </div>
@@ -654,13 +654,11 @@ export default function RMA() {
                       Check Another Product
                     </Button>
                     <Button 
-                      onClick={() => {
-                        window.open('https://my-warranty.com/troubleshoot/', '_blank');
-                        setIsWarrantyCheckDialogOpen(false);
-                        setIsNewRmaDialogOpen(true);
-                      }}
+                      asChild
                     >
-                      Start RMA Process
+                      <a href="/warranty-claim">
+                        Start RMA Process
+                      </a>
                     </Button>
                   </DialogFooter>
                 </div>
