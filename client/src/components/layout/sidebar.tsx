@@ -143,7 +143,7 @@ export default function Sidebar() {
           </NavItem>
           <NavItem
             href="/warranty-claim"
-            icon="ri-add-line"
+            icon="ri-file-text-line"
             active={location === "/warranty-claim"}
           >
             Start RMA
