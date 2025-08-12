@@ -908,10 +908,12 @@ export default function Warranty() {
                 <div className="space-y-2 w-full max-w-sm">
                   <Button 
                     className="w-full bg-[#08ABAB] hover:bg-[#069999] text-white"
-                    onClick={() => window.open('https://circularcomputing.com/products/', '_blank')}
+                    asChild
                   >
-                    <i className="ri-shopping-cart-line mr-2"></i>
-                    Browse Remanufactured Laptops
+                    <a href="https://circularcomputing.com/products/" target="_blank" rel="noopener noreferrer">
+                      <i className="ri-shopping-cart-line mr-2"></i>
+                      Browse Remanufactured Laptops
+                    </a>
                   </Button>
                   <Button 
                     variant="outline" 
