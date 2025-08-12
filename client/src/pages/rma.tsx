@@ -467,7 +467,7 @@ export default function RMA() {
           </Tabs>
         ) : (
           <div className="p-8 text-center bg-white rounded-xl shadow-sm border border-neutral-200">
-            <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-neutral-100 text-neutral-400 mb-3">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[#e0f2f2] text-[#08ABAB] mb-3">
               <i className="ri-inbox-line text-2xl"></i>
             </div>
             <h3 className="text-lg font-medium text-neutral-700"></h3>
