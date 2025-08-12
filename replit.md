@@ -6,6 +6,14 @@ The Circular Computing Customer Portal is a full-stack web application designed 
 
 The application emphasizes environmental impact visualization, showing users how their laptop purchases contribute to carbon reduction, water conservation through charity partnerships, and mineral resource savings. It integrates with charity: water projects to demonstrate real-world impact and includes comprehensive order tracking, warranty management, and customer support features.
 
+## Recent Updates (August 2025)
+
+### Warranty Claim System Implementation
+- **Comprehensive Warranty Claim Form**: Successfully implemented a full-featured warranty claim form at `/warranty-claim` with all requested fields including contact information, billing/delivery addresses, product details, fault descriptions, and file upload capabilities for CSV/Excel documentation.
+- **RMA Integration**: Updated the RMA tracking system to redirect users to the new warranty claim form instead of external troubleshooting sites, providing a seamless internal workflow.
+- **QR Code Support**: Enhanced both Warranty & Troubleshooting and RMA pages with QR code scanning functionality supporting URLs, JSON data, and direct serial number formats.
+- **Navigation Updates**: Changed "Environmental Impact" to "Your Impact" across all navigation elements and page headings as requested.
+
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
