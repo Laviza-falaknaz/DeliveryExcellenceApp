@@ -35,6 +35,7 @@ import { formatDate } from "@/lib/utils";
 import { Camera, X, AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { BrowserMultiFormatReader, NotFoundException } from "@zxing/library";
+import { Link } from "wouter";
 
 const serialNumberSchema = z.object({
   serialNumber: z.string().min(5, "Serial number must be at least 5 characters"),
@@ -311,10 +312,10 @@ export default function RMA() {
             variant="outline"
             className="bg-white text-black border-neutral-300 hover:bg-teal-600 hover:text-white hover:border-teal-600 transition-colors"
           >
-            <a href="/warranty-claim">
+            <Link href="/warranty-claim">
               <i className="ri-add-line mr-2"></i>
               <span>Create RMA</span>
-            </a>
+            </Link>
           </Button>
         </div>
       </div>
@@ -656,9 +657,9 @@ export default function RMA() {
                     <Button 
                       asChild
                     >
-                      <a href="/warranty-claim">
+                      <Link href="/warranty-claim">
                         Start RMA Process
-                      </a>
+                      </Link>
                     </Button>
                   </DialogFooter>
                 </div>
