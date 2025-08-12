@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -8,8 +8,10 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Upload, FileText, X } from "lucide-react";
+import { Upload, FileText, X, Camera, QrCode } from "lucide-react";
+import { BrowserMultiFormatReader, NotFoundException } from "@zxing/library";
 
 const warrantyClaimSchema = z.object({
   fullName: z.string().min(2, "Full name must be at least 2 characters"),
@@ -36,6 +38,13 @@ export default function WarrantyClaim() {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [isScanning, setIsScanning] = useState(false);
+  const [isScannerOpen, setIsScannerOpen] = useState(false);
+  const [scannerError, setScannerError] = useState<string | null>(null);
+  
+  // Scanner refs
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const codeReader = useRef<BrowserMultiFormatReader | null>(null);
 
   const form = useForm<WarrantyClaimFormValues>({
     resolver: zodResolver(warrantyClaimSchema),
@@ -56,6 +65,108 @@ export default function WarrantyClaim() {
       consent: false,
     },
   });
+  
+  // Initialize scanner
+  useEffect(() => {
+    codeReader.current = new BrowserMultiFormatReader();
+    return () => {
+      if (codeReader.current) {
+        codeReader.current.reset();
+      }
+    };
+  }, []);
+  
+  const startScanner = async () => {
+    if (!codeReader.current || !videoRef.current) return;
+    
+    try {
+      setIsScanning(true);
+      setScannerError(null);
+      
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: { 
+          facingMode: 'environment',
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
+        } 
+      });
+      
+      videoRef.current.srcObject = stream;
+      
+      codeReader.current.decodeFromVideoDevice(null, videoRef.current, (result, error) => {
+        if (result) {
+          const scannedText = result.getText();
+          let serialNumber = scannedText;
+          
+          // Handle URLs with serial parameters
+          if (scannedText.startsWith('http')) {
+            try {
+              const url = new URL(scannedText);
+              const serialFromUrl = url.searchParams.get('serial') || url.searchParams.get('sn');
+              if (serialFromUrl) {
+                serialNumber = serialFromUrl;
+              }
+            } catch (e) {
+              // Use original text if URL parsing fails
+            }
+          }
+          
+          // Handle JSON with serial data
+          if (scannedText.startsWith('{')) {
+            try {
+              const parsed = JSON.parse(scannedText);
+              if (parsed.serial || parsed.serialNumber || parsed.sn) {
+                serialNumber = parsed.serial || parsed.serialNumber || parsed.sn;
+              }
+            } catch (e) {
+              // Use original text if JSON parsing fails
+            }
+          }
+          
+          // Validate serial number format
+          if (/^[A-Za-z0-9]{5,}$/.test(serialNumber)) {
+            form.setValue('manufacturerSerialNumber', serialNumber);
+            stopScanner();
+            setIsScannerOpen(false);
+            toast({
+              title: "Serial Number Scanned",
+              description: `Serial number captured: ${serialNumber}`,
+            });
+          } else {
+            toast({
+              title: "Invalid Code",
+              description: "Please scan a valid QR code containing a serial number",
+              variant: "destructive",
+            });
+          }
+        }
+        
+        if (error && !(error instanceof NotFoundException)) {
+          console.warn('Scanner error:', error);
+        }
+      });
+    } catch (error) {
+      setScannerError('Unable to access camera. Please ensure camera permissions are granted.');
+      setIsScanning(false);
+    }
+  };
+  
+  const stopScanner = () => {
+    if (codeReader.current) {
+      codeReader.current.reset();
+    }
+    if (videoRef.current && videoRef.current.srcObject) {
+      const stream = videoRef.current.srcObject as MediaStream;
+      stream.getTracks().forEach(track => track.stop());
+    }
+    setIsScanning(false);
+  };
+  
+  const handleScannerClose = () => {
+    stopScanner();
+    setIsScannerOpen(false);
+    setScannerError(null);
+  };
 
   async function onSubmit(data: WarrantyClaimFormValues) {
     try {
@@ -322,6 +433,79 @@ export default function WarrantyClaim() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Manufacturer's Serial Number *</FormLabel>
+                        <div className="flex gap-2">
+                          <FormControl>
+                            <Input placeholder="e.g. SN12345678" {...field} />
+                          </FormControl>
+                          <Dialog open={isScannerOpen} onOpenChange={setIsScannerOpen}>
+                            <DialogTrigger asChild>
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="icon"
+                                className="shrink-0"
+                              >
+                                <QrCode className="h-4 w-4" />
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent className="sm:max-w-[500px]">
+                              <DialogHeader>
+                                <DialogTitle>Scan Serial Number</DialogTitle>
+                                <DialogDescription>
+                                  Position the QR code or barcode within the camera view to scan the serial number
+                                </DialogDescription>
+                              </DialogHeader>
+                              
+                              <div className="space-y-4">
+                                {!isScanning ? (
+                                  <div className="text-center py-6">
+                                    <Camera className="h-12 w-12 text-neutral-400 mx-auto mb-4" />
+                                    <p className="text-neutral-600 mb-4">Ready to scan</p>
+                                    <Button onClick={startScanner}>
+                                      Start Scanner
+                                    </Button>
+                                  </div>
+                                ) : (
+                                  <div className="relative">
+                                    <video 
+                                      ref={videoRef}
+                                      className="w-full h-64 bg-black rounded-lg"
+                                      autoPlay
+                                      muted
+                                      playsInline
+                                    />
+                                    <div className="absolute inset-0 border-2 border-teal-500 rounded-lg pointer-events-none">
+                                      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-48 h-32 border-2 border-white rounded-lg"></div>
+                                    </div>
+                                  </div>
+                                )}
+                                
+                                {scannerError && (
+                                  <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                                    <p className="text-red-700 text-sm">{scannerError}</p>
+                                  </div>
+                                )}
+                                
+                                <div className="flex justify-end gap-2">
+                                  <Button variant="outline" onClick={handleScannerClose}>
+                                    {isScanning ? 'Stop & Close' : 'Close'}
+                                  </Button>
+                                </div>
+                              </div>
+                            </DialogContent>
+                          </Dialog>
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="inHouseSerialNumber"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>In-house Serial Number *</FormLabel>
                         <FormControl>
                           <Input placeholder="e.g. 5CG041295L" {...field} />
                         </FormControl>
