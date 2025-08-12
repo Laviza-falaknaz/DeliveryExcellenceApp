@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useOrders } from "@/hooks/use-orders";
-import OrderCard from "@/components/dashboard/order-card";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -10,6 +9,16 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 export default function Orders() {
   const { orders, isLoadingOrders, getActiveOrders, getPastOrders } = useOrders();
@@ -35,6 +44,47 @@ export default function Orders() {
   const filteredActiveOrders = filterOrders(activeOrders);
   const filteredPastOrders = filterOrders(pastOrders);
 
+  // Format date to UK format DD/MM/YY
+  function formatUKDate(date: Date | string): string {
+    const d = new Date(date);
+    return d.toLocaleDateString('en-GB', {
+      day: '2-digit',
+      month: '2-digit',
+      year: '2-digit'
+    });
+  }
+
+  // Get status color based on order status
+  function getStatusColor(status: string): string {
+    switch (status.toLowerCase()) {
+      case "placed":
+        return "bg-blue-100 text-blue-800";
+      case "processing":
+        return "bg-yellow-100 text-yellow-800";
+      case "in_production":
+        return "bg-orange-100 text-orange-800";
+      case "quality_check":
+        return "bg-purple-100 text-purple-800";
+      case "shipped":
+        return "bg-indigo-100 text-indigo-800";
+      case "delivered":
+        return "bg-green-100 text-green-800";
+      case "completed":
+        return "bg-neutral-100 text-neutral-800";
+      case "cancelled":
+        return "bg-red-100 text-red-800";
+      case "returned":
+        return "bg-red-100 text-red-800";
+      default:
+        return "bg-neutral-100 text-neutral-800";
+    }
+  }
+
+  // Format status label
+  function getStatusLabel(status: string): string {
+    return status.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+  }
+
   return (
     <div className="py-6 px-4 md:px-8 max-w-7xl mx-auto">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
@@ -48,7 +98,7 @@ export default function Orders() {
           <Button 
             onClick={() => window.open('https://circularcomputing.com/contact/', '_blank')}
             variant="outline"
-            className="bg-white border-neutral-300 text-neutral-900 hover:bg-teal-600 hover:text-white hover:border-teal-600 transition-colors"
+            className="bg-white border-neutral-300 text-neutral-900 hover:bg-[#08ABAB] hover:text-white hover:border-[#08ABAB] transition-colors"
           >
             <i className="ri-phone-line mr-2"></i>
             <span>Contact Us</span>
@@ -101,60 +151,108 @@ export default function Orders() {
         </Button>
       </div>
 
-      {isLoadingOrders ? (
-        <div className="space-y-4">
-          {[1, 2, 3].map((i) => (
-            <Skeleton key={i} className="h-80 w-full" />
-          ))}
-        </div>
-      ) : orders && orders.length > 0 ? (
-        <Tabs defaultValue="active" className="w-full">
-          <TabsList className="mb-4">
-            <TabsTrigger value="active">Active Orders</TabsTrigger>
-            <TabsTrigger value="past">Past Orders</TabsTrigger>
-          </TabsList>
-          <TabsContent value="active">
-            {filteredActiveOrders.length > 0 ? (
-              filteredActiveOrders.map((order) => (
-                <OrderCard key={order.id} order={order} />
-              ))
-            ) : (
-              <div className="p-8 text-center bg-white rounded-xl shadow-sm border border-neutral-200">
-                <h3 className="font-medium text-neutral-700">No active orders found</h3>
-                <p className="text-neutral-500 mt-2">
-                  {searchTerm || statusFilter 
-                    ? "Try changing your search or filter criteria"
-                    : "You don't have any active orders at the moment"}
-                </p>
-              </div>
-            )}
-          </TabsContent>
-          <TabsContent value="past">
-            {filteredPastOrders.length > 0 ? (
-              filteredPastOrders.map((order) => (
-                <OrderCard key={order.id} order={order} isPast={true} />
-              ))
-            ) : (
-              <div className="p-8 text-center bg-white rounded-xl shadow-sm border border-neutral-200">
-                <h3 className="font-medium text-neutral-700">No past orders found</h3>
-                <p className="text-neutral-500 mt-2">
-                  {searchTerm || statusFilter 
-                    ? "Try changing your search or filter criteria"
-                    : "You don't have any completed orders yet"}
-                </p>
-              </div>
-            )}
-          </TabsContent>
-        </Tabs>
-      ) : (
-        <div className="p-8 text-center bg-white rounded-xl shadow-sm border border-neutral-200">
-          <div className="icon-circle mb-3 mx-auto">
-            <i className="ri-inbox-line text-2xl"></i>
+      <Card>
+        <CardContent className="p-0">
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow className="border-b border-neutral-200">
+                  <TableHead className="text-left font-medium text-neutral-600 py-4 px-6 cursor-pointer hover:text-neutral-900 transition-colors">
+                    Order Date ↓
+                  </TableHead>
+                  <TableHead className="text-left font-medium text-neutral-600 py-4 px-6 cursor-pointer hover:text-neutral-900 transition-colors">
+                    Order Number ↓
+                  </TableHead>
+                  <TableHead className="text-left font-medium text-neutral-600 py-4 px-6 cursor-pointer hover:text-neutral-900 transition-colors">
+                    Customer Name ↓
+                  </TableHead>
+                  <TableHead className="text-left font-medium text-neutral-600 py-4 px-6 cursor-pointer hover:text-neutral-900 transition-colors">
+                    Order Status ↓
+                  </TableHead>
+                  <TableHead className="text-left font-medium text-neutral-600 py-4 px-6 cursor-pointer hover:text-neutral-900 transition-colors">
+                    Expected Shipping Date ↓
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {isLoadingOrders ? (
+                  // Loading skeleton rows
+                  Array.from({ length: 5 }).map((_, index) => (
+                    <TableRow key={index} className="border-b border-neutral-100">
+                      <TableCell className="py-4 px-6">
+                        <Skeleton className="h-4 w-32" />
+                      </TableCell>
+                      <TableCell className="py-4 px-6">
+                        <Skeleton className="h-4 w-24" />
+                      </TableCell>
+                      <TableCell className="py-4 px-6">
+                        <Skeleton className="h-4 w-40" />
+                      </TableCell>
+                      <TableCell className="py-4 px-6">
+                        <Skeleton className="h-4 w-28" />
+                      </TableCell>
+                      <TableCell className="py-4 px-6">
+                        <Skeleton className="h-4 w-32" />
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : orders && orders.length > 0 ? (
+                  // Display orders
+                  orders
+                    .filter(order => {
+                      const matchesSearch = searchTerm === "" || 
+                        order.orderNumber.toLowerCase().includes(searchTerm.toLowerCase());
+                      const matchesStatus = statusFilter === null || statusFilter === "all" || order.status === statusFilter;
+                      return matchesSearch && matchesStatus;
+                    })
+                    .sort((a, b) => new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime())
+                    .map((order) => (
+                      <TableRow 
+                        key={order.id} 
+                        className="border-b border-neutral-100 hover:bg-neutral-50 cursor-pointer transition-colors"
+                      >
+                        <TableCell className="py-4 px-6 text-sm text-neutral-700">
+                          {formatUKDate(order.orderDate)}
+                        </TableCell>
+                        <TableCell className="py-4 px-6 text-sm">
+                          <span className="text-primary font-medium cursor-pointer hover:underline">
+                            {order.orderNumber}
+                          </span>
+                        </TableCell>
+                        <TableCell className="py-4 px-6 text-sm text-neutral-700">
+                          {order.customerName || 'N/A'}
+                        </TableCell>
+                        <TableCell className="py-4 px-6">
+                          <Badge className={`text-xs ${getStatusColor(order.status)}`}>
+                            {getStatusLabel(order.status)}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="py-4 px-6 text-sm text-neutral-700">
+                          {order.estimatedDeliveryDate ? formatUKDate(order.estimatedDeliveryDate) : 'TBC'}
+                        </TableCell>
+                      </TableRow>
+                    ))
+                ) : (
+                  // Empty state
+                  <TableRow>
+                    <TableCell colSpan={5} className="text-center py-12">
+                      <div className="flex flex-col items-center">
+                        <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[#e0f2f2] text-[#08ABAB] mb-3">
+                          <i className="ri-inbox-line text-2xl"></i>
+                        </div>
+                        <h3 className="text-lg font-medium text-neutral-700">No orders yet</h3>
+                        <p className="text-neutral-500 mt-1">
+                          Start by placing your first order to track your sustainable impact.
+                        </p>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
           </div>
-          <h3 className="text-lg font-medium text-neutral-700">No orders yet</h3>
-          <p className="text-neutral-500 mt-2">Start by placing your first order to track your sustainable impact.</p>
-        </div>
-      )}
+        </CardContent>
+      </Card>
 
       {/* New Order Dialog - This would be more complex in a real implementation */}
       <Dialog open={isOrderDialogOpen} onOpenChange={setIsOrderDialogOpen}>
