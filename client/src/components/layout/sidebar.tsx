@@ -16,7 +16,7 @@ function NavItem({ href, icon, children, active }: NavItemProps) {
     <Link href={href}>
       <div
         className={cn(
-          "flex items-center px-3 py-2 rounded-lg mb-1 text-neutral-700 hover:bg-neutral-100 cursor-pointer",
+          "flex items-center px-3 py-2 rounded-lg mb-1 text-black hover:bg-neutral-100 cursor-pointer",
           active && "bg-primary-light/10 text-primary font-medium"
         )}
       >
