@@ -577,7 +577,7 @@ export default function RMA() {
                           <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-neutral-100 text-neutral-400 mb-3">
                             <i className="ri-inbox-line text-2xl"></i>
                           </div>
-                          <h3 className="text-lg font-medium text-neutral-700">No RMAs in progress</h3>
+                          <h3 className="text-lg font-medium text-neutral-700"></h3>
                           <p className="text-neutral-500 mt-1">
                             You don't have any active return requests at the moment.
                           </p>
