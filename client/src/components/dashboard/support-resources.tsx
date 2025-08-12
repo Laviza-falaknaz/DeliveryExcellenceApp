@@ -43,7 +43,7 @@ function SupportResource({
           {buttonText === "Contact Support" || buttonText === "Contact Sales Team" ? (
             <a href="https://circularcomputing.com/contact/" target="_blank" rel="noreferrer">{buttonText}</a>
           ) : buttonText === "Create RMA" ? (
-            <a href="https://my-warranty.com/troubleshoot/" target="_blank" rel="noreferrer">{buttonText}</a>
+            <Link href="/warranty-claim">{buttonText}</Link>
           ) : (
             <Link href={href}>{buttonText}</Link>
           )}

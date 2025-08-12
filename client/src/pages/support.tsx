@@ -129,7 +129,7 @@ export default function Support() {
             <span>Contact Us</span>
           </Button>
           <Button 
-            onClick={() => setIsNewTicketDialogOpen(true)}
+            onClick={() => window.location.href = '/warranty-claim'}
             className="bg-white text-neutral-900 border border-neutral-300 hover:bg-teal-600 hover:text-white hover:border-teal-600 transition-colors"
           >
             <i className="ri-add-line mr-2"></i>
@@ -188,7 +188,7 @@ export default function Support() {
                 Need to return or replace a product? Start the RMA process.
               </p>
               <Button variant="outline" asChild>
-                <a href="https://my-warranty.com/troubleshoot/" target="_blank" rel="noreferrer">Create RMA</a>
+                <Link href="/warranty-claim">Create RMA</Link>
               </Button>
             </div>
           </CardContent>

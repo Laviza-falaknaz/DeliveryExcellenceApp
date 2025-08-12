@@ -467,9 +467,9 @@ export default function RMA() {
               Need to return or exchange a product? Create an RMA request to start the process.
             </p>
             <Button className="mt-4 btn-white-hover" asChild>
-              <a href="https://my-warranty.com/troubleshoot/" target="_blank" rel="noreferrer">
+              <Link href="/warranty-claim">
                 Create RMA
-              </a>
+              </Link>
             </Button>
           </div>
         )}

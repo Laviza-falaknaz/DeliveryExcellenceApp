@@ -19,6 +19,7 @@ import { AlertCircle, CheckCircle, HelpCircle, Search, Camera, X } from "lucide-
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { BrowserMultiFormatReader, NotFoundException } from "@zxing/library";
+import { Link } from "wouter";
 
 const serialNumberSchema = z.object({
   serialNumber: z.string().min(5, "Serial number must be at least 5 characters"),
@@ -703,10 +704,10 @@ export default function Warranty() {
                         Live Chat
                       </Button>
                       <Button variant="outline" className="w-full" asChild>
-                        <a href="https://my-warranty.com/troubleshoot/" target="_blank" rel="noreferrer">
+                        <Link href="/warranty-claim">
                           <i className="ri-tools-line mr-2"></i>
                           Create RMA
-                        </a>
+                        </Link>
                       </Button>
                     </div>
                   </div>
