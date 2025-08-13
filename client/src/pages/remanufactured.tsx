@@ -237,7 +237,7 @@ export default function Remanufactured() {
         {/* Tips and Hints Carousel */}
         <Card>
           <CardHeader>
-            <CardTitle>Setup Tips & Best Practices</CardTitle>
+            <CardTitle>Tips for Setting Up Remanufactured Laptops</CardTitle>
             <CardDescription>
               Essential tips for getting the most out of your remanufactured laptop
             </CardDescription>
