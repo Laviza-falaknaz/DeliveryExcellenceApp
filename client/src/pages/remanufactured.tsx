@@ -54,25 +54,31 @@ export default function Remanufactured() {
     setCurrentTip((prev) => (prev - 1 + tips.length) % tips.length);
   };
 
-  // YouTube videos data - placeholder for now, will be replaced with actual links
+  // YouTube videos data from provided links
   const videos = [
     {
-      id: "VIDEO_ID_1", // Will be replaced with actual YouTube video ID
+      id: "u7IOWNV2zFU",
       title: "The Remanufacturing Process",
       description: "See how we transform used laptops into like-new devices",
-      embedUrl: "https://www.youtube.com/embed/VIDEO_ID_1"
+      embedUrl: "https://www.youtube.com/embed/u7IOWNV2zFU"
     },
     {
-      id: "VIDEO_ID_2",
+      id: "6pOqhKEHiNE",
       title: "Quality Testing & Certification", 
       description: "Our comprehensive testing process ensures reliability",
-      embedUrl: "https://www.youtube.com/embed/VIDEO_ID_2"
+      embedUrl: "https://www.youtube.com/embed/6pOqhKEHiNE"
     },
     {
-      id: "VIDEO_ID_3",
+      id: "Q9Kfc9S6AOQ",
       title: "Environmental Impact",
       description: "How remanufactured laptops help save the planet",
-      embedUrl: "https://www.youtube.com/embed/VIDEO_ID_3"
+      embedUrl: "https://www.youtube.com/embed/Q9Kfc9S6AOQ"
+    },
+    {
+      id: "P8ouoPRbLiM",
+      title: "Sustainability in Action",
+      description: "Our commitment to circular economy and environmental responsibility",
+      embedUrl: "https://www.youtube.com/embed/P8ouoPRbLiM"
     }
   ];
 
@@ -335,24 +341,15 @@ export default function Remanufactured() {
                     <div key={index} className="w-full flex-shrink-0">
                       <div className="bg-neutral-50 rounded-lg border overflow-hidden">
                         {/* Video Embed */}
-                        <div className="aspect-video bg-neutral-200 flex items-center justify-center">
-                          {video.id.startsWith('VIDEO_ID') ? (
-                            // Placeholder for when actual video IDs are provided
-                            <div className="text-center text-neutral-500">
-                              <i className="ri-youtube-line text-6xl mb-4 text-red-500"></i>
-                              <p className="font-medium">YouTube Video Placeholder</p>
-                              <p className="text-sm">Video will appear here once link is provided</p>
-                            </div>
-                          ) : (
-                            <iframe
-                              src={video.embedUrl}
-                              title={video.title}
-                              className="w-full h-full"
-                              frameBorder="0"
-                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                              allowFullScreen
-                            />
-                          )}
+                        <div className="aspect-video bg-neutral-200">
+                          <iframe
+                            src={video.embedUrl}
+                            title={video.title}
+                            className="w-full h-full rounded-t-lg"
+                            frameBorder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                          />
                         </div>
                         
                         {/* Video Info */}
