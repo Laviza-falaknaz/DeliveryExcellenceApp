@@ -324,7 +324,7 @@ export default function Remanufactured() {
         {/* YouTube Videos Carousel */}
         <Card>
           <CardHeader>
-            <CardTitle>Video Library</CardTitle>
+            <CardTitle>Sustainable IT in Conversation - the Podcast</CardTitle>
             <CardDescription>
               Watch our YouTube content about remanufacturing processes and sustainability
             </CardDescription>
