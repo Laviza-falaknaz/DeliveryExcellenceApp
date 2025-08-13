@@ -172,11 +172,11 @@ export default function Orders() {
                   <TableHead className="text-left font-medium text-neutral-600 py-4 px-6 cursor-pointer hover:text-neutral-900 transition-colors">
                     Expected Shipping Date ↓
                   </TableHead>
-                  <TableHead className="text-left font-medium text-neutral-600 py-4 px-6">
-                    Packing List
+                  <TableHead className="text-left font-medium text-neutral-600 py-4 px-6 cursor-pointer hover:text-neutral-900 transition-colors">
+                    Packing List ↓
                   </TableHead>
-                  <TableHead className="text-left font-medium text-neutral-600 py-4 px-6">
-                    Hashcodes
+                  <TableHead className="text-left font-medium text-neutral-600 py-4 px-6 cursor-pointer hover:text-neutral-900 transition-colors">
+                    Hashcodes ↓
                   </TableHead>
                 </TableRow>
               </TableHeader>
