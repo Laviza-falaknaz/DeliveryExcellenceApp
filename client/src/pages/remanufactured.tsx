@@ -25,66 +25,55 @@ export default function Remanufactured() {
       <div className="space-y-6">
         <Card>
           <CardHeader>
-            <CardTitle>What is Remanufacturing?</CardTitle>
+            <CardTitle>Benefits of Choosing Remanufactured</CardTitle>
             <CardDescription>
-              Understanding the circular economy approach to sustainable computing
+              Environmental and quality advantages of remanufactured laptops
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="prose prose-neutral max-w-none">
-              <p className="text-neutral-700 leading-relaxed">
-                Remanufacturing is a comprehensive industrial process that transforms end-of-life products back to like-new condition. 
-                Unlike simple refurbishing, remanufacturing involves complete disassembly, cleaning, inspection, replacement of worn components, 
-                and reassembly to original manufacturer specifications.
-              </p>
-            </div>
-            
-            <div>
-              <h3 className="font-semibold text-lg mb-4">Benefits of Choosing Remanufactured</h3>
-              <Accordion type="single" collapsible className="w-full">
-                <AccordionItem value="environmental-sustainability">
-                  <AccordionTrigger className="text-left">
-                    <div className="flex items-center">
-                      <div className="h-8 w-8 rounded-full bg-[#08ABAB] flex items-center justify-center text-white mr-3 shrink-0">
-                        <i className="ri-recycle-line text-sm"></i>
-                      </div>
-                      Environmental Sustainability
+          <CardContent>
+            <Accordion type="single" collapsible className="w-full">
+              <AccordionItem value="environmental-sustainability">
+                <AccordionTrigger className="text-left">
+                  <div className="flex items-center">
+                    <div className="h-8 w-8 rounded-full bg-[#08ABAB] flex items-center justify-center text-white mr-3 shrink-0">
+                      <i className="ri-recycle-line text-sm"></i>
                     </div>
-                  </AccordionTrigger>
-                  <AccordionContent>
-                    <div className="pl-11 pt-2">
-                      <ul className="text-neutral-700 space-y-2 text-sm">
-                        <li>• 70% reduction in CO2 emissions vs. new manufacturing</li>
-                        <li>• 80% reduction in water consumption</li>
-                        <li>• 85% reduction in mineral extraction</li>
-                        <li>• Diverts electronics from landfills</li>
-                      </ul>
+                    Environmental Sustainability
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent>
+                  <div className="pl-11 pt-2">
+                    <ul className="text-neutral-700 space-y-2 text-sm">
+                      <li>• 70% reduction in CO2 emissions vs. new manufacturing</li>
+                      <li>• 80% reduction in water consumption</li>
+                      <li>• 85% reduction in mineral extraction</li>
+                      <li>• Diverts electronics from landfills</li>
+                    </ul>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+              
+              <AccordionItem value="quality-standards">
+                <AccordionTrigger className="text-left">
+                  <div className="flex items-center">
+                    <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center text-white mr-3 shrink-0">
+                      <i className="ri-award-line text-sm"></i>
                     </div>
-                  </AccordionContent>
-                </AccordionItem>
-                
-                <AccordionItem value="quality-standards">
-                  <AccordionTrigger className="text-left">
-                    <div className="flex items-center">
-                      <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center text-white mr-3 shrink-0">
-                        <i className="ri-award-line text-sm"></i>
-                      </div>
-                      Quality Standards
-                    </div>
-                  </AccordionTrigger>
-                  <AccordionContent>
-                    <div className="pl-11 pt-2">
-                      <ul className="text-neutral-700 space-y-2 text-sm">
-                        <li>• Same performance as new products</li>
-                        <li>• Rigorous 100+ point testing process</li>
-                        <li>• Premium warranty coverage</li>
-                        <li>• ISO 14001 certified processes</li>
-                      </ul>
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
-              </Accordion>
-            </div>
+                    Quality Standards
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent>
+                  <div className="pl-11 pt-2">
+                    <ul className="text-neutral-700 space-y-2 text-sm">
+                      <li>• Same performance as new products</li>
+                      <li>• Rigorous 100+ point testing process</li>
+                      <li>• Premium warranty coverage</li>
+                      <li>• ISO 14001 certified processes</li>
+                    </ul>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
           </CardContent>
         </Card>
         
