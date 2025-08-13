@@ -128,13 +128,6 @@ export default function Support() {
             <i className="ri-phone-line mr-2"></i>
             <span>Contact Us</span>
           </Button>
-          <Button 
-            onClick={() => window.location.href = '/warranty-claim'}
-            className="bg-white text-neutral-900 border border-neutral-300 hover:bg-teal-600 hover:text-white hover:border-teal-600 transition-colors"
-          >
-            <i className="ri-add-line mr-2"></i>
-            <span>Create RMA</span>
-          </Button>
         </div>
       </div>
 
