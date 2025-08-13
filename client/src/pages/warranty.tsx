@@ -291,13 +291,13 @@ export default function Warranty() {
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger 
             value="warranty" 
-            className="hover:bg-[#08ABAB] hover:text-white transition-colors data-[state=active]:bg-[#08ABAB] data-[state=active]:text-white"
+            className="hover:bg-neutral-100 transition-colors data-[state=active]:bg-[#08ABAB] data-[state=active]:text-white data-[state=active]:hover:bg-[#08ABAB]"
           >
             Warranty Information
           </TabsTrigger>
           <TabsTrigger 
             value="troubleshooting" 
-            className="hover:bg-[#08ABAB] hover:text-white transition-colors data-[state=active]:bg-[#08ABAB] data-[state=active]:text-white"
+            className="hover:bg-neutral-100 transition-colors data-[state=active]:bg-[#08ABAB] data-[state=active]:text-white data-[state=active]:hover:bg-[#08ABAB]"
           >
             Troubleshooting Guide
           </TabsTrigger>
