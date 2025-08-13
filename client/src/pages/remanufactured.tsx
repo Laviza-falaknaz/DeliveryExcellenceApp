@@ -38,40 +38,51 @@ export default function Remanufactured() {
                 and reassembly to original manufacturer specifications.
               </p>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                <div className="border rounded-lg p-6 bg-gradient-to-br from-teal-50 to-green-50">
-                  <div className="flex items-start">
-                    <div className="h-10 w-10 rounded-full bg-[#08ABAB] flex items-center justify-center text-white mr-4 shrink-0">
-                      <i className="ri-recycle-line text-lg"></i>
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-lg mb-2">Environmental Impact</h3>
-                      <ul className="text-neutral-700 space-y-1 text-sm">
-                        <li>• 70% reduction in CO2 emissions vs. new manufacturing</li>
-                        <li>• 80% reduction in water consumption</li>
-                        <li>• 85% reduction in mineral extraction</li>
-                        <li>• Diverts electronics from landfills</li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="border rounded-lg p-6 bg-gradient-to-br from-blue-50 to-indigo-50">
-                  <div className="flex items-start">
-                    <div className="h-10 w-10 rounded-full bg-blue-600 flex items-center justify-center text-white mr-4 shrink-0">
-                      <i className="ri-award-line text-lg"></i>
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-lg mb-2">Quality Standards</h3>
-                      <ul className="text-neutral-700 space-y-1 text-sm">
-                        <li>• Same performance as new products</li>
-                        <li>• Rigorous 100+ point testing process</li>
-                        <li>• Premium warranty coverage</li>
-                        <li>• ISO 14001 certified processes</li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
+              <div className="mt-6">
+                <h3 className="font-semibold text-lg mb-4">Benefits of Choosing Remanufactured</h3>
+                <Accordion type="single" collapsible className="w-full">
+                  <AccordionItem value="environmental-impact">
+                    <AccordionTrigger className="text-left">
+                      <div className="flex items-center">
+                        <div className="h-8 w-8 rounded-full bg-[#08ABAB] flex items-center justify-center text-white mr-3 shrink-0">
+                          <i className="ri-recycle-line text-sm"></i>
+                        </div>
+                        Environmental Impact
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      <div className="pl-11 pt-2">
+                        <ul className="text-neutral-700 space-y-2 text-sm">
+                          <li>• 70% reduction in CO2 emissions vs. new manufacturing</li>
+                          <li>• 80% reduction in water consumption</li>
+                          <li>• 85% reduction in mineral extraction</li>
+                          <li>• Diverts electronics from landfills</li>
+                        </ul>
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                  
+                  <AccordionItem value="quality-standards">
+                    <AccordionTrigger className="text-left">
+                      <div className="flex items-center">
+                        <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center text-white mr-3 shrink-0">
+                          <i className="ri-award-line text-sm"></i>
+                        </div>
+                        Quality Standards
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      <div className="pl-11 pt-2">
+                        <ul className="text-neutral-700 space-y-2 text-sm">
+                          <li>• Same performance as new products</li>
+                          <li>• Rigorous 100+ point testing process</li>
+                          <li>• Premium warranty coverage</li>
+                          <li>• ISO 14001 certified processes</li>
+                        </ul>
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
               </div>
             </div>
           </CardContent>
