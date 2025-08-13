@@ -5,6 +5,7 @@ import { useState } from "react";
 
 export default function Remanufactured() {
   const [currentTip, setCurrentTip] = useState(0);
+  const [currentVideo, setCurrentVideo] = useState(0);
   
   const tips = [
     {
@@ -51,6 +52,36 @@ export default function Remanufactured() {
 
   const prevTip = () => {
     setCurrentTip((prev) => (prev - 1 + tips.length) % tips.length);
+  };
+
+  // YouTube videos data - placeholder for now, will be replaced with actual links
+  const videos = [
+    {
+      id: "VIDEO_ID_1", // Will be replaced with actual YouTube video ID
+      title: "The Remanufacturing Process",
+      description: "See how we transform used laptops into like-new devices",
+      embedUrl: "https://www.youtube.com/embed/VIDEO_ID_1"
+    },
+    {
+      id: "VIDEO_ID_2",
+      title: "Quality Testing & Certification", 
+      description: "Our comprehensive testing process ensures reliability",
+      embedUrl: "https://www.youtube.com/embed/VIDEO_ID_2"
+    },
+    {
+      id: "VIDEO_ID_3",
+      title: "Environmental Impact",
+      description: "How remanufactured laptops help save the planet",
+      embedUrl: "https://www.youtube.com/embed/VIDEO_ID_3"
+    }
+  ];
+
+  const nextVideo = () => {
+    setCurrentVideo((prev) => (prev + 1) % videos.length);
+  };
+
+  const prevVideo = () => {
+    setCurrentVideo((prev) => (prev - 1 + videos.length) % videos.length);
   };
 
   return (
@@ -278,6 +309,105 @@ export default function Remanufactured() {
               <div className="text-center mt-3">
                 <span className="text-sm text-neutral-500">
                   Tip {currentTip + 1} of {tips.length}
+                </span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        
+        {/* YouTube Videos Carousel */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Video Library</CardTitle>
+            <CardDescription>
+              Watch our YouTube content about remanufacturing processes and sustainability
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="relative">
+              {/* Video Carousel Container */}
+              <div className="overflow-hidden rounded-lg">
+                <div 
+                  className="flex transition-transform duration-300 ease-in-out"
+                  style={{ transform: `translateX(-${currentVideo * 100}%)` }}
+                >
+                  {videos.map((video, index) => (
+                    <div key={index} className="w-full flex-shrink-0">
+                      <div className="bg-neutral-50 rounded-lg border overflow-hidden">
+                        {/* Video Embed */}
+                        <div className="aspect-video bg-neutral-200 flex items-center justify-center">
+                          {video.id.startsWith('VIDEO_ID') ? (
+                            // Placeholder for when actual video IDs are provided
+                            <div className="text-center text-neutral-500">
+                              <i className="ri-youtube-line text-6xl mb-4 text-red-500"></i>
+                              <p className="font-medium">YouTube Video Placeholder</p>
+                              <p className="text-sm">Video will appear here once link is provided</p>
+                            </div>
+                          ) : (
+                            <iframe
+                              src={video.embedUrl}
+                              title={video.title}
+                              className="w-full h-full"
+                              frameBorder="0"
+                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                              allowFullScreen
+                            />
+                          )}
+                        </div>
+                        
+                        {/* Video Info */}
+                        <div className="p-4">
+                          <h4 className="font-semibold text-lg text-neutral-900 mb-2">{video.title}</h4>
+                          <p className="text-neutral-600 text-sm">{video.description}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+              {/* Video Navigation Controls */}
+              <div className="flex items-center justify-between mt-4">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={prevVideo}
+                  className="flex items-center space-x-2 bg-white border-neutral-300 text-neutral-900 hover:bg-[#08ABAB] hover:text-white hover:border-[#08ABAB] transition-colors"
+                >
+                  <i className="ri-arrow-left-line"></i>
+                  <span>Previous</span>
+                </Button>
+                
+                {/* Video Dots Indicator */}
+                <div className="flex space-x-2">
+                  {videos.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setCurrentVideo(index)}
+                      className={`w-3 h-3 rounded-full transition-colors ${
+                        index === currentVideo 
+                          ? 'bg-[#08ABAB]' 
+                          : 'bg-neutral-300 hover:bg-neutral-400'
+                      }`}
+                    />
+                  ))}
+                </div>
+                
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={nextVideo}
+                  className="flex items-center space-x-2 bg-white border-neutral-300 text-neutral-900 hover:bg-[#08ABAB] hover:text-white hover:border-[#08ABAB] transition-colors"
+                >
+                  <span>Next</span>
+                  <i className="ri-arrow-right-line"></i>
+                </Button>
+              </div>
+              
+              {/* Video Counter */}
+              <div className="text-center mt-3">
+                <span className="text-sm text-neutral-500">
+                  Video {currentVideo + 1} of {videos.length}
                 </span>
               </div>
             </div>
