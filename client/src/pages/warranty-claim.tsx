@@ -236,7 +236,7 @@ export default function WarrantyClaim() {
           <Button 
             onClick={() => window.open('https://circularcomputing.com/warranty/uk/', '_blank')}
             variant="outline"
-            className="bg-white border-neutral-300 text-neutral-900 hover:bg-teal-600 hover:text-white hover:border-teal-600 transition-colors"
+            className="bg-white border-neutral-300 text-neutral-900 hover:bg-[#08ABAB] hover:text-white hover:border-[#08ABAB] transition-colors"
           >
             <i className="ri-file-text-line mr-2"></i>
             <span>View Warranty Terms</span>
