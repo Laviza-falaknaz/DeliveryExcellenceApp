@@ -17,6 +17,7 @@ The application emphasizes environmental impact visualization, showing users how
 ### Document Management & Educational Content (August 2025)
 - **Orders Table Enhancement**: Added Packing List (PDF) and Hashcodes (CSV/Excel) columns to "Your Orders" table with download functionality for account manager uploaded documents. Maintained consistent teal branding and professional styling.
 - **Remanufactured Explained Tab**: Successfully implemented comprehensive educational tab under Warranty & Troubleshooting section explaining remanufacturing process, environmental benefits, quality standards, and business advantages. Includes working external links to product catalog and contact pages.
+- **Setup Tips Carousel**: Added interactive carousel-style component to Remanufactured Explained page featuring 6 mini blog tips covering battery calibration, driver updates, storage optimization, warranty registration, performance testing, and thermal management. Includes navigation controls, dot indicators, and smooth transitions.
 
 ## User Preferences
 
