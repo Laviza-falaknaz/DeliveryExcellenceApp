@@ -63,7 +63,7 @@ export default function SupportResources() {
         title="Customer Support"
         description="Need help with setup or having technical issues?"
         buttonText="Contact Support"
-        buttonColor="bg-white border hover:bg-teal-600 hover:text-white hover:border-teal-600 transition-colors"
+        buttonColor="bg-white border hover:bg-[#08ABAB] hover:text-white hover:border-[#08ABAB] transition-colors"
         href="/support/new"
       />
       <SupportResource
@@ -73,7 +73,7 @@ export default function SupportResources() {
         title="Returns & RMA"
         description="Need to return or replace a product?"
         buttonText="Create RMA"
-        buttonColor="bg-white border hover:bg-teal-600 hover:text-white hover:border-teal-600 transition-colors"
+        buttonColor="bg-white border hover:bg-[#08ABAB] hover:text-white hover:border-[#08ABAB] transition-colors"
         href="/rma/new"
       />
       <SupportResource
@@ -83,7 +83,7 @@ export default function SupportResources() {
         title="New Order"
         description="Ready to expand your sustainable IT equipment?"
         buttonText="Contact Sales Team"
-        buttonColor="bg-white border hover:bg-teal-600 hover:text-white hover:border-teal-600 transition-colors"
+        buttonColor="bg-white border hover:bg-[#08ABAB] hover:text-white hover:border-[#08ABAB] transition-colors"
         href="/orders/new"
       />
     </div>
