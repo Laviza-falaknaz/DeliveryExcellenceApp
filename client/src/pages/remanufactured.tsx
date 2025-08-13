@@ -216,7 +216,7 @@ export default function Remanufactured() {
                   className="w-full bg-white border-neutral-300 text-neutral-900 hover:bg-[#08ABAB] hover:text-white hover:border-[#08ABAB] transition-colors"
                   asChild
                 >
-                  <a href="https://circularcomputing.com/products/" target="_blank" rel="noopener noreferrer">
+                  <a href="https://circularcomputing.com/remanufactured-laptops/" target="_blank" rel="noopener noreferrer">
                     <i className="ri-shopping-cart-line mr-2"></i>
                     Browse Remanufactured Laptops
                   </a>
