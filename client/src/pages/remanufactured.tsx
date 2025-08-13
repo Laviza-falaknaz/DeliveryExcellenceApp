@@ -206,7 +206,7 @@ export default function Remanufactured() {
               <div className="h-12 w-12 rounded-full bg-[#08ABAB]/10 flex items-center justify-center text-[#08ABAB] mb-4">
                 <i className="ri-earth-line text-xl"></i>
               </div>
-              <h3 className="font-medium mb-2">Ready to Make a Sustainable Choice?</h3>
+              <h3 className="font-medium mb-2">Our Sustainable IT</h3>
               <p className="text-neutral-600 mb-4 max-w-md">
                 Join thousands of customers who have chosen remanufactured laptops for their environmental and economic benefits
               </p>
