@@ -42,13 +42,13 @@ export default function Remanufactured() {
             <div>
               <h3 className="font-semibold text-lg mb-4">Benefits of Choosing Remanufactured</h3>
               <Accordion type="single" collapsible className="w-full">
-                <AccordionItem value="environmental-impact">
+                <AccordionItem value="environmental-sustainability">
                   <AccordionTrigger className="text-left">
                     <div className="flex items-center">
                       <div className="h-8 w-8 rounded-full bg-[#08ABAB] flex items-center justify-center text-white mr-3 shrink-0">
                         <i className="ri-recycle-line text-sm"></i>
                       </div>
-                      Environmental Impact
+                      Environmental Sustainability
                     </div>
                   </AccordionTrigger>
                   <AccordionContent>
