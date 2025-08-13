@@ -279,7 +279,7 @@ export default function Warranty() {
           <Button 
             onClick={() => window.open('https://circularcomputing.com/contact/', '_blank')}
             variant="outline"
-            className="bg-white border-neutral-300 text-neutral-900 hover:bg-teal-600 hover:text-white hover:border-teal-600 transition-colors"
+            className="bg-white border-neutral-300 text-neutral-900 hover:bg-[#08ABAB] hover:text-white hover:border-[#08ABAB] transition-colors"
           >
             <i className="ri-phone-line mr-2"></i>
             <span>Contact Us</span>
@@ -289,8 +289,18 @@ export default function Warranty() {
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="warranty">Warranty Information</TabsTrigger>
-          <TabsTrigger value="troubleshooting">Troubleshooting Guide</TabsTrigger>
+          <TabsTrigger 
+            value="warranty" 
+            className="hover:bg-[#08ABAB] hover:text-white transition-colors data-[state=active]:bg-[#08ABAB] data-[state=active]:text-white"
+          >
+            Warranty Information
+          </TabsTrigger>
+          <TabsTrigger 
+            value="troubleshooting" 
+            className="hover:bg-[#08ABAB] hover:text-white transition-colors data-[state=active]:bg-[#08ABAB] data-[state=active]:text-white"
+          >
+            Troubleshooting Guide
+          </TabsTrigger>
         </TabsList>
         
         {/* Warranty Information Tab */}
