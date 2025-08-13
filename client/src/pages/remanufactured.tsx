@@ -239,7 +239,7 @@ export default function Remanufactured() {
           <CardHeader>
             <CardTitle>Tips for Setting Up Remanufactured Laptops</CardTitle>
             <CardDescription>
-              Essential tips for getting the most out of your remanufactured laptop
+              Quick tips if you're new to the world of remanufactured laptops
             </CardDescription>
           </CardHeader>
           <CardContent>
