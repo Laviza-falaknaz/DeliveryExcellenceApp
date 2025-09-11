@@ -8,6 +8,7 @@ import { motion } from "framer-motion";
 import { formatEnvironmentalImpact } from "@/lib/utils";
 import carbonIcon from "@assets/Carbon Icon CC_1757609284710.png";
 import waterIcon from "@assets/Minerals Saved Icon CC _1757609311468.png";
+import resourceIcon from "@assets/Resource Pres Icon CC_1757609329084.png";
 import {
   LineChart,
   Line,
@@ -266,8 +267,8 @@ Learn more about sustainable IT solutions: circularcomputing.com
                       {formatEnvironmentalImpact(impact.mineralsSaved, "g")}
                     </p>
                   </div>
-                  <div className="icon-circle">
-                    <i className="ri-recycle-line text-2xl"></i>
+                  <div className="h-12 w-12 rounded-full bg-accent/10 flex items-center justify-center">
+                    <img src={resourceIcon} alt="Resource Icon" className="w-7 h-7" />
                   </div>
                 </div>
                 <div className="mt-2">
