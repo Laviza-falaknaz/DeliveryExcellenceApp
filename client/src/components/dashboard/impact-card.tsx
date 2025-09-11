@@ -7,6 +7,7 @@ interface ImpactCardProps {
   value: number;
   unit: string;
   icon: string;
+  iconImage?: string;
   iconColor: string;
   iconBgColor: string;
   progress: number;
@@ -19,6 +20,7 @@ export default function ImpactCard({
   value,
   unit,
   icon,
+  iconImage,
   iconColor,
   iconBgColor,
   progress,
@@ -37,8 +39,12 @@ export default function ImpactCard({
               {formattedValue}
             </h3>
           </div>
-          <div className="icon-circle">
-            <i className={`${icon} text-xl`}></i>
+          <div className={`h-10 w-10 rounded-full ${iconBgColor} flex items-center justify-center ${iconColor}`}>
+            {iconImage ? (
+              <img src={iconImage} alt={title} className="w-6 h-6" />
+            ) : (
+              <i className={`${icon} text-xl`}></i>
+            )}
           </div>
         </div>
         <div className="mt-4">

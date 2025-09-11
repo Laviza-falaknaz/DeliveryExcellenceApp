@@ -11,6 +11,8 @@ import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState, useEffect } from "react";
+import carbonIcon from "@assets/Carbon Icon CC_1757591684851.png";
+import mineralsIcon from "@assets/Minerals Saved Icon CC _1757591709661.png";
 
 export default function Dashboard() {
   const { data: user } = useQuery({
@@ -90,6 +92,7 @@ export default function Dashboard() {
               value={impact.carbonSaved}
               unit="g"
               icon="ri-plant-line"
+              iconImage={carbonIcon}
               iconColor="text-success"
               iconBgColor="bg-success/10"
               progress={65}
@@ -101,6 +104,7 @@ export default function Dashboard() {
               value={impact.waterProvided}
               unit="litres"
               icon="ri-water-flash-line"
+              iconImage={mineralsIcon}
               iconColor="text-secondary"
               iconBgColor="bg-secondary/10"
               progress={78}
