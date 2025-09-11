@@ -6,6 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
 import { formatEnvironmentalImpact } from "@/lib/utils";
+import carbonIcon from "@assets/Carbon Icon CC_1757609284710.png";
 import {
   LineChart,
   Line,
@@ -199,8 +200,8 @@ Learn more about sustainable IT solutions: circularcomputing.com
                       {formatEnvironmentalImpact(impact.carbonSaved, "g")}
                     </p>
                   </div>
-                  <div className="icon-circle">
-                    <i className="ri-plant-line text-2xl"></i>
+                  <div className="h-12 w-12 rounded-full bg-success/10 flex items-center justify-center">
+                    <img src={carbonIcon} alt="Carbon Icon" className="w-7 h-7" />
                   </div>
                 </div>
                 <div className="mt-2">
