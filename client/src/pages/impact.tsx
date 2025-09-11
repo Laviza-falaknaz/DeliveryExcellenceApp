@@ -165,15 +165,13 @@ Learn more about sustainable IT solutions: circularcomputing.com
         </div>
         <div className="mt-4 md:mt-0 flex gap-2">
           <Button 
-            variant="outline" 
-            className="bg-white border-neutral-300 text-neutral-900 hover:bg-teal-600 hover:text-white hover:border-teal-600 transition-colors"
+            variant="outline"
           >
             <i className="ri-download-line mr-2"></i>
             <span>Download Report</span>
           </Button>
           <Button 
             variant="outline"
-            className="bg-white text-neutral-900 border-neutral-300 hover:bg-teal-600 hover:text-white hover:border-teal-600 transition-colors" 
             asChild
           >
             <Link href="/water-projects">View Water Projects</Link>
@@ -644,7 +642,6 @@ Learn more about sustainable IT solutions: circularcomputing.com
               <div className="flex flex-wrap gap-3">
                 <Button 
                   variant="outline"
-                  className="bg-white text-neutral-900 border-neutral-200 hover:bg-secondary hover:text-white hover:border-secondary transition-all duration-200"
                   asChild
                 >
                   <Link href="/case-studies?share=true">Join Case Study Programme</Link>
