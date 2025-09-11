@@ -219,9 +219,118 @@ export default function CaseStudies() {
       {/* Featured Case Studies */}
       <section className="mb-8">
         <h2 className="text-lg font-semibold font-poppins mb-4">Featured Case Studies</h2>
+        <p className="text-neutral-600 mb-6">See the impact Circular Computing laptops have on organisations and the Earth. We are proud to have helped organisations in the public and private sectors achieve their IT procurement and sustainability goals.</p>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           
+          {/* Salvation Army Trading Company Case Study */}
+          <Card>
+            <div className="h-48 overflow-hidden">
+              <img
+                src="https://circularcomputing.com/wp-content/uploads/2025/08/case-salavation.png"
+                alt="Salvation Army Trading Company charity shops and donation banks"
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <CardHeader>
+              <CardTitle>Salvation Army Trading Company</CardTitle>
+              <CardDescription>Charity & Social Services</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-neutral-700 mb-4">
+                Through managing over 260 charity shops and thousands of clothing donation banks, SATCoL facilitates substantial fundraising for the Salvation Army's charitable programs.
+              </p>
+            </CardContent>
+            <CardFooter>
+              <Button variant="outline" className="w-full bg-white hover:bg-teal-600 hover:text-white transition-colors" asChild>
+                <a href="https://circularcomputing.com/case-studies/salvation-army-trading-company/" target="_blank" rel="noreferrer">
+                  Read Full Case Study
+                </a>
+              </Button>
+            </CardFooter>
+          </Card>
+
+          {/* Tourism Ireland Case Study */}
+          <Card>
+            <div className="h-48 overflow-hidden">
+              <img
+                src="https://circularcomputing.com/wp-content/uploads/2025/07/tour-123.jpg"
+                alt="Tourism Ireland marketing campaigns and business events"
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <CardHeader>
+              <CardTitle>Tourism Ireland</CardTitle>
+              <CardDescription>Tourism & Marketing</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-neutral-700 mb-4">
+                Tourism Ireland is responsible for marketing Ireland overseas as a leading holiday and Business Events destination. Delivering world-class campaigns in 13+ markets.
+              </p>
+            </CardContent>
+            <CardFooter>
+              <Button variant="outline" className="w-full bg-white hover:bg-teal-600 hover:text-white transition-colors" asChild>
+                <a href="https://circularcomputing.com/case-studies/tourism-ireland/" target="_blank" rel="noreferrer">
+                  Read Full Case Study
+                </a>
+              </Button>
+            </CardFooter>
+          </Card>
+
+          {/* Weightmans Case Study */}
+          <Card>
+            <div className="h-48 overflow-hidden">
+              <img
+                src="https://circularcomputing.com/wp-content/uploads/2025/06/upscalemedia-transformed-1-scaled.jpeg"
+                alt="Weightmans law firm sustainability integration"
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <CardHeader>
+              <CardTitle>Weightmans</CardTitle>
+              <CardDescription>Legal Services</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-neutral-700 mb-4">
+                Weightmans integrates sustainability into their core strategy with Circular Computing's remanufactured laptops. Like many large organisations, Weightmans recognised the vital role technology plays in their daily operations.
+              </p>
+            </CardContent>
+            <CardFooter>
+              <Button variant="outline" className="w-full bg-white hover:bg-teal-600 hover:text-white transition-colors" asChild>
+                <a href="https://circularcomputing.com/case-studies/weightmans/" target="_blank" rel="noreferrer">
+                  Read Full Case Study
+                </a>
+              </Button>
+            </CardFooter>
+          </Card>
+
+          {/* Cavan County Council Case Study */}
+          <Card>
+            <div className="h-48 overflow-hidden">
+              <img
+                src="https://circularcomputing.com/wp-content/uploads/2025/06/Edited-image.png"
+                alt="Cavan County Council building and Green Public Procurement Strategy"
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <CardHeader>
+              <CardTitle>Cavan County Council</CardTitle>
+              <CardDescription>Local Government</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-neutral-700 mb-4">
+                Cavan County Council needed to modernise its IT estate while advancing its Climate Action Implementation Plan and aligned with Ireland's 'Buying Greener' Green Public Procurement Strategy.
+              </p>
+            </CardContent>
+            <CardFooter>
+              <Button variant="outline" className="w-full bg-white hover:bg-teal-600 hover:text-white transition-colors" asChild>
+                <a href="https://circularcomputing.com/case-studies/cavan-county-council/" target="_blank" rel="noreferrer">
+                  Read Full Case Study
+                </a>
+              </Button>
+            </CardFooter>
+          </Card>
+
           {/* WWF Case Study */}
           <Card>
             <div className="h-48 overflow-hidden">
