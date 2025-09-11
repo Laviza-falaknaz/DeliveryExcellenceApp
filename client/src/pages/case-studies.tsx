@@ -143,7 +143,6 @@ export default function CaseStudies() {
           {!hasSubmitted && (
             <Button 
               variant="outline" 
-              className="bg-white border-neutral-300 text-neutral-900 hover:bg-teal-600 hover:text-white hover:border-teal-600 transition-colors"
               onClick={() => setIsDialogOpen(true)}
             >
               <i className="ri-add-line mr-2"></i>
@@ -195,7 +194,6 @@ export default function CaseStudies() {
                 {!hasSubmitted && (
                   <Button 
                     variant="outline" 
-                    className="bg-white border-neutral-300 text-neutral-900 hover:bg-teal-600 hover:text-white hover:border-teal-600 transition-colors"
                     onClick={() => setIsDialogOpen(true)}
                   >
                     Join Case Study Programme
@@ -242,7 +240,7 @@ export default function CaseStudies() {
               </p>
             </CardContent>
             <CardFooter>
-              <Button variant="outline" className="w-full bg-white hover:bg-teal-600 hover:text-white transition-colors" asChild>
+              <Button variant="outline" className="w-full" asChild>
                 <a href="https://circularcomputing.com/case-studies/salvation-army-trading-company/" target="_blank" rel="noreferrer">
                   Read Full Case Study
                 </a>
@@ -269,7 +267,7 @@ export default function CaseStudies() {
               </p>
             </CardContent>
             <CardFooter>
-              <Button variant="outline" className="w-full bg-white hover:bg-teal-600 hover:text-white transition-colors" asChild>
+              <Button variant="outline" className="w-full" asChild>
                 <a href="https://circularcomputing.com/case-studies/tourism-ireland/" target="_blank" rel="noreferrer">
                   Read Full Case Study
                 </a>
@@ -296,7 +294,7 @@ export default function CaseStudies() {
               </p>
             </CardContent>
             <CardFooter>
-              <Button variant="outline" className="w-full bg-white hover:bg-teal-600 hover:text-white transition-colors" asChild>
+              <Button variant="outline" className="w-full" asChild>
                 <a href="https://circularcomputing.com/case-studies/weightmans/" target="_blank" rel="noreferrer">
                   Read Full Case Study
                 </a>
@@ -323,7 +321,7 @@ export default function CaseStudies() {
               </p>
             </CardContent>
             <CardFooter>
-              <Button variant="outline" className="w-full bg-white hover:bg-teal-600 hover:text-white transition-colors" asChild>
+              <Button variant="outline" className="w-full" asChild>
                 <a href="https://circularcomputing.com/case-studies/cavan-county-council/" target="_blank" rel="noreferrer">
                   Read Full Case Study
                 </a>
@@ -350,7 +348,7 @@ export default function CaseStudies() {
               </p>
             </CardContent>
             <CardFooter>
-              <Button variant="outline" className="w-full bg-white hover:bg-teal-600 hover:text-white transition-colors" asChild>
+              <Button variant="outline" className="w-full" asChild>
                 <a href="https://circularcomputing.com/case-studies/wwf/" target="_blank" rel="noreferrer">
                   Read Full Case Study
                 </a>
@@ -377,7 +375,7 @@ export default function CaseStudies() {
               </p>
             </CardContent>
             <CardFooter>
-              <Button variant="outline" className="w-full bg-white hover:bg-teal-600 hover:text-white transition-colors" asChild>
+              <Button variant="outline" className="w-full" asChild>
                 <a href="https://circularcomputing.com/case-studies/royal-mint/" target="_blank" rel="noreferrer">
                   Read Full Case Study
                 </a>
@@ -404,7 +402,7 @@ export default function CaseStudies() {
               </p>
             </CardContent>
             <CardFooter>
-              <Button variant="outline" className="w-full bg-white hover:bg-teal-600 hover:text-white transition-colors" asChild>
+              <Button variant="outline" className="w-full" asChild>
                 <a href="https://circularcomputing.com/case-studies/east-england-ambulance-service/" target="_blank" rel="noreferrer">
                   Read Full Case Study
                 </a>
@@ -431,7 +429,7 @@ export default function CaseStudies() {
               </p>
             </CardContent>
             <CardFooter>
-              <Button variant="outline" className="w-full bg-white hover:bg-teal-600 hover:text-white transition-colors" asChild>
+              <Button variant="outline" className="w-full" asChild>
                 <a href="https://circularcomputing.com/case-studies/chichester-high-school/" target="_blank" rel="noreferrer">
                   Read Full Case Study
                 </a>
@@ -458,7 +456,7 @@ export default function CaseStudies() {
               </p>
             </CardContent>
             <CardFooter>
-              <Button variant="outline" className="w-full bg-white hover:bg-teal-600 hover:text-white transition-colors" asChild>
+              <Button variant="outline" className="w-full" asChild>
                 <a href="https://circularcomputing.com/case-studies/the-pensions-authority/" target="_blank" rel="noreferrer">
                   Read Full Case Study
                 </a>
@@ -485,7 +483,7 @@ export default function CaseStudies() {
               </p>
             </CardContent>
             <CardFooter>
-              <Button variant="outline" className="w-full bg-white hover:bg-teal-600 hover:text-white transition-colors" asChild>
+              <Button variant="outline" className="w-full" asChild>
                 <a href="https://circularcomputing.com/case-studies/london-borough-of-barking-and-dagenham/" target="_blank" rel="noreferrer">
                   Read Full Case Study
                 </a>
@@ -512,7 +510,7 @@ export default function CaseStudies() {
               </p>
             </CardContent>
             <CardFooter>
-              <Button variant="outline" className="w-full bg-white hover:bg-teal-600 hover:text-white transition-colors" asChild>
+              <Button variant="outline" className="w-full" asChild>
                 <a href="https://circularcomputing.com/case-studies/together-for-mental-wellbeing/" target="_blank" rel="noreferrer">
                   Read Full Case Study
                 </a>
@@ -539,7 +537,7 @@ export default function CaseStudies() {
               </p>
             </CardContent>
             <CardFooter>
-              <Button variant="outline" className="w-full bg-white hover:bg-teal-600 hover:text-white transition-colors" asChild>
+              <Button variant="outline" className="w-full" asChild>
                 <a href="https://circularcomputing.com/case-studies/google-cloud-and-formula-e-hackathon/" target="_blank" rel="noreferrer">
                   Read Full Case Study
                 </a>
@@ -566,7 +564,7 @@ export default function CaseStudies() {
               </p>
             </CardContent>
             <CardFooter>
-              <Button variant="outline" className="w-full bg-white hover:bg-teal-600 hover:text-white transition-colors" asChild>
+              <Button variant="outline" className="w-full" asChild>
                 <a href="https://circularcomputing.com/case-studies/kent-county_council/" target="_blank" rel="noreferrer">
                   Read Full Case Study
                 </a>
@@ -593,7 +591,7 @@ export default function CaseStudies() {
               </p>
             </CardContent>
             <CardFooter>
-              <Button variant="outline" className="w-full bg-white hover:bg-teal-600 hover:text-white transition-colors" asChild>
+              <Button variant="outline" className="w-full" asChild>
                 <a href="https://circularcomputing.com/case-studies/kings-college-hospital-foundation/" target="_blank" rel="noreferrer">
                   Read Full Case Study
                 </a>
@@ -620,7 +618,7 @@ export default function CaseStudies() {
               </p>
             </CardContent>
             <CardFooter>
-              <Button variant="outline" className="w-full bg-white hover:bg-teal-600 hover:text-white transition-colors" asChild>
+              <Button variant="outline" className="w-full" asChild>
                 <a href="https://circularcomputing.com/case-studies/balfour-beatty/" target="_blank" rel="noreferrer">
                   Read Full Case Study
                 </a>
@@ -860,7 +858,7 @@ export default function CaseStudies() {
                 <Button 
                   type="submit" 
                   disabled={isSubmitting}
-                  className="flex-1 bg-white hover:bg-teal-600 hover:text-white transition-colors"
+                  className="flex-1"
                 >
                   {isSubmitting ? "Submitting..." : "Submit Case Study"}
                 </Button>
