@@ -279,7 +279,6 @@ export default function Warranty() {
           <Button 
             onClick={() => window.open('https://circularcomputing.com/contact/', '_blank')}
             variant="outline"
-            className="bg-white border-neutral-300 text-neutral-900 hover:bg-[#08ABAB] hover:text-white hover:border-[#08ABAB] transition-colors"
           >
             <i className="ri-phone-line mr-2"></i>
             <span>Contact Us</span>

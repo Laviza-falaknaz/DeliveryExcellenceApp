@@ -310,7 +310,6 @@ export default function RMA() {
           <Button 
             onClick={() => window.open('https://circularcomputing.com/contact/', '_blank')}
             variant="outline"
-            className="bg-white border-neutral-300 text-neutral-900 hover:bg-[#08ABAB] hover:text-white hover:border-[#08ABAB] transition-colors"
           >
             <i className="ri-phone-line mr-2"></i>
             <span>Contact Us</span>
@@ -329,7 +328,7 @@ export default function RMA() {
               <p className="text-neutral-600 text-sm mb-4">
                 First verify your warranty status, then submit an RMA request for your return.
               </p>
-              <Button variant="outline" className="btn-outline-hover" asChild>
+              <Button variant="outline"  asChild>
                 <a href="https://circularcomputing.com/warranty/uk/" target="_blank" rel="noreferrer">
                   View Return Policy
                 </a>
@@ -348,7 +347,7 @@ export default function RMA() {
               <p className="text-neutral-600 text-sm mb-4">
                 Verify your product's warranty status before starting the RMA process.
               </p>
-              <Button variant="outline" onClick={() => setIsWarrantyCheckDialogOpen(true)} className="btn-outline-hover">
+              <Button variant="outline" onClick={() => setIsWarrantyCheckDialogOpen(true)} >
                 Check Warranty Status
               </Button>
             </div>
@@ -365,7 +364,7 @@ export default function RMA() {
               <p className="text-neutral-600 text-sm mb-4">
                 Our support team is ready to assist you with your return needs.
               </p>
-              <Button variant="outline" className="btn-outline-hover" asChild>
+              <Button variant="outline"  asChild>
                 <a href="https://circularcomputing.com/contact/" target="_blank" rel="noreferrer">Contact Support</a>
               </Button>
             </div>
