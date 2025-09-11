@@ -63,6 +63,9 @@
     @apply transition-colors duration-200;
   }
   
+  /* NEW CONSISTENT BUTTON TREATMENT */
+  /* Standard: teal #08ABAB with white text, Hover: gold #FF9E1C with black text */
+  
   /* Primary button variants */
   .btn-primary-hover {
     @apply text-white transition-colors;
@@ -70,26 +73,32 @@
   }
   
   .btn-primary-hover:hover {
-    background-color: #067878 !important;
+    background-color: #FF9E1C !important;
+    color: #000000 !important;
   }
   
-  /* White button variants with teal hover */
+  /* White button variants with teal background and gold hover */
   .btn-white-hover {
-    @apply bg-white hover:text-white transition-colors;
+    @apply text-white transition-colors;
+    background-color: #08ABAB;
   }
   
   .btn-white-hover:hover {
-    background-color: #08ABAB !important;
+    background-color: #FF9E1C !important;
+    color: #000000 !important;
   }
   
-  /* Outline button variants */
+  /* Outline button variants with new treatment */
   .btn-outline-hover {
-    @apply border hover:text-white transition-colors;
+    @apply border text-white transition-colors;
+    background-color: #08ABAB;
+    border-color: #08ABAB;
   }
   
   .btn-outline-hover:hover {
-    background-color: #08ABAB !important;
-    border-color: #08ABAB !important;
+    background-color: #FF9E1C !important;
+    border-color: #FF9E1C !important;
+    color: #000000 !important;
   }
   
   /* Circular icon styling */
