@@ -93,8 +93,8 @@ export default function Dashboard() {
               unit="g"
               icon="ri-plant-line"
               iconImage={carbonIcon}
-              iconColor="text-success"
-              iconBgColor="bg-success/10"
+              iconColor="text-secondary"
+              iconBgColor="bg-secondary/10"
               progress={65}
               footnote1={`Equivalent to ${impact.treesEquivalent} trees`}
               footnote2="+18% vs last month"
