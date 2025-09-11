@@ -32,6 +32,7 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
 import { formatDate, formatEnvironmentalImpact } from "@/lib/utils";
+import carbonIcon from "@assets/Carbon Icon CC_1757609663969.png";
 
 export default function ESGReport() {
   const { toast } = useToast();
@@ -119,7 +120,7 @@ export default function ESGReport() {
     { 
       category: "Environmental", 
       goals: [
-        { id: 1, title: "Carbon Footprint Reduction", target: "30% by 2025", progress: 65, description: "Reducing carbon emissions through sustainable technology choices" },
+        { id: 1, title: "Total Carbon Saved", target: "30% by 2025", progress: 65, description: "Reducing carbon emissions through sustainable technology choices" },
         { id: 2, title: "E-waste Diversion", target: "10,000 kg by 2025", progress: 48, description: "Diverting e-waste from landfills through circular economy practices" },
         { id: 3, title: "Water Conservation", target: "Provide clean water to 500 people", progress: 72, description: "Supporting charity: water projects through sustainable IT purchases" }
       ]
@@ -147,10 +148,10 @@ export default function ESGReport() {
     return [
       {
         id: "carbon",
-        title: "Carbon Footprint Reduction",
+        title: "Total Carbon Saved",
         value: impact.totalImpact?.carbonSaved || 0,
         unit: "kg CO₂e",
-        icon: <Leaf className="h-6 w-6" />,
+        icon: <img src={carbonIcon} alt="Carbon Icon" className="w-6 h-6" />,
         color: "text-green-600",
         bgColor: "bg-green-100"
       },
@@ -319,10 +320,10 @@ export default function ESGReport() {
           <CardContent className="p-4">
             <div className="flex items-start">
               <div className="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center text-green-600 mr-3">
-                <Leaf className="h-6 w-6" />
+                <img src={carbonIcon} alt="Carbon Icon" className="w-6 h-6" />
               </div>
               <div>
-                <p className="text-neutral-600 text-sm">Carbon Footprint Reduction</p>
+                <p className="text-neutral-600 text-sm">Total Carbon Saved</p>
                 <h3 className="text-2xl font-bold mt-1">
                   {formatEnvironmentalImpact(impact.totalImpact?.carbonSaved || 0, "kg CO₂e")}
                 </h3>
@@ -478,7 +479,7 @@ export default function ESGReport() {
                 <h3 className="text-lg font-semibold mb-3">Environmental Impact Breakdown</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <h4 className="font-medium mb-3">Carbon Footprint Reduction</h4>
+                    <h4 className="font-medium mb-3">Total Carbon Saved</h4>
                     <div className="space-y-3">
                       <div>
                         <div className="flex justify-between mb-1">
