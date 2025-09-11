@@ -214,7 +214,7 @@ export default function ESGReport() {
           </Button>
           <Dialog open={shareDialogOpen} onOpenChange={setShareDialogOpen}>
             <DialogTrigger asChild>
-              <Button variant="outline" className="flex items-center gap-2 bg-white border-neutral-300 text-neutral-900 hover:bg-teal-600 hover:text-white hover:border-teal-600 transition-colors">
+              <Button variant="outline" className="flex items-center gap-2">
                 <Share className="h-4 w-4" />
                 <span>Share Report</span>
               </Button>
