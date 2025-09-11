@@ -7,6 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
 import { formatEnvironmentalImpact } from "@/lib/utils";
 import carbonIcon from "@assets/Carbon Icon CC_1757609284710.png";
+import waterIcon from "@assets/Minerals Saved Icon CC _1757609311468.png";
 import {
   LineChart,
   Line,
@@ -236,8 +237,8 @@ Learn more about sustainable IT solutions: circularcomputing.com
                       {formatEnvironmentalImpact(impact.waterProvided, "litres")}
                     </p>
                   </div>
-                  <div className="icon-circle">
-                    <i className="ri-water-flash-line text-2xl"></i>
+                  <div className="h-12 w-12 rounded-full bg-secondary/10 flex items-center justify-center">
+                    <img src={waterIcon} alt="Water Icon" className="w-7 h-7" />
                   </div>
                 </div>
                 <div className="mt-2">
