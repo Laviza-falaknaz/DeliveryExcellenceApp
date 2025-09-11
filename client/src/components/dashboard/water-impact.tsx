@@ -7,6 +7,7 @@ import { formatEnvironmentalImpact } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 import { WaterProject } from "@shared/schema";
 import charityWaterImage from "@assets/Charity Water.png";
+import waterIcon from "@assets/Minerals Saved Icon CC _1757592540046.png";
 
 export default function WaterImpact() {
   const { data: impact, isLoading: isImpactLoading } = useQuery({
@@ -46,7 +47,7 @@ export default function WaterImpact() {
       <CardContent className="p-5">
         <div className="flex items-center mb-4">
           <div className="h-10 w-10 rounded-full bg-secondary/10 flex items-center justify-center text-secondary mr-3">
-            <i className="ri-water-flash-line text-xl"></i>
+            <img src={waterIcon} alt="Water Icon" className="w-6 h-6" />
           </div>
           <div>
             <h3 className="font-semibold text-neutral-900">charity: water Impact</h3>
@@ -90,7 +91,7 @@ export default function WaterImpact() {
           <div className="border border-neutral-200 rounded-lg p-4">
             <div className="flex items-center">
               <div className="h-8 w-8 rounded-full bg-secondary/10 flex items-center justify-center text-secondary mr-2">
-                <i className="ri-drop-line text-lg"></i>
+                <img src={waterIcon} alt="Water Icon" className="w-5 h-5" />
               </div>
               <span className="text-sm font-medium text-neutral-700">Water Provided</span>
             </div>
