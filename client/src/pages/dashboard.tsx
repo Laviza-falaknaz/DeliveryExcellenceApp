@@ -13,6 +13,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useState, useEffect } from "react";
 import carbonIcon from "@assets/Carbon Icon CC_1757591684851.png";
 import mineralsIcon from "@assets/Minerals Saved Icon CC _1757591709661.png";
+import resourceIcon from "@assets/Resource Pres Icon CC_1757592358474.png";
 
 export default function Dashboard() {
   const { data: user } = useQuery({
@@ -116,6 +117,7 @@ export default function Dashboard() {
               value={impact.mineralsSaved}
               unit="g"
               icon="ri-recycle-line"
+              iconImage={resourceIcon}
               iconColor="text-accent"
               iconBgColor="bg-accent/10"
               progress={45}
