@@ -34,6 +34,7 @@ import { useToast } from "@/hooks/use-toast";
 import { formatDate, formatEnvironmentalImpact } from "@/lib/utils";
 import carbonIcon from "@assets/Carbon Icon CC_1757609663969.png";
 import waterIcon from "@assets/Minerals Saved Icon CC _1757609703592.png";
+import resourceIcon from "@assets/Resource Pres Icon CC_1757609742523.png";
 
 export default function ESGReport() {
   const { toast } = useToast();
@@ -167,10 +168,10 @@ export default function ESGReport() {
       },
       {
         id: "minerals",
-        title: "Raw Materials Saved",
+        title: "Core Minerals Saved",
         value: impact.totalImpact?.mineralsSaved || 0,
         unit: "kg",
-        icon: <BarChart4 className="h-6 w-6" />,
+        icon: <img src={resourceIcon} alt="Resource Icon" className="w-6 h-6" />,
         color: "text-amber-600",
         bgColor: "bg-amber-100"
       }
@@ -359,10 +360,10 @@ export default function ESGReport() {
           <CardContent className="p-4">
             <div className="flex items-start">
               <div className="h-12 w-12 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 mr-3">
-                <BarChart4 className="h-6 w-6" />
+                <img src={resourceIcon} alt="Resource Icon" className="w-6 h-6" />
               </div>
               <div>
-                <p className="text-neutral-600 text-sm">Raw Materials Saved</p>
+                <p className="text-neutral-600 text-sm">Core Minerals Saved</p>
                 <h3 className="text-2xl font-bold mt-1">
                   {formatEnvironmentalImpact(impact.totalImpact?.mineralsSaved || 0, "kg")}
                 </h3>
