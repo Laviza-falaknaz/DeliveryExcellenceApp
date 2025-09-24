@@ -466,7 +466,7 @@ export default function RMA() {
               Need to return or exchange a product? Create an RMA request to start the process.
             </p>
             <Button 
-              className="mt-4 bg-white text-neutral-900 border border-neutral-300 hover:bg-[#08ABAB] hover:text-white hover:border-[#08ABAB] transition-colors" 
+              className="mt-4 bg-[#08ABAB] text-white border-[#08ABAB] hover:bg-[#FF9E1C] hover:text-black hover:border-[#FF9E1C] transition-colors" 
               asChild
             >
               <Link href="/warranty-claim">
