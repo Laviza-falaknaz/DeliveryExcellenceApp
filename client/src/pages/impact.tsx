@@ -295,8 +295,8 @@ Learn more about sustainable IT solutions: circularcomputing.com
                       {formatEnvironmentalImpact(impact.waterSaved || 0, "litres")}
                     </p>
                   </div>
-                  <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
-                    <i className="ri-drop-line text-blue-600 text-xl"></i>
+                  <div className="h-12 w-12 rounded-full bg-secondary/10 flex items-center justify-center">
+                    <img src={waterIcon} alt="Water Icon" className="w-7 h-7" />
                   </div>
                 </div>
                 <div className="mt-2">
