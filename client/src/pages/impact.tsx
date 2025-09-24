@@ -330,7 +330,7 @@ Learn more about sustainable IT solutions: circularcomputing.com
                     dataKey="minerals"
                     stroke="#ffa726"
                     strokeWidth={2}
-                    name="Minerals Saved (g)"
+                    name="Resources Preserved (g)"
                   />
                 </LineChart>
               </ResponsiveContainer>
@@ -343,7 +343,7 @@ Learn more about sustainable IT solutions: circularcomputing.com
       <section className="mb-8 grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
-            <CardTitle>Minerals Saved Breakdown</CardTitle>
+            <CardTitle>Resources Preserved Breakdown</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="h-64">
