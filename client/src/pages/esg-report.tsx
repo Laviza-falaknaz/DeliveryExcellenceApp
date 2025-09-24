@@ -321,7 +321,7 @@ export default function ESGReport() {
         <Card className="bg-white">
           <CardContent className="p-4">
             <div className="flex items-start">
-              <div className="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center text-green-600 mr-3">
+              <div className="h-12 w-12 rounded-full bg-[#08ABAB]/10 flex items-center justify-center text-[#08ABAB] mr-3">
                 <img src={carbonIcon} alt="Carbon Icon" className="w-6 h-6" />
               </div>
               <div>
@@ -329,7 +329,7 @@ export default function ESGReport() {
                 <h3 className="text-2xl font-bold mt-1">
                   {formatEnvironmentalImpact(impact.totalImpact?.carbonSaved || 0, "kg CO₂e")}
                 </h3>
-                <p className="text-xs text-green-600 mt-1">
+                <p className="text-xs text-[#08ABAB] mt-1">
                   Equivalent to {Math.round((impact.totalImpact?.treesEquivalent || 0) * 100) / 100} trees planted
                 </p>
               </div>
@@ -340,7 +340,7 @@ export default function ESGReport() {
         <Card className="bg-white">
           <CardContent className="p-4">
             <div className="flex items-start">
-              <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mr-3">
+              <div className="h-12 w-12 rounded-full bg-[#305269]/10 flex items-center justify-center text-[#305269] mr-3">
                 <img src={waterIcon} alt="Water Icon" className="w-6 h-6" />
               </div>
               <div>
@@ -348,7 +348,7 @@ export default function ESGReport() {
                 <h3 className="text-2xl font-bold mt-1">
                   {formatEnvironmentalImpact(impact.totalImpact?.waterProvided || 0, "litres")}
                 </h3>
-                <p className="text-xs text-blue-600 mt-1">
+                <p className="text-xs text-[#305269] mt-1">
                   Providing clean water to {impact.totalImpact?.familiesHelped || 0} people
                 </p>
               </div>
@@ -359,7 +359,7 @@ export default function ESGReport() {
         <Card className="bg-white">
           <CardContent className="p-4">
             <div className="flex items-start">
-              <div className="h-12 w-12 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 mr-3">
+              <div className="h-12 w-12 rounded-full bg-[#FF9E1C]/10 flex items-center justify-center text-[#FF9E1C] mr-3">
                 <img src={resourceIcon} alt="Resource Icon" className="w-6 h-6" />
               </div>
               <div>
@@ -367,7 +367,7 @@ export default function ESGReport() {
                 <h3 className="text-2xl font-bold mt-1">
                   {formatEnvironmentalImpact(impact.totalImpact?.mineralsSaved || 0, "kg")}
                 </h3>
-                <p className="text-xs text-amber-600 mt-1">
+                <p className="text-xs text-[#FF9E1C] mt-1">
                   Through remanufactured technology adoption
                 </p>
               </div>
