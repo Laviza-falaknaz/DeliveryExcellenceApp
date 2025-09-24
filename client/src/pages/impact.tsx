@@ -200,7 +200,7 @@ Learn more about sustainable IT solutions: circularcomputing.com
                       {formatEnvironmentalImpact(impact.carbonSaved, "g")}
                     </p>
                   </div>
-                  <div className="h-12 w-12 rounded-full bg-success/10 flex items-center justify-center">
+                  <div className="h-12 w-12 rounded-full bg-secondary/10 flex items-center justify-center">
                     <img src={carbonIcon} alt="Carbon Icon" className="w-7 h-7" />
                   </div>
                 </div>
