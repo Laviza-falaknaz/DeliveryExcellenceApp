@@ -259,7 +259,7 @@ Learn more about sustainable IT solutions: circularcomputing.com
                 <div className="flex items-center justify-between mb-4">
                   <div>
                     <h3 className="text-sm font-medium text-neutral-500">
-                      Core Minerals Saved
+                      Resource Preservation
                     </h3>
                     <p className="text-3xl font-bold mt-1">
                       {formatEnvironmentalImpact(impact.mineralsSaved, "g")}
