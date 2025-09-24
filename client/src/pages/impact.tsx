@@ -362,6 +362,13 @@ Learn more about sustainable IT solutions: circularcomputing.com
                     strokeWidth={2}
                     name="Resources Preserved (g)"
                   />
+                  <Line
+                    type="monotone"
+                    dataKey="waterSaved"
+                    stroke="#08ABAB"
+                    strokeWidth={2}
+                    name="Water Saved (L)"
+                  />
                 </LineChart>
               </ResponsiveContainer>
             </div>
