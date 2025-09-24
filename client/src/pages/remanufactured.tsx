@@ -120,7 +120,7 @@ export default function Remanufactured() {
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               <div className="text-center p-4 border rounded-lg">
-                <div className="h-12 w-12 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center mx-auto mb-3">
+                <div className="h-12 w-12 rounded-full flex items-center justify-center mx-auto mb-3" style={{backgroundColor: '#FF9E1C20', color: '#FF9E1C'}}>
                   <i className="ri-tools-line text-xl"></i>
                 </div>
                 <h4 className="font-medium mb-2">1. Disassembly</h4>
