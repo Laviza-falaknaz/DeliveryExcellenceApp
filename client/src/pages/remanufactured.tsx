@@ -136,7 +136,7 @@ export default function Remanufactured() {
               </div>
               
               <div className="text-center p-4 border rounded-lg">
-                <div className="h-12 w-12 rounded-full bg-green-100 text-green-600 flex items-center justify-center mx-auto mb-3">
+                <div className="h-12 w-12 rounded-full flex items-center justify-center mx-auto mb-3" style={{backgroundColor: '#08ABAB20', color: '#08ABAB'}}>
                   <i className="ri-refresh-line text-xl"></i>
                 </div>
                 <h4 className="font-medium mb-2">3. Restoration</h4>
