@@ -180,7 +180,7 @@ export default function Support() {
               <p className="text-neutral-600 text-sm mb-4">
                 Need to return or replace a product? Start the RMA process.
               </p>
-              <Button variant="outline" asChild>
+              <Button variant="outline" className="bg-[#08ABAB] border-[#08ABAB] text-white hover:bg-[#FF9E1C] hover:text-black hover:border-[#FF9E1C] transition-colors" asChild>
                 <Link href="/warranty-claim">Create RMA</Link>
               </Button>
             </div>
@@ -237,7 +237,7 @@ export default function Support() {
                   <h3 className="text-lg font-medium text-neutral-700">No active tickets</h3>
                   <p className="text-neutral-500 mt-2">You don't have any active support tickets at the moment.</p>
                   <Button 
-                    className="mt-4 bg-white text-neutral-900 border border-neutral-300 hover:bg-teal-600 hover:text-white hover:border-teal-600 transition-colors" 
+                    className="mt-4 bg-[#08ABAB] border-[#08ABAB] text-white hover:bg-[#FF9E1C] hover:text-black hover:border-[#FF9E1C] transition-colors" 
                     asChild
                   >
                     <Link href="/warranty-claim">
@@ -291,7 +291,7 @@ export default function Support() {
               Need help with your remanufactured laptops? Create a support ticket and our team will assist you.
             </p>
             <Button 
-              className="mt-4 bg-white text-neutral-900 border border-neutral-300 hover:bg-[#08ABAB] hover:text-white hover:border-[#08ABAB] transition-colors" 
+              className="mt-4 bg-[#08ABAB] border-[#08ABAB] text-white hover:bg-[#FF9E1C] hover:text-black hover:border-[#FF9E1C] transition-colors" 
               asChild
             >
               <Link href="/warranty-claim">
