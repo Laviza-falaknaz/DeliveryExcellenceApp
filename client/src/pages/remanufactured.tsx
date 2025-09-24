@@ -128,7 +128,7 @@ export default function Remanufactured() {
               </div>
               
               <div className="text-center p-4 border rounded-lg">
-                <div className="h-12 w-12 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mx-auto mb-3">
+                <div className="h-12 w-12 rounded-full flex items-center justify-center mx-auto mb-3" style={{backgroundColor: '#30526920', color: '#305269'}}>
                   <i className="ri-search-line text-xl"></i>
                 </div>
                 <h4 className="font-medium mb-2">2. Inspection</h4>
