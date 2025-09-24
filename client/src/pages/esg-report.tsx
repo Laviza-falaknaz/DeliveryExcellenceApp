@@ -172,8 +172,8 @@ export default function ESGReport() {
         value: impact.totalImpact?.mineralsSaved || 0,
         unit: "kg",
         icon: <img src={resourceIcon} alt="Resource Icon" className="w-6 h-6" />,
-        color: "text-amber-600",
-        bgColor: "bg-amber-100"
+        color: "text-[#FF9E1C]",
+        bgColor: "bg-[#FF9E1C]/10"
       }
     ];
   };
