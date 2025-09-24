@@ -168,7 +168,7 @@ export default function ESGReport() {
       },
       {
         id: "minerals",
-        title: "Core Minerals Saved",
+        title: "Resources Preserved",
         value: impact.totalImpact?.mineralsSaved || 0,
         unit: "kg",
         icon: <img src={resourceIcon} alt="Resource Icon" className="w-6 h-6" />,
@@ -363,7 +363,7 @@ export default function ESGReport() {
                 <img src={resourceIcon} alt="Resource Icon" className="w-6 h-6" />
               </div>
               <div>
-                <p className="text-neutral-600 text-sm">Core Minerals Saved</p>
+                <p className="text-neutral-600 text-sm">Resources Preserved</p>
                 <h3 className="text-2xl font-bold mt-1">
                   {formatEnvironmentalImpact(impact.totalImpact?.mineralsSaved || 0, "kg")}
                 </h3>
