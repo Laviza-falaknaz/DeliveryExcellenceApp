@@ -639,7 +639,7 @@ export default function WarrantyClaim() {
                 <Button 
                   type="submit" 
                   disabled={isSubmitting}
-                  className="w-full md:w-auto bg-primary hover:bg-primary/90 text-white"
+                  className="w-full md:w-auto bg-[#08ABAB] text-white hover:bg-[#FF9E1C] hover:text-black transition-colors"
                 >
                   {isSubmitting ? "Submitting..." : "Submit Warranty Claim"}
                 </Button>
