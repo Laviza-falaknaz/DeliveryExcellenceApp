@@ -328,7 +328,7 @@ export default function Warranty() {
                             type="button"
                             onClick={isScanning ? stopScanner : startScanner}
                             variant="outline"
-                            className="bg-white border-neutral-300 text-neutral-900 hover:bg-primary hover:border-primary hover:text-white transition-all duration-200 shrink-0"
+                            className="bg-[#08ABAB] border-[#08ABAB] text-white hover:bg-[#FF9E1C] hover:text-black hover:border-[#FF9E1C] transition-all duration-200 shrink-0"
                           >
                             {isScanning ? (
                               <>
@@ -346,7 +346,7 @@ export default function Warranty() {
                             type="submit" 
                             disabled={isSubmitting}
                             variant="outline"
-                            className="bg-white border-neutral-300 text-neutral-900 hover:bg-primary hover:border-primary hover:text-white transition-all duration-200 shrink-0"
+                            className="bg-[#08ABAB] border-[#08ABAB] text-white hover:bg-[#FF9E1C] hover:text-black hover:border-[#FF9E1C] transition-all duration-200 shrink-0"
                           >
                             {isSubmitting ? "Checking..." : "Check Status"}
                           </Button>
