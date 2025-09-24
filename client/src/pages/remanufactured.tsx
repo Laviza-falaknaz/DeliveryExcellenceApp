@@ -144,7 +144,7 @@ export default function Remanufactured() {
               </div>
               
               <div className="text-center p-4 border rounded-lg">
-                <div className="h-12 w-12 rounded-full flex items-center justify-center mx-auto mb-3" style={{backgroundColor: '#2596be20', color: '#2596be'}}>
+                <div className="h-12 w-12 rounded-full flex items-center justify-center mx-auto mb-3" style={{backgroundColor: '#8f4c8b20', color: '#8f4c8b'}}>
                   <i className="ri-shield-check-line text-xl"></i>
                 </div>
                 <h4 className="font-medium mb-2">4. Testing</h4>
