@@ -174,6 +174,15 @@ export default function ESGReport() {
         icon: <img src={resourceIcon} alt="Resource Icon" className="w-6 h-6" />,
         color: "text-[#FF9E1C]",
         bgColor: "bg-[#FF9E1C]/10"
+      },
+      {
+        id: "waterSaved",
+        title: "Litres of Water Saved",
+        value: impact.totalImpact?.waterSaved || 0,
+        unit: "litres",
+        icon: <img src={waterIcon} alt="Water Icon" className="w-6 h-6" />,
+        color: "text-[#08ABAB]",
+        bgColor: "bg-[#08ABAB]/10"
       }
     ];
   };
@@ -317,7 +326,7 @@ export default function ESGReport() {
       </div>
 
       {/* Report Header with key metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <Card className="bg-white">
           <CardContent className="p-4">
             <div className="flex items-start">
@@ -369,6 +378,25 @@ export default function ESGReport() {
                 </h3>
                 <p className="text-xs text-[#FF9E1C] mt-1">
                   Through remanufactured technology adoption
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-white">
+          <CardContent className="p-4">
+            <div className="flex items-start">
+              <div className="h-12 w-12 rounded-full bg-[#08ABAB]/10 flex items-center justify-center text-[#08ABAB] mr-3">
+                <img src={waterIcon} alt="Water Icon" className="w-6 h-6" />
+              </div>
+              <div>
+                <p className="text-neutral-600 text-sm">Litres of Water Saved</p>
+                <h3 className="text-2xl font-bold mt-1">
+                  {formatEnvironmentalImpact(impact.totalImpact?.waterSaved || 0, "litres")}
+                </h3>
+                <p className="text-xs text-[#08ABAB] mt-1">
+                  Water conservation through reuse
                 </p>
               </div>
             </div>
