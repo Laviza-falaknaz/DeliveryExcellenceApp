@@ -306,7 +306,7 @@ Learn more about sustainable IT solutions: circularcomputing.com
                   </div>
                   <Progress value={55} className="h-2" />
                 </div>
-                <div className="mt-4 text-sm flex items-center text-blue-600">
+                <div className="mt-4 text-sm flex items-center text-[#08ABAB]">
                   <i className="ri-recycle-line mr-1"></i>
                   <span>Water conservation through reuse</span>
                 </div>
