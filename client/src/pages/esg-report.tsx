@@ -163,8 +163,8 @@ export default function ESGReport() {
         value: impact.totalImpact?.familiesHelped || 0,
         unit: "people helped",
         icon: <img src={waterIcon} alt="Water Icon" className="w-6 h-6" />,
-        color: "text-blue-600",
-        bgColor: "bg-blue-100"
+        color: "text-[#305269]",
+        bgColor: "bg-[#305269]/10"
       },
       {
         id: "minerals",
