@@ -154,8 +154,8 @@ export default function ESGReport() {
         value: impact.totalImpact?.carbonSaved || 0,
         unit: "kg CO₂e",
         icon: <img src={carbonIcon} alt="Carbon Icon" className="w-6 h-6" />,
-        color: "text-green-600",
-        bgColor: "bg-green-100"
+        color: "text-[#08ABAB]",
+        bgColor: "bg-[#08ABAB]/10"
       },
       {
         id: "water",
