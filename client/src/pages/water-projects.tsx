@@ -33,7 +33,7 @@ export default function WaterProjects() {
         <div className="mt-4 md:mt-0 flex gap-2">
           <Button 
             variant="outline" 
-            className="bg-white border-neutral-300 text-neutral-900 hover:bg-teal-600 hover:text-white hover:border-teal-600 transition-colors" 
+            className="bg-[#08ABAB] border-[#08ABAB] text-white hover:bg-[#FF9E1C] hover:text-black hover:border-[#FF9E1C] transition-colors" 
             asChild
           >
             <a href="https://www.charitywater.org/" target="_blank" rel="noreferrer">
@@ -42,7 +42,7 @@ export default function WaterProjects() {
           </Button>
           <Button 
             variant="outline"
-            className="bg-white text-neutral-900 border-neutral-300 hover:bg-teal-600 hover:text-white hover:border-teal-600 transition-colors" 
+            className="bg-[#08ABAB] border-[#08ABAB] text-white hover:bg-[#FF9E1C] hover:text-black hover:border-[#FF9E1C] transition-colors" 
             asChild
           >
             <a href="https://www.charitywater.org/donate" target="_blank" rel="noreferrer">
@@ -180,7 +180,7 @@ export default function WaterProjects() {
                 </div>
               </CardContent>
               <CardFooter>
-                <Button variant="outline" className="w-full" asChild>
+                <Button variant="outline" className="w-full bg-[#08ABAB] border-[#08ABAB] text-white hover:bg-[#FF9E1C] hover:text-black hover:border-[#FF9E1C] transition-colors" asChild>
                   <a href={
                     project.name === "Uganda Rainwater Harvesting" 
                       ? "https://www.charitywater.org/our-projects/uganda"
