@@ -278,7 +278,7 @@ export default function Remanufactured() {
                   variant="outline"
                   size="sm"
                   onClick={prevTip}
-                  className="flex items-center space-x-2 bg-white border-neutral-300 text-neutral-900 hover:bg-[#08ABAB] hover:text-white hover:border-[#08ABAB] transition-colors"
+                  className="flex items-center space-x-2 bg-[#08ABAB] border-[#08ABAB] text-white hover:bg-[#FF9E1C] hover:text-black hover:border-[#FF9E1C] transition-colors"
                 >
                   <i className="ri-arrow-left-line"></i>
                   <span>Previous</span>
@@ -303,7 +303,7 @@ export default function Remanufactured() {
                   variant="outline"
                   size="sm"
                   onClick={nextTip}
-                  className="flex items-center space-x-2 bg-white border-neutral-300 text-neutral-900 hover:bg-[#08ABAB] hover:text-white hover:border-[#08ABAB] transition-colors"
+                  className="flex items-center space-x-2 bg-[#08ABAB] border-[#08ABAB] text-white hover:bg-[#FF9E1C] hover:text-black hover:border-[#FF9E1C] transition-colors"
                 >
                   <span>Next</span>
                   <i className="ri-arrow-right-line"></i>
@@ -368,7 +368,7 @@ export default function Remanufactured() {
                   variant="outline"
                   size="sm"
                   onClick={prevVideo}
-                  className="flex items-center space-x-2 bg-white border-neutral-300 text-neutral-900 hover:bg-[#08ABAB] hover:text-white hover:border-[#08ABAB] transition-colors"
+                  className="flex items-center space-x-2 bg-[#08ABAB] border-[#08ABAB] text-white hover:bg-[#FF9E1C] hover:text-black hover:border-[#FF9E1C] transition-colors"
                 >
                   <i className="ri-arrow-left-line"></i>
                   <span>Previous</span>
@@ -393,7 +393,7 @@ export default function Remanufactured() {
                   variant="outline"
                   size="sm"
                   onClick={nextVideo}
-                  className="flex items-center space-x-2 bg-white border-neutral-300 text-neutral-900 hover:bg-[#08ABAB] hover:text-white hover:border-[#08ABAB] transition-colors"
+                  className="flex items-center space-x-2 bg-[#08ABAB] border-[#08ABAB] text-white hover:bg-[#FF9E1C] hover:text-black hover:border-[#FF9E1C] transition-colors"
                 >
                   <span>Next</span>
                   <i className="ri-arrow-right-line"></i>
@@ -423,7 +423,7 @@ export default function Remanufactured() {
               <div className="space-y-2 w-full max-w-sm">
                 <Button 
                   variant="outline"
-                  className="w-full bg-white border-neutral-300 text-neutral-900 hover:bg-[#08ABAB] hover:text-white hover:border-[#08ABAB] transition-colors"
+                  className="w-full bg-[#08ABAB] border-[#08ABAB] text-white hover:bg-[#FF9E1C] hover:text-black hover:border-[#FF9E1C] transition-colors"
                   asChild
                 >
                   <a href="https://circularcomputing.com/remanufactured-laptops/" target="_blank" rel="noopener noreferrer">
@@ -433,7 +433,7 @@ export default function Remanufactured() {
                 </Button>
                 <Button 
                   variant="outline" 
-                  className="w-full bg-white border-neutral-300 text-neutral-900 hover:bg-[#08ABAB] hover:text-white hover:border-[#08ABAB] transition-colors"
+                  className="w-full bg-[#08ABAB] border-[#08ABAB] text-white hover:bg-[#FF9E1C] hover:text-black hover:border-[#FF9E1C] transition-colors"
                   onClick={() => window.open('https://circularcomputing.com/contact/', '_blank')}
                 >
                   <i className="ri-question-line mr-2"></i>
