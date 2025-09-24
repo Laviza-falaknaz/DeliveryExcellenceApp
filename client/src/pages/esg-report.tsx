@@ -18,9 +18,10 @@ import {
 import { 
   Share, 
   Download, 
-  Twitter, 
+  X, 
   Linkedin, 
   Facebook, 
+  Instagram,
   Mail,
   Copy,
   CheckCircle,
@@ -264,8 +265,8 @@ export default function ESGReport() {
                     className="flex flex-col items-center justify-center h-20 gap-2"
                     onClick={() => handleShare('twitter')}
                   >
-                    <Twitter className={`h-5 w-5 ${activeShareOption === 'twitter' ? 'text-primary' : 'text-neutral-600'}`} />
-                    <span className="text-xs">Twitter</span>
+                    <X className={`h-5 w-5 ${activeShareOption === 'twitter' ? 'text-primary' : 'text-neutral-600'}`} />
+                    <span className="text-xs">X</span>
                   </Button>
                   
                   <Button 
@@ -284,6 +285,15 @@ export default function ESGReport() {
                   >
                     <Facebook className={`h-5 w-5 ${activeShareOption === 'facebook' ? 'text-primary' : 'text-neutral-600'}`} />
                     <span className="text-xs">Facebook</span>
+                  </Button>
+                  
+                  <Button 
+                    variant="outline" 
+                    className="flex flex-col items-center justify-center h-20 gap-2"
+                    onClick={() => handleShare('instagram')}
+                  >
+                    <Instagram className={`h-5 w-5 ${activeShareOption === 'instagram' ? 'text-primary' : 'text-neutral-600'}`} />
+                    <span className="text-xs">Instagram</span>
                   </Button>
                   
                   <Button 
@@ -892,7 +902,10 @@ export default function ESGReport() {
                   <Facebook className="h-4 w-4" />
                 </Button>
                 <Button variant="ghost" size="icon" className="h-8 w-8">
-                  <Twitter className="h-4 w-4" />
+                  <X className="h-4 w-4" />
+                </Button>
+                <Button variant="ghost" size="icon" className="h-8 w-8">
+                  <Instagram className="h-4 w-4" />
                 </Button>
                 <Button variant="ghost" size="icon" className="h-8 w-8">
                   <Linkedin className="h-4 w-4" />
