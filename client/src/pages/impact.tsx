@@ -180,9 +180,10 @@ Learn more about sustainable IT solutions: circularcomputing.com
       </div>
 
       {/* Impact Summary Cards */}
-      <section className="mb-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+      <section className="mb-8 grid grid-cols-1 md:grid-cols-4 gap-4">
         {isLoadingImpact ? (
           <>
+            <Skeleton className="h-40 w-full" />
             <Skeleton className="h-40 w-full" />
             <Skeleton className="h-40 w-full" />
             <Skeleton className="h-40 w-full" />
@@ -282,9 +283,38 @@ Learn more about sustainable IT solutions: circularcomputing.com
                 </div>
               </CardContent>
             </Card>
+
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h3 className="text-sm font-medium text-neutral-500">
+                      Litres of Water Saved
+                    </h3>
+                    <p className="text-3xl font-bold mt-1">
+                      {formatEnvironmentalImpact(impact.waterSaved || 0, "litres")}
+                    </p>
+                  </div>
+                  <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
+                    <i className="ri-drop-line text-blue-600 text-xl"></i>
+                  </div>
+                </div>
+                <div className="mt-2">
+                  <div className="flex justify-between mb-1 text-sm">
+                    <span>Impact level</span>
+                    <span>Medium</span>
+                  </div>
+                  <Progress value={55} className="h-2" />
+                </div>
+                <div className="mt-4 text-sm flex items-center text-blue-600">
+                  <i className="ri-recycle-line mr-1"></i>
+                  <span>Water conservation through reuse</span>
+                </div>
+              </CardContent>
+            </Card>
           </>
         ) : (
-          <div className="md:col-span-3 p-8 text-center bg-white rounded-xl shadow-sm">
+          <div className="md:col-span-4 p-8 text-center bg-white rounded-xl shadow-sm">
             <h3 className="text-lg font-medium text-neutral-700">
               No impact data available yet
             </h3>
