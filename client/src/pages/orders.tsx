@@ -178,6 +178,9 @@ export default function Orders() {
                   <TableHead className="text-left font-medium text-neutral-600 py-4 px-6 cursor-pointer hover:text-neutral-900 transition-colors">
                     Hashcodes ↓
                   </TableHead>
+                  <TableHead className="text-left font-medium text-neutral-600 py-4 px-6 cursor-pointer hover:text-neutral-900 transition-colors">
+                    Credit Note ↓
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -199,6 +202,9 @@ export default function Orders() {
                       </TableCell>
                       <TableCell className="py-4 px-6">
                         <Skeleton className="h-4 w-32" />
+                      </TableCell>
+                      <TableCell className="py-4 px-6">
+                        <Skeleton className="h-8 w-24" />
                       </TableCell>
                       <TableCell className="py-4 px-6">
                         <Skeleton className="h-8 w-24" />
@@ -278,12 +284,30 @@ export default function Orders() {
                             <span className="text-neutral-400 text-xs">Not Available</span>
                           )}
                         </TableCell>
+                        <TableCell className="py-4 px-6">
+                          {order.creditNoteUrl ? (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="bg-white text-neutral-900 border-neutral-300 hover:bg-[#08ABAB] hover:text-white hover:border-[#08ABAB] transition-colors text-xs"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                window.open(order.creditNoteUrl, '_blank');
+                              }}
+                            >
+                              <i className="ri-download-line mr-1 text-sm"></i>
+                              Download Now
+                            </Button>
+                          ) : (
+                            <span className="text-neutral-400 text-xs">Not Available</span>
+                          )}
+                        </TableCell>
                       </TableRow>
                     ))
                 ) : (
                   // Empty state
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center py-12">
+                    <TableCell colSpan={8} className="text-center py-12">
                       <div className="flex flex-col items-center">
                         <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[#e0f2f2] text-[#08ABAB] mb-3">
                           <i className="ri-inbox-line text-2xl"></i>
