@@ -62,12 +62,12 @@ export default function WaterProjects() {
                 <>
                   <div className="flex items-baseline mb-2">
                     <h3 className="text-3xl font-bold text-secondary">
-                      {formatEnvironmentalImpact(impact.waterProvided, "litres")}
+                      {impact.familiesHelped} families
                     </h3>
-                    <span className="text-neutral-500 ml-2">of clean water provided</span>
+                    <span className="text-neutral-500 ml-2">receiving clean water</span>
                   </div>
                   <p className="text-neutral-600 mb-4">
-                    Helping <span className="font-semibold">{impact.familiesHelped} families</span> access clean water
+                    <span className="font-semibold">Clean water provider per family per week</span>
                   </p>
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
@@ -76,7 +76,7 @@ export default function WaterProjects() {
                     </div>
                     <Progress value={progressValue} className="h-2" />
                     <p className="text-sm text-neutral-500">
-                      Just {formatEnvironmentalImpact(25000 - (impact.waterProvided || 0), "litres")} more to fund a new water point
+                      Just {25 - (impact.familiesHelped || 0)} more families to fund a new water point
                     </p>
                   </div>
                 </>
@@ -165,8 +165,8 @@ export default function WaterProjects() {
                     <span className="font-semibold">{project.peopleImpacted.toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span>Water Provided</span>
-                    <span className="font-semibold">{formatEnvironmentalImpact(project.waterProvided, "litres")}</span>
+                    <span>Families Supported</span>
+                    <span className="font-semibold">{Math.round(project.peopleImpacted / 5)} families</span>
                   </div>
                 </div>
               </CardContent>
