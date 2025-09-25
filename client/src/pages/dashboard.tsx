@@ -109,7 +109,7 @@ export default function Dashboard() {
               iconColor="text-secondary"
               iconBgColor="bg-secondary/10"
               progress={78}
-              footnote1="Clean water provider per family per week"
+              footnote1="per family per week"
               footnote2="+23% vs last month"
             />
             <ImpactCard

@@ -250,7 +250,7 @@ Learn more about sustainable IT solutions: circularcomputing.com
                 </div>
                 <div className="mt-4 text-sm flex items-center text-secondary">
                   <i className="ri-group-line mr-1"></i>
-                  <span>Clean water provider per family per week</span>
+                  <span>per family per week</span>
                 </div>
               </CardContent>
             </Card>

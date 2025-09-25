@@ -67,7 +67,7 @@ export default function WaterProjects() {
                     <span className="text-neutral-500 ml-2">receiving clean water</span>
                   </div>
                   <p className="text-neutral-600 mb-4">
-                    <span className="font-semibold">Clean water provider per family per week</span>
+                    <span className="font-semibold">per family per week</span>
                   </p>
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
