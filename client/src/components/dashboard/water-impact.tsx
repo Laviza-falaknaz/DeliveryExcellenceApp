@@ -96,10 +96,10 @@ export default function WaterImpact() {
               <span className="text-sm font-medium text-neutral-700">Water Provided</span>
             </div>
             <p className="text-2xl font-bold mt-2">
-              {formatEnvironmentalImpact(currentWaterProvided, "litres")}
+              {impact.familiesHelped} families
             </p>
             <p className="text-xs text-success mt-1">
-              +{formatEnvironmentalImpact(impact.waterProvided, "litres")} from your orders
+              Clean water provider per family per week
             </p>
           </div>
 

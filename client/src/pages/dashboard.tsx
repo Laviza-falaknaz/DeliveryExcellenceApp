@@ -102,14 +102,14 @@ export default function Dashboard() {
             />
             <ImpactCard
               title="Clean Water Provided"
-              value={impact.waterProvided}
-              unit="litres"
+              value={impact.familiesHelped}
+              unit="families"
               icon="ri-water-flash-line"
               iconImage={waterIcon}
               iconColor="text-secondary"
               iconBgColor="bg-secondary/10"
               progress={78}
-              footnote1={`Helping ${impact.familiesHelped} families`}
+              footnote1="Clean water provider per family per week"
               footnote2="+23% vs last month"
             />
             <ImpactCard
