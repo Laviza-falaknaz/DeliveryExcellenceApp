@@ -20,7 +20,7 @@ import { AlertCircle, CheckCircle, HelpCircle, Search, Camera, X, ShoppingCart, 
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { BrowserMultiFormatReader, NotFoundException } from "@zxing/library";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 
 const serialNumberSchema = z.object({
   serialNumber: z.string().min(5, "Serial number must be at least 5 characters"),
@@ -97,7 +97,9 @@ export default function Warranty() {
     });
   };
   
-  const submitRmaRequest = async () => {
+  const [, setLocation] = useLocation();
+  
+  const submitRmaRequest = () => {
     if (rmaBasket.length === 0) {
       toast({
         title: "No Devices Selected",
@@ -107,29 +109,28 @@ export default function Warranty() {
       return;
     }
     
-    try {
-      setIsSubmitting(true);
-      // In a real implementation, this would submit to an API
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      toast({
-        title: "RMA Request Submitted",
-        description: `RMA request created for ${rmaBasket.length} device(s). You'll receive a confirmation email shortly.`,
-      });
-      
-      // Clear basket after successful submission
-      setRmaBasket([]);
-      setShowBasket(false);
-      
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Unable to submit RMA request. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
+    // Prepare basket data for transfer to warranty-claim page
+    const basketData = rmaBasket.map(device => ({
+      serialNumber: device.serialNumber,
+      productName: device.productName,
+      warrantyStatus: device.warrantyStatus
+    }));
+    
+    // Encode basket data as URL search params
+    const searchParams = new URLSearchParams();
+    searchParams.set('basket', JSON.stringify(basketData));
+    
+    // Navigate to warranty-claim page with basket data
+    setLocation(`/warranty-claim?${searchParams.toString()}`);
+    
+    // Clear basket since we're transferring to the form
+    setRmaBasket([]);
+    setShowBasket(false);
+    
+    toast({
+      title: "Redirecting to RMA Form",
+      description: `Transferring ${basketData.length} device(s) to the RMA request form.`,
+    });
   };
   
   const startScanner = async () => {
