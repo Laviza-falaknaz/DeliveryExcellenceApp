@@ -113,7 +113,7 @@ export default function Dashboard() {
               footnote2="+23% vs last month"
             />
             <ImpactCard
-              title="Resource Preservation"
+              title="Resources Preserved"
               value={impact.mineralsSaved}
               unit="g"
               icon="ri-recycle-line"
