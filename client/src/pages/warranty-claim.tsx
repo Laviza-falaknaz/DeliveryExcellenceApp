@@ -42,6 +42,34 @@ export default function WarrantyClaim() {
   const [isScannerOpen, setIsScannerOpen] = useState(false);
   const [scannerError, setScannerError] = useState<string | null>(null);
   
+  // Parse basket data from URL params
+  const [basketData, setBasketData] = useState<any[]>([]);
+  
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const basketParam = urlParams.get('basket');
+    
+    if (basketParam) {
+      try {
+        const parsedBasket = JSON.parse(basketParam);
+        setBasketData(parsedBasket);
+        
+        // Show toast notification about transferred devices
+        toast({
+          title: "Devices Transferred from RMA Basket",
+          description: `${parsedBasket.length} device(s) have been added to your RMA request form.`,
+        });
+        
+        // Clean up URL to remove basket param
+        const newUrl = window.location.pathname;
+        window.history.replaceState({}, '', newUrl);
+        
+      } catch (error) {
+        console.error('Error parsing basket data:', error);
+      }
+    }
+  }, [toast]);
+  
   // Scanner refs
   const videoRef = useRef<HTMLVideoElement>(null);
   const codeReader = useRef<BrowserMultiFormatReader | null>(null);
@@ -65,6 +93,35 @@ export default function WarrantyClaim() {
       consent: false,
     },
   });
+  
+  // Update form when basket data is available
+  useEffect(() => {
+    if (basketData.length > 0) {
+      // Set number of products
+      form.setValue('numberOfProducts', basketData.length);
+      
+      // Set manufacturer serial number (first device for now)
+      if (basketData[0]?.serialNumber) {
+        form.setValue('manufacturerSerialNumber', basketData[0].serialNumber);
+      }
+      
+      // Set product make/model (first device for now)
+      if (basketData[0]?.productName) {
+        form.setValue('productMakeModel', basketData[0].productName);
+      }
+      
+      // If multiple devices, add them to fault description for reference
+      if (basketData.length > 1) {
+        const deviceList = basketData.map((device, index) => 
+          `Device ${index + 1}: ${device.productName} (SN: ${device.serialNumber})`
+        ).join('\n');
+        
+        form.setValue('faultDescription', 
+          `Multiple devices from RMA basket:\n${deviceList}\n\nFault description: `
+        );
+      }
+    }
+  }, [basketData, form]);
   
   // Initialize scanner
   useEffect(() => {

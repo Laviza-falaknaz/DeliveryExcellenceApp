@@ -897,10 +897,9 @@ export default function Warranty() {
             {rmaBasket.length > 0 && (
               <Button 
                 onClick={submitRmaRequest}
-                disabled={isSubmitting}
                 className="bg-[#08ABAB] text-white border-[#08ABAB] hover:bg-[#FF9E1C] hover:text-black hover:border-[#FF9E1C] transition-colors"
               >
-                {isSubmitting ? "Submitting..." : `Submit RMA Request (${rmaBasket.length} devices)`}
+                Continue to RMA Form ({rmaBasket.length} device{rmaBasket.length > 1 ? 's' : ''})
               </Button>
             )}
           </DialogFooter>
