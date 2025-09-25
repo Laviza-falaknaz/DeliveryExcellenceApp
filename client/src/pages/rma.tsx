@@ -864,7 +864,7 @@ export default function RMA() {
                       onClick={() => window.location.href = '/warranty-claim'}
                       variant="outline"
                     >
-                      Create RMA Directly
+                      Add to RMA Request
                     </Button>
                   </DialogFooter>
                 </div>
