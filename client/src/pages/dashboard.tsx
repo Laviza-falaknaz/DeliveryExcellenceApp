@@ -98,7 +98,6 @@ export default function Dashboard() {
               iconBgColor="bg-secondary/10"
               progress={65}
               footnote1={`Equivalent to ${impact.treesEquivalent} trees`}
-              footnote2="+18% vs last month"
             />
             <ImpactCard
               title="Clean Water Provided"
@@ -110,7 +109,6 @@ export default function Dashboard() {
               iconBgColor="bg-secondary/10"
               progress={78}
               footnote1="per family per week"
-              footnote2="+23% vs last month"
             />
             <ImpactCard
               title="Resources Preserved"
@@ -122,7 +120,6 @@ export default function Dashboard() {
               iconBgColor="bg-accent/10"
               progress={45}
               footnote1="Including rare earth metals"
-              footnote2="+8% vs last month"
             />
             <ImpactCard
               title="Litres of Water Saved"
@@ -134,7 +131,6 @@ export default function Dashboard() {
               iconBgColor="bg-[#08ABAB]/10"
               progress={55}
               footnote1="Water conservation through reuse"
-              footnote2="+12% vs last month"
             />
           </div>
         ) : (

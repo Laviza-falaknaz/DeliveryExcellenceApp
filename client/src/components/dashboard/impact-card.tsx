@@ -12,7 +12,7 @@ interface ImpactCardProps {
   iconBgColor: string;
   progress: number;
   footnote1: string;
-  footnote2: string;
+  footnote2?: string;
 }
 
 export default function ImpactCard({
@@ -58,7 +58,7 @@ export default function ImpactCard({
           </div>
           <div className="flex justify-between mt-2 text-xs text-neutral-500">
             <span>{footnote1}</span>
-            <span>{footnote2}</span>
+            {footnote2 && <span>{footnote2}</span>}
           </div>
         </div>
       </CardContent>
