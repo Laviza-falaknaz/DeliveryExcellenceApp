@@ -162,7 +162,7 @@ export default function ESGReport() {
         id: "water",
         title: "Clean Water Provided",
         value: impact.totalImpact?.familiesHelped || 0,
-        unit: "people helped",
+        unit: "families",
         icon: <img src={waterIcon} alt="Water Icon" className="w-6 h-6" />,
         color: "text-[#305269]",
         bgColor: "bg-[#305269]/10"
@@ -599,7 +599,7 @@ export default function ESGReport() {
                       <div>
                         <h4 className="font-medium">Clean Water Access</h4>
                         <p className="text-sm text-neutral-700 mt-1">
-                          Through partnership with charity: water, your organization has helped provide clean water access to {impact.totalImpact?.familiesHelped || 0} people in water-stressed regions.
+                          Through partnership with charity: water, your organization provides clean water per family per week to {impact.totalImpact?.familiesHelped || 0} families in water-stressed regions.
                         </p>
                       </div>
                     </div>
