@@ -81,13 +81,13 @@ export default function Dashboard() {
       <section className="mb-8">
         <h2 className="text-lg font-semibold font-poppins mb-4">Your Environmental Impact</h2>
         {isLoadingImpact ? (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {[1, 2, 3].map((i) => (
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            {[1, 2, 3, 4].map((i) => (
               <Skeleton key={i} className="h-40 w-full" />
             ))}
           </div>
         ) : impact ? (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <ImpactCard
               title="Carbon Saved"
               value={impact.carbonSaved}
@@ -113,7 +113,7 @@ export default function Dashboard() {
               footnote2="+23% vs last month"
             />
             <ImpactCard
-              title="Core Minerals Saved"
+              title="Resource Preservation"
               value={impact.mineralsSaved}
               unit="g"
               icon="ri-recycle-line"
@@ -123,6 +123,18 @@ export default function Dashboard() {
               progress={45}
               footnote1="Including rare earth metals"
               footnote2="+8% vs last month"
+            />
+            <ImpactCard
+              title="Litres of Water Saved"
+              value={impact.waterSaved || 0}
+              unit="litres"
+              icon="ri-drop-line"
+              iconImage={waterIcon}
+              iconColor="text-[#08ABAB]"
+              iconBgColor="bg-[#08ABAB]/10"
+              progress={55}
+              footnote1="Water conservation through reuse"
+              footnote2="+12% vs last month"
             />
           </div>
         ) : (
