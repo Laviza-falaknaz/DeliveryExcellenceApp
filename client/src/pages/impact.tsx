@@ -234,7 +234,7 @@ Learn more about sustainable IT solutions: circularcomputing.com
                       Clean Water Provided
                     </h3>
                     <p className="text-3xl font-bold mt-1">
-                      {formatEnvironmentalImpact(impact.waterProvided, "litres")}
+                      {impact.familiesHelped}
                     </p>
                   </div>
                   <div className="h-12 w-12 rounded-full bg-secondary/10 flex items-center justify-center">
@@ -250,7 +250,7 @@ Learn more about sustainable IT solutions: circularcomputing.com
                 </div>
                 <div className="mt-4 text-sm flex items-center text-secondary">
                   <i className="ri-group-line mr-1"></i>
-                  <span>Helping {impact.familiesHelped} families</span>
+                  <span>Clean water provider per family per week</span>
                 </div>
               </CardContent>
             </Card>
