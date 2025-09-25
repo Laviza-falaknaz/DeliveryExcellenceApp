@@ -861,10 +861,10 @@ export default function RMA() {
                       </Button>
                     </div>
                     <Button 
-                      onClick={() => window.location.href = '/warranty-claim'}
+                      onClick={() => setIsWarrantyCheckDialogOpen(false)}
                       variant="outline"
                     >
-                      Add to RMA Request
+                      Submit RMA
                     </Button>
                   </DialogFooter>
                 </div>
