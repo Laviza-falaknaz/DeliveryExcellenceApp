@@ -217,7 +217,7 @@ Learn more about sustainable IT solutions: circularcomputing.com
                     className="h-2"
                   />
                 </div>
-                <div className="mt-4 text-sm flex items-center text-secondary">
+                <div className="mt-4 text-sm flex items-center text-[#08ABAB]">
                   <i className="ri-arrow-up-line mr-1"></i>
                   <span>
                     Equivalent to planting {impact.treesEquivalent} trees
