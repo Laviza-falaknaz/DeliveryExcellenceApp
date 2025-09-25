@@ -217,7 +217,7 @@ Learn more about sustainable IT solutions: circularcomputing.com
                     className="h-2"
                   />
                 </div>
-                <div className="mt-4 text-sm flex items-center text-success">
+                <div className="mt-4 text-sm flex items-center text-secondary">
                   <i className="ri-arrow-up-line mr-1"></i>
                   <span>
                     Equivalent to planting {impact.treesEquivalent} trees
@@ -277,7 +277,7 @@ Learn more about sustainable IT solutions: circularcomputing.com
                   </div>
                   <Progress value={45} className="h-2" />
                 </div>
-                <div className="mt-4 text-sm flex items-center text-accent">
+                <div className="mt-4 text-sm flex items-center text-secondary">
                   <i className="ri-earth-line mr-1"></i>
                   <span>Reduced mining impact by 68%</span>
                 </div>
@@ -306,7 +306,7 @@ Learn more about sustainable IT solutions: circularcomputing.com
                   </div>
                   <Progress value={55} className="h-2" />
                 </div>
-                <div className="mt-4 text-sm flex items-center text-[#08ABAB]">
+                <div className="mt-4 text-sm flex items-center text-secondary">
                   <i className="ri-recycle-line mr-1"></i>
                   <span>Water conservation through reuse</span>
                 </div>
