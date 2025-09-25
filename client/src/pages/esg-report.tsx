@@ -599,7 +599,7 @@ export default function ESGReport() {
                       <div>
                         <h4 className="font-medium">Clean Water Access</h4>
                         <p className="text-sm text-neutral-700 mt-1">
-                          Through partnership with charity: water, your organization provides clean water per family per week to {impact.totalImpact?.familiesHelped || 0} families in water-stressed regions.
+                          Through partnership with charity: water, your organization provides clean water to {impact.totalImpact?.familiesHelped || 0} families in water-stressed regions (Figure is for 1 week supply per family).
                         </p>
                       </div>
                     </div>
