@@ -14,8 +14,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
-import { AlertCircle, CheckCircle, HelpCircle, Search, Camera, X } from "lucide-react";
+import { AlertCircle, CheckCircle, HelpCircle, Search, Camera, X, ShoppingCart, Trash2, Plus } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { BrowserMultiFormatReader, NotFoundException } from "@zxing/library";
@@ -42,6 +43,10 @@ export default function Warranty() {
   // Mock data for warranty lookup
   const [warrantyInfo, setWarrantyInfo] = useState<any>(null);
   
+  // RMA Basket state
+  const [rmaBasket, setRmaBasket] = useState<any[]>([]);
+  const [showBasket, setShowBasket] = useState(false);
+  
   // Scanner refs
   const videoRef = useRef<HTMLVideoElement>(null);
   const codeReader = useRef<BrowserMultiFormatReader | null>(null);
@@ -55,6 +60,77 @@ export default function Warranty() {
       }
     };
   }, []);
+  
+  // RMA Basket functions
+  const addToRmaBasket = () => {
+    if (!warrantyInfo) return;
+    
+    // Check if device already in basket
+    const alreadyExists = rmaBasket.find(item => item.serialNumber === warrantyInfo.serialNumber);
+    if (alreadyExists) {
+      toast({
+        title: "Device Already Added",
+        description: "This device is already in your RMA request basket.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    const basketItem = {
+      id: Date.now().toString(),
+      ...warrantyInfo,
+      addedAt: new Date().toISOString()
+    };
+    
+    setRmaBasket(prev => [...prev, basketItem]);
+    toast({
+      title: "Added to RMA Request",
+      description: `${warrantyInfo.productName} (${warrantyInfo.serialNumber}) added to your RMA basket.`,
+    });
+  };
+  
+  const removeFromRmaBasket = (id: string) => {
+    setRmaBasket(prev => prev.filter(item => item.id !== id));
+    toast({
+      title: "Removed from RMA Request",
+      description: "Device removed from your RMA basket.",
+    });
+  };
+  
+  const submitRmaRequest = async () => {
+    if (rmaBasket.length === 0) {
+      toast({
+        title: "No Devices Selected",
+        description: "Please add at least one device to your RMA request.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    try {
+      setIsSubmitting(true);
+      // In a real implementation, this would submit to an API
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      toast({
+        title: "RMA Request Submitted",
+        description: `RMA request created for ${rmaBasket.length} device(s). You'll receive a confirmation email shortly.`,
+      });
+      
+      // Clear basket after successful submission
+      setRmaBasket([]);
+      setShowBasket(false);
+      
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Unable to submit RMA request. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
   
   const startScanner = async () => {
     if (!codeReader.current || !videoRef.current) return;
@@ -275,7 +351,20 @@ export default function Warranty() {
           <h1 className="text-2xl font-bold font-poppins text-neutral-900">Warranty & Troubleshooting</h1>
           <p className="text-neutral-600">Check your warranty status and get support for your product</p>
         </div>
-        <div className="mt-4 md:mt-0">
+        <div className="mt-4 md:mt-0 flex gap-2">
+          <Button 
+            onClick={() => setShowBasket(true)}
+            variant="outline"
+            className="relative"
+          >
+            <ShoppingCart className="h-4 w-4 mr-2" />
+            <span>RMA Basket</span>
+            {rmaBasket.length > 0 && (
+              <Badge className="absolute -top-2 -right-2 h-5 w-5 p-0 flex items-center justify-center bg-[#FF9E1C] text-black">
+                {rmaBasket.length}
+              </Badge>
+            )}
+          </Button>
           <Button 
             onClick={() => window.open('https://circularcomputing.com/contact/', '_blank')}
             variant="outline"
@@ -449,9 +538,19 @@ export default function Warranty() {
                     </div>
                   </CardContent>
                   <CardFooter className="flex justify-between">
-                    <Button variant="outline" onClick={() => serialForm.reset()}>
-                      Check Another Product
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button variant="outline" onClick={() => serialForm.reset()}>
+                        Check Another Product
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        onClick={addToRmaBasket}
+                        className="bg-[#08ABAB] text-white border-[#08ABAB] hover:bg-[#FF9E1C] hover:text-black hover:border-[#FF9E1C] transition-colors"
+                      >
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add to RMA Request
+                      </Button>
+                    </div>
                     <Button onClick={() => setActiveTab("troubleshooting")}>
                       Troubleshooting Guide
                     </Button>
@@ -724,6 +823,88 @@ export default function Warranty() {
               </Card>
         </TabsContent>
       </Tabs>
+      
+      {/* RMA Basket Dialog */}
+      <Dialog open={showBasket} onOpenChange={setShowBasket}>
+        <DialogContent className="sm:max-w-[700px]">
+          <DialogHeader>
+            <DialogTitle>RMA Request Basket</DialogTitle>
+            <DialogDescription>
+              Review the devices you want to include in your RMA request. You can add more devices by checking their warranty status.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="py-4">
+            {rmaBasket.length === 0 ? (
+              <div className="text-center py-8">
+                <ShoppingCart className="h-12 w-12 mx-auto text-neutral-400 mb-4" />
+                <h3 className="text-lg font-medium text-neutral-700 mb-2">No devices in basket</h3>
+                <p className="text-neutral-500">Check warranty status of your devices and add them to create an RMA request.</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between mb-4">
+                  <h4 className="font-medium">{rmaBasket.length} device(s) ready for RMA</h4>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => setRmaBasket([])}
+                    className="text-red-600 hover:text-red-700"
+                  >
+                    <Trash2 className="h-4 w-4 mr-1" />
+                    Clear All
+                  </Button>
+                </div>
+                
+                {rmaBasket.map((device) => (
+                  <div key={device.id} className="border rounded-lg p-4 bg-neutral-50">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <h4 className="font-medium text-sm">{device.productName}</h4>
+                        <p className="text-sm text-neutral-600 mt-1">Serial: {device.serialNumber}</p>
+                        <div className="flex items-center gap-4 mt-2">
+                          <Badge 
+                            variant={device.warrantyStatus === "Active" ? "default" : "secondary"}
+                            className={device.warrantyStatus === "Active" ? "bg-green-100 text-green-800" : ""}
+                          >
+                            {device.warrantyStatus}
+                          </Badge>
+                          <span className="text-xs text-neutral-500">
+                            Added: {new Date(device.addedAt).toLocaleDateString()}
+                          </span>
+                        </div>
+                      </div>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={() => removeFromRmaBasket(device.id)}
+                        className="text-red-600 hover:text-red-700"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowBasket(false)}>
+              Continue Adding Devices
+            </Button>
+            {rmaBasket.length > 0 && (
+              <Button 
+                onClick={submitRmaRequest}
+                disabled={isSubmitting}
+                className="bg-[#08ABAB] text-white border-[#08ABAB] hover:bg-[#FF9E1C] hover:text-black hover:border-[#FF9E1C] transition-colors"
+              >
+                {isSubmitting ? "Submitting..." : `Submit RMA Request (${rmaBasket.length} devices)`}
+              </Button>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
