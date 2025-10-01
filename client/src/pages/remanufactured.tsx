@@ -5,6 +5,7 @@ import { useState } from "react";
 import disassemblyImage from "@assets/1PS_5162_Disassembly Other_1759312369804.jpg";
 import inspectionImage from "@assets/1PS_4937_Staged Quality Control_1759312556402.jpg";
 import restorationImage from "@assets/1PS_4970_Circular Computing - Conveyor Belt_1759312597292.jpg";
+import testingImage from "@assets/1PS_5065_Circular Computing - Laptop Testing Row - 1p_1759312638169.jpg";
 
 export default function Remanufactured() {
   const [currentTip, setCurrentTip] = useState(0);
@@ -173,12 +174,21 @@ export default function Remanufactured() {
                 </div>
               </div>
               
-              <div className="text-center p-4 border rounded-lg">
-                <div className="h-12 w-12 rounded-full flex items-center justify-center mx-auto mb-3" style={{backgroundColor: '#8f4c8b20', color: '#8f4c8b'}}>
-                  <i className="ri-shield-check-line text-xl"></i>
+              <div className="text-center p-4 border rounded-lg relative overflow-hidden">
+                <div 
+                  className="absolute inset-0 bg-cover bg-center"
+                  style={{
+                    backgroundImage: `url(${testingImage})`,
+                    opacity: 0.15
+                  }}
+                />
+                <div className="relative z-10">
+                  <div className="h-12 w-12 rounded-full flex items-center justify-center mx-auto mb-3" style={{backgroundColor: '#8f4c8b20', color: '#8f4c8b'}}>
+                    <i className="ri-shield-check-line text-xl"></i>
+                  </div>
+                  <h4 className="font-medium mb-2">4. Testing</h4>
+                  <p className="text-sm text-neutral-600">Comprehensive quality assurance testing before certification</p>
                 </div>
-                <h4 className="font-medium mb-2">4. Testing</h4>
-                <p className="text-sm text-neutral-600">Comprehensive quality assurance testing before certification</p>
               </div>
             </div>
           </CardContent>
