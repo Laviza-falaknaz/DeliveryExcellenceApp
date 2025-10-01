@@ -100,9 +100,14 @@ export default function WarrantyClaim() {
       // Set number of products
       form.setValue('numberOfProducts', basketData.length);
       
-      // Set manufacturer serial number (first device for now)
-      if (basketData[0]?.serialNumber) {
-        form.setValue('manufacturerSerialNumber', basketData[0].serialNumber);
+      // Set manufacturer serial number - all serial numbers separated by commas
+      const serialNumbers = basketData
+        .map(device => device.serialNumber)
+        .filter(Boolean)
+        .join(', ');
+      
+      if (serialNumbers) {
+        form.setValue('manufacturerSerialNumber', serialNumbers);
       }
       
       // Set product make/model (first device for now)
