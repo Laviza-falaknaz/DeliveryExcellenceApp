@@ -76,7 +76,7 @@ export default function WaterImpact() {
           </a>
         )}
 
-        <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="border border-neutral-200 rounded-lg p-4">
             <div className="flex items-center">
               <div className="h-8 w-8 rounded-full bg-secondary/10 flex items-center justify-center text-secondary mr-2">
@@ -100,19 +100,6 @@ export default function WaterImpact() {
             </p>
             <p className="text-xs text-success mt-1">
               Figure for 1 week supply per family
-            </p>
-          </div>
-
-          <div className="border border-neutral-200 rounded-lg p-4">
-            <div className="flex items-center">
-              <div className="h-8 w-8 rounded-full bg-secondary/10 flex items-center justify-center text-secondary mr-2">
-                <i className="ri-map-pin-line text-lg"></i>
-              </div>
-              <span className="text-sm font-medium text-neutral-700">Projects Supported</span>
-            </div>
-            <p className="text-2xl font-bold mt-2">{projectCount}</p>
-            <p className="text-xs text-neutral-500 mt-1">
-              {countries.join(", ")}
             </p>
           </div>
         </div>
@@ -145,8 +132,8 @@ function WaterImpactSkeleton() {
 
         <Skeleton className="w-full h-48 rounded-lg" />
 
-        <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-          {[1, 2, 3].map((i) => (
+        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+          {[1, 2].map((i) => (
             <div key={i} className="border border-neutral-200 rounded-lg p-4">
               <div className="flex items-center">
                 <Skeleton className="h-8 w-8 rounded-full mr-2" />
