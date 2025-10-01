@@ -12,6 +12,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import caseStudyImage from "@assets/Case Study - Image_1759311266301.jpg";
 
 const industries = [
   "Education",
@@ -121,8 +122,8 @@ export default function CaseStudyBanner() {
           </div>
           <div className="mt-6 md:mt-0 md:ml-6">
             <img
-              src="https://images.unsplash.com/photo-1552581234-26160f608093?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300"
-              alt="Business meeting discussing sustainability impact"
+              src={caseStudyImage}
+              alt="Misty forest landscape representing environmental sustainability"
               className="rounded-lg shadow-sm"
             />
           </div>
