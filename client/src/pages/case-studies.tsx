@@ -32,6 +32,7 @@ import googleFormulaEImage from "@assets/Goolge and Formula E Hackathon.png";
 import kentImage from "@assets/Kent County Council .png";
 import kingsCollegeImage from "@assets/Kings College Hospital Foundation.png";
 import balfourBeattyImage from "@assets/Balfour Beatty.png";
+import caseStudyHeroImage from "@assets/Case Study - Image_1759311984141.jpg";
 
 const industries = [
   "Education",
@@ -202,8 +203,8 @@ export default function CaseStudies() {
               </div>
               <div className="md:w-1/3 mt-6 md:mt-0">
                 <img
-                  src="https://images.unsplash.com/photo-1552581234-26160f608093?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300"
-                  alt="Business meeting discussing sustainability impact"
+                  src={caseStudyHeroImage}
+                  alt="Misty forest landscape representing environmental sustainability"
                   className="rounded-lg shadow-sm"
                 />
               </div>
