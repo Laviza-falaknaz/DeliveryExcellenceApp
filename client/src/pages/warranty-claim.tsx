@@ -676,7 +676,7 @@ export default function WarrantyClaim() {
                       </FormControl>
                       <div className="space-y-1 leading-none">
                         <FormLabel>
-                          I agree to the warranty terms and conditions *
+                          I understand the warranty terms and conditions *
                         </FormLabel>
                         <FormMessage />
                       </div>
