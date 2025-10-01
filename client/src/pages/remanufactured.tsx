@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useState } from "react";
 import disassemblyImage from "@assets/1PS_5162_Disassembly Other_1759312369804.jpg";
+import inspectionImage from "@assets/1PS_4937_Staged Quality Control_1759312556402.jpg";
 
 export default function Remanufactured() {
   const [currentTip, setCurrentTip] = useState(0);
@@ -137,12 +138,21 @@ export default function Remanufactured() {
                 </div>
               </div>
               
-              <div className="text-center p-4 border rounded-lg">
-                <div className="h-12 w-12 rounded-full flex items-center justify-center mx-auto mb-3" style={{backgroundColor: '#30526920', color: '#305269'}}>
-                  <i className="ri-search-line text-xl"></i>
+              <div className="text-center p-4 border rounded-lg relative overflow-hidden">
+                <div 
+                  className="absolute inset-0 bg-cover bg-center"
+                  style={{
+                    backgroundImage: `url(${inspectionImage})`,
+                    opacity: 0.15
+                  }}
+                />
+                <div className="relative z-10">
+                  <div className="h-12 w-12 rounded-full flex items-center justify-center mx-auto mb-3" style={{backgroundColor: '#30526920', color: '#305269'}}>
+                    <i className="ri-search-line text-xl"></i>
+                  </div>
+                  <h4 className="font-medium mb-2">2. Inspection</h4>
+                  <p className="text-sm text-neutral-600">Detailed analysis of every component using advanced diagnostic tools</p>
                 </div>
-                <h4 className="font-medium mb-2">2. Inspection</h4>
-                <p className="text-sm text-neutral-600">Detailed analysis of every component using advanced diagnostic tools</p>
               </div>
               
               <div className="text-center p-4 border rounded-lg">
