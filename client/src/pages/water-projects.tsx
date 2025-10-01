@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { formatEnvironmentalImpact } from "@/lib/utils";
 import { WaterProject } from "@shared/schema";
 import { motion } from "framer-motion";
+import ugandaImage from "@assets/Uganda_1600 by 1027_a_1759311025910.png";
 
 export default function WaterProjects() {
   const { data: waterProjects, isLoading: isLoadingProjects } = useQuery<WaterProject[]>({
@@ -221,8 +222,8 @@ export default function WaterProjects() {
                   </div>
                   <div className="flex items-center justify-center">
                     <img
-                      src="/attached_assets/charity-water-logo.jpeg"
-                      alt="charity: water logo"
+                      src={ugandaImage}
+                      alt="Child accessing clean water in Uganda through charity: water"
                       className="rounded-lg max-w-[300px] h-auto"
                     />
                   </div>
