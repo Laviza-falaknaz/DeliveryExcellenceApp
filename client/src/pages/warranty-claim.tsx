@@ -676,19 +676,8 @@ export default function WarrantyClaim() {
                       </FormControl>
                       <div className="space-y-1 leading-none">
                         <FormLabel>
-                          Consent *
+                          I agree to the warranty terms and conditions *
                         </FormLabel>
-                        <FormDescription>
-                          I agree to the{" "}
-                          <a 
-                            href="https://circularcomputing.com/warranty/uk/" 
-                            target="_blank" 
-                            rel="noreferrer"
-                            className="text-primary hover:underline"
-                          >
-                            UK warranty terms and conditions
-                          </a>
-                        </FormDescription>
                         <FormMessage />
                       </div>
                     </FormItem>
