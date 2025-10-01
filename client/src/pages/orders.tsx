@@ -173,6 +173,9 @@ export default function Orders() {
                     Expected Shipping Date ↓
                   </TableHead>
                   <TableHead className="text-left font-medium text-neutral-600 py-4 px-6 cursor-pointer hover:text-neutral-900 transition-colors">
+                    Invoice ↓
+                  </TableHead>
+                  <TableHead className="text-left font-medium text-neutral-600 py-4 px-6 cursor-pointer hover:text-neutral-900 transition-colors">
                     Packing List ↓
                   </TableHead>
                   <TableHead className="text-left font-medium text-neutral-600 py-4 px-6 cursor-pointer hover:text-neutral-900 transition-colors">
@@ -202,6 +205,9 @@ export default function Orders() {
                       </TableCell>
                       <TableCell className="py-4 px-6">
                         <Skeleton className="h-4 w-32" />
+                      </TableCell>
+                      <TableCell className="py-4 px-6">
+                        <Skeleton className="h-8 w-24" />
                       </TableCell>
                       <TableCell className="py-4 px-6">
                         <Skeleton className="h-8 w-24" />
@@ -247,6 +253,24 @@ export default function Orders() {
                         </TableCell>
                         <TableCell className="py-4 px-6 text-sm text-neutral-700">
                           {order.estimatedDeliveryDate ? formatUKDate(order.estimatedDeliveryDate) : 'TBC'}
+                        </TableCell>
+                        <TableCell className="py-4 px-6">
+                          {order.invoiceUrl ? (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="bg-white text-neutral-900 border-neutral-300 hover:bg-[#08ABAB] hover:text-white hover:border-[#08ABAB] transition-colors text-xs"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                window.open(order.invoiceUrl, '_blank');
+                              }}
+                            >
+                              <i className="ri-download-line mr-1 text-sm"></i>
+                              Download Now
+                            </Button>
+                          ) : (
+                            <span className="text-neutral-400 text-xs">Not Available</span>
+                          )}
                         </TableCell>
                         <TableCell className="py-4 px-6">
                           {order.packingListUrl ? (
