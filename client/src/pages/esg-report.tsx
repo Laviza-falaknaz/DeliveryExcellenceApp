@@ -35,6 +35,7 @@ import { useToast } from "@/hooks/use-toast";
 import { formatDate, formatEnvironmentalImpact } from "@/lib/utils";
 import carbonIcon from "@assets/Carbon Icon CC_1757609663969.png";
 import waterIcon from "@assets/CC_Icons_Weight increased-152_1759311752403.png";
+import waterDropletsIcon from "@assets/Minerals Saved Icon CC _1759311880681.png";
 import resourceIcon from "@assets/Resource Pres Icon CC_1757609742523.png";
 
 export default function ESGReport() {
@@ -181,7 +182,7 @@ export default function ESGReport() {
         title: "Litres of Water Saved",
         value: impact.totalImpact?.waterSaved || 0,
         unit: "litres",
-        icon: <img src={waterIcon} alt="Water Icon" className="w-6 h-6" />,
+        icon: <img src={waterDropletsIcon} alt="Water Icon" className="w-6 h-6" />,
         color: "text-[#08ABAB]",
         bgColor: "bg-[#08ABAB]/10"
       }
@@ -398,7 +399,7 @@ export default function ESGReport() {
           <CardContent className="p-4">
             <div className="flex items-start">
               <div className="h-12 w-12 rounded-full bg-[#08ABAB]/10 flex items-center justify-center text-[#08ABAB] mr-3">
-                <img src={waterIcon} alt="Water Icon" className="w-6 h-6" />
+                <img src={waterDropletsIcon} alt="Water Icon" className="w-6 h-6" />
               </div>
               <div>
                 <p className="text-neutral-600 text-sm">Litres of Water Saved</p>
