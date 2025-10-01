@@ -7,7 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
 import { formatEnvironmentalImpact } from "@/lib/utils";
 import carbonIcon from "@assets/Carbon Icon CC_1757609284710.png";
-import waterIcon from "@assets/Minerals Saved Icon CC _1757609311468.png";
+import waterIcon from "@assets/CC_Icons_Weight increased-152_1759311452405.png";
 import resourceIcon from "@assets/Resource Pres Icon CC_1757609329084.png";
 import {
   LineChart,

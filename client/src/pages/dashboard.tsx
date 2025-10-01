@@ -14,7 +14,7 @@ import { useState, useEffect } from "react";
 import carbonIcon from "@assets/Carbon Icon CC_1757591684851.png";
 import mineralsIcon from "@assets/Minerals Saved Icon CC _1757591709661.png";
 import resourceIcon from "@assets/Resource Pres Icon CC_1757592358474.png";
-import waterIcon from "@assets/Minerals Saved Icon CC _1757592540046.png";
+import waterIcon from "@assets/CC_Icons_Weight increased-152_1759311452405.png";
 
 export default function Dashboard() {
   const { data: user } = useQuery({

@@ -7,7 +7,7 @@ import { formatEnvironmentalImpact } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 import { WaterProject } from "@shared/schema";
 import charityWaterImage from "@assets/Charity Water.png";
-import waterIcon from "@assets/Minerals Saved Icon CC _1757592540046.png";
+import waterIcon from "@assets/CC_Icons_Weight increased-152_1759311452405.png";
 
 export default function WaterImpact() {
   const { data: impact, isLoading: isImpactLoading } = useQuery({
