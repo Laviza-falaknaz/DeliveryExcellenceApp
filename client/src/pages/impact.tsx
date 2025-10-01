@@ -8,6 +8,7 @@ import { motion } from "framer-motion";
 import { formatEnvironmentalImpact } from "@/lib/utils";
 import carbonIcon from "@assets/Carbon Icon CC_1757609284710.png";
 import waterIcon from "@assets/CC_Icons_Weight increased-152_1759311452405.png";
+import waterDropletsIcon from "@assets/Minerals Saved Icon CC _1759311586728.png";
 import resourceIcon from "@assets/Resource Pres Icon CC_1757609329084.png";
 import {
   LineChart,
@@ -296,7 +297,7 @@ Learn more about sustainable IT solutions: circularcomputing.com
                     </p>
                   </div>
                   <div className="h-12 w-12 rounded-full bg-secondary/10 flex items-center justify-center">
-                    <img src={waterIcon} alt="Water Icon" className="w-7 h-7" />
+                    <img src={waterDropletsIcon} alt="Water Icon" className="w-7 h-7" />
                   </div>
                 </div>
                 <div className="mt-2">

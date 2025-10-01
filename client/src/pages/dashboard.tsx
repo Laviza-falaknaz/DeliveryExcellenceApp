@@ -15,6 +15,7 @@ import carbonIcon from "@assets/Carbon Icon CC_1757591684851.png";
 import mineralsIcon from "@assets/Minerals Saved Icon CC _1757591709661.png";
 import resourceIcon from "@assets/Resource Pres Icon CC_1757592358474.png";
 import waterIcon from "@assets/CC_Icons_Weight increased-152_1759311452405.png";
+import waterDropletsIcon from "@assets/Minerals Saved Icon CC _1759311586728.png";
 
 export default function Dashboard() {
   const { data: user } = useQuery({
@@ -126,7 +127,7 @@ export default function Dashboard() {
               value={impact.waterSaved || 0}
               unit="litres"
               icon="ri-drop-line"
-              iconImage={waterIcon}
+              iconImage={waterDropletsIcon}
               iconColor="text-[#08ABAB]"
               iconBgColor="bg-[#08ABAB]/10"
               progress={55}
