@@ -99,7 +99,7 @@ export default function WaterImpact() {
               {impact.familiesHelped} families
             </p>
             <p className="text-xs text-success mt-1">
-              Figure is for 1 week supply per family
+              Figure for 1 week supply per family
             </p>
           </div>
 

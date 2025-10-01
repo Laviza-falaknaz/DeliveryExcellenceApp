@@ -108,7 +108,7 @@ export default function Dashboard() {
               iconColor="text-secondary"
               iconBgColor="bg-secondary/10"
               progress={78}
-              footnote1="Figure is for 1 week supply per family"
+              footnote1="Figure for 1 week supply per family"
             />
             <ImpactCard
               title="Resources Preserved"
