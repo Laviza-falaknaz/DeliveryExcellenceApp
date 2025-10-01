@@ -120,11 +120,11 @@ export default function CaseStudyBanner() {
               </Button>
             </div>
           </div>
-          <div className="mt-6 md:mt-0 md:ml-6">
+          <div className="mt-6 md:mt-0 md:ml-6 md:w-64">
             <img
               src={caseStudyImage}
               alt="Misty forest landscape representing environmental sustainability"
-              className="rounded-lg shadow-sm"
+              className="rounded-lg shadow-sm w-full h-auto"
             />
           </div>
         </div>
