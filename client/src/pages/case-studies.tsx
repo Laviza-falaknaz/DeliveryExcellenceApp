@@ -153,68 +153,6 @@ export default function CaseStudies() {
         </div>
       </div>
 
-      {/* Case Study Information */}
-      <section className="mb-8">
-        <Card className="bg-primary/5 border border-primary/20">
-          <CardContent className="p-6">
-            <div className="flex flex-col md:flex-row">
-              <div className="md:w-2/3 md:pr-6">
-                <h2 className="text-xl font-semibold text-primary mb-4">Why Share Your Sustainability Story?</h2>
-                <p className="text-neutral-700 mb-4">
-                  By sharing your experience with Circular Computing's remanufactured laptops, you can help inspire other organizations to make sustainable IT choices. Your case study will showcase the positive environmental and social impact of your decision.
-                </p>
-                <div className="space-y-3 mb-4">
-                  <div className="flex items-start">
-                    <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center text-primary mt-0.5 mr-3">
-                      <i className="ri-check-line"></i>
-                    </div>
-                    <div>
-                      <h3 className="font-medium">Showcase Your Environmental Leadership</h3>
-                      <p className="text-sm text-neutral-600">Demonstrate your organization's commitment to sustainability and responsible business practices.</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start">
-                    <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center text-primary mt-0.5 mr-3">
-                      <i className="ri-check-line"></i>
-                    </div>
-                    <div>
-                      <h3 className="font-medium">Inspire Others</h3>
-                      <p className="text-sm text-neutral-600">Help other organizations see the benefits of sustainable IT procurement and remanufactured technology.</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start">
-                    <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center text-primary mt-0.5 mr-3">
-                      <i className="ri-check-line"></i>
-                    </div>
-                    <div>
-                      <h3 className="font-medium">Gain Recognition</h3>
-                      <p className="text-sm text-neutral-600">Be featured on our website, marketing materials, and industry publications as a sustainability champion.</p>
-                    </div>
-                  </div>
-                </div>
-                {!hasSubmitted && (
-                  <Button 
-                    variant="outline" 
-                    onClick={() => setIsDialogOpen(true)}
-                  >
-                    Join Case Study Programme
-                  </Button>
-                )}
-              </div>
-              <div className="md:w-1/3 mt-6 md:mt-0">
-                <img
-                  src={caseStudyHeroImage}
-                  alt="Misty forest landscape representing environmental sustainability"
-                  className="rounded-lg shadow-sm"
-                />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </section>
-
-
-
       {/* Featured Case Studies */}
       <section className="mb-8">
         <h2 className="text-lg font-semibold font-poppins mb-4">Featured Case Studies</h2>
@@ -627,6 +565,66 @@ export default function CaseStudies() {
             </CardFooter>
           </Card>
         </div>
+      </section>
+
+      {/* Why Share Your Sustainability Story */}
+      <section className="mb-8">
+        <Card className="bg-primary/5 border border-primary/20">
+          <CardContent className="p-6">
+            <div className="flex flex-col md:flex-row">
+              <div className="md:w-2/3 md:pr-6">
+                <h2 className="text-xl font-semibold text-primary mb-4">Why Share Your Sustainability Story?</h2>
+                <p className="text-neutral-700 mb-4">
+                  By sharing your experience with Circular Computing's remanufactured laptops, you can help inspire other organizations to make sustainable IT choices. Your case study will showcase the positive environmental and social impact of your decision.
+                </p>
+                <div className="space-y-3 mb-4">
+                  <div className="flex items-start">
+                    <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center text-primary mt-0.5 mr-3">
+                      <i className="ri-check-line"></i>
+                    </div>
+                    <div>
+                      <h3 className="font-medium">Showcase Your Environmental Leadership</h3>
+                      <p className="text-sm text-neutral-600">Demonstrate your organization's commitment to sustainability and responsible business practices.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start">
+                    <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center text-primary mt-0.5 mr-3">
+                      <i className="ri-check-line"></i>
+                    </div>
+                    <div>
+                      <h3 className="font-medium">Inspire Others</h3>
+                      <p className="text-sm text-neutral-600">Help other organizations see the benefits of sustainable IT procurement and remanufactured technology.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start">
+                    <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center text-primary mt-0.5 mr-3">
+                      <i className="ri-check-line"></i>
+                    </div>
+                    <div>
+                      <h3 className="font-medium">Gain Recognition</h3>
+                      <p className="text-sm text-neutral-600">Be featured on our website, marketing materials, and industry publications as a sustainability champion.</p>
+                    </div>
+                  </div>
+                </div>
+                {!hasSubmitted && (
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setIsDialogOpen(true)}
+                  >
+                    Join Case Study Programme
+                  </Button>
+                )}
+              </div>
+              <div className="md:w-1/3 mt-6 md:mt-0">
+                <img
+                  src={caseStudyHeroImage}
+                  alt="Misty forest landscape representing environmental sustainability"
+                  className="rounded-lg shadow-sm"
+                />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </section>
 
       {/* Case Study Form Dialog */}
