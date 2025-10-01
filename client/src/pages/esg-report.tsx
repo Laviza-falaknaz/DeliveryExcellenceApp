@@ -34,7 +34,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
 import { formatDate, formatEnvironmentalImpact } from "@/lib/utils";
 import carbonIcon from "@assets/Carbon Icon CC_1757609663969.png";
-import waterIcon from "@assets/CC_Icons_Weight increased-152_1759311452405.png";
+import waterIcon from "@assets/CC_Icons_Weight increased-152_1759311752403.png";
 import resourceIcon from "@assets/Resource Pres Icon CC_1757609742523.png";
 
 export default function ESGReport() {
