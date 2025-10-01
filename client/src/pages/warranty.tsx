@@ -600,7 +600,6 @@ export default function Warranty() {
                 </p>
                 <ul className="list-disc list-inside text-neutral-700 space-y-1">
                   <li>Accidental Damage Protection (covers drops, spills, and electrical surges)</li>
-                  <li>Extended Battery Coverage (extends battery warranty to full 36 months)</li>
                   <li>Next Business Day Replacement Service</li>
                   <li>Premium Support with dedicated technical advisor</li>
                   <li>International Coverage Option for global organizations</li>
