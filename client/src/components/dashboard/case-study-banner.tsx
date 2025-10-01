@@ -105,7 +105,7 @@ export default function CaseStudyBanner() {
             <p className="text-neutral-700">
               Your organization has saved {impact.carbonSaved / 1000} kg of carbon emissions and provided clean water to {impact.familiesHelped * 5} people by choosing remanufactured laptops.
             </p>
-            <p className="text-neutral-600 mt-2">
+            <p className="text-neutral-600 mt-4">
               Would you like to be featured in our case study to inspire other organizations?
             </p>
 
