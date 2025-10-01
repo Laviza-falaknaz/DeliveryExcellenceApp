@@ -861,7 +861,34 @@ export default function RMA() {
                       </Button>
                     </div>
                     <Button 
-                      onClick={() => setIsWarrantyCheckDialogOpen(false)}
+                      onClick={() => {
+                        if (rmaBasket.length === 0) {
+                          toast({
+                            title: "No Devices Selected",
+                            description: "Please add at least one device to your RMA request before submitting.",
+                            variant: "destructive",
+                          });
+                          return;
+                        }
+                        
+                        // Prepare basket data for transfer to warranty-claim page
+                        const basketData = rmaBasket.map(device => ({
+                          serialNumber: device.serialNumber,
+                          productName: device.productName,
+                          warrantyStatus: device.warrantyStatus
+                        }));
+                        
+                        // Encode basket data as URL search params
+                        const searchParams = new URLSearchParams();
+                        searchParams.set('basket', JSON.stringify(basketData));
+                        
+                        // Navigate to warranty-claim page with basket data
+                        setLocation(`/warranty-claim?${searchParams.toString()}`);
+                        
+                        // Clear basket and close dialog
+                        setRmaBasket([]);
+                        setIsWarrantyCheckDialogOpen(false);
+                      }}
                       variant="outline"
                     >
                       Submit RMA
