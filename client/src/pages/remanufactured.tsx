@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useState } from "react";
+import disassemblyImage from "@assets/1PS_5162_Disassembly Other_1759312369804.jpg";
 
 export default function Remanufactured() {
   const [currentTip, setCurrentTip] = useState(0);
@@ -119,12 +120,21 @@ export default function Remanufactured() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="text-center p-4 border rounded-lg">
-                <div className="h-12 w-12 rounded-full flex items-center justify-center mx-auto mb-3" style={{backgroundColor: '#FF9E1C20', color: '#FF9E1C'}}>
-                  <i className="ri-tools-line text-xl"></i>
+              <div className="text-center p-4 border rounded-lg relative overflow-hidden">
+                <div 
+                  className="absolute inset-0 bg-cover bg-center"
+                  style={{
+                    backgroundImage: `url(${disassemblyImage})`,
+                    opacity: 0.15
+                  }}
+                />
+                <div className="relative z-10">
+                  <div className="h-12 w-12 rounded-full flex items-center justify-center mx-auto mb-3" style={{backgroundColor: '#FF9E1C20', color: '#FF9E1C'}}>
+                    <i className="ri-tools-line text-xl"></i>
+                  </div>
+                  <h4 className="font-medium mb-2">1. Disassembly</h4>
+                  <p className="text-sm text-neutral-600">Complete breakdown into individual components for thorough inspection</p>
                 </div>
-                <h4 className="font-medium mb-2">1. Disassembly</h4>
-                <p className="text-sm text-neutral-600">Complete breakdown into individual components for thorough inspection</p>
               </div>
               
               <div className="text-center p-4 border rounded-lg">
