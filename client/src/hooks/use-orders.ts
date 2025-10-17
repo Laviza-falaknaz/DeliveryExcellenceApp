@@ -79,7 +79,7 @@ export function useOrders() {
         order.status !== "completed" && 
         order.status !== "cancelled" && 
         order.status !== "returned"
-    ).sort((a, b) => new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime());
+    ).sort((a, b) => new Date(b.orderDate || 0).getTime() - new Date(a.orderDate || 0).getTime());
   }
 
   // Function to get past orders (completed, cancelled, or returned)
@@ -90,7 +90,7 @@ export function useOrders() {
         order.status === "completed" || 
         order.status === "cancelled" || 
         order.status === "returned"
-    ).sort((a, b) => new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime());
+    ).sort((a, b) => new Date(b.orderDate || 0).getTime() - new Date(a.orderDate || 0).getTime());
   }
 
   // Get most recent active order
