@@ -6,7 +6,17 @@ The Circular Computing Customer Portal is a full-stack web application designed 
 
 The application emphasizes environmental impact visualization, showing users how their laptop purchases contribute to carbon reduction, water conservation through charity partnerships, and mineral resource savings. It integrates with charity: water projects to demonstrate real-world impact and includes comprehensive order tracking, warranty management, and customer support features.
 
-## Recent Updates (August 2025)
+## Recent Updates (October 2025)
+
+### Azure SQL Database Migration & Backend Overhaul
+- **Database Migration**: Successfully migrated from in-memory storage to Azure SQL Database (DeliveryExcellence) with comprehensive schema design including 13 tables for complete application functionality.
+- **Authentication Enhancement**: Updated authentication to use bcrypt password hashing. Registration is now disabled - users must be created by administrators. Default test user: `lavizaniazi2001@gmail.com` / `admin123`.
+- **IP Conflict Detection**: Implemented automatic IP conflict detection with email notifications to `laviza.falak@a2c.co.uk` when database firewall blocks connection. Current IP requiring whitelist: `34.14.140.197`.
+- **Dynamic Theming**: Created system settings table to store theme configuration (colors, fonts, logos) dynamically in database for easy updates without code changes.
+- **Comprehensive Logging**: All errors and system events are logged to database tables (`error_logs`, `system_logs`) with full request context including IP address, user agent, and stack traces.
+- **SQL Storage Layer**: Implemented complete SQL storage adapter replacing in-memory storage, supporting all CRUD operations for users, orders, RMAs, support tickets, environmental impact, water projects, and case studies.
+
+## Previous Updates (August 2025)
 
 ### Warranty Claim System Implementation
 - **Comprehensive RMA Request Form**: Successfully implemented a full-featured warranty claim form at `/warranty-claim` with all requested fields including contact information, billing/delivery addresses, product details, fault descriptions, and file upload capabilities for CSV/Excel documentation. Updated branding from "Warranty Claim Form" to "New RMA Request" throughout the interface.
@@ -49,30 +59,36 @@ The backend follows a REST API architecture built on Node.js with Express:
 The server implements comprehensive logging, error handling, and serves both API endpoints and static assets including the built frontend application.
 
 ### Database Design
-The application uses PostgreSQL with Drizzle ORM for type-safe database operations:
+The application uses Azure SQL Database (Microsoft SQL Server) for production data storage:
 
-- **ORM**: Drizzle ORM with migration support and schema management
-- **Schema Design**: Relational database design with proper foreign key relationships
+- **Database**: Azure SQL Database (DeliveryExcellence) hosted on `a2cwarehouse.database.windows.net`
+- **Connection**: mssql package with connection pooling and automatic retry logic
+- **Schema Design**: Relational database design with proper foreign key relationships and constraints
 - **Key Entities**: Users, Orders, OrderItems, OrderUpdates, EnvironmentalImpact, RMAs, SupportTickets, WaterProjects, CaseStudies, DeliveryTimelines
-- **Data Types**: Comprehensive type definitions with JSON fields for complex data structures like notification preferences
+- **System Tables**: SystemSettings (dynamic theming), ErrorLogs, SystemLogs for monitoring and configuration
+- **Data Types**: Comprehensive type definitions with NVARCHAR(MAX) for JSON fields supporting complex data structures
+- **Initialization**: Automatic schema creation and data seeding on server startup
 
-The database schema supports the full customer lifecycle from order placement through delivery and ongoing support, with detailed tracking of environmental impact metrics.
+The database schema supports the full customer lifecycle from order placement through delivery and ongoing support, with detailed tracking of environmental impact metrics, comprehensive error logging, and dynamic theme configuration.
 
 ### Authentication & Authorization
 The application implements session-based authentication with the following approach:
 
-- **Strategy**: Local username/password authentication via Passport.js
-- **Session Management**: Express-session with configurable storage and security settings
+- **Strategy**: Local username/password authentication via Passport.js with bcrypt password hashing
+- **Session Management**: Express-session with memory store (configurable for production)
 - **Route Protection**: Middleware-based route protection with redirect handling
-- **User Management**: Complete user registration, login, and profile management
+- **User Management**: Login-only authentication (registration disabled for security). Users must be created by administrators directly in the database with hashed passwords.
+- **Security**: All passwords are hashed using bcrypt before storage, preventing plain-text password exposure
 
 ### External Service Integration
 The platform integrates with several external services and resources:
 
+- **Azure SQL Database**: Production database hosted on Azure with automatic IP conflict detection and notification
 - **Asset Management**: Static asset serving for images and attachments via Express middleware
 - **Charity Integration**: Visual integration with charity: water projects and impact tracking
 - **External Links**: Deep integration with Circular Computing's main website and external warranty systems
-- **Email Services**: Placeholder integration for notification systems
+- **Email Notifications**: Automated email alerts for database connection issues (IP conflicts) sent to `laviza.falak@a2c.co.uk`
+- **Logging & Monitoring**: Database-backed error logging and system event tracking for debugging and auditing
 
 ### Environmental Impact Tracking
 A core feature of the application is comprehensive environmental impact tracking:
@@ -89,8 +105,9 @@ The architecture prioritizes scalability, maintainability, and user experience w
 ### Core Technologies
 - **Node.js/Express**: Backend framework with TypeScript support
 - **React**: Frontend framework with Vite build tooling
-- **PostgreSQL**: Primary database with Neon Database serverless hosting
-- **Drizzle ORM**: Type-safe database operations and migrations
+- **Azure SQL Database**: Production database (DeliveryExcellence on a2cwarehouse.database.windows.net)
+- **mssql**: SQL Server client for Node.js with connection pooling
+- **bcryptjs**: Password hashing for secure authentication
 
 ### Authentication & Session Management
 - **Passport.js**: Authentication middleware with local strategy
