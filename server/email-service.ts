@@ -1,5 +1,3 @@
-import * as nodemailer from 'nodemailer';
-
 interface EmailOptions {
   to: string;
   subject: string;
@@ -7,29 +5,17 @@ interface EmailOptions {
   from?: string;
 }
 
-// Configure nodemailer transporter
-// Note: For production, use environment variables for email credentials
-const transporter = nodemailer.createTransporter({
-  host: 'smtp.gmail.com', // or your SMTP server
-  port: 587,
-  secure: false,
-  auth: {
-    user: process.env.EMAIL_USER || 'noreply@example.com',
-    pass: process.env.EMAIL_PASSWORD || 'password',
-  },
-});
-
 export async function sendEmail(options: EmailOptions): Promise<void> {
   try {
-    const mailOptions = {
-      from: options.from || 'A2C Delivery Portal <noreply@a2c.co.uk>',
-      to: options.to,
-      subject: options.subject,
-      html: options.html,
-    };
-
-    await transporter.sendMail(mailOptions);
-    console.log(`📧 Email sent to ${options.to}`);
+    // Log email to console for now
+    // In production, this would use a proper email service like SendGrid, AWS SES, or nodemailer
+    console.log('📧 Email notification:');
+    console.log(`  To: ${options.to}`);
+    console.log(`  Subject: ${options.subject}`);
+    console.log(`  Body: ${options.html}`);
+    
+    // TODO: Implement actual email sending when email credentials are configured
+    // For now, just log to console
   } catch (error) {
     console.error('❌ Email send error:', error);
     // Don't throw - we don't want email failures to crash the app
