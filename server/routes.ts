@@ -19,6 +19,8 @@ import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
 import crypto from "crypto";
 import MemoryStore from "memorystore";
+import bcrypt from "bcryptjs";
+import { logError } from "./logger";
 
 declare module "express-session" {
   interface SessionData {
@@ -52,12 +54,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       try {
         const user = await storage.getUserByUsername(username);
         if (!user) {
-          return done(null, false, { message: "Incorrect username." });
+          return done(null, false, { message: "Incorrect username or password." });
         }
 
-        // In a real app, use proper password hashing
-        if (user.password !== password) {
-          return done(null, false, { message: "Incorrect password." });
+        // Use bcrypt to compare passwords
+        const isValidPassword = await bcrypt.compare(password, user.password);
+        if (!isValidPassword) {
+          return done(null, false, { message: "Incorrect username or password." });
         }
 
         return done(null, user);
@@ -89,36 +92,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   };
 
   // Auth routes
+  // Registration is disabled - users are created by administrators
   app.post("/api/auth/register", async (req, res) => {
-    try {
-      const userData = insertUserSchema.parse(req.body);
-      
-      const existingUser = await storage.getUserByUsername(userData.username);
-      if (existingUser) {
-        return res.status(400).json({ message: "Username already exists" });
-      }
-
-      const existingEmail = await storage.getUserByEmail(userData.email);
-      if (existingEmail) {
-        return res.status(400).json({ message: "Email already exists" });
-      }
-
-      const user = await storage.createUser(userData);
-      // Don't send password back to client
-      const { password, ...userWithoutPassword } = user;
-      
-      req.login(user, (err) => {
-        if (err) {
-          return res.status(500).json({ message: "Error during login" });
-        }
-        return res.status(201).json(userWithoutPassword);
-      });
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: error.errors });
-      }
-      return res.status(500).json({ message: "Internal server error" });
-    }
+    return res.status(403).json({ 
+      message: "Registration is disabled. Please contact your administrator to create an account." 
+    });
   });
 
   app.post("/api/auth/login", passport.authenticate("local"), (req, res) => {

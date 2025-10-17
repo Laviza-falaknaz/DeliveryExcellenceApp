@@ -2,6 +2,8 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import path from "path";
+import { initializeDatabase } from "./init-database";
+import { logError, logSystem } from "./logger";
 
 const app = express();
 app.use(express.json());
@@ -41,11 +43,24 @@ app.use((req, res, next) => {
 });
 
 (async () => {
+  // Initialize database
+  try {
+    await initializeDatabase();
+    await logSystem('info', 'Database initialized successfully');
+  } catch (error) {
+    console.error('Failed to initialize database:', error);
+    await logSystem('error', 'Database initialization failed', { error: error instanceof Error ? error.message : 'Unknown error' });
+    // Don't exit - allow server to start for potential manual recovery
+  }
+
   const server = await registerRoutes(app);
 
-  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+  app.use((err: any, req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
     const message = err.message || "Internal Server Error";
+
+    // Log error to database
+    logError(err, req).catch(console.error);
 
     res.status(status).json({ message });
     throw err;

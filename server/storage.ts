@@ -443,4 +443,7 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+import { SqlStorage } from './sql-storage';
+
+// Use SQL storage for production
+export const storage = new SqlStorage();
