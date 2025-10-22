@@ -12,7 +12,7 @@ import {
   systemSettings, SystemSetting
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, sum } from "drizzle-orm";
+import { eq, sum, like, and, or } from "drizzle-orm";
 
 export interface IStorage {
   // User operations
@@ -22,6 +22,7 @@ export interface IStorage {
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: number, data: Partial<User>): Promise<User | undefined>;
   getAllUsers(): Promise<User[]>;
+  searchUsers(filters: { email?: string; name?: string; company?: string }): Promise<User[]>;
   deleteUser(id: number): Promise<void>;
 
   // Order operations
@@ -31,6 +32,7 @@ export interface IStorage {
   createOrder(order: InsertOrder): Promise<Order>;
   updateOrder(id: number, data: Partial<Order>): Promise<Order | undefined>;
   getAllOrders(): Promise<Order[]>;
+  searchOrders(filters: { orderNumber?: string; userId?: number; status?: string }): Promise<Order[]>;
   deleteOrder(id: number): Promise<void>;
 
   // Order items operations
@@ -55,10 +57,12 @@ export interface IStorage {
 
   // RMA operations
   getRma(id: number): Promise<Rma | undefined>;
+  getRmaByNumber(rmaNumber: string): Promise<Rma | undefined>;
   getRmasByUserId(userId: number): Promise<Rma[]>;
   createRma(rma: InsertRma): Promise<Rma>;
   updateRma(id: number, data: Partial<Rma>): Promise<Rma | undefined>;
   getAllRmas(): Promise<Rma[]>;
+  searchRmas(filters: { rmaNumber?: string; userId?: number; status?: string }): Promise<Rma[]>;
   deleteRma(id: number): Promise<void>;
 
   // Water project operations
@@ -70,10 +74,12 @@ export interface IStorage {
 
   // Support ticket operations
   getSupportTicket(id: number): Promise<SupportTicket | undefined>;
+  getSupportTicketByNumber(ticketNumber: string): Promise<SupportTicket | undefined>;
   getSupportTicketsByUserId(userId: number): Promise<SupportTicket[]>;
   createSupportTicket(ticket: InsertSupportTicket): Promise<SupportTicket>;
   updateSupportTicket(id: number, data: Partial<SupportTicket>): Promise<SupportTicket | undefined>;
   getAllSupportTickets(): Promise<SupportTicket[]>;
+  searchSupportTickets(filters: { ticketNumber?: string; userId?: number; status?: string }): Promise<SupportTicket[]>;
   deleteSupportTicket(id: number): Promise<void>;
 
   // Case study operations
@@ -121,6 +127,25 @@ export class DatabaseStorage implements IStorage {
     return updated || undefined;
   }
 
+  async searchUsers(filters: { email?: string; name?: string; company?: string }): Promise<User[]> {
+    const conditions = [];
+    if (filters.email) {
+      conditions.push(like(users.email, `%${filters.email}%`));
+    }
+    if (filters.name) {
+      conditions.push(like(users.name, `%${filters.name}%`));
+    }
+    if (filters.company) {
+      conditions.push(like(users.company, `%${filters.company}%`));
+    }
+    
+    if (conditions.length === 0) {
+      return db.select().from(users);
+    }
+    
+    return db.select().from(users).where(or(...conditions));
+  }
+
   // Order operations
   async getOrder(id: number): Promise<Order | undefined> {
     const [order] = await db.select().from(orders).where(eq(orders.id, id));
@@ -144,6 +169,25 @@ export class DatabaseStorage implements IStorage {
   async updateOrder(id: number, data: Partial<Order>): Promise<Order | undefined> {
     const [updated] = await db.update(orders).set(data).where(eq(orders.id, id)).returning();
     return updated || undefined;
+  }
+
+  async searchOrders(filters: { orderNumber?: string; userId?: number; status?: string }): Promise<Order[]> {
+    const conditions = [];
+    if (filters.orderNumber) {
+      conditions.push(like(orders.orderNumber, `%${filters.orderNumber}%`));
+    }
+    if (filters.userId) {
+      conditions.push(eq(orders.userId, filters.userId));
+    }
+    if (filters.status) {
+      conditions.push(eq(orders.status, filters.status as any));
+    }
+    
+    if (conditions.length === 0) {
+      return db.select().from(orders);
+    }
+    
+    return db.select().from(orders).where(and(...conditions));
   }
 
   // Order items operations
@@ -214,8 +258,32 @@ export class DatabaseStorage implements IStorage {
     return rma || undefined;
   }
 
+  async getRmaByNumber(rmaNumber: string): Promise<Rma | undefined> {
+    const [rma] = await db.select().from(rmas).where(eq(rmas.rmaNumber, rmaNumber));
+    return rma || undefined;
+  }
+
   async getRmasByUserId(userId: number): Promise<Rma[]> {
     return db.select().from(rmas).where(eq(rmas.userId, userId));
+  }
+
+  async searchRmas(filters: { rmaNumber?: string; userId?: number; status?: string }): Promise<Rma[]> {
+    const conditions = [];
+    if (filters.rmaNumber) {
+      conditions.push(like(rmas.rmaNumber, `%${filters.rmaNumber}%`));
+    }
+    if (filters.userId) {
+      conditions.push(eq(rmas.userId, filters.userId));
+    }
+    if (filters.status) {
+      conditions.push(eq(rmas.status, filters.status as any));
+    }
+    
+    if (conditions.length === 0) {
+      return db.select().from(rmas);
+    }
+    
+    return db.select().from(rmas).where(and(...conditions));
   }
 
   async createRma(insertRma: InsertRma): Promise<Rma> {
@@ -249,8 +317,32 @@ export class DatabaseStorage implements IStorage {
     return ticket || undefined;
   }
 
+  async getSupportTicketByNumber(ticketNumber: string): Promise<SupportTicket | undefined> {
+    const [ticket] = await db.select().from(supportTickets).where(eq(supportTickets.ticketNumber, ticketNumber));
+    return ticket || undefined;
+  }
+
   async getSupportTicketsByUserId(userId: number): Promise<SupportTicket[]> {
     return db.select().from(supportTickets).where(eq(supportTickets.userId, userId));
+  }
+
+  async searchSupportTickets(filters: { ticketNumber?: string; userId?: number; status?: string }): Promise<SupportTicket[]> {
+    const conditions = [];
+    if (filters.ticketNumber) {
+      conditions.push(like(supportTickets.ticketNumber, `%${filters.ticketNumber}%`));
+    }
+    if (filters.userId) {
+      conditions.push(eq(supportTickets.userId, filters.userId));
+    }
+    if (filters.status) {
+      conditions.push(eq(supportTickets.status, filters.status as any));
+    }
+    
+    if (conditions.length === 0) {
+      return db.select().from(supportTickets);
+    }
+    
+    return db.select().from(supportTickets).where(and(...conditions));
   }
 
   async createSupportTicket(insertTicket: InsertSupportTicket): Promise<SupportTicket> {
