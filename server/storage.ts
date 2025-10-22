@@ -12,7 +12,7 @@ import {
   systemSettings, SystemSetting
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, sum, like, and, or } from "drizzle-orm";
+import { eq, sum, like, and } from "drizzle-orm";
 
 export interface IStorage {
   // User operations
@@ -143,7 +143,8 @@ export class DatabaseStorage implements IStorage {
       return db.select().from(users);
     }
     
-    return db.select().from(users).where(or(...conditions));
+    // Use AND to narrow results when multiple filters are provided
+    return db.select().from(users).where(conditions.length === 1 ? conditions[0] : and(...conditions));
   }
 
   // Order operations
@@ -187,7 +188,8 @@ export class DatabaseStorage implements IStorage {
       return db.select().from(orders);
     }
     
-    return db.select().from(orders).where(and(...conditions));
+    // Use AND to narrow results when multiple filters are provided
+    return db.select().from(orders).where(conditions.length === 1 ? conditions[0] : and(...conditions));
   }
 
   // Order items operations
@@ -283,7 +285,8 @@ export class DatabaseStorage implements IStorage {
       return db.select().from(rmas);
     }
     
-    return db.select().from(rmas).where(and(...conditions));
+    // Use AND to narrow results when multiple filters are provided
+    return db.select().from(rmas).where(conditions.length === 1 ? conditions[0] : and(...conditions));
   }
 
   async createRma(insertRma: InsertRma): Promise<Rma> {
@@ -342,7 +345,8 @@ export class DatabaseStorage implements IStorage {
       return db.select().from(supportTickets);
     }
     
-    return db.select().from(supportTickets).where(and(...conditions));
+    // Use AND to narrow results when multiple filters are provided
+    return db.select().from(supportTickets).where(conditions.length === 1 ? conditions[0] : and(...conditions));
   }
 
   async createSupportTicket(insertTicket: InsertSupportTicket): Promise<SupportTicket> {
