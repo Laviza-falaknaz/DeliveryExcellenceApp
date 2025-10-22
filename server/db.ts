@@ -1,77 +1,29 @@
-import sql from 'mssql';
-import { sendEmail } from './email-service';
+// Replit PostgreSQL database connection using blueprint:javascript_database
+import { Pool, neonConfig } from '@neondatabase/serverless';
+import { drizzle } from 'drizzle-orm/neon-serverless';
+import ws from "ws";
+import * as schema from "@shared/schema";
 
-const config: sql.config = {
-  server: 'a2cwarehouse.database.windows.net',
-  database: 'DeliveryExcellence',
-  user: 'CbqvYOy5SKI47n1566hk',
-  password: 'ZUXG+!^3pcsL)tY7PIqhuH',
-  options: {
-    encrypt: true,
-    trustServerCertificate: false,
-    enableArithAbort: true,
-  },
-  pool: {
-    max: 10,
-    min: 0,
-    idleTimeoutMillis: 30000
-  },
-  connectionTimeout: 30000,
-  requestTimeout: 30000,
-};
+neonConfig.webSocketConstructor = ws;
 
-let pool: sql.ConnectionPool | null = null;
-
-export async function getConnection(): Promise<sql.ConnectionPool> {
-  if (pool && pool.connected) {
-    return pool;
-  }
-
-  try {
-    pool = await sql.connect(config);
-    console.log('✅ Connected to Azure SQL Database');
-    return pool;
-  } catch (error: any) {
-    console.error('❌ Database connection error:', error.message);
-    
-    // Check if it's an IP whitelist error
-    if (error.message?.includes('firewall') || error.message?.includes('IP') || error.code === 'ELOGIN') {
-      await sendEmail({
-        to: 'laviza.falak@a2c.co.uk',
-        subject: 'Database IP Whitelist Request - Urgent',
-        html: `
-          <h2>Database IP Whitelist Request</h2>
-          <p>The application failed to connect to the Azure SQL Database due to IP restrictions.</p>
-          <p><strong>Error:</strong> ${error.message}</p>
-          <p><strong>Time:</strong> ${new Date().toISOString()}</p>
-          <p><strong>Action Required:</strong> Please whitelist the current server IP address in Azure SQL firewall rules.</p>
-          <hr>
-          <p>To get the current IP, you can check the Azure SQL connection logs or use an IP lookup service.</p>
-        `,
-      });
-    }
-    
-    throw error;
-  }
+if (!process.env.DATABASE_URL) {
+  throw new Error(
+    "DATABASE_URL must be set. Did you forget to provision a database?",
+  );
 }
 
-export async function closeConnection(): Promise<void> {
-  if (pool) {
-    await pool.close();
-    pool = null;
-    console.log('🔌 Database connection closed');
-  }
-}
+export const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+export const db = drizzle({ client: pool, schema });
 
 // Graceful shutdown
 process.on('SIGINT', async () => {
-  await closeConnection();
+  await pool.end();
+  console.log('🔌 Database connection closed');
   process.exit(0);
 });
 
 process.on('SIGTERM', async () => {
-  await closeConnection();
+  await pool.end();
+  console.log('🔌 Database connection closed');
   process.exit(0);
 });
-
-export { sql };

@@ -20,7 +20,6 @@ import { Strategy as LocalStrategy } from "passport-local";
 import crypto from "crypto";
 import MemoryStore from "memorystore";
 import bcrypt from "bcryptjs";
-import { logError } from "./logger";
 
 declare module "express-session" {
   interface SessionData {

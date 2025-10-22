@@ -10,6 +10,8 @@ import {
   caseStudies, CaseStudy, InsertCaseStudy,
   deliveryTimelines, DeliveryTimeline, InsertDeliveryTimeline
 } from "@shared/schema";
+import { db } from "./db";
+import { eq, sum } from "drizzle-orm";
 
 export interface IStorage {
   // User operations
@@ -75,203 +77,91 @@ export interface IStorage {
   updateDeliveryTimeline(orderId: number, data: Partial<DeliveryTimeline>): Promise<DeliveryTimeline | undefined>;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<number, User>;
-  private orders: Map<number, Order>;
-  private orderItems: Map<number, OrderItem>;
-  private orderUpdates: Map<number, OrderUpdate>;
-  private environmentalImpacts: Map<number, EnvironmentalImpact>;
-  private rmas: Map<number, Rma>;
-  private waterProjects: Map<number, WaterProject>;
-  private supportTickets: Map<number, SupportTicket>;
-  private caseStudies: Map<number, CaseStudy>;
-  private deliveryTimelines: Map<number, DeliveryTimeline>;
-
-  private currentUserId: number;
-  private currentOrderId: number;
-  private currentOrderItemId: number;
-  private currentOrderUpdateId: number;
-  private currentEnvironmentalImpactId: number;
-  private currentRmaId: number;
-  private currentWaterProjectId: number;
-  private currentSupportTicketId: number;
-  private currentCaseStudyId: number;
-
-  constructor() {
-    this.users = new Map();
-    this.orders = new Map();
-    this.orderItems = new Map();
-    this.orderUpdates = new Map();
-    this.environmentalImpacts = new Map();
-    this.rmas = new Map();
-    this.waterProjects = new Map();
-    this.supportTickets = new Map();
-    this.caseStudies = new Map();
-    this.deliveryTimelines = new Map();
-
-    this.currentUserId = 1;
-    this.currentOrderId = 1;
-    this.currentOrderItemId = 1;
-    this.currentOrderUpdateId = 1;
-    this.currentEnvironmentalImpactId = 1;
-    this.currentRmaId = 1;
-    this.currentWaterProjectId = 1;
-    this.currentSupportTicketId = 1;
-    this.currentCaseStudyId = 1;
-
-    // Initialize with sample water projects
-    this.seedWaterProjects();
-  }
-
-  private seedWaterProjects() {
-    const projects: InsertWaterProject[] = [
-      {
-        name: "Ethiopia Clean Water Initiative",
-        location: "Ethiopia",
-        description: "This project is providing clean water access to rural communities in Ethiopia, focusing on sustainable well construction and community education on water management.",
-        peopleImpacted: 1200,
-        waterProvided: 3000000,
-        imageUrl: "/attached_assets/Ethiopia.png",
-      },
-      {
-        name: "Rwanda Clean Water Project",
-        location: "Rwanda",
-        description: "Building sustainable water infrastructure in rural Rwanda to provide clean drinking water and improve sanitation facilities.",
-        peopleImpacted: 850,
-        waterProvided: 1850000,
-        imageUrl: "/attached_assets/Rwanda.png",
-      },
-      {
-        name: "Uganda Rainwater Harvesting",
-        location: "Uganda",
-        description: "Implementing rainwater harvesting systems to collect and store clean water for communities in drought-prone regions of Uganda.",
-        peopleImpacted: 730,
-        waterProvided: 1450000,
-        imageUrl: "/attached_assets/Uganda.png",
-      }
-    ];
-
-    projects.forEach(project => {
-      this.createWaterProject(project);
-    });
-  }
-
+// Database storage implementation using Drizzle ORM - blueprint:javascript_database
+export class DatabaseStorage implements IStorage {
   // User operations
   async getUser(id: number): Promise<User | undefined> {
-    return this.users.get(id);
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || undefined;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username.toLowerCase() === username.toLowerCase(),
-    );
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user || undefined;
   }
 
   async getUserByEmail(email: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.email.toLowerCase() === email.toLowerCase(),
-    );
+    const [user] = await db.select().from(users).where(eq(users.email, email));
+    return user || undefined;
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const id = this.currentUserId++;
-    const createdAt = new Date();
-    const user: User = { ...insertUser, id, createdAt };
-    this.users.set(id, user);
+    const [user] = await db.insert(users).values(insertUser).returning();
     return user;
   }
 
   async updateUser(id: number, data: Partial<User>): Promise<User | undefined> {
-    const user = this.users.get(id);
-    if (!user) return undefined;
-
-    const updatedUser = { ...user, ...data };
-    this.users.set(id, updatedUser);
-    return updatedUser;
+    const [updated] = await db.update(users).set(data).where(eq(users.id, id)).returning();
+    return updated || undefined;
   }
 
   // Order operations
   async getOrder(id: number): Promise<Order | undefined> {
-    return this.orders.get(id);
+    const [order] = await db.select().from(orders).where(eq(orders.id, id));
+    return order || undefined;
   }
 
   async getOrderByNumber(orderNumber: string): Promise<Order | undefined> {
-    return Array.from(this.orders.values()).find(
-      (order) => order.orderNumber === orderNumber,
-    );
+    const [order] = await db.select().from(orders).where(eq(orders.orderNumber, orderNumber));
+    return order || undefined;
   }
 
   async getOrdersByUserId(userId: number): Promise<Order[]> {
-    return Array.from(this.orders.values()).filter(
-      (order) => order.userId === userId,
-    ).sort((a, b) => b.orderDate.getTime() - a.orderDate.getTime());
+    return db.select().from(orders).where(eq(orders.userId, userId));
   }
 
   async createOrder(insertOrder: InsertOrder): Promise<Order> {
-    const id = this.currentOrderId++;
-    const createdAt = new Date();
-    const order: Order = { ...insertOrder, id, createdAt };
-    this.orders.set(id, order);
+    const [order] = await db.insert(orders).values(insertOrder).returning();
     return order;
   }
 
   async updateOrder(id: number, data: Partial<Order>): Promise<Order | undefined> {
-    const order = this.orders.get(id);
-    if (!order) return undefined;
-
-    const updatedOrder = { ...order, ...data };
-    this.orders.set(id, updatedOrder);
-    return updatedOrder;
+    const [updated] = await db.update(orders).set(data).where(eq(orders.id, id)).returning();
+    return updated || undefined;
   }
 
   // Order items operations
   async getOrderItems(orderId: number): Promise<OrderItem[]> {
-    return Array.from(this.orderItems.values()).filter(
-      (item) => item.orderId === orderId,
-    );
+    return db.select().from(orderItems).where(eq(orderItems.orderId, orderId));
   }
 
   async createOrderItem(insertOrderItem: InsertOrderItem): Promise<OrderItem> {
-    const id = this.currentOrderItemId++;
-    const createdAt = new Date();
-    const orderItem: OrderItem = { ...insertOrderItem, id, createdAt };
-    this.orderItems.set(id, orderItem);
-    return orderItem;
+    const [item] = await db.insert(orderItems).values(insertOrderItem).returning();
+    return item;
   }
 
   // Order updates operations
   async getOrderUpdates(orderId: number): Promise<OrderUpdate[]> {
-    return Array.from(this.orderUpdates.values())
-      .filter(update => update.orderId === orderId)
-      .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+    return db.select().from(orderUpdates).where(eq(orderUpdates.orderId, orderId));
   }
 
   async createOrderUpdate(insertOrderUpdate: InsertOrderUpdate): Promise<OrderUpdate> {
-    const id = this.currentOrderUpdateId++;
-    const createdAt = new Date();
-    const orderUpdate: OrderUpdate = { ...insertOrderUpdate, id, createdAt };
-    this.orderUpdates.set(id, orderUpdate);
-    return orderUpdate;
+    const [update] = await db.insert(orderUpdates).values(insertOrderUpdate).returning();
+    return update;
   }
 
   // Environmental impact operations
   async getEnvironmentalImpactByUserId(userId: number): Promise<EnvironmentalImpact[]> {
-    return Array.from(this.environmentalImpacts.values()).filter(
-      (impact) => impact.userId === userId,
-    );
+    return db.select().from(environmentalImpact).where(eq(environmentalImpact.userId, userId));
   }
 
   async getEnvironmentalImpactByOrderId(orderId: number): Promise<EnvironmentalImpact | undefined> {
-    return Array.from(this.environmentalImpacts.values()).find(
-      (impact) => impact.orderId === orderId,
-    );
+    const [impact] = await db.select().from(environmentalImpact).where(eq(environmentalImpact.orderId, orderId));
+    return impact || undefined;
   }
 
   async createEnvironmentalImpact(insertImpact: InsertEnvironmentalImpact): Promise<EnvironmentalImpact> {
-    const id = this.currentEnvironmentalImpactId++;
-    const createdAt = new Date();
-    const impact: EnvironmentalImpact = { ...insertImpact, id, createdAt };
-    this.environmentalImpacts.set(id, impact);
+    const [impact] = await db.insert(environmentalImpact).values(insertImpact).returning();
     return impact;
   }
 
@@ -282,168 +172,122 @@ export class MemStorage implements IStorage {
     treesEquivalent: number;
     familiesHelped: number;
   }> {
-    const impacts = await this.getEnvironmentalImpactByUserId(userId);
-    const totals = impacts.reduce((acc, impact) => {
-      return {
-        carbonSaved: acc.carbonSaved + impact.carbonSaved,
-        waterProvided: acc.waterProvided + impact.waterProvided,
-        mineralsSaved: acc.mineralsSaved + impact.mineralsSaved,
-        treesEquivalent: acc.treesEquivalent + impact.treesEquivalent,
-        familiesHelped: acc.familiesHelped + impact.familiesHelped,
-      };
-    }, {
-      carbonSaved: 0,
-      waterProvided: 0,
-      mineralsSaved: 0,
-      treesEquivalent: 0,
-      familiesHelped: 0,
-    });
+    const [result] = await db
+      .select({
+        carbonSaved: sum(environmentalImpact.carbonSaved),
+        waterProvided: sum(environmentalImpact.waterProvided),
+        mineralsSaved: sum(environmentalImpact.mineralsSaved),
+        treesEquivalent: sum(environmentalImpact.treesEquivalent),
+        familiesHelped: sum(environmentalImpact.familiesHelped),
+      })
+      .from(environmentalImpact)
+      .where(eq(environmentalImpact.userId, userId));
 
-    return totals;
+    return {
+      carbonSaved: Number(result.carbonSaved) || 0,
+      waterProvided: Number(result.waterProvided) || 0,
+      mineralsSaved: Number(result.mineralsSaved) || 0,
+      treesEquivalent: Number(result.treesEquivalent) || 0,
+      familiesHelped: Number(result.familiesHelped) || 0,
+    };
   }
 
   // RMA operations
   async getRma(id: number): Promise<Rma | undefined> {
-    return this.rmas.get(id);
+    const [rma] = await db.select().from(rmas).where(eq(rmas.id, id));
+    return rma || undefined;
   }
 
   async getRmasByUserId(userId: number): Promise<Rma[]> {
-    return Array.from(this.rmas.values()).filter(
-      (rma) => rma.userId === userId,
-    );
+    return db.select().from(rmas).where(eq(rmas.userId, userId));
   }
 
   async createRma(insertRma: InsertRma): Promise<Rma> {
-    const id = this.currentRmaId++;
-    const createdAt = new Date();
-    const rma: Rma = { ...insertRma, id, createdAt };
-    this.rmas.set(id, rma);
+    const [rma] = await db.insert(rmas).values(insertRma).returning();
     return rma;
   }
 
   async updateRma(id: number, data: Partial<Rma>): Promise<Rma | undefined> {
-    const rma = this.rmas.get(id);
-    if (!rma) return undefined;
-
-    const updatedRma = { ...rma, ...data };
-    this.rmas.set(id, updatedRma);
-    return updatedRma;
+    const [updated] = await db.update(rmas).set(data).where(eq(rmas.id, id)).returning();
+    return updated || undefined;
   }
 
   // Water project operations
   async getWaterProjects(): Promise<WaterProject[]> {
-    return Array.from(this.waterProjects.values());
+    return db.select().from(waterProjects);
   }
 
   async getWaterProject(id: number): Promise<WaterProject | undefined> {
-    return this.waterProjects.get(id);
+    const [project] = await db.select().from(waterProjects).where(eq(waterProjects.id, id));
+    return project || undefined;
   }
 
   async createWaterProject(insertProject: InsertWaterProject): Promise<WaterProject> {
-    const id = this.currentWaterProjectId++;
-    const createdAt = new Date();
-    const project: WaterProject = { ...insertProject, id, createdAt };
-    this.waterProjects.set(id, project);
+    const [project] = await db.insert(waterProjects).values(insertProject).returning();
     return project;
   }
 
   // Support ticket operations
   async getSupportTicket(id: number): Promise<SupportTicket | undefined> {
-    return this.supportTickets.get(id);
+    const [ticket] = await db.select().from(supportTickets).where(eq(supportTickets.id, id));
+    return ticket || undefined;
   }
 
   async getSupportTicketsByUserId(userId: number): Promise<SupportTicket[]> {
-    return Array.from(this.supportTickets.values()).filter(
-      (ticket) => ticket.userId === userId,
-    );
+    return db.select().from(supportTickets).where(eq(supportTickets.userId, userId));
   }
 
   async createSupportTicket(insertTicket: InsertSupportTicket): Promise<SupportTicket> {
-    const id = this.currentSupportTicketId++;
-    const createdAt = new Date();
-    const updatedAt = new Date();
-    const ticketNumber = `ST-${String(id).padStart(4, '0')}`;
-    const ticket: SupportTicket = { ...insertTicket, id, ticketNumber, createdAt, updatedAt };
-    this.supportTickets.set(id, ticket);
+    const [ticket] = await db.insert(supportTickets).values(insertTicket).returning();
     return ticket;
   }
 
   async updateSupportTicket(id: number, data: Partial<SupportTicket>): Promise<SupportTicket | undefined> {
-    const ticket = this.supportTickets.get(id);
-    if (!ticket) return undefined;
-
-    const updatedAt = new Date();
-    const updatedTicket = { ...ticket, ...data, updatedAt };
-    this.supportTickets.set(id, updatedTicket);
-    return updatedTicket;
+    const [updated] = await db.update(supportTickets).set(data).where(eq(supportTickets.id, id)).returning();
+    return updated || undefined;
   }
 
   // Case study operations
   async getCaseStudy(id: number): Promise<CaseStudy | undefined> {
-    return this.caseStudies.get(id);
+    const [study] = await db.select().from(caseStudies).where(eq(caseStudies.id, id));
+    return study || undefined;
   }
 
   async getCaseStudiesByUserId(userId: number): Promise<CaseStudy[]> {
-    return Array.from(this.caseStudies.values()).filter(
-      (caseStudy) => caseStudy.userId === userId,
-    );
+    return db.select().from(caseStudies).where(eq(caseStudies.userId, userId));
   }
 
   async createCaseStudy(insertCaseStudy: InsertCaseStudy): Promise<CaseStudy> {
-    const id = this.currentCaseStudyId++;
-    const createdAt = new Date();
-    const caseStudy: CaseStudy = { 
-      ...insertCaseStudy, 
-      id, 
-      approved: false, 
-      featured: false, 
-      createdAt 
-    };
-    this.caseStudies.set(id, caseStudy);
-    return caseStudy;
+    const [study] = await db.insert(caseStudies).values(insertCaseStudy).returning();
+    return study;
   }
 
   async updateCaseStudy(id: number, data: Partial<CaseStudy>): Promise<CaseStudy | undefined> {
-    const caseStudy = this.caseStudies.get(id);
-    if (!caseStudy) return undefined;
-
-    const updatedCaseStudy = { ...caseStudy, ...data };
-    this.caseStudies.set(id, updatedCaseStudy);
-    return updatedCaseStudy;
+    const [updated] = await db.update(caseStudies).set(data).where(eq(caseStudies.id, id)).returning();
+    return updated || undefined;
   }
 
   // Delivery timeline operations
   async getDeliveryTimeline(orderId: number): Promise<DeliveryTimeline | undefined> {
-    return Array.from(this.deliveryTimelines.values()).find(timeline => timeline.orderId === orderId);
+    const [timeline] = await db.select().from(deliveryTimelines).where(eq(deliveryTimelines.orderId, orderId));
+    return timeline || undefined;
   }
 
   async createDeliveryTimeline(insertTimeline: InsertDeliveryTimeline): Promise<DeliveryTimeline> {
-    const id = this.deliveryTimelines.size + 1;
-    const createdAt = new Date();
-    const updatedAt = new Date();
-
-    const timeline: DeliveryTimeline = { 
-      ...insertTimeline, 
-      id, 
-      createdAt, 
-      updatedAt,
-      orderPlaced: true // First step is always completed when timeline is created
-    };
-    this.deliveryTimelines.set(id, timeline);
+    const [timeline] = await db.insert(deliveryTimelines).values({
+      ...insertTimeline,
+      orderPlaced: true // First step is always completed
+    }).returning();
     return timeline;
   }
 
   async updateDeliveryTimeline(orderId: number, data: Partial<DeliveryTimeline>): Promise<DeliveryTimeline | undefined> {
-    const timeline = await this.getDeliveryTimeline(orderId);
-    if (!timeline) return undefined;
-
-    const updatedTimeline = { ...timeline, ...data, updatedAt: new Date() };
-    this.deliveryTimelines.set(timeline.id, updatedTimeline);
-    return updatedTimeline;
+    const [updated] = await db.update(deliveryTimelines)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(deliveryTimelines.orderId, orderId))
+      .returning();
+    return updated || undefined;
   }
 }
 
-import { SqlStorage } from './sql-storage';
-
-// Use SQL storage for production
-export const storage = new SqlStorage();
+export const storage = new DatabaseStorage();
