@@ -18,6 +18,7 @@ import Remanufactured from "@/pages/remanufactured";
 import ESGReport from "@/pages/esg-report";
 import DeliveryTimeline from "@/pages/delivery-timeline";
 import WarrantyClaim from "@/pages/warranty-claim";
+import { AdminDashboard } from "@/pages/admin-dashboard";
 import { useEffect, useState } from "react";
 import { apiRequest } from "@/lib/queryClient";
 import Sidebar from "@/components/layout/sidebar";
@@ -143,6 +144,11 @@ function Router() {
       <Route path="/delivery-timeline">
         <ProtectedRoute>
           <DeliveryTimeline />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/admin">
+        <ProtectedRoute>
+          <AdminDashboard />
         </ProtectedRoute>
       </Route>
       <Route component={NotFound} />
