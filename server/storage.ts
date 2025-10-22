@@ -20,6 +20,8 @@ export interface IStorage {
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: number, data: Partial<User>): Promise<User | undefined>;
+  getAllUsers(): Promise<User[]>;
+  deleteUser(id: number): Promise<void>;
 
   // Order operations
   getOrder(id: number): Promise<Order | undefined>;
@@ -27,6 +29,8 @@ export interface IStorage {
   getOrdersByUserId(userId: number): Promise<Order[]>;
   createOrder(order: InsertOrder): Promise<Order>;
   updateOrder(id: number, data: Partial<Order>): Promise<Order | undefined>;
+  getAllOrders(): Promise<Order[]>;
+  deleteOrder(id: number): Promise<void>;
 
   // Order items operations
   getOrderItems(orderId: number): Promise<OrderItem[]>;
@@ -53,23 +57,30 @@ export interface IStorage {
   getRmasByUserId(userId: number): Promise<Rma[]>;
   createRma(rma: InsertRma): Promise<Rma>;
   updateRma(id: number, data: Partial<Rma>): Promise<Rma | undefined>;
+  getAllRmas(): Promise<Rma[]>;
+  deleteRma(id: number): Promise<void>;
 
   // Water project operations
   getWaterProjects(): Promise<WaterProject[]>;
   getWaterProject(id: number): Promise<WaterProject | undefined>;
   createWaterProject(project: InsertWaterProject): Promise<WaterProject>;
+  updateWaterProject(id: number, data: Partial<WaterProject>): Promise<WaterProject | undefined>;
+  deleteWaterProject(id: number): Promise<void>;
 
   // Support ticket operations
   getSupportTicket(id: number): Promise<SupportTicket | undefined>;
   getSupportTicketsByUserId(userId: number): Promise<SupportTicket[]>;
   createSupportTicket(ticket: InsertSupportTicket): Promise<SupportTicket>;
   updateSupportTicket(id: number, data: Partial<SupportTicket>): Promise<SupportTicket | undefined>;
+  getAllSupportTickets(): Promise<SupportTicket[]>;
+  deleteSupportTicket(id: number): Promise<void>;
 
   // Case study operations
   getCaseStudy(id: number): Promise<CaseStudy | undefined>;
   getCaseStudiesByUserId(userId: number): Promise<CaseStudy[]>;
   createCaseStudy(caseStudy: InsertCaseStudy): Promise<CaseStudy>;
   updateCaseStudy(id: number, data: Partial<CaseStudy>): Promise<CaseStudy | undefined>;
+  deleteCaseStudy(id: number): Promise<void>;
 
   // Delivery timeline operations
   getDeliveryTimeline(orderId: number): Promise<DeliveryTimeline | undefined>;
@@ -287,6 +298,52 @@ export class DatabaseStorage implements IStorage {
       .where(eq(deliveryTimelines.orderId, orderId))
       .returning();
     return updated || undefined;
+  }
+
+  // Admin methods
+  async getAllUsers(): Promise<User[]> {
+    return db.select().from(users);
+  }
+
+  async deleteUser(id: number): Promise<void> {
+    await db.delete(users).where(eq(users.id, id));
+  }
+
+  async getAllOrders(): Promise<Order[]> {
+    return db.select().from(orders);
+  }
+
+  async deleteOrder(id: number): Promise<void> {
+    await db.delete(orders).where(eq(orders.id, id));
+  }
+
+  async getAllRmas(): Promise<Rma[]> {
+    return db.select().from(rmas);
+  }
+
+  async deleteRma(id: number): Promise<void> {
+    await db.delete(rmas).where(eq(rmas.id, id));
+  }
+
+  async getAllSupportTickets(): Promise<SupportTicket[]> {
+    return db.select().from(supportTickets);
+  }
+
+  async deleteSupportTicket(id: number): Promise<void> {
+    await db.delete(supportTickets).where(eq(supportTickets.id, id));
+  }
+
+  async updateWaterProject(id: number, data: Partial<WaterProject>): Promise<WaterProject | undefined> {
+    const [updated] = await db.update(waterProjects).set(data).where(eq(waterProjects.id, id)).returning();
+    return updated || undefined;
+  }
+
+  async deleteWaterProject(id: number): Promise<void> {
+    await db.delete(waterProjects).where(eq(waterProjects.id, id));
+  }
+
+  async deleteCaseStudy(id: number): Promise<void> {
+    await db.delete(caseStudies).where(eq(caseStudies.id, id));
   }
 }
 

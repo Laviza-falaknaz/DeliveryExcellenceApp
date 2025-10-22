@@ -23,6 +23,7 @@ export async function seedDatabase() {
         company: "A2C",
         email: "lavizaniazi2001@gmail.com",
         phoneNumber: "+44 1234 567890",
+        isAdmin: true,
         notificationPreferences: {
           orderUpdates: true,
           environmentalImpact: true,

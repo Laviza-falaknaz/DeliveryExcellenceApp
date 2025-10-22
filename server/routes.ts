@@ -12,6 +12,7 @@ import {
   insertSupportTicketSchema,
   insertCaseStudySchema,
   insertDeliveryTimelineSchema,
+  insertWaterProjectSchema,
   User
 } from "@shared/schema";
 import session from "express-session";
@@ -20,6 +21,7 @@ import { Strategy as LocalStrategy } from "passport-local";
 import crypto from "crypto";
 import MemoryStore from "memorystore";
 import bcrypt from "bcryptjs";
+import { requireAdmin } from "./admin-middleware";
 
 declare module "express-session" {
   interface SessionData {
@@ -516,6 +518,179 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       res.json(timeline);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // ============ ADMIN ROUTES ============
+  
+  // Admin user management
+  app.get("/api/admin/users", requireAdmin, async (req, res) => {
+    try {
+      const users = await storage.getAllUsers();
+      res.json(users);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/admin/users", requireAdmin, async (req, res) => {
+    try {
+      const userData = insertUserSchema.parse(req.body);
+      const hashedPassword = await bcrypt.hash(userData.password, 10);
+      const user = await storage.createUser({
+        ...userData,
+        password: hashedPassword,
+      });
+      res.status(201).json(user);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: error.errors });
+      }
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.patch("/api/admin/users/:id", requireAdmin, async (req, res) => {
+    try {
+      const userId = parseInt(req.params.id);
+      const updateData = req.body;
+      
+      // Hash password if it's being updated
+      if (updateData.password) {
+        updateData.password = await bcrypt.hash(updateData.password, 10);
+      }
+      
+      const user = await storage.updateUser(userId, updateData);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      res.json(user);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.delete("/api/admin/users/:id", requireAdmin, async (req, res) => {
+    try {
+      const userId = parseInt(req.params.id);
+      await storage.deleteUser(userId);
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Admin order management
+  app.get("/api/admin/orders", requireAdmin, async (req, res) => {
+    try {
+      const orders = await storage.getAllOrders();
+      res.json(orders);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.delete("/api/admin/orders/:id", requireAdmin, async (req, res) => {
+    try {
+      const orderId = parseInt(req.params.id);
+      await storage.deleteOrder(orderId);
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Admin RMA management
+  app.get("/api/admin/rmas", requireAdmin, async (req, res) => {
+    try {
+      const rmas = await storage.getAllRmas();
+      res.json(rmas);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.delete("/api/admin/rmas/:id", requireAdmin, async (req, res) => {
+    try {
+      const rmaId = parseInt(req.params.id);
+      await storage.deleteRma(rmaId);
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Admin support ticket management
+  app.get("/api/admin/support-tickets", requireAdmin, async (req, res) => {
+    try {
+      const tickets = await storage.getAllSupportTickets();
+      res.json(tickets);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.delete("/api/admin/support-tickets/:id", requireAdmin, async (req, res) => {
+    try {
+      const ticketId = parseInt(req.params.id);
+      await storage.deleteSupportTicket(ticketId);
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Admin water project management
+  app.post("/api/admin/water-projects", requireAdmin, async (req, res) => {
+    try {
+      const projectData = insertWaterProjectSchema.parse(req.body);
+      const project = await storage.createWaterProject(projectData);
+      res.status(201).json(project);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: error.errors });
+      }
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.patch("/api/admin/water-projects/:id", requireAdmin, async (req, res) => {
+    try {
+      const projectId = parseInt(req.params.id);
+      const updateData = req.body;
+      
+      const project = await storage.updateWaterProject(projectId, updateData);
+      
+      if (!project) {
+        return res.status(404).json({ message: "Water project not found" });
+      }
+      
+      res.json(project);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.delete("/api/admin/water-projects/:id", requireAdmin, async (req, res) => {
+    try {
+      const projectId = parseInt(req.params.id);
+      await storage.deleteWaterProject(projectId);
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Admin case study management
+  app.delete("/api/admin/case-studies/:id", requireAdmin, async (req, res) => {
+    try {
+      const caseStudyId = parseInt(req.params.id);
+      await storage.deleteCaseStudy(caseStudyId);
+      res.status(204).send();
     } catch (error) {
       res.status(500).json({ message: "Internal server error" });
     }
