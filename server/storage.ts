@@ -8,7 +8,8 @@ import {
   waterProjects, WaterProject, InsertWaterProject,
   supportTickets, SupportTicket, InsertSupportTicket,
   caseStudies, CaseStudy, InsertCaseStudy,
-  deliveryTimelines, DeliveryTimeline, InsertDeliveryTimeline
+  deliveryTimelines, DeliveryTimeline, InsertDeliveryTimeline,
+  systemSettings, SystemSetting
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, sum } from "drizzle-orm";
@@ -86,6 +87,10 @@ export interface IStorage {
   getDeliveryTimeline(orderId: number): Promise<DeliveryTimeline | undefined>;
   createDeliveryTimeline(timeline: InsertDeliveryTimeline): Promise<DeliveryTimeline>;
   updateDeliveryTimeline(orderId: number, data: Partial<DeliveryTimeline>): Promise<DeliveryTimeline | undefined>;
+
+  // Theme settings operations
+  getThemeSettings(): Promise<any>;
+  saveThemeSettings(settings: any): Promise<any>;
 }
 
 // Database storage implementation using Drizzle ORM - blueprint:javascript_database
@@ -344,6 +349,31 @@ export class DatabaseStorage implements IStorage {
 
   async deleteCaseStudy(id: number): Promise<void> {
     await db.delete(caseStudies).where(eq(caseStudies.id, id));
+  }
+
+  // Theme settings operations
+  async getThemeSettings(): Promise<any> {
+    const [setting] = await db.select().from(systemSettings).where(eq(systemSettings.settingKey, 'theme'));
+    return setting?.settingValue || null;
+  }
+
+  async saveThemeSettings(settings: any): Promise<any> {
+    const [existing] = await db.select().from(systemSettings).where(eq(systemSettings.settingKey, 'theme'));
+    
+    if (existing) {
+      const [updated] = await db
+        .update(systemSettings)
+        .set({ settingValue: settings, updatedAt: new Date() })
+        .where(eq(systemSettings.settingKey, 'theme'))
+        .returning();
+      return updated.settingValue;
+    } else {
+      const [created] = await db
+        .insert(systemSettings)
+        .values({ settingKey: 'theme', settingValue: settings })
+        .returning();
+      return created.settingValue;
+    }
   }
 }
 

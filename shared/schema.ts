@@ -243,6 +243,28 @@ export const insertDeliveryTimelineSchema = createInsertSchema(deliveryTimelines
   updatedAt: true,
 });
 
+// System Settings schema
+export const systemSettings = pgTable("system_settings", {
+  id: serial("id").primaryKey(),
+  settingKey: text("setting_key").notNull().unique(),
+  settingValue: json("setting_value").$type<{
+    primaryColor?: string;
+    secondaryColor?: string;
+    accentColor?: string;
+    backgroundColor?: string;
+    headingFont?: string;
+    bodyFont?: string;
+    logoUrl?: string;
+    companyName?: string;
+  }>(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertSystemSettingsSchema = createInsertSchema(systemSettings).omit({
+  id: true,
+  updatedAt: true,
+});
+
 // Types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -273,3 +295,6 @@ export type InsertCaseStudy = z.infer<typeof insertCaseStudySchema>;
 
 export type DeliveryTimeline = typeof deliveryTimelines.$inferSelect;
 export type InsertDeliveryTimeline = z.infer<typeof insertDeliveryTimelineSchema>;
+
+export type SystemSetting = typeof systemSettings.$inferSelect;
+export type InsertSystemSetting = z.infer<typeof insertSystemSettingsSchema>;

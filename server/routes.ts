@@ -702,5 +702,104 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Theme settings routes
+  const themeSettingsSchema = z.object({
+    primaryColor: z.string().default("#0D9488"),
+    secondaryColor: z.string().default("#14B8A6"),
+    accentColor: z.string().default("#2DD4BF"),
+    backgroundColor: z.string().default("#FFFFFF"),
+    headingFont: z.string().default("Inter"),
+    bodyFont: z.string().default("Inter"),
+    logoUrl: z.string().default(""),
+    companyName: z.string().default("Circular Computing")
+  });
+
+  const defaultTheme = {
+    primaryColor: "#0D9488",
+    secondaryColor: "#14B8A6",
+    accentColor: "#2DD4BF",
+    backgroundColor: "#FFFFFF",
+    headingFont: "Inter",
+    bodyFont: "Inter",
+    logoUrl: "",
+    companyName: "Circular Computing"
+  };
+
+  app.get("/api/admin/theme", requireAdmin, async (req, res) => {
+    try {
+      const settings = await storage.getThemeSettings();
+      // Merge with defaults to ensure all fields are present
+      res.json({ ...defaultTheme, ...(settings || {}) });
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/admin/theme", requireAdmin, async (req, res) => {
+    try {
+      // Validate and apply defaults
+      const validated = themeSettingsSchema.parse(req.body);
+      const settings = await storage.saveThemeSettings(validated);
+      res.json({ ...defaultTheme, ...(settings || {}) });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid theme settings", errors: error.errors });
+      }
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Database connection info route
+  app.get("/api/admin/connection", requireAdmin, (req, res) => {
+    try {
+      const dbUrl = process.env.DATABASE_URL || "";
+      let maskedUrl = dbUrl;
+      
+      // Safely mask password by replacing everything between // and @ with username:****
+      try {
+        const urlObj = new URL(dbUrl);
+        if (urlObj.password) {
+          maskedUrl = dbUrl.replace(
+            new RegExp(`://${urlObj.username}:${urlObj.password.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}@`),
+            `://${urlObj.username}:****@`
+          );
+        }
+        
+        res.json({
+          development: {
+            host: urlObj.hostname,
+            port: urlObj.port || "5432",
+            database: urlObj.pathname.slice(1),
+            user: urlObj.username,
+            ssl: urlObj.searchParams.get("sslmode") === "require",
+            connectionString: maskedUrl
+          },
+          production: {
+            note: "Production database is managed separately by Replit. Use the Replit database pane to access production settings.",
+            managedBy: "Replit"
+          }
+        });
+      } catch (urlError) {
+        // Fallback if URL parsing fails
+        res.json({
+          development: {
+            host: "N/A",
+            port: "N/A",
+            database: "N/A",
+            user: "N/A",
+            ssl: false,
+            connectionString: "Unable to parse connection string"
+          },
+          production: {
+            note: "Production database is managed separately by Replit. Use the Replit database pane to access production settings.",
+            managedBy: "Replit"
+          }
+        });
+      }
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   return httpServer;
 }

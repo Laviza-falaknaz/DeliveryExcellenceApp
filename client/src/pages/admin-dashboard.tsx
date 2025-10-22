@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Users, ShoppingCart, Wrench, HelpCircle, Droplets, FileText, Palette } from "lucide-react";
+import { Users, ShoppingCart, Wrench, HelpCircle, Droplets, FileText, Palette, Database } from "lucide-react";
 import { UserManagement } from "./admin/user-management";
 import { OrderManagement } from "./admin/order-management";
 import { RMAManagement } from "./admin/rma-management";
@@ -9,6 +9,7 @@ import { SupportTicketManagement } from "./admin/support-ticket-management";
 import { WaterProjectManagement } from "./admin/water-project-management";
 import { CaseStudyManagement } from "./admin/case-study-management";
 import { ThemeSettings } from "./admin/theme-settings";
+import { ConnectionSettings } from "./admin/connection-settings";
 
 export function AdminDashboard() {
   const { data: stats } = useQuery({
@@ -70,7 +71,7 @@ export function AdminDashboard() {
         </div>
 
         <Tabs defaultValue="users" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-7">
+          <TabsList className="grid w-full grid-cols-8">
             <TabsTrigger value="users" data-testid="tab-users">
               <Users className="mr-2 h-4 w-4" />
               Users
@@ -98,6 +99,10 @@ export function AdminDashboard() {
             <TabsTrigger value="theme" data-testid="tab-theme">
               <Palette className="mr-2 h-4 w-4" />
               Theme
+            </TabsTrigger>
+            <TabsTrigger value="connection" data-testid="tab-connection">
+              <Database className="mr-2 h-4 w-4" />
+              Connection
             </TabsTrigger>
           </TabsList>
 
@@ -127,6 +132,10 @@ export function AdminDashboard() {
 
           <TabsContent value="theme" className="space-y-4">
             <ThemeSettings />
+          </TabsContent>
+
+          <TabsContent value="connection" className="space-y-4">
+            <ConnectionSettings />
           </TabsContent>
         </Tabs>
       </div>
