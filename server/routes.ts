@@ -801,5 +801,442 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ============================================
+  // External CRUD API Routes with Filtering
+  // ============================================
+  // Note: These routes are designed for external access with comprehensive filtering options
+
+  // Users API
+  app.get("/api/crud/users", requireAdmin, async (req, res) => {
+    try {
+      const { email, name, company } = req.query;
+      
+      if (email || name || company) {
+        const users = await storage.searchUsers({
+          email: email as string,
+          name: name as string,
+          company: company as string
+        });
+        return res.json(users.map(u => {
+          const { password, ...userWithoutPassword } = u;
+          return userWithoutPassword;
+        }));
+      }
+      
+      const users = await storage.getAllUsers();
+      res.json(users.map(u => {
+        const { password, ...userWithoutPassword } = u;
+        return userWithoutPassword;
+      }));
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.get("/api/crud/users/:id", requireAdmin, async (req, res) => {
+    try {
+      const user = await storage.getUser(parseInt(req.params.id));
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      const { password, ...userWithoutPassword } = user;
+      res.json(userWithoutPassword);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/crud/users", requireAdmin, async (req, res) => {
+    try {
+      const validated = insertUserSchema.parse(req.body);
+      const user = await storage.createUser(validated);
+      const { password, ...userWithoutPassword } = user;
+      res.status(201).json(userWithoutPassword);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.patch("/api/crud/users/:id", requireAdmin, async (req, res) => {
+    try {
+      const user = await storage.updateUser(parseInt(req.params.id), req.body);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      const { password, ...userWithoutPassword } = user;
+      res.json(userWithoutPassword);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.delete("/api/crud/users/:id", requireAdmin, async (req, res) => {
+    try {
+      await storage.deleteUser(parseInt(req.params.id));
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Orders API
+  app.get("/api/crud/orders", requireAdmin, async (req, res) => {
+    try {
+      const { orderNumber, userId, status } = req.query;
+      
+      if (orderNumber || userId || status) {
+        const orders = await storage.searchOrders({
+          orderNumber: orderNumber as string,
+          userId: userId ? parseInt(userId as string) : undefined,
+          status: status as string
+        });
+        return res.json(orders);
+      }
+      
+      const orders = await storage.getAllOrders();
+      res.json(orders);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.get("/api/crud/orders/:id", requireAdmin, async (req, res) => {
+    try {
+      const order = await storage.getOrder(parseInt(req.params.id));
+      if (!order) {
+        return res.status(404).json({ message: "Order not found" });
+      }
+      res.json(order);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/crud/orders", requireAdmin, async (req, res) => {
+    try {
+      const validated = insertOrderSchema.parse(req.body);
+      const order = await storage.createOrder(validated);
+      res.status(201).json(order);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.patch("/api/crud/orders/:id", requireAdmin, async (req, res) => {
+    try {
+      const order = await storage.updateOrder(parseInt(req.params.id), req.body);
+      if (!order) {
+        return res.status(404).json({ message: "Order not found" });
+      }
+      res.json(order);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.delete("/api/crud/orders/:id", requireAdmin, async (req, res) => {
+    try {
+      await storage.deleteOrder(parseInt(req.params.id));
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Order Items API
+  app.get("/api/crud/order-items", requireAdmin, async (req, res) => {
+    try {
+      const { orderId } = req.query;
+      
+      if (!orderId) {
+        return res.status(400).json({ message: "orderId query parameter is required" });
+      }
+      
+      const items = await storage.getOrderItems(parseInt(orderId as string));
+      res.json(items);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/crud/order-items", requireAdmin, async (req, res) => {
+    try {
+      const validated = insertOrderItemSchema.parse(req.body);
+      const item = await storage.createOrderItem(validated);
+      res.status(201).json(item);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // RMAs API
+  app.get("/api/crud/rmas", requireAdmin, async (req, res) => {
+    try {
+      const { rmaNumber, userId, status } = req.query;
+      
+      if (rmaNumber || userId || status) {
+        const rmas = await storage.searchRmas({
+          rmaNumber: rmaNumber as string,
+          userId: userId ? parseInt(userId as string) : undefined,
+          status: status as string
+        });
+        return res.json(rmas);
+      }
+      
+      const rmas = await storage.getAllRmas();
+      res.json(rmas);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.get("/api/crud/rmas/:id", requireAdmin, async (req, res) => {
+    try {
+      const rma = await storage.getRma(parseInt(req.params.id));
+      if (!rma) {
+        return res.status(404).json({ message: "RMA not found" });
+      }
+      res.json(rma);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/crud/rmas", requireAdmin, async (req, res) => {
+    try {
+      const validated = insertRmaSchema.parse(req.body);
+      const rma = await storage.createRma(validated);
+      res.status(201).json(rma);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.patch("/api/crud/rmas/:id", requireAdmin, async (req, res) => {
+    try {
+      const rma = await storage.updateRma(parseInt(req.params.id), req.body);
+      if (!rma) {
+        return res.status(404).json({ message: "RMA not found" });
+      }
+      res.json(rma);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.delete("/api/crud/rmas/:id", requireAdmin, async (req, res) => {
+    try {
+      await storage.deleteRma(parseInt(req.params.id));
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Support Tickets API
+  app.get("/api/crud/support-tickets", requireAdmin, async (req, res) => {
+    try {
+      const { ticketNumber, userId, status } = req.query;
+      
+      if (ticketNumber || userId || status) {
+        const tickets = await storage.searchSupportTickets({
+          ticketNumber: ticketNumber as string,
+          userId: userId ? parseInt(userId as string) : undefined,
+          status: status as string
+        });
+        return res.json(tickets);
+      }
+      
+      const tickets = await storage.getAllSupportTickets();
+      res.json(tickets);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.get("/api/crud/support-tickets/:id", requireAdmin, async (req, res) => {
+    try {
+      const ticket = await storage.getSupportTicket(parseInt(req.params.id));
+      if (!ticket) {
+        return res.status(404).json({ message: "Support ticket not found" });
+      }
+      res.json(ticket);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/crud/support-tickets", requireAdmin, async (req, res) => {
+    try {
+      const validated = insertSupportTicketSchema.parse(req.body);
+      const ticket = await storage.createSupportTicket(validated);
+      res.status(201).json(ticket);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.patch("/api/crud/support-tickets/:id", requireAdmin, async (req, res) => {
+    try {
+      const ticket = await storage.updateSupportTicket(parseInt(req.params.id), req.body);
+      if (!ticket) {
+        return res.status(404).json({ message: "Support ticket not found" });
+      }
+      res.json(ticket);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.delete("/api/crud/support-tickets/:id", requireAdmin, async (req, res) => {
+    try {
+      await storage.deleteSupportTicket(parseInt(req.params.id));
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Environmental Impact API
+  app.get("/api/crud/environmental-impact", requireAdmin, async (req, res) => {
+    try {
+      const { userId } = req.query;
+      
+      if (!userId) {
+        return res.status(400).json({ message: "userId query parameter is required" });
+      }
+      
+      const impacts = await storage.getEnvironmentalImpactByUserId(parseInt(userId as string));
+      res.json(impacts);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/crud/environmental-impact", requireAdmin, async (req, res) => {
+    try {
+      const validated = insertEnvironmentalImpactSchema.parse(req.body);
+      const impact = await storage.createEnvironmentalImpact(validated);
+      res.status(201).json(impact);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Water Projects API
+  app.get("/api/crud/water-projects", requireAdmin, async (req, res) => {
+    try {
+      const projects = await storage.getWaterProjects();
+      res.json(projects);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.get("/api/crud/water-projects/:id", requireAdmin, async (req, res) => {
+    try {
+      const project = await storage.getWaterProject(parseInt(req.params.id));
+      if (!project) {
+        return res.status(404).json({ message: "Water project not found" });
+      }
+      res.json(project);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/crud/water-projects", requireAdmin, async (req, res) => {
+    try {
+      const validated = insertWaterProjectSchema.parse(req.body);
+      const project = await storage.createWaterProject(validated);
+      res.status(201).json(project);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.patch("/api/crud/water-projects/:id", requireAdmin, async (req, res) => {
+    try {
+      const project = await storage.updateWaterProject(parseInt(req.params.id), req.body);
+      if (!project) {
+        return res.status(404).json({ message: "Water project not found" });
+      }
+      res.json(project);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.delete("/api/crud/water-projects/:id", requireAdmin, async (req, res) => {
+    try {
+      await storage.deleteWaterProject(parseInt(req.params.id));
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Delivery Timelines API
+  app.get("/api/crud/delivery-timelines", requireAdmin, async (req, res) => {
+    try {
+      const { orderId } = req.query;
+      
+      if (!orderId) {
+        return res.status(400).json({ message: "orderId query parameter is required" });
+      }
+      
+      const timeline = await storage.getDeliveryTimeline(parseInt(orderId as string));
+      res.json(timeline);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/crud/delivery-timelines", requireAdmin, async (req, res) => {
+    try {
+      const validated = insertDeliveryTimelineSchema.parse(req.body);
+      const timeline = await storage.createDeliveryTimeline(validated);
+      res.status(201).json(timeline);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.patch("/api/crud/delivery-timelines/:orderId", requireAdmin, async (req, res) => {
+    try {
+      const timeline = await storage.updateDeliveryTimeline(parseInt(req.params.orderId), req.body);
+      if (!timeline) {
+        return res.status(404).json({ message: "Delivery timeline not found" });
+      }
+      res.json(timeline);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   return httpServer;
 }
