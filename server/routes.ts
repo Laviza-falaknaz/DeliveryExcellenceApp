@@ -115,6 +115,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/auth/me", isAuthenticated, (req, res) => {
     const user = req.user as User;
     const { password, ...userWithoutPassword } = user;
+    console.log("User data in /api/auth/me:", JSON.stringify(userWithoutPassword, null, 2));
     res.json(userWithoutPassword);
   });
 
