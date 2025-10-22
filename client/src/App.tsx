@@ -52,6 +52,37 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   return isAuthenticated ? <>{children}</> : null;
 }
 
+function AdminProtectedRoute({ children }: { children: React.ReactNode }) {
+  const [isLoading, setIsLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [, setLocation] = useLocation();
+
+  useEffect(() => {
+    const checkAdmin = async () => {
+      try {
+        const user = await apiRequest("GET", "/api/auth/me");
+        if (user.isAdmin) {
+          setIsAdmin(true);
+        } else {
+          setLocation("/");
+        }
+      } catch (error) {
+        setLocation("/login");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkAdmin();
+  }, [setLocation]);
+
+  if (isLoading) {
+    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  }
+
+  return isAdmin ? <>{children}</> : null;
+}
+
 function AppLayout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
   
@@ -147,9 +178,9 @@ function Router() {
         </ProtectedRoute>
       </Route>
       <Route path="/admin">
-        <ProtectedRoute>
+        <AdminProtectedRoute>
           <AdminDashboard />
-        </ProtectedRoute>
+        </AdminProtectedRoute>
       </Route>
       <Route component={NotFound} />
     </Switch>
