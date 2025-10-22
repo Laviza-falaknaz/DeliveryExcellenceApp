@@ -8,12 +8,17 @@ The application emphasizes environmental impact visualization, showing users how
 
 ## Recent Updates (October 2025)
 
-### Azure SQL Database Migration & Backend Overhaul
+### PostgreSQL Database Migration (October 22, 2025)
+- **Database Migration**: Successfully migrated from Azure SQL Database to Replit's built-in PostgreSQL database (Neon-hosted PostgreSQL 16) with automatic test/production database separation. Removed all Azure SQL infrastructure including custom connection pooling, IP detection, and email notification systems.
+- **Drizzle ORM Integration**: Implemented complete type-safe database layer using Drizzle ORM with `@neondatabase/serverless` driver. All database operations now use the DatabaseStorage class with full TypeScript support.
+- **Automatic Database Seeding**: Created seed.ts script that automatically initializes database with test user and water projects on first application start. No manual database setup required.
+- **Simplified Architecture**: Removed complex Azure-specific infrastructure (db.ts connection pooling, sql-storage.ts, init-database.ts, email-service.ts, logger.ts) in favor of Replit's streamlined database integration.
+- **Schema Management**: Database schema is managed through Drizzle with `npm run db:push` for safe schema synchronization. All 13 tables (users, orders, orderItems, orderUpdates, environmentalImpact, rmas, waterProjects, supportTickets, caseStudies, deliveryTimelines, systemSettings, errorLogs, systemLogs) automatically created on deployment.
+- **Test Credentials**: Default test user remains `lavizaniazi2001@gmail.com` / `admin123` with bcrypt password hashing. Registration disabled for security.
+
+### Previous: Azure SQL Database Migration & Backend Overhaul (August 2025)
 - **Database Migration**: Successfully migrated from in-memory storage to Azure SQL Database (DeliveryExcellence) with comprehensive schema design including 13 tables for complete application functionality.
-- **Authentication Enhancement**: Updated authentication to use bcrypt password hashing. Registration is now disabled - users must be created by administrators. Default test user: `lavizaniazi2001@gmail.com` / `admin123`.
-- **IP Conflict Detection**: Implemented automatic IP conflict detection with email notifications to `laviza.falak@a2c.co.uk` when database firewall blocks connection. Current IP requiring whitelist: `34.14.140.197`.
-- **Dynamic Theming**: Created system settings table to store theme configuration (colors, fonts, logos) dynamically in database for easy updates without code changes.
-- **Comprehensive Logging**: All errors and system events are logged to database tables (`error_logs`, `system_logs`) with full request context including IP address, user agent, and stack traces.
+- **Authentication Enhancement**: Updated authentication to use bcrypt password hashing. Registration is now disabled - users must be created by administrators.
 - **SQL Storage Layer**: Implemented complete SQL storage adapter replacing in-memory storage, supporting all CRUD operations for users, orders, RMAs, support tickets, environmental impact, water projects, and case studies.
 
 ## Previous Updates (August 2025)
@@ -59,17 +64,19 @@ The backend follows a REST API architecture built on Node.js with Express:
 The server implements comprehensive logging, error handling, and serves both API endpoints and static assets including the built frontend application.
 
 ### Database Design
-The application uses Azure SQL Database (Microsoft SQL Server) for production data storage:
+The application uses Replit's built-in PostgreSQL database (Neon-hosted PostgreSQL 16) for production data storage:
 
-- **Database**: Azure SQL Database (DeliveryExcellence) hosted on `a2cwarehouse.database.windows.net`
-- **Connection**: mssql package with connection pooling and automatic retry logic
-- **Schema Design**: Relational database design with proper foreign key relationships and constraints
+- **Database**: Replit PostgreSQL with automatic test/production database separation
+- **ORM**: Drizzle ORM with `@neondatabase/serverless` driver for type-safe database operations
+- **Connection**: Automatic connection via DATABASE_URL environment variable with built-in connection pooling
+- **Schema Design**: Relational database design with proper foreign key relationships and constraints managed through Drizzle schema
 - **Key Entities**: Users, Orders, OrderItems, OrderUpdates, EnvironmentalImpact, RMAs, SupportTickets, WaterProjects, CaseStudies, DeliveryTimelines
 - **System Tables**: SystemSettings (dynamic theming), ErrorLogs, SystemLogs for monitoring and configuration
-- **Data Types**: Comprehensive type definitions with NVARCHAR(MAX) for JSON fields supporting complex data structures
-- **Initialization**: Automatic schema creation and data seeding on server startup
+- **Data Types**: PostgreSQL native types including serial (auto-increment), varchar, text, integer, timestamp, boolean, and jsonb for complex data structures
+- **Schema Management**: `npm run db:push` syncs Drizzle schema to database safely without manual migrations
+- **Initialization**: Automatic schema creation and data seeding on first application start via seed.ts script
 
-The database schema supports the full customer lifecycle from order placement through delivery and ongoing support, with detailed tracking of environmental impact metrics, comprehensive error logging, and dynamic theme configuration.
+The database schema supports the full customer lifecycle from order placement through delivery and ongoing support, with detailed tracking of environmental impact metrics, comprehensive error logging, and dynamic theme configuration. Replit's database provides automatic rollback capabilities and easy production/development environment separation.
 
 ### Authentication & Authorization
 The application implements session-based authentication with the following approach:
@@ -83,11 +90,10 @@ The application implements session-based authentication with the following appro
 ### External Service Integration
 The platform integrates with several external services and resources:
 
-- **Azure SQL Database**: Production database hosted on Azure with automatic IP conflict detection and notification
+- **Replit PostgreSQL**: Built-in database with automatic test/production separation and rollback capabilities
 - **Asset Management**: Static asset serving for images and attachments via Express middleware
 - **Charity Integration**: Visual integration with charity: water projects and impact tracking
 - **External Links**: Deep integration with Circular Computing's main website and external warranty systems
-- **Email Notifications**: Automated email alerts for database connection issues (IP conflicts) sent to `laviza.falak@a2c.co.uk`
 - **Logging & Monitoring**: Database-backed error logging and system event tracking for debugging and auditing
 
 ### Environmental Impact Tracking
@@ -105,8 +111,8 @@ The architecture prioritizes scalability, maintainability, and user experience w
 ### Core Technologies
 - **Node.js/Express**: Backend framework with TypeScript support
 - **React**: Frontend framework with Vite build tooling
-- **Azure SQL Database**: Production database (DeliveryExcellence on a2cwarehouse.database.windows.net)
-- **mssql**: SQL Server client for Node.js with connection pooling
+- **Replit PostgreSQL**: Built-in PostgreSQL database (Neon-hosted PostgreSQL 16)
+- **Drizzle ORM**: Type-safe SQL ORM with `@neondatabase/serverless` driver
 - **bcryptjs**: Password hashing for secure authentication
 
 ### Authentication & Session Management
