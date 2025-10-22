@@ -115,7 +115,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/auth/me", isAuthenticated, (req, res) => {
     const user = req.user as User;
     const { password, ...userWithoutPassword } = user;
-    console.log("User data in /api/auth/me:", JSON.stringify(userWithoutPassword, null, 2));
+    console.log("=== /api/auth/me ===");
+    console.log("Full user object:", user);
+    console.log("isAdmin field:", user?.isAdmin);
+    console.log("User without password:", userWithoutPassword);
+    console.log("==================");
+    res.setHeader('Cache-Control', 'no-store');
     res.json(userWithoutPassword);
   });
 

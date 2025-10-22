@@ -60,7 +60,8 @@ function AdminProtectedRoute({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const checkAdmin = async () => {
       try {
-        const user = await apiRequest("GET", "/api/auth/me");
+        const response = await apiRequest("GET", "/api/auth/me");
+        const user = await response.json();
         if (user.isAdmin) {
           setIsAdmin(true);
         } else {
