@@ -13,6 +13,10 @@ import {
   insertCaseStudySchema,
   insertDeliveryTimelineSchema,
   insertWaterProjectSchema,
+  insertAchievementSchema,
+  insertMilestoneSchema,
+  insertUserProgressSchema,
+  insertActivityLogSchema,
   User
 } from "@shared/schema";
 import session from "express-session";
@@ -100,9 +104,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
-  app.post("/api/auth/login", passport.authenticate("local"), (req, res) => {
+  app.post("/api/auth/login", passport.authenticate("local"), async (req, res) => {
     const user = req.user as User;
     const { password, ...userWithoutPassword } = user;
+    
+    try {
+      const progress = await storage.getUserProgress(user.id);
+      if (!progress) {
+        await storage.createUserProgress({
+          userId: user.id,
+          level: 1,
+          experiencePoints: 0,
+          totalPoints: 0,
+          currentStreak: 0,
+          longestStreak: 0,
+        });
+      }
+      
+      await storage.updateStreak(user.id);
+      
+      await storage.createActivityLog({
+        userId: user.id,
+        activityType: "login",
+        description: "User logged in",
+        pointsEarned: 10,
+      });
+      
+      await storage.addExperiencePoints(user.id, 10);
+    } catch (error) {
+      console.error("Error initializing user progress:", error);
+    }
+    
     res.json(userWithoutPassword);
   });
 
@@ -1233,6 +1265,250 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Delivery timeline not found" });
       }
       res.json(timeline);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // ====================
+  // GAMIFICATION ROUTES
+  // ====================
+
+  // Achievement Routes
+  app.get("/api/gamification/achievements", isAuthenticated, async (req, res) => {
+    try {
+      const achievements = await storage.getAllAchievements();
+      res.json(achievements);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.get("/api/gamification/achievements/:id", isAuthenticated, async (req, res) => {
+    try {
+      const achievement = await storage.getAchievement(parseInt(req.params.id));
+      if (!achievement) {
+        return res.status(404).json({ message: "Achievement not found" });
+      }
+      res.json(achievement);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/gamification/achievements", requireAdmin, async (req, res) => {
+    try {
+      const validated = insertAchievementSchema.parse(req.body);
+      const achievement = await storage.createAchievement(validated);
+      res.status(201).json(achievement);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.patch("/api/gamification/achievements/:id", requireAdmin, async (req, res) => {
+    try {
+      const achievement = await storage.updateAchievement(parseInt(req.params.id), req.body);
+      if (!achievement) {
+        return res.status(404).json({ message: "Achievement not found" });
+      }
+      res.json(achievement);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.delete("/api/gamification/achievements/:id", requireAdmin, async (req, res) => {
+    try {
+      await storage.deleteAchievement(parseInt(req.params.id));
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // User Achievement Routes
+  app.get("/api/gamification/user-achievements", isAuthenticated, async (req, res) => {
+    try {
+      const user = req.user as User;
+      const userAchievements = await storage.getUserAchievementWithDetails(user.id);
+      res.json(userAchievements);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/gamification/user-achievements/unlock", isAuthenticated, async (req, res) => {
+    try {
+      const user = req.user as User;
+      
+      const unlockSchema = z.object({
+        achievementId: z.number().int().positive(),
+      });
+      
+      const validated = unlockSchema.parse(req.body);
+      const { achievementId } = validated;
+      
+      const achievement = await storage.getAchievement(achievementId);
+      if (!achievement) {
+        return res.status(404).json({ message: "Achievement not found" });
+      }
+      
+      const hasIt = await storage.hasAchievement(user.id, achievementId);
+      if (hasIt) {
+        return res.status(400).json({ message: "Achievement already unlocked" });
+      }
+
+      const unlocked = await storage.unlockAchievement(user.id, achievementId);
+      
+      await storage.addExperiencePoints(user.id, achievement.points);
+      await storage.createActivityLog({
+        userId: user.id,
+        activityType: "achievement_unlocked",
+        description: `Unlocked achievement: ${achievement.name}`,
+        pointsEarned: achievement.points,
+      });
+
+      res.status(201).json(unlocked);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Milestone Routes
+  app.get("/api/gamification/milestones", isAuthenticated, async (req, res) => {
+    try {
+      const milestones = await storage.getAllMilestones();
+      res.json(milestones);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/gamification/milestones", requireAdmin, async (req, res) => {
+    try {
+      const validated = insertMilestoneSchema.parse(req.body);
+      const milestone = await storage.createMilestone(validated);
+      res.status(201).json(milestone);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.patch("/api/gamification/milestones/:id", requireAdmin, async (req, res) => {
+    try {
+      const milestone = await storage.updateMilestone(parseInt(req.params.id), req.body);
+      if (!milestone) {
+        return res.status(404).json({ message: "Milestone not found" });
+      }
+      res.json(milestone);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.delete("/api/gamification/milestones/:id", requireAdmin, async (req, res) => {
+    try {
+      await storage.deleteMilestone(parseInt(req.params.id));
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // User Progress Routes
+  app.get("/api/gamification/user-progress", isAuthenticated, async (req, res) => {
+    try {
+      const user = req.user as User;
+      let progress = await storage.getUserProgress(user.id);
+      
+      if (!progress) {
+        progress = await storage.createUserProgress({
+          userId: user.id,
+          level: 1,
+          experiencePoints: 0,
+          totalPoints: 0,
+          currentStreak: 0,
+          longestStreak: 0,
+        });
+      }
+      
+      res.json(progress);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/gamification/user-progress/add-points", isAuthenticated, async (req, res) => {
+    try {
+      const user = req.user as User;
+      const { points } = req.body;
+      
+      if (!points || points <= 0) {
+        return res.status(400).json({ message: "Points must be a positive number" });
+      }
+      
+      const progress = await storage.addExperiencePoints(user.id, points);
+      res.json(progress);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/gamification/user-progress/update-streak", isAuthenticated, async (req, res) => {
+    try {
+      const user = req.user as User;
+      const progress = await storage.updateStreak(user.id);
+      res.json(progress);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Activity Log Routes
+  app.get("/api/gamification/activity-log", isAuthenticated, async (req, res) => {
+    try {
+      const user = req.user as User;
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 50;
+      const activities = await storage.getActivityLog(user.id, limit);
+      res.json(activities);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/gamification/activity-log", isAuthenticated, async (req, res) => {
+    try {
+      const user = req.user as User;
+      const validated = insertActivityLogSchema.parse({
+        ...req.body,
+        userId: user.id,
+      });
+      const log = await storage.createActivityLog(validated);
+      res.status(201).json(log);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.get("/api/gamification/recent-activity", isAuthenticated, async (req, res) => {
+    try {
+      const user = req.user as User;
+      const days = req.query.days ? parseInt(req.query.days as string) : 7;
+      const activities = await storage.getRecentActivity(user.id, days);
+      res.json(activities);
     } catch (error) {
       res.status(500).json({ message: "Internal server error" });
     }

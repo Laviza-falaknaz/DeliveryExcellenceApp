@@ -9,7 +9,12 @@ import {
   supportTickets, SupportTicket, InsertSupportTicket,
   caseStudies, CaseStudy, InsertCaseStudy,
   deliveryTimelines, DeliveryTimeline, InsertDeliveryTimeline,
-  systemSettings, SystemSetting
+  systemSettings, SystemSetting,
+  achievements, Achievement, InsertAchievement,
+  userAchievements, UserAchievement, InsertUserAchievement,
+  milestones, Milestone, InsertMilestone,
+  userProgress, UserProgress, InsertUserProgress,
+  activityLog, ActivityLog, InsertActivityLog
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, sum, like, and } from "drizzle-orm";
@@ -97,6 +102,39 @@ export interface IStorage {
   // Theme settings operations
   getThemeSettings(): Promise<any>;
   saveThemeSettings(settings: any): Promise<any>;
+
+  // Gamification: Achievement operations
+  getAllAchievements(): Promise<Achievement[]>;
+  getAchievement(id: number): Promise<Achievement | undefined>;
+  createAchievement(achievement: InsertAchievement): Promise<Achievement>;
+  updateAchievement(id: number, data: Partial<Achievement>): Promise<Achievement | undefined>;
+  deleteAchievement(id: number): Promise<void>;
+
+  // Gamification: User Achievement operations
+  getUserAchievements(userId: number): Promise<UserAchievement[]>;
+  getUserAchievementWithDetails(userId: number): Promise<(UserAchievement & { achievement: Achievement })[]>;
+  unlockAchievement(userId: number, achievementId: number): Promise<UserAchievement>;
+  hasAchievement(userId: number, achievementId: number): Promise<boolean>;
+  markNotificationSent(userAchievementId: number): Promise<void>;
+
+  // Gamification: Milestone operations
+  getAllMilestones(): Promise<Milestone[]>;
+  getMilestone(id: number): Promise<Milestone | undefined>;
+  createMilestone(milestone: InsertMilestone): Promise<Milestone>;
+  updateMilestone(id: number, data: Partial<Milestone>): Promise<Milestone | undefined>;
+  deleteMilestone(id: number): Promise<void>;
+
+  // Gamification: User Progress operations
+  getUserProgress(userId: number): Promise<UserProgress | undefined>;
+  createUserProgress(progress: InsertUserProgress): Promise<UserProgress>;
+  updateUserProgress(userId: number, data: Partial<UserProgress>): Promise<UserProgress | undefined>;
+  addExperiencePoints(userId: number, points: number): Promise<UserProgress | undefined>;
+  updateStreak(userId: number): Promise<UserProgress | undefined>;
+
+  // Gamification: Activity Log operations
+  getActivityLog(userId: number, limit?: number): Promise<ActivityLog[]>;
+  createActivityLog(log: InsertActivityLog): Promise<ActivityLog>;
+  getRecentActivity(userId: number, days: number): Promise<ActivityLog[]>;
 }
 
 // Database storage implementation using Drizzle ORM - blueprint:javascript_database
@@ -470,6 +508,202 @@ export class DatabaseStorage implements IStorage {
         .returning();
       return created.settingValue;
     }
+  }
+
+  // Gamification: Achievement operations
+  async getAllAchievements(): Promise<Achievement[]> {
+    return db.select().from(achievements).where(eq(achievements.isActive, true));
+  }
+
+  async getAchievement(id: number): Promise<Achievement | undefined> {
+    const [achievement] = await db.select().from(achievements).where(eq(achievements.id, id));
+    return achievement || undefined;
+  }
+
+  async createAchievement(insertAchievement: InsertAchievement): Promise<Achievement> {
+    const [achievement] = await db.insert(achievements).values(insertAchievement).returning();
+    return achievement;
+  }
+
+  async updateAchievement(id: number, data: Partial<Achievement>): Promise<Achievement | undefined> {
+    const [updated] = await db.update(achievements).set(data).where(eq(achievements.id, id)).returning();
+    return updated || undefined;
+  }
+
+  async deleteAchievement(id: number): Promise<void> {
+    await db.delete(achievements).where(eq(achievements.id, id));
+  }
+
+  // Gamification: User Achievement operations
+  async getUserAchievements(userId: number): Promise<UserAchievement[]> {
+    return db.select().from(userAchievements).where(eq(userAchievements.userId, userId));
+  }
+
+  async getUserAchievementWithDetails(userId: number): Promise<(UserAchievement & { achievement: Achievement })[]> {
+    const result = await db
+      .select({
+        id: userAchievements.id,
+        userId: userAchievements.userId,
+        achievementId: userAchievements.achievementId,
+        unlockedAt: userAchievements.unlockedAt,
+        notificationSent: userAchievements.notificationSent,
+        achievement: achievements,
+      })
+      .from(userAchievements)
+      .innerJoin(achievements, eq(userAchievements.achievementId, achievements.id))
+      .where(eq(userAchievements.userId, userId));
+    
+    return result as any;
+  }
+
+  async unlockAchievement(userId: number, achievementId: number): Promise<UserAchievement> {
+    const [unlocked] = await db.insert(userAchievements).values({
+      userId,
+      achievementId,
+      notificationSent: false,
+    }).returning();
+    return unlocked;
+  }
+
+  async hasAchievement(userId: number, achievementId: number): Promise<boolean> {
+    const [existing] = await db
+      .select()
+      .from(userAchievements)
+      .where(and(
+        eq(userAchievements.userId, userId),
+        eq(userAchievements.achievementId, achievementId)
+      ));
+    return !!existing;
+  }
+
+  async markNotificationSent(userAchievementId: number): Promise<void> {
+    await db.update(userAchievements)
+      .set({ notificationSent: true })
+      .where(eq(userAchievements.id, userAchievementId));
+  }
+
+  // Gamification: Milestone operations
+  async getAllMilestones(): Promise<Milestone[]> {
+    return db.select().from(milestones).where(eq(milestones.isActive, true));
+  }
+
+  async getMilestone(id: number): Promise<Milestone | undefined> {
+    const [milestone] = await db.select().from(milestones).where(eq(milestones.id, id));
+    return milestone || undefined;
+  }
+
+  async createMilestone(insertMilestone: InsertMilestone): Promise<Milestone> {
+    const [milestone] = await db.insert(milestones).values(insertMilestone).returning();
+    return milestone;
+  }
+
+  async updateMilestone(id: number, data: Partial<Milestone>): Promise<Milestone | undefined> {
+    const [updated] = await db.update(milestones).set(data).where(eq(milestones.id, id)).returning();
+    return updated || undefined;
+  }
+
+  async deleteMilestone(id: number): Promise<void> {
+    await db.delete(milestones).where(eq(milestones.id, id));
+  }
+
+  // Gamification: User Progress operations
+  async getUserProgress(userId: number): Promise<UserProgress | undefined> {
+    const [progress] = await db.select().from(userProgress).where(eq(userProgress.userId, userId));
+    return progress || undefined;
+  }
+
+  async createUserProgress(insertProgress: InsertUserProgress): Promise<UserProgress> {
+    const [progress] = await db.insert(userProgress).values(insertProgress).returning();
+    return progress;
+  }
+
+  async updateUserProgress(userId: number, data: Partial<UserProgress>): Promise<UserProgress | undefined> {
+    const [updated] = await db.update(userProgress)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(userProgress.userId, userId))
+      .returning();
+    return updated || undefined;
+  }
+
+  async addExperiencePoints(userId: number, points: number): Promise<UserProgress | undefined> {
+    const current = await this.getUserProgress(userId);
+    if (!current) {
+      return this.createUserProgress({
+        userId,
+        experiencePoints: points,
+        totalPoints: points,
+        level: 1,
+        currentStreak: 0,
+        longestStreak: 0,
+      });
+    }
+
+    const newXP = current.experiencePoints + points;
+    const newTotal = current.totalPoints + points;
+    const newLevel = Math.floor(newXP / 1000) + 1;
+
+    return this.updateUserProgress(userId, {
+      experiencePoints: newXP,
+      totalPoints: newTotal,
+      level: newLevel > current.level ? newLevel : current.level,
+    });
+  }
+
+  async updateStreak(userId: number): Promise<UserProgress | undefined> {
+    const current = await this.getUserProgress(userId);
+    if (!current) {
+      return this.createUserProgress({
+        userId,
+        currentStreak: 1,
+        longestStreak: 1,
+        experiencePoints: 0,
+        totalPoints: 0,
+        level: 1,
+      });
+    }
+
+    const lastActivity = current.lastActivityDate ? new Date(current.lastActivityDate) : new Date(0);
+    const now = new Date();
+    const daysDiff = Math.floor((now.getTime() - lastActivity.getTime()) / (1000 * 60 * 60 * 24));
+
+    let newStreak = current.currentStreak;
+    if (daysDiff === 1) {
+      newStreak = current.currentStreak + 1;
+    } else if (daysDiff > 1) {
+      newStreak = 1;
+    }
+
+    const newLongest = Math.max(newStreak, current.longestStreak);
+
+    return this.updateUserProgress(userId, {
+      currentStreak: newStreak,
+      longestStreak: newLongest,
+      lastActivityDate: now,
+    });
+  }
+
+  // Gamification: Activity Log operations
+  async getActivityLog(userId: number, limit: number = 50): Promise<ActivityLog[]> {
+    return db.select()
+      .from(activityLog)
+      .where(eq(activityLog.userId, userId))
+      .orderBy(activityLog.createdAt)
+      .limit(limit);
+  }
+
+  async createActivityLog(insertLog: InsertActivityLog): Promise<ActivityLog> {
+    const [log] = await db.insert(activityLog).values(insertLog).returning();
+    return log;
+  }
+
+  async getRecentActivity(userId: number, days: number): Promise<ActivityLog[]> {
+    const date = new Date();
+    date.setDate(date.getDate() - days);
+    
+    return db.select()
+      .from(activityLog)
+      .where(eq(activityLog.userId, userId))
+      .orderBy(activityLog.createdAt);
   }
 }
 

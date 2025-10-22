@@ -298,3 +298,129 @@ export type InsertDeliveryTimeline = z.infer<typeof insertDeliveryTimelineSchema
 
 export type SystemSetting = typeof systemSettings.$inferSelect;
 export type InsertSystemSetting = z.infer<typeof insertSystemSettingsSchema>;
+
+// Gamification: Achievement definitions
+export const achievementCategoryEnum = pgEnum("achievement_category", [
+  "environmental",
+  "orders",
+  "engagement",
+  "milestones",
+  "social",
+]);
+
+export const achievements = pgTable("achievements", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  description: text("description").notNull(),
+  category: achievementCategoryEnum("category").notNull(),
+  icon: text("icon").notNull(), // Remix icon class
+  badgeColor: text("badge_color").notNull(), // Hex color
+  points: integer("points").notNull().default(100),
+  criteria: json("criteria").$type<{
+    type: string; // e.g., "orders_count", "carbon_saved", "water_provided"
+    threshold: number;
+  }>().notNull(),
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertAchievementSchema = createInsertSchema(achievements).omit({
+  id: true,
+  createdAt: true,
+});
+
+// Gamification: User achievements (junction table)
+export const userAchievements = pgTable("user_achievements", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id),
+  achievementId: integer("achievement_id").notNull().references(() => achievements.id),
+  unlockedAt: timestamp("unlocked_at").defaultNow(),
+  notificationSent: boolean("notification_sent").default(false),
+});
+
+export const insertUserAchievementSchema = createInsertSchema(userAchievements).omit({
+  id: true,
+  unlockedAt: true,
+});
+
+// Gamification: Milestones configuration
+export const milestones = pgTable("milestones", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  description: text("description").notNull(),
+  metricType: text("metric_type").notNull(), // "carbon_saved", "water_provided", etc.
+  targetValue: integer("target_value").notNull(),
+  rewardPoints: integer("reward_points").notNull().default(500),
+  icon: text("icon").notNull(),
+  color: text("color").notNull(),
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertMilestoneSchema = createInsertSchema(milestones).omit({
+  id: true,
+  createdAt: true,
+});
+
+// Gamification: User progress (level, points, streaks)
+export const userProgress = pgTable("user_progress", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().unique().references(() => users.id),
+  level: integer("level").notNull().default(1),
+  experiencePoints: integer("experience_points").notNull().default(0),
+  totalPoints: integer("total_points").notNull().default(0),
+  currentStreak: integer("current_streak").notNull().default(0), // Days logged in consecutively
+  longestStreak: integer("longest_streak").notNull().default(0),
+  lastActivityDate: timestamp("last_activity_date").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertUserProgressSchema = createInsertSchema(userProgress).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+// Gamification: Activity log
+export const activityTypeEnum = pgEnum("activity_type", [
+  "login",
+  "order_placed",
+  "rma_created",
+  "support_ticket",
+  "impact_shared",
+  "profile_updated",
+  "milestone_reached",
+  "achievement_unlocked",
+]);
+
+export const activityLog = pgTable("activity_log", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id),
+  activityType: activityTypeEnum("activity_type").notNull(),
+  description: text("description").notNull(),
+  pointsEarned: integer("points_earned").default(0),
+  metadata: json("metadata").$type<Record<string, any>>(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertActivityLogSchema = createInsertSchema(activityLog).omit({
+  id: true,
+  createdAt: true,
+});
+
+// Types
+export type Achievement = typeof achievements.$inferSelect;
+export type InsertAchievement = z.infer<typeof insertAchievementSchema>;
+
+export type UserAchievement = typeof userAchievements.$inferSelect;
+export type InsertUserAchievement = z.infer<typeof insertUserAchievementSchema>;
+
+export type Milestone = typeof milestones.$inferSelect;
+export type InsertMilestone = z.infer<typeof insertMilestoneSchema>;
+
+export type UserProgress = typeof userProgress.$inferSelect;
+export type InsertUserProgress = z.infer<typeof insertUserProgressSchema>;
+
+export type ActivityLog = typeof activityLog.$inferSelect;
+export type InsertActivityLog = z.infer<typeof insertActivityLogSchema>;

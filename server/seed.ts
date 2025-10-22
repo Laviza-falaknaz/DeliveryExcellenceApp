@@ -2,6 +2,7 @@ import { db } from "./db";
 import { users, waterProjects } from "@shared/schema";
 import bcrypt from "bcryptjs";
 import { eq } from "drizzle-orm";
+import { seedGamificationData } from "./gamification-seed";
 
 export async function seedDatabase() {
   console.log("🌱 Starting database seeding...");
@@ -70,6 +71,9 @@ export async function seedDatabase() {
       
       console.log("✅ Water projects created");
     }
+
+    // Seed gamification data
+    await seedGamificationData();
 
     console.log("✅ Database seeding completed successfully");
   } catch (error) {
