@@ -149,6 +149,18 @@ export default function Sidebar() {
             Profile Settings
           </NavItem>
         </NavSection>
+
+        {user?.isAdmin && (
+          <NavSection title="Administration">
+            <NavItem
+              href="/admin"
+              icon="ri-admin-line"
+              active={location === "/admin"}
+            >
+              Admin Portal
+            </NavItem>
+          </NavSection>
+        )}
       </div>
 
       {user && (

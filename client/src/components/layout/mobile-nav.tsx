@@ -192,6 +192,25 @@ export default function MobileNav() {
                     </Link>
                   </nav>
                 </div>
+
+                {user?.isAdmin && (
+                  <div className="px-4 py-2 mt-2">
+                    <h3 className="text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-2">
+                      Administration
+                    </h3>
+                    <nav className="space-y-1">
+                      <Link href="/admin" onClick={() => setOpen(false)}>
+                        <div className={cn(
+                          "flex items-center px-2 py-2 rounded-md text-neutral-700 hover:bg-neutral-100 cursor-pointer",
+                          location === "/admin" && "bg-primary-light/10 text-primary font-medium"
+                        )}>
+                          <i className="ri-admin-line text-xl mr-3"></i>
+                          <span>Admin Portal</span>
+                        </div>
+                      </Link>
+                    </nav>
+                  </div>
+                )}
               </div>
 
               {user && (
