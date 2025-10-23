@@ -8,9 +8,14 @@ import CaseStudyBanner from "@/components/dashboard/case-study-banner";
 import SupportResources from "@/components/dashboard/support-resources";
 import NotificationBanner from "@/components/dashboard/notification-banner";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "wouter";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState, useEffect } from "react";
+import { Trophy, Zap, TrendingUp, Award } from "lucide-react";
+import UserProfileCard from "@/components/gamification/user-profile-card";
+import AchievementCard from "@/components/gamification/achievement-card";
+import ProgressRing from "@/components/gamification/progress-ring";
 import carbonIcon from "@assets/Carbon Icon CC_1757591684851.png";
 import mineralsIcon from "@assets/Minerals Saved Icon CC _1757591709661.png";
 import resourceIcon from "@assets/Resource Pres Icon CC_1757592358474.png";
@@ -20,6 +25,18 @@ import waterDropletsIcon from "@assets/Minerals Saved Icon CC _1759311586728.png
 export default function Dashboard() {
   const { data: user } = useQuery({
     queryKey: ["/api/auth/me"],
+  });
+  
+  const { data: userProgress } = useQuery({
+    queryKey: ["/api/gamification/user-progress"],
+  });
+  
+  const { data: userAchievements = [] } = useQuery({
+    queryKey: ["/api/gamification/user-achievements"],
+  });
+  
+  const { data: activityLog = [] } = useQuery({
+    queryKey: ["/api/gamification/activity-log"],
   });
   
   const { getMostRecentActiveOrder, getPastOrders, isLoadingOrders } = useOrders();
@@ -35,26 +52,22 @@ export default function Dashboard() {
   // Used for notification banner
   const orderForNotification = activeOrder || recentPastOrder;
   
+  // Get recent unlocked achievements (top 3)
+  const recentAchievements = userAchievements.slice(0, 3);
+  
   return (
     <div className="py-6 px-4 md:px-8 max-w-7xl mx-auto">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-bold font-poppins text-neutral-900">
-            Welcome back, {user?.name?.split(' ')[0] || 'User'}!
-          </h1>
-          <p className="text-neutral-600">
-            Here's your latest sustainable impact and order status
-          </p>
-        </div>
-        <div className="mt-4 md:mt-0">
-          <Button 
-            onClick={() => window.open('https://circularcomputing.com/contact/', '_blank')}
-            variant="outline"
-          >
-            <i className="ri-phone-line mr-2"></i>
-            <span>Contact Us</span>
-          </Button>
-        </div>
+      {/* Gamified Header with User Profile */}
+      <div className="mb-6">
+        <UserProfileCard 
+          userName={user?.name || 'User'}
+          userEmail={user?.email || ''}
+          level={userProgress?.level || 1}
+          currentXP={userProgress?.experiencePoints || 0}
+          xpToNextLevel={100}
+          currentStreak={userProgress?.currentStreak || 0}
+          longestStreak={userProgress?.longestStreak || 0}
+        />
       </div>
 
       {orderForNotification && notificationVisible && (
@@ -78,9 +91,84 @@ export default function Dashboard() {
         />
       )}
 
+      {/* Achievements & Activity Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        <Card className="lg:col-span-2 border-[#08ABAB]/20 hover:border-[#08ABAB]/40 transition-all duration-300">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Trophy className="h-5 w-5 text-[#08ABAB]" />
+              Recent Achievements
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {recentAchievements.length > 0 ? (
+              <div className="space-y-3">
+                {recentAchievements.map((achievement: any) => (
+                  <AchievementCard
+                    key={achievement.id}
+                    achievement={achievement}
+                    size="small"
+                  />
+                ))}
+                <Button variant="outline" className="w-full mt-4" asChild>
+                  <Link href="/achievements">View All Achievements</Link>
+                </Button>
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <Award className="h-12 w-12 mx-auto text-neutral-300 mb-3" />
+                <p className="text-neutral-500">No achievements unlocked yet</p>
+                <p className="text-sm text-neutral-400 mt-1">Start your journey to unlock achievements!</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+        
+        <Card className="border-[#08ABAB]/20 hover:border-[#08ABAB]/40 transition-all duration-300">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <TrendingUp className="h-5 w-5 text-[#08ABAB]" />
+              Recent Activity
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {activityLog.length > 0 ? (
+              <div className="space-y-3">
+                {activityLog.slice(0, 5).map((activity: any) => (
+                  <div key={activity.id} className="flex items-start gap-3 p-3 rounded-lg bg-neutral-50 hover:bg-neutral-100 transition-colors">
+                    <div className="mt-1">
+                      <Zap className="h-4 w-4 text-[#08ABAB]" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-neutral-700 font-medium truncate">{activity.description}</p>
+                      <p className="text-xs text-neutral-500 mt-1">
+                        +{activity.pointsEarned} XP
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <Zap className="h-12 w-12 mx-auto text-neutral-300 mb-3" />
+                <p className="text-neutral-500">No activity yet</p>
+                <p className="text-sm text-neutral-400 mt-1">Your journey starts now!</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
       {/* Environmental Impact Section */}
       <section className="mb-8">
-        <h2 className="text-lg font-semibold font-poppins mb-4">Your Environmental Impact</h2>
+        <h2 className="text-lg font-semibold font-poppins mb-4 flex items-center gap-2">
+          Your Environmental Impact
+          {impact && (
+            <span className="text-sm font-normal text-neutral-500">
+              (Earning you XP!)
+            </span>
+          )}
+        </h2>
         {isLoadingImpact ? (
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             {[1, 2, 3, 4].map((i) => (
