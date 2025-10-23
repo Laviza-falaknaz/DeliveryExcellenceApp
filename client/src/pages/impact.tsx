@@ -6,10 +6,15 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
 import { formatEnvironmentalImpact } from "@/lib/utils";
+import { useQuery } from "@tanstack/react-query";
+import { Trophy, Star, TrendingUp } from "lucide-react";
+import { ProgressRing } from "@/components/gamification/progress-ring";
+import { Confetti } from "@/components/gamification/confetti";
 import carbonIcon from "@assets/Carbon Icon CC_1757609284710.png";
 import waterIcon from "@assets/CC_Icons_Weight increased-152_1759311452405.png";
 import waterDropletsIcon from "@assets/Minerals Saved Icon CC _1759311586728.png";
 import resourceIcon from "@assets/Resource Pres Icon CC_1757609329084.png";
+import { useState } from "react";
 import {
   LineChart,
   Line,
@@ -51,6 +56,11 @@ const COLORS = ["#4caf50", "#03a9f4", "#ffa726", "#f44336", "#9c27b0"];
 export default function Impact() {
   const { impact, isLoadingImpact } = useImpact();
   const { toast } = useToast();
+  const [showConfetti, setShowConfetti] = useState(false);
+  
+  const { data: milestones = [] } = useQuery({
+    queryKey: ["/api/gamification/milestones"],
+  });
 
   // Create personalized social media content
   const generateSocialContent = (platform: string) => {
@@ -180,6 +190,66 @@ Learn more about sustainable IT solutions: circularcomputing.com
         </div>
       </div>
 
+      {showConfetti && <Confetti />}
+      
+      {/* Milestone Progress Overview */}
+      {milestones.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-8"
+        >
+          <Card className="border-[#08ABAB]/20 bg-gradient-to-br from-[#08ABAB]/5 to-transparent">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Trophy className="h-5 w-5 text-[#08ABAB]" />
+                Impact Milestones
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                {milestones.slice(0, 4).map((milestone: any) => {
+                  const progress = impact ? 
+                    Math.min(100, (impact.carbonSaved / milestone.targetValue) * 100) : 0;
+                  const isCompleted = progress >= 100;
+                  
+                  return (
+                    <motion.div
+                      key={milestone.id}
+                      className="flex flex-col items-center"
+                      whileHover={{ scale: 1.05 }}
+                      onClick={() => {
+                        if (isCompleted) {
+                          setShowConfetti(true);
+                          setTimeout(() => setShowConfetti(false), 3000);
+                        }
+                      }}
+                    >
+                      <ProgressRing
+                        progress={progress}
+                        size={100}
+                        strokeWidth={8}
+                        color={isCompleted ? "#08ABAB" : "#d1d5db"}
+                      />
+                      <h4 className="text-sm font-medium mt-3 text-center">{milestone.name}</h4>
+                      <p className="text-xs text-neutral-500 text-center mt-1">
+                        {formatEnvironmentalImpact(milestone.targetValue, "g")}
+                      </p>
+                      {isCompleted && (
+                        <div className="flex items-center gap-1 mt-2 text-[#08ABAB]">
+                          <Star className="h-4 w-4 fill-current" />
+                          <span className="text-xs font-medium">Achieved!</span>
+                        </div>
+                      )}
+                    </motion.div>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
+
       {/* Impact Summary Cards */}
       <section className="mb-8 grid grid-cols-1 md:grid-cols-4 gap-4">
         {isLoadingImpact ? (
@@ -191,49 +261,52 @@ Learn more about sustainable IT solutions: circularcomputing.com
           </>
         ) : impact ? (
           <>
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <h3 className="text-sm font-medium text-neutral-500">
-                      Total Carbon Saved
-                    </h3>
-                    <p className="text-3xl font-bold mt-1">
-                      {formatEnvironmentalImpact(impact.carbonSaved, "g")}
-                    </p>
+            <motion.div whileHover={{ scale: 1.02 }} transition={{ duration: 0.2 }}>
+              <Card className="border-[#08ABAB]/20 hover:border-[#08ABAB]/40 transition-all">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <h3 className="text-sm font-medium text-neutral-500">
+                        Total Carbon Saved
+                      </h3>
+                      <p className="text-3xl font-bold mt-1">
+                        {formatEnvironmentalImpact(impact.carbonSaved, "g")}
+                      </p>
+                    </div>
+                    <div className="h-12 w-12 rounded-full bg-secondary/10 flex items-center justify-center">
+                      <img src={carbonIcon} alt="Carbon Icon" className="w-7 h-7" />
+                    </div>
                   </div>
-                  <div className="h-12 w-12 rounded-full bg-secondary/10 flex items-center justify-center">
-                    <img src={carbonIcon} alt="Carbon Icon" className="w-7 h-7" />
+                  <div className="mt-2">
+                    <div className="flex justify-between mb-1 text-sm">
+                      <span>Progress to 1 tonne</span>
+                      <span>
+                        {Math.round((impact.carbonSaved / 1000000) * 100)}%
+                      </span>
+                    </div>
+                    <Progress
+                      value={(impact.carbonSaved / 1000000) * 100}
+                      className="h-2"
+                    />
                   </div>
-                </div>
-                <div className="mt-2">
-                  <div className="flex justify-between mb-1 text-sm">
-                    <span>Progress to 1 tonne</span>
+                  <div className="mt-4 text-sm flex items-center text-[#08ABAB]">
+                    <TrendingUp className="h-4 w-4 mr-1" />
                     <span>
-                      {Math.round((impact.carbonSaved / 1000000) * 100)}%
+                      Equivalent to planting {impact.treesEquivalent} trees
                     </span>
-                  </div>
-                  <Progress
-                    value={(impact.carbonSaved / 1000000) * 100}
-                    className="h-2"
-                  />
-                </div>
-                <div className="mt-4 text-sm flex items-center text-[#08ABAB]">
-                  <i className="ri-arrow-up-line mr-1"></i>
-                  <span>
-                    Equivalent to planting {impact.treesEquivalent} trees
-                  </span>
                 </div>
               </CardContent>
             </Card>
+          </motion.div>
 
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <h3 className="text-sm font-medium text-neutral-500">
-                      Clean Water Provided
-                    </h3>
+            <motion.div whileHover={{ scale: 1.02 }} transition={{ duration: 0.2 }}>
+              <Card className="border-[#08ABAB]/20 hover:border-[#08ABAB]/40 transition-all">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <h3 className="text-sm font-medium text-neutral-500">
+                        Clean Water Provided
+                      </h3>
                     <p className="text-3xl font-bold mt-1">
                       {impact.familiesHelped}
                     </p>
@@ -255,14 +328,16 @@ Learn more about sustainable IT solutions: circularcomputing.com
                 </div>
               </CardContent>
             </Card>
+          </motion.div>
 
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <h3 className="text-sm font-medium text-neutral-500">
-                      Resource Preservation
-                    </h3>
+            <motion.div whileHover={{ scale: 1.02 }} transition={{ duration: 0.2 }}>
+              <Card className="border-[#08ABAB]/20 hover:border-[#08ABAB]/40 transition-all">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <h3 className="text-sm font-medium text-neutral-500">
+                        Resource Preservation
+                      </h3>
                     <p className="text-3xl font-bold mt-1">
                       {formatEnvironmentalImpact(impact.mineralsSaved, "g")}
                     </p>
@@ -284,14 +359,16 @@ Learn more about sustainable IT solutions: circularcomputing.com
                 </div>
               </CardContent>
             </Card>
+          </motion.div>
 
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <h3 className="text-sm font-medium text-neutral-500">
-                      Litres of Water Saved
-                    </h3>
+            <motion.div whileHover={{ scale: 1.02 }} transition={{ duration: 0.2 }}>
+              <Card className="border-[#08ABAB]/20 hover:border-[#08ABAB]/40 transition-all">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <h3 className="text-sm font-medium text-neutral-500">
+                        Litres of Water Saved
+                      </h3>
                     <p className="text-3xl font-bold mt-1">
                       {formatEnvironmentalImpact(impact.waterSaved || 0, "litres")}
                     </p>
@@ -313,6 +390,7 @@ Learn more about sustainable IT solutions: circularcomputing.com
                 </div>
               </CardContent>
             </Card>
+          </motion.div>
           </>
         ) : (
           <div className="md:col-span-4 p-8 text-center bg-white rounded-xl shadow-sm">

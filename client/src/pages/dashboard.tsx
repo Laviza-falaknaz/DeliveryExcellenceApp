@@ -13,9 +13,9 @@ import { Link } from "wouter";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState, useEffect } from "react";
 import { Trophy, Zap, TrendingUp, Award } from "lucide-react";
-import UserProfileCard from "@/components/gamification/user-profile-card";
-import AchievementCard from "@/components/gamification/achievement-card";
-import ProgressRing from "@/components/gamification/progress-ring";
+import { UserProfileCard } from "@/components/gamification/user-profile-card";
+import { AchievementCard } from "@/components/gamification/achievement-card";
+import { ProgressRing } from "@/components/gamification/progress-ring";
 import carbonIcon from "@assets/Carbon Icon CC_1757591684851.png";
 import mineralsIcon from "@assets/Minerals Saved Icon CC _1757591709661.png";
 import resourceIcon from "@assets/Resource Pres Icon CC_1757592358474.png";
@@ -59,15 +59,7 @@ export default function Dashboard() {
     <div className="py-6 px-4 md:px-8 max-w-7xl mx-auto">
       {/* Gamified Header with User Profile */}
       <div className="mb-6">
-        <UserProfileCard 
-          userName={user?.name || 'User'}
-          userEmail={user?.email || ''}
-          level={userProgress?.level || 1}
-          currentXP={userProgress?.experiencePoints || 0}
-          xpToNextLevel={100}
-          currentStreak={userProgress?.currentStreak || 0}
-          longestStreak={userProgress?.longestStreak || 0}
-        />
+        <UserProfileCard />
       </div>
 
       {orderForNotification && notificationVisible && (
