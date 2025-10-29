@@ -97,6 +97,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.status(401).json({ message: "Unauthorized" });
   };
 
+  // API Key authentication middleware
+  const requireApiKey = async (req: Request, res: Response, next: Function) => {
+    try {
+      // Check for API key in headers: X-API-Key or Authorization: Bearer <key>
+      const apiKey = req.headers['x-api-key'] as string || 
+                     (req.headers.authorization?.startsWith('Bearer ') ? 
+                      req.headers.authorization.substring(7) : null);
+      
+      if (!apiKey) {
+        return res.status(401).json({ 
+          success: false,
+          error: "API key required. Provide it in X-API-Key header or Authorization: Bearer <key>" 
+        });
+      }
+
+      const validKey = await storage.validateApiKey(apiKey);
+      
+      if (!validKey) {
+        return res.status(401).json({ 
+          success: false,
+          error: "Invalid or expired API key" 
+        });
+      }
+
+      // API key is valid, proceed
+      next();
+    } catch (error) {
+      res.status(500).json({ 
+        success: false,
+        error: "Internal server error" 
+      });
+    }
+  };
+
   // Auth routes
   // Registration is disabled - users are created by administrators
   app.post("/api/auth/register", async (req, res) => {
@@ -1244,9 +1278,118 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ==================== API KEY MANAGEMENT ====================
+  // Admin endpoints to generate and manage API keys for data push APIs
+
+  // Create a new API key
+  app.post("/api/admin/api-keys", requireAdmin, async (req, res) => {
+    try {
+      const user = req.user as User;
+      const { name } = req.body;
+      
+      if (!name || typeof name !== 'string') {
+        return res.status(400).json({ 
+          success: false,
+          error: "API key name is required" 
+        });
+      }
+
+      const { key, apiKey } = await storage.createApiKey(name, user.id);
+      
+      // Return the full key only once (it won't be shown again)
+      res.json({
+        success: true,
+        apiKey: key, // The actual key to use in API calls
+        metadata: {
+          id: apiKey.id,
+          name: apiKey.name,
+          keyPrefix: apiKey.keyPrefix,
+          createdAt: apiKey.createdAt,
+          isActive: apiKey.isActive
+        },
+        message: "Save this API key securely. It won't be shown again."
+      });
+    } catch (error) {
+      res.status(500).json({ 
+        success: false,
+        error: "Internal server error" 
+      });
+    }
+  });
+
+  // List all API keys (doesn't show the actual keys)
+  app.get("/api/admin/api-keys", requireAdmin, async (req, res) => {
+    try {
+      const activeOnly = req.query.activeOnly !== 'false';
+      const keys = await storage.listApiKeys(activeOnly);
+      
+      // Don't return the key hash, only metadata
+      const safeKeys = keys.map(k => ({
+        id: k.id,
+        name: k.name,
+        keyPrefix: k.keyPrefix,
+        createdBy: k.createdBy,
+        lastUsedAt: k.lastUsedAt,
+        expiresAt: k.expiresAt,
+        isActive: k.isActive,
+        createdAt: k.createdAt
+      }));
+      
+      res.json(safeKeys);
+    } catch (error) {
+      res.status(500).json({ 
+        success: false,
+        error: "Internal server error" 
+      });
+    }
+  });
+
+  // Revoke an API key
+  app.patch("/api/admin/api-keys/:id/revoke", requireAdmin, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const revoked = await storage.revokeApiKey(id);
+      
+      if (!revoked) {
+        return res.status(404).json({ 
+          success: false,
+          error: "API key not found" 
+        });
+      }
+      
+      res.json({
+        success: true,
+        message: "API key revoked successfully"
+      });
+    } catch (error) {
+      res.status(500).json({ 
+        success: false,
+        error: "Internal server error" 
+      });
+    }
+  });
+
+  // Delete an API key
+  app.delete("/api/admin/api-keys/:id", requireAdmin, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      await storage.deleteApiKey(id);
+      
+      res.json({
+        success: true,
+        message: "API key deleted successfully"
+      });
+    } catch (error) {
+      res.status(500).json({ 
+        success: false,
+        error: "Internal server error" 
+      });
+    }
+  });
+
   // ==================== DATA PUSH APIS ====================
   // These APIs allow external systems to push data into the portal
-  // Authentication required: Use bearer token or session-based auth
+  // Authentication required: Use API key in X-API-Key header or Authorization: Bearer <key>
 
   // Warranty Lookup API (User-facing)
   app.get("/api/warranties/search", async (req, res) => {
@@ -1302,7 +1445,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Upsert Users API
-  app.post("/api/data/users/upsert", requireAdmin, async (req, res) => {
+  app.post("/api/data/users/upsert", requireApiKey, async (req, res) => {
     try {
       const { users: usersToUpsert } = req.body;
       
@@ -1349,7 +1492,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Upsert Orders API
-  app.post("/api/data/orders/upsert", requireAdmin, async (req, res) => {
+  app.post("/api/data/orders/upsert", requireApiKey, async (req, res) => {
     try {
       const { orders: ordersToUpsert } = req.body;
       
@@ -1463,7 +1606,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Bulk Upsert Warranties API
-  app.post("/api/data/warranties/upsert", requireAdmin, async (req, res) => {
+  app.post("/api/data/warranties/upsert", requireApiKey, async (req, res) => {
     try {
       const { warranties: warrantiesToUpsert } = req.body;
       
