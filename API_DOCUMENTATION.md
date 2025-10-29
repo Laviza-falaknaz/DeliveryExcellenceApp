@@ -560,8 +560,431 @@ For API support or to report issues, please contact the development team or crea
 
 ## Changelog
 
+### Version 2.0 (October 2025)
+- **NEW:** Data Push APIs with upsert functionality
+- **NEW:** Warranty lookup API with serial number search
+- **REMOVED:** Admin portal routes (all management via APIs now)
+- Bulk upsert support for users, orders, RMAs, and warranties
+- Email-based user lookup and linking for data synchronization
+
 ### Version 1.0 (October 2024)
 - Initial release of CRUD APIs
 - Full filtering support for users, orders, RMAs, and support tickets
 - Admin authentication requirement
 - Comprehensive error handling and validation
+
+---
+
+# Data Push APIs (Version 2.0)
+
+## Overview
+The Data Push APIs enable external systems to synchronize data with the customer portal using upsert operations. These APIs create new records if they don't exist or update existing records based on unique identifiers.
+
+## Key Features
+- **Upsert Operations**: Automatically create or update records
+- **Bulk Processing**: Handle multiple records in a single API call
+- **Error Reporting**: Individual error tracking for each failed record
+- **Email Linking**: Link orders and RMAs to users via email addresses
+
+## Warranty Lookup API (Public)
+
+### Search Warranty by Serial Number
+This endpoint allows users to search for warranty information using either the serial number or manufacturer serial number.
+
+```bash
+GET /api/warranties/search?q={serialNumber}
+```
+
+**Query Parameters:**
+- `q` (string, required): Serial number or manufacturer serial number to search
+
+**Response (Warranty Found):**
+```json
+{
+  "found": true,
+  "warranty": {
+    "serialNumber": "SN123456789",
+    "manufacturerSerialNumber": "MFG-987654321",
+    "warrantyDescription": "3-Year Premium Warranty",
+    "startDate": "2024-01-01T00:00:00.000Z",
+    "endDate": "2027-01-01T00:00:00.000Z",
+    "status": "active",
+    "daysRemaining": 730
+  }
+}
+```
+
+**Response (Warranty Not Found):**
+```json
+{
+  "found": false,
+  "message": "No warranty found for this serial number"
+}
+```
+
+**Example:**
+```bash
+curl "https://your-portal.replit.app/api/warranties/search?q=SN123456789"
+```
+
+---
+
+## Upsert Users API (Admin Only)
+
+### Bulk Upsert Users
+Create or update multiple users in a single request. Users are identified by email address (unique key).
+
+```bash
+POST /api/data/users/upsert
+Content-Type: application/json
+```
+
+**Request Body:**
+```json
+{
+  "users": [
+    {
+      "username": "john.doe@example.com",
+      "password": "$2a$10$hashedpassword...",
+      "name": "John Doe",
+      "company": "Tech Solutions Inc",
+      "email": "john.doe@example.com",
+      "phoneNumber": "+1234567890",
+      "isAdmin": false,
+      "notificationPreferences": {
+        "orderUpdates": true,
+        "environmentalImpact": true,
+        "charityUpdates": false,
+        "serviceReminders": true
+      }
+    },
+    {
+      "username": "jane.smith@example.com",
+      "password": "$2a$10$hashedpassword...",
+      "name": "Jane Smith",
+      "company": "Green Computing Ltd",
+      "email": "jane.smith@example.com",
+      "phoneNumber": "+9876543210",
+      "isAdmin": false
+    }
+  ]
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "created": 2,
+  "updated": 0,
+  "errors": []
+}
+```
+
+**Important Notes:**
+- Passwords must be bcrypt hashed before sending
+- Email is the unique identifier - existing users will be updated
+- All fields except `notificationPreferences` are required
+
+---
+
+## Upsert Orders API (Admin Only)
+
+### Bulk Upsert Orders
+Create or update multiple orders with their items. Orders are identified by order number (unique key) and linked to users via email.
+
+```bash
+POST /api/data/orders/upsert
+Content-Type: application/json
+```
+
+**Request Body:**
+```json
+{
+  "orders": [
+    {
+      "orderNumber": "ORD-2024-001",
+      "email": "john.doe@example.com",
+      "orderDate": "2024-01-15T10:30:00.000Z",
+      "status": "shipped",
+      "totalAmount": 1299.99,
+      "shippingAddress": "123 Main St, City, State 12345",
+      "billingAddress": "123 Main St, City, State 12345",
+      "trackingNumber": "TRACK123456789",
+      "estimatedDelivery": "2024-01-20T00:00:00.000Z",
+      "packingListUrl": "https://example.com/packing-list.pdf",
+      "hashcodesUrl": "https://example.com/hashcodes.csv",
+      "items": [
+        {
+          "productName": "Remanufactured Dell Latitude 5420",
+          "sku": "DELL-LAT-5420-I5-16GB",
+          "quantity": 1,
+          "unitPrice": 899.99,
+          "totalPrice": 899.99,
+          "serialNumber": "SN123456789",
+          "warrantyEndDate": "2027-01-15T00:00:00.000Z"
+        },
+        {
+          "productName": "USB-C Docking Station",
+          "sku": "DOCK-USBC-001",
+          "quantity": 1,
+          "unitPrice": 149.99,
+          "totalPrice": 149.99
+        }
+      ]
+    }
+  ]
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "created": 1,
+  "updated": 0,
+  "errors": []
+}
+```
+
+**Important Notes:**
+- `orderNumber` must be unique (used as identifier for upsert)
+- `email` must match an existing user in the database
+- `items` array will replace all existing items for the order
+- If user doesn't exist, the operation fails with an error
+
+**Error Example:**
+```json
+{
+  "success": true,
+  "created": 0,
+  "updated": 0,
+  "errors": [
+    {
+      "orderNumber": "ORD-2024-001",
+      "error": "User with email john.doe@example.com not found"
+    }
+  ]
+}
+```
+
+---
+
+## Upsert RMAs API (Admin Only)
+
+### Bulk Upsert RMAs
+Create or update multiple RMA (Return Merchandise Authorization) requests. RMAs are identified by RMA number (unique key) and linked to users and orders via email and order number.
+
+```bash
+POST /api/data/rmas/upsert
+Content-Type: application/json
+```
+
+**Request Body:**
+```json
+{
+  "rmas": [
+    {
+      "rmaNumber": "RMA-2024-001",
+      "email": "john.doe@example.com",
+      "orderNumber": "ORD-2024-001",
+      "status": "approved",
+      "issueDescription": "Battery not holding charge properly",
+      "requestedAction": "replacement",
+      "createdAt": "2024-02-01T09:00:00.000Z",
+      "updatedAt": "2024-02-02T14:30:00.000Z",
+      "resolutionNotes": "Approved for battery replacement. New unit shipped.",
+      "trackingNumber": "RMA-TRACK789",
+      "productName": "Dell Latitude 5420",
+      "serialNumber": "SN123456789",
+      "faultDetails": "Battery drains from 100% to 0% in under 2 hours",
+      "customerName": "John Doe",
+      "customerEmail": "john.doe@example.com",
+      "customerPhone": "+1234567890",
+      "billingAddress": "123 Main St, City, State 12345",
+      "deliveryAddress": "123 Main St, City, State 12345"
+    }
+  ]
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "created": 1,
+  "updated": 0,
+  "errors": []
+}
+```
+
+**Important Notes:**
+- `rmaNumber` must be unique (used as identifier for upsert)
+- Both `email` and `orderNumber` must exist in the database
+- If user or order doesn't exist, the operation fails with an error
+
+---
+
+## Bulk Upsert Warranties API (Admin Only)
+
+### Bulk Upsert Warranties
+Create or update multiple warranty records. Warranties are identified by serial number (unique key).
+
+```bash
+POST /api/data/warranties/upsert
+Content-Type: application/json
+```
+
+**Request Body:**
+```json
+{
+  "warranties": [
+    {
+      "serialNumber": "SN123456789",
+      "manufacturerSerialNumber": "MFG-987654321",
+      "warrantyDescription": "3-Year Premium Warranty with Advanced Exchange",
+      "startDate": "2024-01-15T00:00:00.000Z",
+      "endDate": "2027-01-15T00:00:00.000Z"
+    },
+    {
+      "serialNumber": "SN987654321",
+      "manufacturerSerialNumber": "MFG-123456789",
+      "warrantyDescription": "1-Year Standard Warranty",
+      "startDate": "2024-03-01T00:00:00.000Z",
+      "endDate": "2025-03-01T00:00:00.000Z"
+    }
+  ]
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "created": 2,
+  "updated": 0,
+  "errors": []
+}
+```
+
+**Important Notes:**
+- `serialNumber` is the unique identifier for upsert
+- If warranty with same serial number exists, it will be updated
+- `manufacturerSerialNumber` can also be used for warranty lookups
+
+---
+
+## Data Push API Usage Examples
+
+### Example 1: Synchronize Users from External System
+```bash
+# Login first
+curl -c cookies.txt -X POST http://localhost:5000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "admin@example.com",
+    "password": "admin123"
+  }'
+
+# Upsert users
+curl -b cookies.txt -X POST http://localhost:5000/api/data/users/upsert \
+  -H "Content-Type: application/json" \
+  -d '{
+    "users": [
+      {
+        "username": "customer1@example.com",
+        "password": "$2a$10$hashedpassword...",
+        "name": "Customer One",
+        "company": "Example Corp",
+        "email": "customer1@example.com",
+        "phoneNumber": "+1234567890",
+        "isAdmin": false
+      }
+    ]
+  }'
+```
+
+### Example 2: Push Order Updates with Items
+```bash
+curl -b cookies.txt -X POST http://localhost:5000/api/data/orders/upsert \
+  -H "Content-Type: application/json" \
+  -d '{
+    "orders": [
+      {
+        "orderNumber": "ORD-2024-042",
+        "email": "customer1@example.com",
+        "orderDate": "2024-10-15T10:00:00.000Z",
+        "status": "delivered",
+        "totalAmount": 1999.99,
+        "shippingAddress": "456 Oak Ave, Town, State 67890",
+        "billingAddress": "456 Oak Ave, Town, State 67890",
+        "items": [
+          {
+            "productName": "Dell Latitude 7420",
+            "sku": "DELL-LAT-7420",
+            "quantity": 2,
+            "unitPrice": 999.99,
+            "totalPrice": 1999.98,
+            "serialNumber": "SN111222333"
+          }
+        ]
+      }
+    ]
+  }'
+```
+
+### Example 3: Update Warranty Information
+```bash
+curl -b cookies.txt -X POST http://localhost:5000/api/data/warranties/upsert \
+  -H "Content-Type: application/json" \
+  -d '{
+    "warranties": [
+      {
+        "serialNumber": "SN111222333",
+        "manufacturerSerialNumber": "DELL-MFG-999888",
+        "warrantyDescription": "Extended 5-Year Warranty",
+        "startDate": "2024-10-15T00:00:00.000Z",
+        "endDate": "2029-10-15T00:00:00.000Z"
+      }
+    ]
+  }'
+```
+
+---
+
+## Data Synchronization Best Practices
+
+1. **Regular Sync Schedule**: Run upsert operations on a regular schedule (e.g., hourly, daily)
+2. **Batch Size**: Keep batch sizes reasonable (recommended: 100-500 records per request)
+3. **Error Handling**: Always check the `errors` array in responses and retry failed records
+4. **User Creation First**: Always upsert users before orders/RMAs to ensure email links work
+5. **Password Security**: Always bcrypt hash passwords before sending (never send plain text)
+6. **Date Formats**: Use ISO 8601 format for all dates (e.g., `2024-01-15T10:30:00.000Z`)
+7. **Idempotency**: Upsert operations are idempotent - safe to retry without creating duplicates
+
+---
+
+## Authentication for Data Push APIs
+
+All data push APIs require admin authentication:
+
+```bash
+# Step 1: Login and save cookies
+curl -c cookies.txt -X POST https://your-portal.replit.app/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "admin@example.com",
+    "password": "your-secure-password"
+  }'
+
+# Step 2: Use cookies in subsequent requests
+curl -b cookies.txt -X POST https://your-portal.replit.app/api/data/users/upsert \
+  -H "Content-Type: application/json" \
+  -d '{"users": [...]}'
+```
+
+**Security Notes:**
+- Only admin users can access data push APIs
+- Session cookies expire after 24 hours
+- Always use HTTPS in production
+- Rotate admin credentials regularly
