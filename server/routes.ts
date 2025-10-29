@@ -1553,7 +1553,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Upsert RMAs API
-  app.post("/api/data/rmas/upsert", requireAdmin, async (req, res) => {
+  app.post("/api/data/rmas/upsert", requireApiKey, async (req, res) => {
     try {
       const { rmas: rmasToUpsert } = req.body;
       
