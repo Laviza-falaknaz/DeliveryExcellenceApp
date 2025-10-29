@@ -445,3 +445,24 @@ export const insertWarrantySchema = createInsertSchema(warranties).omit({
 
 export type Warranty = typeof warranties.$inferSelect;
 export type InsertWarranty = z.infer<typeof insertWarrantySchema>;
+
+// API Keys schema for authentication
+export const apiKeys = pgTable("api_keys", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  keyHash: text("key_hash").notNull(),
+  keyPrefix: text("key_prefix").notNull(), // First 8 chars for identification
+  createdBy: integer("created_by").references(() => users.id),
+  lastUsedAt: timestamp("last_used_at"),
+  expiresAt: timestamp("expires_at"),
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertApiKeySchema = createInsertSchema(apiKeys).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type ApiKey = typeof apiKeys.$inferSelect;
+export type InsertApiKey = z.infer<typeof insertApiKeySchema>;

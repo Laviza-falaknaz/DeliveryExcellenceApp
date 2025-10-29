@@ -15,7 +15,8 @@ import {
   milestones, Milestone, InsertMilestone,
   userProgress, UserProgress, InsertUserProgress,
   activityLog, ActivityLog, InsertActivityLog,
-  warranties, Warranty, InsertWarranty
+  warranties, Warranty, InsertWarranty,
+  apiKeys, ApiKey
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, sum, like, and } from "drizzle-orm";
@@ -866,6 +867,86 @@ export class DatabaseStorage implements IStorage {
         .returning();
       return created;
     }
+  }
+
+  // API Key management operations
+  async createApiKey(name: string, createdBy: number): Promise<{ key: string; apiKey: ApiKey }> {
+    const crypto = await import("crypto");
+    const bcrypt = await import("bcryptjs");
+    
+    // Generate a secure random API key (32 bytes = 64 hex chars)
+    const key = `cc_${crypto.randomBytes(32).toString('hex')}`;
+    const keyPrefix = key.substring(0, 11); // 'cc_' + first 8 chars
+    const keyHash = await bcrypt.hash(key, 10);
+    
+    const [apiKey] = await db.insert(apiKeys).values({
+      name,
+      keyHash,
+      keyPrefix,
+      createdBy,
+      isActive: true,
+    }).returning();
+    
+    return { key, apiKey };
+  }
+
+  async validateApiKey(key: string): Promise<ApiKey | null> {
+    const bcrypt = await import("bcryptjs");
+    
+    if (!key || !key.startsWith('cc_')) {
+      return null;
+    }
+    
+    const keyPrefix = key.substring(0, 11);
+    
+    // Find potential matching keys by prefix
+    const potentialKeys = await db.select()
+      .from(apiKeys)
+      .where(eq(apiKeys.keyPrefix, keyPrefix));
+    
+    for (const apiKey of potentialKeys) {
+      if (!apiKey.isActive) continue;
+      
+      // Check if expired
+      if (apiKey.expiresAt && new Date(apiKey.expiresAt) < new Date()) {
+        continue;
+      }
+      
+      // Verify the key hash
+      const isValid = await bcrypt.compare(key, apiKey.keyHash);
+      if (isValid) {
+        // Update last used time
+        await db.update(apiKeys)
+          .set({ lastUsedAt: new Date() })
+          .where(eq(apiKeys.id, apiKey.id));
+        
+        return apiKey;
+      }
+    }
+    
+    return null;
+  }
+
+  async listApiKeys(activeOnly: boolean = true): Promise<ApiKey[]> {
+    if (activeOnly) {
+      return db.select()
+        .from(apiKeys)
+        .where(eq(apiKeys.isActive, true))
+        .orderBy(apiKeys.createdAt);
+    }
+    return db.select().from(apiKeys).orderBy(apiKeys.createdAt);
+  }
+
+  async revokeApiKey(id: number): Promise<ApiKey | undefined> {
+    const [revoked] = await db.update(apiKeys)
+      .set({ isActive: false })
+      .where(eq(apiKeys.id, id))
+      .returning();
+    return revoked;
+  }
+
+  async deleteApiKey(id: number): Promise<void> {
+    await db.delete(apiKeys).where(eq(apiKeys.id, id));
   }
 }
 

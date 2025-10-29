@@ -17,6 +17,7 @@ import {
   insertMilestoneSchema,
   insertUserProgressSchema,
   insertActivityLogSchema,
+  insertWarrantySchema,
   User
 } from "@shared/schema";
 import session from "express-session";
@@ -1366,8 +1367,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       for (const orderData of ordersToUpsert) {
         try {
           const { orderNumber, email, items, ...order } = orderData;
+          
+          // Convert date strings to Date objects
+          if (order.orderDate) order.orderDate = new Date(order.orderDate);
+          if (order.estimatedDelivery) order.estimatedDelivery = new Date(order.estimatedDelivery);
+          
+          // Convert dates in order items if they exist
+          const processedItems = items?.map((item: any) => {
+            if (item.warrantyEndDate) {
+              return { ...item, warrantyEndDate: new Date(item.warrantyEndDate) };
+            }
+            return item;
+          });
+          
           const existing = await storage.getOrderByNumber(orderNumber);
-          await storage.upsertOrder(orderNumber, email, order, items);
+          await storage.upsertOrder(orderNumber, email, order, processedItems);
           if (existing) {
             updated++;
           } else {
@@ -1414,6 +1428,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       for (const rmaData of rmasToUpsert) {
         try {
           const { rmaNumber, email, orderNumber, ...rma } = rmaData;
+          
+          // Convert date strings to Date objects if they exist
+          if (rma.createdAt) rma.createdAt = new Date(rma.createdAt);
+          if (rma.updatedAt) rma.updatedAt = new Date(rma.updatedAt);
+          
           const existing = await storage.getRmaByNumber(rmaNumber);
           await storage.upsertRma(rmaNumber, email, orderNumber, rma);
           if (existing) {
@@ -1455,11 +1474,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      const result = await storage.bulkUpsertWarranties(warrantiesToUpsert);
+      // Validate and convert each warranty
+      const validatedWarranties = [];
+      const validationErrors: any[] = [];
+      
+      for (let i = 0; i < warrantiesToUpsert.length; i++) {
+        try {
+          const validated = insertWarrantySchema.parse({
+            ...warrantiesToUpsert[i],
+            startDate: new Date(warrantiesToUpsert[i].startDate),
+            endDate: new Date(warrantiesToUpsert[i].endDate)
+          });
+          validatedWarranties.push(validated);
+        } catch (error: any) {
+          if (error instanceof z.ZodError) {
+            validationErrors.push({
+              serialNumber: warrantiesToUpsert[i].serialNumber || `index-${i}`,
+              error: error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ')
+            });
+          } else {
+            validationErrors.push({
+              serialNumber: warrantiesToUpsert[i].serialNumber || `index-${i}`,
+              error: error.message
+            });
+          }
+        }
+      }
+
+      // Upsert validated warranties
+      const result = await storage.bulkUpsertWarranties(validatedWarranties);
 
       res.json({
         success: true,
-        ...result
+        ...result,
+        errors: [...result.errors, ...validationErrors]
       });
     } catch (error) {
       res.status(500).json({ 
