@@ -560,6 +560,13 @@ For API support or to report issues, please contact the development team or crea
 
 ## Changelog
 
+### Version 2.1 (October 2025)
+- **NEW:** API Key authentication for data push APIs (Power Automate friendly)
+- Supports both X-API-Key header and Authorization Bearer token
+- Admin endpoints to create, list, revoke, and delete API keys
+- Secure bcrypt hashing of API keys
+- Automatic tracking of API key usage (lastUsedAt timestamp)
+
 ### Version 2.0 (October 2025)
 - **NEW:** Data Push APIs with upsert functionality
 - **NEW:** Warranty lookup API with serial number search
@@ -966,10 +973,14 @@ curl -b cookies.txt -X POST http://localhost:5000/api/data/warranties/upsert \
 
 ## Authentication for Data Push APIs
 
-All data push APIs require admin authentication:
+All data push APIs use API key authentication for easy integration with automation tools like Power Automate.
+
+### Step 1: Generate an API Key
+
+Login to the customer portal as an admin and create an API key:
 
 ```bash
-# Step 1: Login and save cookies
+# Login to the admin portal
 curl -c cookies.txt -X POST https://your-portal.replit.app/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{
@@ -977,14 +988,80 @@ curl -c cookies.txt -X POST https://your-portal.replit.app/api/auth/login \
     "password": "your-secure-password"
   }'
 
-# Step 2: Use cookies in subsequent requests
-curl -b cookies.txt -X POST https://your-portal.replit.app/api/data/users/upsert \
+# Create an API key
+curl -b cookies.txt -X POST https://your-portal.replit.app/api/admin/api-keys \
   -H "Content-Type: application/json" \
+  -d '{
+    "name": "Power Automate Integration"
+  }'
+
+# Response will include the API key (save it securely - it won't be shown again):
+{
+  "success": true,
+  "apiKey": "cc_0daf54d0edd5dc7c1f1ec2a16b98812ee6e76fc5f7173caf922cac221cd04b2f",
+  "metadata": {
+    "id": 1,
+    "name": "Power Automate Integration",
+    "keyPrefix": "cc_0daf54d0",
+    "createdAt": "2025-10-29T11:44:57.811Z",
+    "isActive": true
+  },
+  "message": "Save this API key securely. It won't be shown again."
+}
+```
+
+### Step 2: Use the API Key in Your Requests
+
+You can provide the API key in two ways:
+
+**Option 1: X-API-Key Header (Recommended for Power Automate)**
+```bash
+curl -X POST https://your-portal.replit.app/api/data/users/upsert \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: cc_0daf54d0edd5dc7c1f1ec2a16b98812ee6e76fc5f7173caf922cac221cd04b2f" \
   -d '{"users": [...]}'
 ```
 
+**Option 2: Authorization Bearer Token**
+```bash
+curl -X POST https://your-portal.replit.app/api/data/users/upsert \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer cc_0daf54d0edd5dc7c1f1ec2a16b98812ee6e76fc5f7173caf922cac221cd04b2f" \
+  -d '{"users": [...]}'
+```
+
+### Managing API Keys
+
+**List all API keys:**
+```bash
+curl -b cookies.txt https://your-portal.replit.app/api/admin/api-keys
+```
+
+**Revoke an API key:**
+```bash
+curl -b cookies.txt -X PATCH https://your-portal.replit.app/api/admin/api-keys/1/revoke
+```
+
+**Delete an API key:**
+```bash
+curl -b cookies.txt -X DELETE https://your-portal.replit.app/api/admin/api-keys/1
+```
+
+### Power Automate Configuration
+
+When configuring HTTP requests in Power Automate:
+
+1. **Method**: POST
+2. **URI**: `https://your-portal.replit.app/api/data/users/upsert`
+3. **Headers**:
+   - `Content-Type`: `application/json`
+   - `X-API-Key`: `cc_your_api_key_here`
+4. **Body**: Your JSON payload
+
 **Security Notes:**
-- Only admin users can access data push APIs
-- Session cookies expire after 24 hours
+- API keys do not expire (unless you set an expiration date)
+- Store API keys securely (use Power Automate's secure input feature)
+- API keys can be revoked instantly if compromised
 - Always use HTTPS in production
-- Rotate admin credentials regularly
+- Monitor API key usage via the `lastUsedAt` timestamp
+- Each API key is hashed and cannot be retrieved after creation
