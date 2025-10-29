@@ -1,532 +1,314 @@
-# Circular Computing Customer Portal API Documentation
+# Circular Computing Customer Portal - API Documentation
 
-## Overview
-This document provides comprehensive documentation for the external CRUD APIs. These APIs allow you to perform Create, Read, Update, and Delete operations on all database entities with advanced filtering capabilities.
+## Quick Start
+
+**Your Production API Key:** `cc_7101cbf99d27c5a98e3cefc80f79fb28b94e194a289c139b179655d8f565cb28`
+
+Use this key in all your Power Automate flows and external integrations. This key never expires unless you revoke it.
+
+---
+
+## Table of Contents
+
+1. [Data Push APIs](#data-push-apis) - **Primary Integration Method** ⭐
+2. [Warranty Lookup API](#warranty-lookup-api) - Public endpoint
+3. [API Key Management](#api-key-management) - Admin only
+4. [Portal APIs](#portal-apis) - Internal use
+5. [Legacy CRUD APIs](#legacy-crud-apis) - Deprecated
+
+---
+
+# Data Push APIs
+
+The Data Push APIs are the **recommended method** for integrating external systems like Power Automate, Zapier, or custom applications with the Customer Portal. These APIs allow you to synchronize data using upsert operations (create if new, update if exists).
 
 ## Authentication
-All API endpoints require admin authentication. You must first authenticate using the login endpoint and maintain the session cookie in subsequent requests.
 
-### Login
+All Data Push APIs require API key authentication. Include your API key in one of two ways:
+
+**Option 1: X-API-Key Header (Recommended)**
 ```bash
-POST /api/auth/login
-Content-Type: application/json
+X-API-Key: cc_7101cbf99d27c5a98e3cefc80f79fb28b94e194a289c139b179655d8f565cb28
+```
 
+**Option 2: Authorization Bearer Token**
+```bash
+Authorization: Bearer cc_7101cbf99d27c5a98e3cefc80f79fb28b94e194a289c139b179655d8f565cb28
+```
+
+## Power Automate Configuration
+
+When setting up HTTP requests in Power Automate:
+
+1. **Method**: `POST`
+2. **URI**: `https://your-portal.replit.app/api/data/users/upsert`
+3. **Headers**:
+   - `Content-Type`: `application/json`
+   - `X-API-Key`: `cc_7101cbf99d27c5a98e3cefc80f79fb28b94e194a289c139b179655d8f565cb28`
+4. **Body**: Your JSON payload (see examples below)
+
+---
+
+## 1. Users Upsert API
+
+Create or update users in bulk.
+
+**Endpoint:** `POST /api/data/users/upsert`
+
+**Request Body:**
+```json
 {
-  "username": "your-email@example.com",
-  "password": "your-password"
+  "users": [
+    {
+      "username": "john.doe@company.com",
+      "password": "$2a$10$hashed_password_here",
+      "name": "John Doe",
+      "company": "ABC Corporation",
+      "email": "john.doe@company.com",
+      "phoneNumber": "+44 7700 900123",
+      "isAdmin": false
+    }
+  ]
 }
 ```
+
+**Field Requirements:**
+- `username` (required): Unique username, typically email
+- `password` (required): **Must be bcrypt hashed** before sending
+- `name` (required): Full name
+- `company` (required): Company name
+- `email` (required): Email address (used for linking orders and RMAs)
+- `phoneNumber` (optional): Phone number with country code
+- `isAdmin` (optional): Boolean, defaults to false
 
 **Response:**
 ```json
 {
-  "id": 1,
-  "username": "user@example.com",
-  "name": "User Name",
-  "email": "user@example.com",
-  "isAdmin": true,
-  ...
+  "success": true,
+  "created": 1,
+  "updated": 0,
+  "errors": []
 }
 ```
 
-## API Base URL
-All CRUD endpoints are prefixed with `/api/crud/`
-
-## Common Patterns
-
-### Standard CRUD Operations
-- **GET** `/api/crud/{entity}` - List all entities (with optional filtering)
-- **GET** `/api/crud/{entity}/:id` - Get a specific entity by ID
-- **POST** `/api/crud/{entity}` - Create a new entity
-- **PATCH** `/api/crud/{entity}/:id` - Update an entity
-- **DELETE** `/api/crud/{entity}/:id` - Delete an entity
-
-### Response Formats
-- **Success (200/201):** Returns the requested data as JSON
-- **Not Found (404):** `{"message": "Entity not found"}`
-- **Bad Request (400):** `{"message": "Invalid data", "errors": [...]}`
-- **Server Error (500):** `{"message": "Internal server error"}`
-
----
-
-## 1. Users API
-
-### List/Search Users
+**Example cURL:**
 ```bash
-GET /api/crud/users
-GET /api/crud/users?email=john@example.com
-GET /api/crud/users?name=John
-GET /api/crud/users?company=TechCorp
-```
-
-**Query Parameters:**
-- `email` (string, optional): Search users by email (partial match)
-- `name` (string, optional): Search users by name (partial match)
-- `company` (string, optional): Search users by company (partial match)
-
-**Example:**
-```bash
-curl -b cookies.txt "http://localhost:5000/api/crud/users?email=john"
-```
-
-### Get User by ID
-```bash
-GET /api/crud/users/:id
-```
-
-### Create User
-```bash
-POST /api/crud/users
-Content-Type: application/json
-
-{
-  "username": "user@example.com",
-  "password": "hashed-password",
-  "name": "User Name",
-  "company": "Company Name",
-  "email": "user@example.com",
-  "phoneNumber": "+1234567890",
-  "isAdmin": false,
-  "notificationPreferences": {
-    "orderUpdates": true,
-    "environmentalImpact": true,
-    "charityUpdates": true,
-    "serviceReminders": true
-  }
-}
-```
-
-### Update User
-```bash
-PATCH /api/crud/users/:id
-Content-Type: application/json
-
-{
-  "name": "Updated Name",
-  "phoneNumber": "+9876543210"
-}
-```
-
-### Delete User
-```bash
-DELETE /api/crud/users/:id
-```
-
----
-
-## 2. Orders API
-
-### List/Search Orders
-```bash
-GET /api/crud/orders
-GET /api/crud/orders?orderNumber=ORD-2024-001
-GET /api/crud/orders?userId=1
-GET /api/crud/orders?status=shipped
-```
-
-**Query Parameters:**
-- `orderNumber` (string, optional): Search orders by order number (partial match)
-- `userId` (integer, optional): Filter orders by user ID
-- `status` (string, optional): Filter orders by status (placed, processing, shipped, etc.)
-
-**Example:**
-```bash
-curl -b cookies.txt "http://localhost:5000/api/crud/orders?userId=1&status=shipped"
-```
-
-### Get Order by ID
-```bash
-GET /api/crud/orders/:id
-```
-
-### Create Order
-```bash
-POST /api/crud/orders
-Content-Type: application/json
-
-{
-  "orderNumber": "ORD-2024-001",
-  "userId": 1,
-  "status": "placed",
-  "totalAmount": 50000,
-  "savedAmount": 10000,
-  "estimatedDelivery": "2024-12-31T00:00:00Z",
-  "trackingNumber": "TRACK123",
-  "shippingAddress": {
-    "street": "123 Main St",
-    "city": "London",
-    "state": "England",
-    "zipCode": "SW1A 1AA",
-    "country": "UK"
-  }
-}
-```
-
-### Update Order
-```bash
-PATCH /api/crud/orders/:id
-Content-Type: application/json
-
-{
-  "status": "shipped",
-  "trackingNumber": "TRACK456"
-}
-```
-
-### Delete Order
-```bash
-DELETE /api/crud/orders/:id
-```
-
----
-
-## 3. Order Items API
-
-### List Order Items
-```bash
-GET /api/crud/order-items?orderId=1
-```
-
-**Query Parameters:**
-- `orderId` (integer, required): Filter order items by order ID
-
-**Example:**
-```bash
-curl -b cookies.txt "http://localhost:5000/api/crud/order-items?orderId=1"
-```
-
-### Create Order Item
-```bash
-POST /api/crud/order-items
-Content-Type: application/json
-
-{
-  "orderId": 1,
-  "productName": "Remanufactured Laptop",
-  "productDescription": "Dell Latitude 7490",
-  "quantity": 5,
-  "unitPrice": 10000,
-  "totalPrice": 50000,
-  "imageUrl": "https://example.com/image.jpg"
-}
-```
-
----
-
-## 4. RMAs API
-
-### List/Search RMAs
-```bash
-GET /api/crud/rmas
-GET /api/crud/rmas?rmaNumber=RMA-2024-001
-GET /api/crud/rmas?userId=1
-GET /api/crud/rmas?status=approved
-```
-
-**Query Parameters:**
-- `rmaNumber` (string, optional): Search RMAs by RMA number (partial match)
-- `userId` (integer, optional): Filter RMAs by user ID
-- `status` (string, optional): Filter RMAs by status (requested, approved, completed, etc.)
-
-**Example:**
-```bash
-curl -b cookies.txt "http://localhost:5000/api/crud/rmas?rmaNumber=RMA-2024"
-```
-
-### Get RMA by ID
-```bash
-GET /api/crud/rmas/:id
-```
-
-### Create RMA
-```bash
-POST /api/crud/rmas
-Content-Type: application/json
-
-{
-  "userId": 1,
-  "orderId": 1,
-  "rmaNumber": "RMA-2024-001",
-  "reason": "Defective screen",
-  "status": "requested",
-  "notes": "Customer reported flickering display"
-}
-```
-
-### Update RMA
-```bash
-PATCH /api/crud/rmas/:id
-Content-Type: application/json
-
-{
-  "status": "approved",
-  "notes": "Approved for return"
-}
-```
-
-### Delete RMA
-```bash
-DELETE /api/crud/rmas/:id
-```
-
----
-
-## 5. Support Tickets API
-
-### List/Search Support Tickets
-```bash
-GET /api/crud/support-tickets
-GET /api/crud/support-tickets?ticketNumber=TICKET-2024-001
-GET /api/crud/support-tickets?userId=1
-GET /api/crud/support-tickets?status=open
-```
-
-**Query Parameters:**
-- `ticketNumber` (string, optional): Search tickets by ticket number (partial match)
-- `userId` (integer, optional): Filter tickets by user ID
-- `status` (string, optional): Filter tickets by status (open, in_progress, resolved, closed)
-
-**Example:**
-```bash
-curl -b cookies.txt "http://localhost:5000/api/crud/support-tickets?status=open"
-```
-
-### Get Support Ticket by ID
-```bash
-GET /api/crud/support-tickets/:id
-```
-
-### Create Support Ticket
-```bash
-POST /api/crud/support-tickets
-Content-Type: application/json
-
-{
-  "userId": 1,
-  "orderId": 1,
-  "ticketNumber": "TICKET-2024-001",
-  "subject": "Need help with setup",
-  "description": "Unable to configure network settings",
-  "status": "open"
-}
-```
-
-### Update Support Ticket
-```bash
-PATCH /api/crud/support-tickets/:id
-Content-Type: application/json
-
-{
-  "status": "resolved",
-  "updatedAt": "2024-10-22T10:00:00Z"
-}
-```
-
-### Delete Support Ticket
-```bash
-DELETE /api/crud/support-tickets/:id
-```
-
----
-
-## 6. Environmental Impact API
-
-### List Environmental Impact
-```bash
-GET /api/crud/environmental-impact?userId=1
-```
-
-**Query Parameters:**
-- `userId` (integer, required): Filter environmental impact records by user ID
-
-**Example:**
-```bash
-curl -b cookies.txt "http://localhost:5000/api/crud/environmental-impact?userId=1"
-```
-
-### Create Environmental Impact Record
-```bash
-POST /api/crud/environmental-impact
-Content-Type: application/json
-
-{
-  "userId": 1,
-  "orderId": 1,
-  "carbonSaved": 15000,
-  "waterProvided": 5000,
-  "mineralsSaved": 3000,
-  "treesEquivalent": 2,
-  "familiesHelped": 1
-}
-```
-
----
-
-## 7. Water Projects API
-
-### List Water Projects
-```bash
-GET /api/crud/water-projects
-```
-
-**Example:**
-```bash
-curl -b cookies.txt "http://localhost:5000/api/crud/water-projects"
-```
-
-### Get Water Project by ID
-```bash
-GET /api/crud/water-projects/:id
-```
-
-### Create Water Project
-```bash
-POST /api/crud/water-projects
-Content-Type: application/json
-
-{
-  "name": "Ethiopia Clean Water Initiative",
-  "location": "Ethiopia",
-  "description": "Providing clean water access to rural communities",
-  "peopleImpacted": 5000,
-  "waterProvided": 100000,
-  "imageUrl": "https://example.com/project.jpg"
-}
-```
-
-### Update Water Project
-```bash
-PATCH /api/crud/water-projects/:id
-Content-Type: application/json
-
-{
-  "peopleImpacted": 6000,
-  "waterProvided": 120000
-}
-```
-
-### Delete Water Project
-```bash
-DELETE /api/crud/water-projects/:id
-```
-
----
-
-## 8. Delivery Timelines API
-
-### Get Delivery Timeline
-```bash
-GET /api/crud/delivery-timelines?orderId=1
-```
-
-**Query Parameters:**
-- `orderId` (integer, required): Get delivery timeline by order ID
-
-**Example:**
-```bash
-curl -b cookies.txt "http://localhost:5000/api/crud/delivery-timelines?orderId=1"
-```
-
-### Create Delivery Timeline
-```bash
-POST /api/crud/delivery-timelines
-Content-Type: application/json
-
-{
-  "orderId": 1,
-  "orderPlaced": true,
-  "orderInProgress": true,
-  "orderBeingBuilt": false,
-  "qualityChecks": false,
-  "readyForDelivery": false,
-  "orderDelivered": false,
-  "orderCompleted": false
-}
-```
-
-### Update Delivery Timeline
-```bash
-PATCH /api/crud/delivery-timelines/:orderId
-Content-Type: application/json
-
-{
-  "orderBeingBuilt": true,
-  "qualityChecks": true
-}
-```
-
----
-
-## Complete Usage Example
-
-Here's a complete example workflow using the APIs:
-
-```bash
-# 1. Login to get session cookie
-curl -c cookies.txt -X POST http://localhost:5000/api/auth/login \
+curl -X POST https://your-portal.replit.app/api/data/users/upsert \
   -H "Content-Type: application/json" \
-  -d '{"username":"admin@example.com","password":"admin123"}'
-
-# 2. Search for users by email
-curl -b cookies.txt "http://localhost:5000/api/crud/users?email=john"
-
-# 3. Get all orders for a specific user
-curl -b cookies.txt "http://localhost:5000/api/crud/orders?userId=1"
-
-# 4. Search for RMAs by number
-curl -b cookies.txt "http://localhost:5000/api/crud/rmas?rmaNumber=RMA-2024"
-
-# 5. Create a new support ticket
-curl -b cookies.txt -X POST http://localhost:5000/api/crud/support-tickets \
-  -H "Content-Type: application/json" \
+  -H "X-API-Key: cc_7101cbf99d27c5a98e3cefc80f79fb28b94e194a289c139b179655d8f565cb28" \
   -d '{
-    "userId": 1,
-    "ticketNumber": "TICKET-2024-001",
-    "subject": "Setup assistance needed",
-    "description": "Need help configuring the laptop",
-    "status": "open"
+    "users": [
+      {
+        "username": "jane.smith@company.com",
+        "password": "$2a$10$N9qo8uLOickgx2ZMRZoMye",
+        "name": "Jane Smith",
+        "company": "Tech Corp",
+        "email": "jane.smith@company.com",
+        "phoneNumber": "+44 7700 900456",
+        "isAdmin": false
+      }
+    ]
   }'
-
-# 6. Update an order status
-curl -b cookies.txt -X PATCH http://localhost:5000/api/crud/orders/1 \
-  -H "Content-Type: application/json" \
-  -d '{"status": "shipped", "trackingNumber": "TRACK789"}'
-
-# 7. Get environmental impact for a user
-curl -b cookies.txt "http://localhost:5000/api/crud/environmental-impact?userId=1"
 ```
+
+---
+
+## 2. Orders Upsert API
+
+Create or update orders and automatically link them to users via email.
+
+**Endpoint:** `POST /api/data/orders/upsert`
+
+**Request Body:**
+```json
+{
+  "orders": [
+    {
+      "orderNumber": "ORD-2024-12345",
+      "email": "john.doe@company.com",
+      "customerName": "John Doe",
+      "orderDate": "2024-10-15T10:30:00.000Z",
+      "status": "shipped",
+      "totalAmount": 1299,
+      "savedAmount": 300,
+      "estimatedDelivery": "2024-10-20T00:00:00.000Z",
+      "trackingNumber": "1Z999AA10123456784",
+      "shippingAddress": {
+        "street": "123 Main Street",
+        "city": "London",
+        "state": "Greater London",
+        "zipCode": "SW1A 1AA",
+        "country": "United Kingdom"
+      },
+      "items": [
+        {
+          "productName": "Dell Latitude 7420",
+          "productDescription": "14-inch FHD, Intel i7, 16GB RAM, 512GB SSD",
+          "quantity": 2,
+          "unitPrice": 649,
+          "totalPrice": 1298,
+          "imageUrl": "https://example.com/laptop.jpg"
+        }
+      ]
+    }
+  ]
+}
+```
+
+**Field Requirements:**
+- `orderNumber` (required): Unique order identifier
+- `email` (required): Customer email (must match a user in the system)
+- `customerName` (optional): Customer display name
+- `orderDate` (required): ISO 8601 date format
+- `status` (required): One of: `placed`, `processing`, `in_production`, `quality_check`, `shipped`, `delivered`, `completed`, `cancelled`, `returned`
+- `totalAmount` (required): Integer (in pence/cents, e.g., 1299 = £12.99)
+- `savedAmount` (required): Integer (savings vs new price)
+- `estimatedDelivery` (optional): ISO 8601 date format
+- `trackingNumber` (optional): Shipping tracking number
+- `shippingAddress` (optional): Full address object
+- `items` (optional): Array of order items
+
+**Response:**
+```json
+{
+  "success": true,
+  "created": 1,
+  "updated": 0,
+  "errors": []
+}
+```
+
+**Important Notes:**
+- Users must exist before creating orders (upsert users first)
+- Orders are linked to users via the `email` field
+- All monetary amounts are in pence/cents (multiply by 100)
+- Dates must be in ISO 8601 format with timezone
+
+---
+
+## 3. Warranties Upsert API
+
+Create or update warranty records for devices.
+
+**Endpoint:** `POST /api/data/warranties/upsert`
+
+**Request Body:**
+```json
+{
+  "warranties": [
+    {
+      "serialNumber": "SN123456789",
+      "manufacturerSerialNumber": "DELL-MFG-987654321",
+      "warrantyDescription": "3-Year Premium Warranty",
+      "startDate": "2024-01-01T00:00:00.000Z",
+      "endDate": "2027-01-01T00:00:00.000Z"
+    }
+  ]
+}
+```
+
+**Field Requirements:**
+- `serialNumber` (required): Unique device serial number
+- `manufacturerSerialNumber` (optional): Manufacturer's serial number
+- `warrantyDescription` (required): Warranty description
+- `startDate` (required): Warranty start date (ISO 8601)
+- `endDate` (required): Warranty end date (ISO 8601)
+
+**Response:**
+```json
+{
+  "success": true,
+  "created": 1,
+  "updated": 0,
+  "errors": []
+}
+```
+
+---
+
+## 4. RMAs Upsert API
+
+Create or update Return Merchandise Authorization (RMA) requests.
+
+**Endpoint:** `POST /api/data/rmas/upsert`
+
+**Request Body:**
+```json
+{
+  "rmas": [
+    {
+      "rmaNumber": "RMA-2024-001",
+      "email": "john.doe@company.com",
+      "orderNumber": "ORD-2024-12345",
+      "status": "pending",
+      "issueDescription": "Laptop not powering on",
+      "resolution": null,
+      "createdAt": "2024-10-29T10:00:00.000Z",
+      "resolvedAt": null
+    }
+  ]
+}
+```
+
+**Field Requirements:**
+- `rmaNumber` (required): Unique RMA identifier
+- `email` (required): Customer email (must match existing user)
+- `orderNumber` (optional): Associated order number (must exist if provided)
+- `status` (required): One of: `pending`, `approved`, `in_transit`, `received`, `completed`, `rejected`
+- `issueDescription` (required): Description of the issue
+- `resolution` (optional): Resolution details
+- `createdAt` (required): ISO 8601 date format
+- `resolvedAt` (optional): ISO 8601 date format
+
+**Response:**
+```json
+{
+  "success": true,
+  "created": 1,
+  "updated": 0,
+  "errors": []
+}
+```
+
+**Important Notes:**
+- Users must exist before creating RMAs
+- If `orderNumber` is provided, the order must exist in the system
+- RMAs are linked to users via the `email` field
 
 ---
 
 ## Error Handling
 
-All endpoints return standard HTTP status codes:
+All Data Push APIs return detailed error information:
 
-- **200 OK** - Successful GET/PATCH request
-- **201 Created** - Successful POST request
-- **204 No Content** - Successful DELETE request
-- **400 Bad Request** - Invalid request data
-- **401 Unauthorized** - Not authenticated or not an admin
-- **404 Not Found** - Resource not found
-- **500 Internal Server Error** - Server error
-
-Error responses include a message:
+**Partial Success Example:**
 ```json
 {
-  "message": "Error description"
+  "success": true,
+  "created": 2,
+  "updated": 1,
+  "errors": [
+    {
+      "orderNumber": "ORD-FAIL-001",
+      "error": "User with email customer@example.com not found"
+    }
+  ]
 }
 ```
 
-For validation errors (400), additional error details are provided:
+**Complete Failure Example:**
 ```json
 {
-  "message": "Invalid data",
-  "errors": [
-    {
-      "path": ["fieldName"],
-      "message": "Field is required"
-    }
-  ]
+  "success": false,
+  "error": "Request must include 'users' array"
+}
+```
+
+**Authentication Failure:**
+```json
+{
+  "success": false,
+  "error": "API key required. Provide it in X-API-Key header or Authorization: Bearer <key>"
 }
 ```
 
@@ -534,84 +316,37 @@ For validation errors (400), additional error details are provided:
 
 ## Best Practices
 
-1. **Always use HTTPS in production** - Never send credentials over unencrypted connections
-2. **Maintain session cookies** - Store the session cookie from login and include it in all subsequent requests
-3. **Use filtering to reduce data transfer** - Apply query parameters to get only the data you need
-4. **Handle errors gracefully** - Check response status codes and handle error cases
-5. **Validate data before sending** - Ensure your data matches the schema before POST/PATCH requests
-6. **Use pagination if needed** - For large datasets, consider implementing pagination on your end
+1. **User Creation First**: Always upsert users before orders/RMAs to ensure email linking works
+2. **Batch Size**: Keep batches under 500 records per request for optimal performance
+3. **Error Handling**: Always check the `errors` array and retry failed records
+4. **Date Formats**: Use ISO 8601 format: `2024-10-29T10:30:00.000Z`
+5. **Password Security**: Always bcrypt hash passwords before sending (never send plain text)
+6. **Monetary Values**: Use integers in pence/cents (multiply by 100)
+7. **Idempotency**: Upsert operations are safe to retry - they won't create duplicates
 
 ---
 
-## Rate Limiting
+# Warranty Lookup API
 
-Currently, there are no rate limits on these APIs. However, we recommend:
-- Maximum 100 requests per minute per IP address
-- Implement exponential backoff for failed requests
-- Cache responses when appropriate to reduce server load
+Public endpoint for warranty information lookup (no authentication required).
 
----
+**Endpoint:** `GET /api/warranties/search?q={serialNumber}`
 
-## Support
+**Parameters:**
+- `q` (required): Serial number or manufacturer serial number
 
-For API support or to report issues, please contact the development team or create a support ticket through the portal.
-
----
-
-## Changelog
-
-### Version 2.1 (October 2025)
-- **NEW:** API Key authentication for data push APIs (Power Automate friendly)
-- Supports both X-API-Key header and Authorization Bearer token
-- Admin endpoints to create, list, revoke, and delete API keys
-- Secure bcrypt hashing of API keys
-- Automatic tracking of API key usage (lastUsedAt timestamp)
-
-### Version 2.0 (October 2025)
-- **NEW:** Data Push APIs with upsert functionality
-- **NEW:** Warranty lookup API with serial number search
-- **REMOVED:** Admin portal routes (all management via APIs now)
-- Bulk upsert support for users, orders, RMAs, and warranties
-- Email-based user lookup and linking for data synchronization
-
-### Version 1.0 (October 2024)
-- Initial release of CRUD APIs
-- Full filtering support for users, orders, RMAs, and support tickets
-- Admin authentication requirement
-- Comprehensive error handling and validation
-
----
-
-# Data Push APIs (Version 2.0)
-
-## Overview
-The Data Push APIs enable external systems to synchronize data with the customer portal using upsert operations. These APIs create new records if they don't exist or update existing records based on unique identifiers.
-
-## Key Features
-- **Upsert Operations**: Automatically create or update records
-- **Bulk Processing**: Handle multiple records in a single API call
-- **Error Reporting**: Individual error tracking for each failed record
-- **Email Linking**: Link orders and RMAs to users via email addresses
-
-## Warranty Lookup API (Public)
-
-### Search Warranty by Serial Number
-This endpoint allows users to search for warranty information using either the serial number or manufacturer serial number.
-
+**Example:**
 ```bash
-GET /api/warranties/search?q={serialNumber}
+curl "https://your-portal.replit.app/api/warranties/search?q=SN123456789"
 ```
 
-**Query Parameters:**
-- `q` (string, required): Serial number or manufacturer serial number to search
-
-**Response (Warranty Found):**
+**Response (Found):**
 ```json
 {
   "found": true,
   "warranty": {
     "serialNumber": "SN123456789",
-    "manufacturerSerialNumber": "MFG-987654321",
+    "manufacturerSerialNumber": "DELL-MFG-987654321",
     "warrantyDescription": "3-Year Premium Warranty",
     "startDate": "2024-01-01T00:00:00.000Z",
     "endDate": "2027-01-01T00:00:00.000Z",
@@ -621,7 +356,7 @@ GET /api/warranties/search?q={serialNumber}
 }
 ```
 
-**Response (Warranty Not Found):**
+**Response (Not Found):**
 ```json
 {
   "found": false,
@@ -629,52 +364,20 @@ GET /api/warranties/search?q={serialNumber}
 }
 ```
 
-**Example:**
-```bash
-curl "https://your-portal.replit.app/api/warranties/search?q=SN123456789"
-```
-
 ---
 
-## Upsert Users API (Admin Only)
+# API Key Management
 
-### Bulk Upsert Users
-Create or update multiple users in a single request. Users are identified by email address (unique key).
+Administrators can create and manage API keys through these endpoints (requires session authentication).
 
-```bash
-POST /api/data/users/upsert
-Content-Type: application/json
-```
+## Create API Key
 
-**Request Body:**
+**Endpoint:** `POST /api/admin/api-keys`
+
+**Request:**
 ```json
 {
-  "users": [
-    {
-      "username": "john.doe@example.com",
-      "password": "$2a$10$hashedpassword...",
-      "name": "John Doe",
-      "company": "Tech Solutions Inc",
-      "email": "john.doe@example.com",
-      "phoneNumber": "+1234567890",
-      "isAdmin": false,
-      "notificationPreferences": {
-        "orderUpdates": true,
-        "environmentalImpact": true,
-        "charityUpdates": false,
-        "serviceReminders": true
-      }
-    },
-    {
-      "username": "jane.smith@example.com",
-      "password": "$2a$10$hashedpassword...",
-      "name": "Jane Smith",
-      "company": "Green Computing Ltd",
-      "email": "jane.smith@example.com",
-      "phoneNumber": "+9876543210",
-      "isAdmin": false
-    }
-  ]
+  "name": "My Integration Name"
 }
 ```
 
@@ -682,386 +385,248 @@ Content-Type: application/json
 ```json
 {
   "success": true,
-  "created": 2,
-  "updated": 0,
-  "errors": []
-}
-```
-
-**Important Notes:**
-- Passwords must be bcrypt hashed before sending
-- Email is the unique identifier - existing users will be updated
-- All fields except `notificationPreferences` are required
-
----
-
-## Upsert Orders API (Admin Only)
-
-### Bulk Upsert Orders
-Create or update multiple orders with their items. Orders are identified by order number (unique key) and linked to users via email.
-
-```bash
-POST /api/data/orders/upsert
-Content-Type: application/json
-```
-
-**Request Body:**
-```json
-{
-  "orders": [
-    {
-      "orderNumber": "ORD-2024-001",
-      "email": "john.doe@example.com",
-      "orderDate": "2024-01-15T10:30:00.000Z",
-      "status": "shipped",
-      "totalAmount": 1299.99,
-      "shippingAddress": "123 Main St, City, State 12345",
-      "billingAddress": "123 Main St, City, State 12345",
-      "trackingNumber": "TRACK123456789",
-      "estimatedDelivery": "2024-01-20T00:00:00.000Z",
-      "packingListUrl": "https://example.com/packing-list.pdf",
-      "hashcodesUrl": "https://example.com/hashcodes.csv",
-      "items": [
-        {
-          "productName": "Remanufactured Dell Latitude 5420",
-          "sku": "DELL-LAT-5420-I5-16GB",
-          "quantity": 1,
-          "unitPrice": 899.99,
-          "totalPrice": 899.99,
-          "serialNumber": "SN123456789",
-          "warrantyEndDate": "2027-01-15T00:00:00.000Z"
-        },
-        {
-          "productName": "USB-C Docking Station",
-          "sku": "DOCK-USBC-001",
-          "quantity": 1,
-          "unitPrice": 149.99,
-          "totalPrice": 149.99
-        }
-      ]
-    }
-  ]
-}
-```
-
-**Response:**
-```json
-{
-  "success": true,
-  "created": 1,
-  "updated": 0,
-  "errors": []
-}
-```
-
-**Important Notes:**
-- `orderNumber` must be unique (used as identifier for upsert)
-- `email` must match an existing user in the database
-- `items` array will replace all existing items for the order
-- If user doesn't exist, the operation fails with an error
-
-**Error Example:**
-```json
-{
-  "success": true,
-  "created": 0,
-  "updated": 0,
-  "errors": [
-    {
-      "orderNumber": "ORD-2024-001",
-      "error": "User with email john.doe@example.com not found"
-    }
-  ]
-}
-```
-
----
-
-## Upsert RMAs API (Admin Only)
-
-### Bulk Upsert RMAs
-Create or update multiple RMA (Return Merchandise Authorization) requests. RMAs are identified by RMA number (unique key) and linked to users and orders via email and order number.
-
-```bash
-POST /api/data/rmas/upsert
-Content-Type: application/json
-```
-
-**Request Body:**
-```json
-{
-  "rmas": [
-    {
-      "rmaNumber": "RMA-2024-001",
-      "email": "john.doe@example.com",
-      "orderNumber": "ORD-2024-001",
-      "status": "approved",
-      "issueDescription": "Battery not holding charge properly",
-      "requestedAction": "replacement",
-      "createdAt": "2024-02-01T09:00:00.000Z",
-      "updatedAt": "2024-02-02T14:30:00.000Z",
-      "resolutionNotes": "Approved for battery replacement. New unit shipped.",
-      "trackingNumber": "RMA-TRACK789",
-      "productName": "Dell Latitude 5420",
-      "serialNumber": "SN123456789",
-      "faultDetails": "Battery drains from 100% to 0% in under 2 hours",
-      "customerName": "John Doe",
-      "customerEmail": "john.doe@example.com",
-      "customerPhone": "+1234567890",
-      "billingAddress": "123 Main St, City, State 12345",
-      "deliveryAddress": "123 Main St, City, State 12345"
-    }
-  ]
-}
-```
-
-**Response:**
-```json
-{
-  "success": true,
-  "created": 1,
-  "updated": 0,
-  "errors": []
-}
-```
-
-**Important Notes:**
-- `rmaNumber` must be unique (used as identifier for upsert)
-- Both `email` and `orderNumber` must exist in the database
-- If user or order doesn't exist, the operation fails with an error
-
----
-
-## Bulk Upsert Warranties API (Admin Only)
-
-### Bulk Upsert Warranties
-Create or update multiple warranty records. Warranties are identified by serial number (unique key).
-
-```bash
-POST /api/data/warranties/upsert
-Content-Type: application/json
-```
-
-**Request Body:**
-```json
-{
-  "warranties": [
-    {
-      "serialNumber": "SN123456789",
-      "manufacturerSerialNumber": "MFG-987654321",
-      "warrantyDescription": "3-Year Premium Warranty with Advanced Exchange",
-      "startDate": "2024-01-15T00:00:00.000Z",
-      "endDate": "2027-01-15T00:00:00.000Z"
-    },
-    {
-      "serialNumber": "SN987654321",
-      "manufacturerSerialNumber": "MFG-123456789",
-      "warrantyDescription": "1-Year Standard Warranty",
-      "startDate": "2024-03-01T00:00:00.000Z",
-      "endDate": "2025-03-01T00:00:00.000Z"
-    }
-  ]
-}
-```
-
-**Response:**
-```json
-{
-  "success": true,
-  "created": 2,
-  "updated": 0,
-  "errors": []
-}
-```
-
-**Important Notes:**
-- `serialNumber` is the unique identifier for upsert
-- If warranty with same serial number exists, it will be updated
-- `manufacturerSerialNumber` can also be used for warranty lookups
-
----
-
-## Data Push API Usage Examples
-
-### Example 1: Synchronize Users from External System
-```bash
-# Login first
-curl -c cookies.txt -X POST http://localhost:5000/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{
-    "username": "admin@example.com",
-    "password": "admin123"
-  }'
-
-# Upsert users
-curl -b cookies.txt -X POST http://localhost:5000/api/data/users/upsert \
-  -H "Content-Type: application/json" \
-  -d '{
-    "users": [
-      {
-        "username": "customer1@example.com",
-        "password": "$2a$10$hashedpassword...",
-        "name": "Customer One",
-        "company": "Example Corp",
-        "email": "customer1@example.com",
-        "phoneNumber": "+1234567890",
-        "isAdmin": false
-      }
-    ]
-  }'
-```
-
-### Example 2: Push Order Updates with Items
-```bash
-curl -b cookies.txt -X POST http://localhost:5000/api/data/orders/upsert \
-  -H "Content-Type: application/json" \
-  -d '{
-    "orders": [
-      {
-        "orderNumber": "ORD-2024-042",
-        "email": "customer1@example.com",
-        "orderDate": "2024-10-15T10:00:00.000Z",
-        "status": "delivered",
-        "totalAmount": 1999.99,
-        "shippingAddress": "456 Oak Ave, Town, State 67890",
-        "billingAddress": "456 Oak Ave, Town, State 67890",
-        "items": [
-          {
-            "productName": "Dell Latitude 7420",
-            "sku": "DELL-LAT-7420",
-            "quantity": 2,
-            "unitPrice": 999.99,
-            "totalPrice": 1999.98,
-            "serialNumber": "SN111222333"
-          }
-        ]
-      }
-    ]
-  }'
-```
-
-### Example 3: Update Warranty Information
-```bash
-curl -b cookies.txt -X POST http://localhost:5000/api/data/warranties/upsert \
-  -H "Content-Type: application/json" \
-  -d '{
-    "warranties": [
-      {
-        "serialNumber": "SN111222333",
-        "manufacturerSerialNumber": "DELL-MFG-999888",
-        "warrantyDescription": "Extended 5-Year Warranty",
-        "startDate": "2024-10-15T00:00:00.000Z",
-        "endDate": "2029-10-15T00:00:00.000Z"
-      }
-    ]
-  }'
-```
-
----
-
-## Data Synchronization Best Practices
-
-1. **Regular Sync Schedule**: Run upsert operations on a regular schedule (e.g., hourly, daily)
-2. **Batch Size**: Keep batch sizes reasonable (recommended: 100-500 records per request)
-3. **Error Handling**: Always check the `errors` array in responses and retry failed records
-4. **User Creation First**: Always upsert users before orders/RMAs to ensure email links work
-5. **Password Security**: Always bcrypt hash passwords before sending (never send plain text)
-6. **Date Formats**: Use ISO 8601 format for all dates (e.g., `2024-01-15T10:30:00.000Z`)
-7. **Idempotency**: Upsert operations are idempotent - safe to retry without creating duplicates
-
----
-
-## Authentication for Data Push APIs
-
-All data push APIs use API key authentication for easy integration with automation tools like Power Automate.
-
-### Step 1: Generate an API Key
-
-Login to the customer portal as an admin and create an API key:
-
-```bash
-# Login to the admin portal
-curl -c cookies.txt -X POST https://your-portal.replit.app/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{
-    "username": "admin@example.com",
-    "password": "your-secure-password"
-  }'
-
-# Create an API key
-curl -b cookies.txt -X POST https://your-portal.replit.app/api/admin/api-keys \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "Power Automate Integration"
-  }'
-
-# Response will include the API key (save it securely - it won't be shown again):
-{
-  "success": true,
-  "apiKey": "cc_0daf54d0edd5dc7c1f1ec2a16b98812ee6e76fc5f7173caf922cac221cd04b2f",
+  "apiKey": "cc_7101cbf99d27c5a98e3cefc80f79fb28b94e194a289c139b179655d8f565cb28",
   "metadata": {
-    "id": 1,
-    "name": "Power Automate Integration",
-    "keyPrefix": "cc_0daf54d0",
-    "createdAt": "2025-10-29T11:44:57.811Z",
+    "id": 4,
+    "name": "My Integration Name",
+    "keyPrefix": "cc_7101cbf9",
+    "createdAt": "2025-10-29T12:02:39.783Z",
     "isActive": true
   },
   "message": "Save this API key securely. It won't be shown again."
 }
 ```
 
-### Step 2: Use the API Key in Your Requests
+**Important:** The full API key is only shown once. Store it securely.
 
-You can provide the API key in two ways:
+## List API Keys
 
-**Option 1: X-API-Key Header (Recommended for Power Automate)**
+**Endpoint:** `GET /api/admin/api-keys`
+
+**Response:**
+```json
+{
+  "success": true,
+  "apiKeys": [
+    {
+      "id": 4,
+      "name": "Production API Key - Power Automate",
+      "keyPrefix": "cc_7101cbf9",
+      "isActive": true,
+      "lastUsedAt": "2025-10-29T12:15:00.000Z",
+      "createdAt": "2025-10-29T12:02:39.783Z"
+    }
+  ]
+}
+```
+
+## Revoke API Key
+
+**Endpoint:** `PATCH /api/admin/api-keys/:id/revoke`
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "API key revoked successfully"
+}
+```
+
+## Delete API Key
+
+**Endpoint:** `DELETE /api/admin/api-keys/:id`
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "API key deleted successfully"
+}
+```
+
+**Note:** All API key management endpoints require admin session authentication (login via web portal).
+
+---
+
+# Portal APIs
+
+These APIs are used by the customer portal frontend and require user session authentication. They are documented here for reference but are primarily for internal use.
+
+## Authentication APIs
+
+### Login
 ```bash
-curl -X POST https://your-portal.replit.app/api/data/users/upsert \
+POST /api/auth/login
+Content-Type: application/json
+
+{
+  "username": "user@example.com",
+  "password": "password123"
+}
+```
+
+### Logout
+```bash
+POST /api/auth/logout
+```
+
+### Get Current User
+```bash
+GET /api/auth/me
+```
+
+## Customer-Facing APIs
+
+All require session authentication (logged-in user).
+
+### Orders
+- `GET /api/orders` - List user's orders
+- `GET /api/orders/:id` - Get specific order details
+- `GET /api/orders/:orderId/items` - Get order items
+- `GET /api/orders/:orderId/updates` - Get order status updates
+
+### RMA (Return Merchandise Authorization)
+- `GET /api/rma` - List user's RMAs
+- `GET /api/rma/:id` - Get specific RMA details
+- `POST /api/rma` - Create new RMA request
+
+### Environmental Impact
+- `GET /api/impact` - Get user's total environmental impact
+- `GET /api/impact/order/:orderId` - Get impact for specific order
+
+### Water Projects
+- `GET /api/water-projects` - List charity water projects (public)
+- `GET /api/water-projects/:id` - Get specific project details
+
+### Support Tickets
+- `GET /api/support-tickets` - List user's support tickets
+- `GET /api/support-tickets/:id` - Get specific ticket details
+- `POST /api/support-tickets` - Create new support ticket
+
+### Case Studies
+- `GET /api/case-studies` - List environmental case studies
+
+### Delivery Timeline
+- `GET /api/delivery-timeline/:orderId` - Get delivery timeline for order
+
+---
+
+# Legacy CRUD APIs
+
+⚠️ **DEPRECATED:** These APIs are maintained for backward compatibility but should not be used for new integrations. Use [Data Push APIs](#data-push-apis) instead.
+
+All CRUD endpoints require admin session authentication and are prefixed with `/api/crud/`.
+
+## Supported Entities
+
+- `/api/crud/users`
+- `/api/crud/orders`
+- `/api/crud/order-items`
+- `/api/crud/rmas`
+- `/api/crud/support-tickets`
+- `/api/crud/environmental-impact`
+- `/api/crud/water-projects`
+- `/api/crud/case-studies`
+
+## Standard Operations
+
+- `GET /api/crud/{entity}` - List all (with optional filters)
+- `GET /api/crud/{entity}/:id` - Get by ID
+- `POST /api/crud/{entity}` - Create new
+- `PATCH /api/crud/{entity}/:id` - Update
+- `DELETE /api/crud/{entity}/:id` - Delete
+
+**Example:**
+```bash
+# Login first
+curl -c cookies.txt -X POST http://localhost:5000/api/auth/login \
   -H "Content-Type: application/json" \
-  -H "X-API-Key: cc_0daf54d0edd5dc7c1f1ec2a16b98812ee6e76fc5f7173caf922cac221cd04b2f" \
-  -d '{"users": [...]}'
+  -d '{"username": "admin@example.com", "password": "password"}'
+
+# Use CRUD endpoint
+curl -b cookies.txt "http://localhost:5000/api/crud/users"
 ```
 
-**Option 2: Authorization Bearer Token**
-```bash
-curl -X POST https://your-portal.replit.app/api/data/users/upsert \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer cc_0daf54d0edd5dc7c1f1ec2a16b98812ee6e76fc5f7173caf922cac221cd04b2f" \
-  -d '{"users": [...]}'
+---
+
+## Support & Troubleshooting
+
+### Common Issues
+
+**"API key required" error:**
+- Ensure you're including the API key in the `X-API-Key` header or `Authorization: Bearer` header
+- Verify the key hasn't been revoked
+
+**"User with email X not found" error:**
+- Create users first before creating orders or RMAs
+- Ensure the email matches exactly (case-sensitive)
+
+**"Order with number X not found" error:**
+- Create the order before referencing it in RMAs
+- Verify the order number matches exactly
+
+**Date parsing errors:**
+- Use ISO 8601 format: `2024-10-29T10:30:00.000Z`
+- Include the `T` separator and `Z` timezone
+
+**Monetary value errors:**
+- Use integers only (no decimals)
+- Values are in pence/cents (multiply pounds/dollars by 100)
+
+### Rate Limiting
+
+Currently no rate limits are enforced, but we recommend:
+- Maximum 100 requests per minute
+- Implement exponential backoff for failed requests
+- Use batch operations where possible
+
+### Getting Help
+
+For API support or to report issues:
+1. Check the troubleshooting guide above
+2. Review the error message in the response
+3. Contact your system administrator
+4. Create a support ticket through the portal
+
+---
+
+## Changelog
+
+### Version 2.1 (October 2025) - Current
+- ✅ API Key authentication for data push APIs
+- ✅ Support for both X-API-Key and Authorization Bearer headers
+- ✅ Admin API key management endpoints
+- ✅ Automatic API key usage tracking
+- ✅ Secure bcrypt hashing of API keys
+
+### Version 2.0 (October 2025)
+- Data Push APIs with upsert functionality
+- Warranty lookup API with serial number search
+- Bulk upsert support for users, orders, RMAs, and warranties
+- Email-based user lookup and linking
+
+### Version 1.0 (October 2024)
+- Initial CRUD APIs
+- Session-based authentication
+- Basic filtering and search capabilities
+
+---
+
+## API Reference Summary
+
+| API Category | Authentication | Use Case |
+|-------------|----------------|----------|
+| **Data Push APIs** | API Key | External integrations (Power Automate, Zapier) |
+| **Warranty Lookup** | None (Public) | Public warranty verification |
+| **API Key Management** | Session (Admin) | Managing API keys |
+| **Portal APIs** | Session (User) | Customer portal frontend |
+| **Legacy CRUD APIs** | Session (Admin) | Deprecated - use Data Push instead |
+
+---
+
+**Production API Key (Save This):**
+```
+cc_7101cbf99d27c5a98e3cefc80f79fb28b94e194a289c139b179655d8f565cb28
 ```
 
-### Managing API Keys
-
-**List all API keys:**
-```bash
-curl -b cookies.txt https://your-portal.replit.app/api/admin/api-keys
-```
-
-**Revoke an API key:**
-```bash
-curl -b cookies.txt -X PATCH https://your-portal.replit.app/api/admin/api-keys/1/revoke
-```
-
-**Delete an API key:**
-```bash
-curl -b cookies.txt -X DELETE https://your-portal.replit.app/api/admin/api-keys/1
-```
-
-### Power Automate Configuration
-
-When configuring HTTP requests in Power Automate:
-
-1. **Method**: POST
-2. **URI**: `https://your-portal.replit.app/api/data/users/upsert`
-3. **Headers**:
-   - `Content-Type`: `application/json`
-   - `X-API-Key`: `cc_your_api_key_here`
-4. **Body**: Your JSON payload
-
-**Security Notes:**
-- API keys do not expire (unless you set an expiration date)
-- Store API keys securely (use Power Automate's secure input feature)
-- API keys can be revoked instantly if compromised
-- Always use HTTPS in production
-- Monitor API key usage via the `lastUsedAt` timestamp
-- Each API key is hashed and cannot be retrieved after creation
+Store this key securely. It provides full access to all Data Push APIs and does not expire unless revoked.
