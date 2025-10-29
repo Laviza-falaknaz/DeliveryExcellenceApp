@@ -424,3 +424,24 @@ export type InsertUserProgress = z.infer<typeof insertUserProgressSchema>;
 
 export type ActivityLog = typeof activityLog.$inferSelect;
 export type InsertActivityLog = z.infer<typeof insertActivityLogSchema>;
+
+// Warranty lookup schema
+export const warranties = pgTable("warranties", {
+  id: serial("id").primaryKey(),
+  serialNumber: text("serial_number").notNull(),
+  manufacturerSerialNumber: text("manufacturer_serial_number").notNull(),
+  warrantyDescription: text("warranty_description").notNull(),
+  startDate: timestamp("start_date").notNull(),
+  endDate: timestamp("end_date").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertWarrantySchema = createInsertSchema(warranties).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type Warranty = typeof warranties.$inferSelect;
+export type InsertWarranty = z.infer<typeof insertWarrantySchema>;

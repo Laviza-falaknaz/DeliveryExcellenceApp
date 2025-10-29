@@ -14,7 +14,8 @@ import {
   userAchievements, UserAchievement, InsertUserAchievement,
   milestones, Milestone, InsertMilestone,
   userProgress, UserProgress, InsertUserProgress,
-  activityLog, ActivityLog, InsertActivityLog
+  activityLog, ActivityLog, InsertActivityLog,
+  warranties, Warranty, InsertWarranty
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, sum, like, and } from "drizzle-orm";
@@ -135,6 +136,16 @@ export interface IStorage {
   getActivityLog(userId: number, limit?: number): Promise<ActivityLog[]>;
   createActivityLog(log: InsertActivityLog): Promise<ActivityLog>;
   getRecentActivity(userId: number, days: number): Promise<ActivityLog[]>;
+
+  // Warranty operations
+  searchWarranty(query: string): Promise<Warranty | undefined>;
+  upsertWarranty(warranty: InsertWarranty): Promise<Warranty>;
+  bulkUpsertWarranties(warranties: InsertWarranty[]): Promise<{ created: number; updated: number; errors: any[] }>;
+
+  // Upsert operations for data push APIs
+  upsertUser(email: string, user: InsertUser): Promise<User>;
+  upsertOrder(orderNumber: string, email: string, order: Omit<InsertOrder, 'userId'>, items?: Omit<InsertOrderItem, 'orderId'>[]): Promise<Order>;
+  upsertRma(rmaNumber: string, email: string, orderNumber: string, rma: Omit<InsertRma, 'userId' | 'orderId'>): Promise<Rma>;
 }
 
 // Database storage implementation using Drizzle ORM - blueprint:javascript_database
@@ -704,6 +715,157 @@ export class DatabaseStorage implements IStorage {
       .from(activityLog)
       .where(eq(activityLog.userId, userId))
       .orderBy(activityLog.createdAt);
+  }
+
+  // Warranty operations
+  async searchWarranty(query: string): Promise<Warranty | undefined> {
+    const { or } = await import("drizzle-orm");
+    const [warranty] = await db.select()
+      .from(warranties)
+      .where(
+        or(
+          eq(warranties.serialNumber, query),
+          eq(warranties.manufacturerSerialNumber, query)
+        )
+      );
+    return warranty || undefined;
+  }
+
+  async upsertWarranty(warranty: InsertWarranty): Promise<Warranty> {
+    // Check if warranty exists by serial number or manufacturer serial number
+    const existing = await this.searchWarranty(warranty.serialNumber);
+    
+    if (existing) {
+      // Update existing warranty
+      const [updated] = await db.update(warranties)
+        .set({
+          ...warranty,
+          updatedAt: new Date()
+        })
+        .where(eq(warranties.id, existing.id))
+        .returning();
+      return updated;
+    } else {
+      // Create new warranty
+      const [created] = await db.insert(warranties).values(warranty).returning();
+      return created;
+    }
+  }
+
+  async bulkUpsertWarranties(warrantiesToUpsert: InsertWarranty[]): Promise<{ created: number; updated: number; errors: any[] }> {
+    let created = 0;
+    let updated = 0;
+    const errors: any[] = [];
+
+    for (const warranty of warrantiesToUpsert) {
+      try {
+        const existing = await this.searchWarranty(warranty.serialNumber);
+        if (existing) {
+          await this.upsertWarranty(warranty);
+          updated++;
+        } else {
+          await this.upsertWarranty(warranty);
+          created++;
+        }
+      } catch (error: any) {
+        errors.push({
+          serialNumber: warranty.serialNumber,
+          error: error.message
+        });
+      }
+    }
+
+    return { created, updated, errors };
+  }
+
+  // Upsert operations for data push APIs
+  async upsertUser(email: string, user: InsertUser): Promise<User> {
+    const existing = await this.getUserByEmail(email);
+    
+    if (existing) {
+      // Update existing user
+      const [updated] = await db.update(users)
+        .set(user)
+        .where(eq(users.id, existing.id))
+        .returning();
+      return updated;
+    } else {
+      // Create new user
+      return this.createUser(user);
+    }
+  }
+
+  async upsertOrder(orderNumber: string, email: string, order: Omit<InsertOrder, 'userId'>, items?: Omit<InsertOrderItem, 'orderId'>[]): Promise<Order> {
+    // Find user by email
+    const user = await this.getUserByEmail(email);
+    if (!user) {
+      throw new Error(`User with email ${email} not found`);
+    }
+
+    // Check if order exists
+    const existing = await this.getOrderByNumber(orderNumber);
+    
+    let resultOrder: Order;
+    
+    if (existing) {
+      // Update existing order
+      const [updated] = await db.update(orders)
+        .set({ ...order, userId: user.id })
+        .where(eq(orders.id, existing.id))
+        .returning();
+      resultOrder = updated;
+    } else {
+      // Create new order
+      const [created] = await db.insert(orders)
+        .values({ ...order, orderNumber, userId: user.id })
+        .returning();
+      resultOrder = created;
+    }
+
+    // Handle order items if provided
+    if (items && items.length > 0) {
+      // Delete existing items for this order
+      await db.delete(orderItems).where(eq(orderItems.orderId, resultOrder.id));
+      
+      // Insert new items
+      for (const item of items) {
+        await db.insert(orderItems).values({ ...item, orderId: resultOrder.id });
+      }
+    }
+
+    return resultOrder;
+  }
+
+  async upsertRma(rmaNumber: string, email: string, orderNumber: string, rma: Omit<InsertRma, 'userId' | 'orderId'>): Promise<Rma> {
+    // Find user by email
+    const user = await this.getUserByEmail(email);
+    if (!user) {
+      throw new Error(`User with email ${email} not found`);
+    }
+
+    // Find order by order number
+    const order = await this.getOrderByNumber(orderNumber);
+    if (!order) {
+      throw new Error(`Order with number ${orderNumber} not found`);
+    }
+
+    // Check if RMA exists
+    const existing = await this.getRmaByNumber(rmaNumber);
+    
+    if (existing) {
+      // Update existing RMA
+      const [updated] = await db.update(rmas)
+        .set({ ...rma, userId: user.id, orderId: order.id })
+        .where(eq(rmas.id, existing.id))
+        .returning();
+      return updated;
+    } else {
+      // Create new RMA
+      const [created] = await db.insert(rmas)
+        .values({ ...rma, rmaNumber, userId: user.id, orderId: order.id })
+        .returning();
+      return created;
+    }
   }
 }
 

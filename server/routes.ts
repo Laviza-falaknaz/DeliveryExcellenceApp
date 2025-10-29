@@ -561,277 +561,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // ============ ADMIN ROUTES ============
-  
-  // Admin user management
-  app.get("/api/admin/users", requireAdmin, async (req, res) => {
-    try {
-      const users = await storage.getAllUsers();
-      res.json(users);
-    } catch (error) {
-      res.status(500).json({ message: "Internal server error" });
-    }
-  });
-
-  app.post("/api/admin/users", requireAdmin, async (req, res) => {
-    try {
-      const userData = insertUserSchema.parse(req.body);
-      const hashedPassword = await bcrypt.hash(userData.password, 10);
-      const user = await storage.createUser({
-        ...userData,
-        password: hashedPassword,
-      });
-      res.status(201).json(user);
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: error.errors });
-      }
-      res.status(500).json({ message: "Internal server error" });
-    }
-  });
-
-  app.patch("/api/admin/users/:id", requireAdmin, async (req, res) => {
-    try {
-      const userId = parseInt(req.params.id);
-      const updateData = req.body;
-      
-      // Hash password if it's being updated
-      if (updateData.password) {
-        updateData.password = await bcrypt.hash(updateData.password, 10);
-      }
-      
-      const user = await storage.updateUser(userId, updateData);
-      
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
-      }
-      
-      res.json(user);
-    } catch (error) {
-      res.status(500).json({ message: "Internal server error" });
-    }
-  });
-
-  app.delete("/api/admin/users/:id", requireAdmin, async (req, res) => {
-    try {
-      const userId = parseInt(req.params.id);
-      await storage.deleteUser(userId);
-      res.status(204).send();
-    } catch (error) {
-      res.status(500).json({ message: "Internal server error" });
-    }
-  });
-
-  // Admin order management
-  app.get("/api/admin/orders", requireAdmin, async (req, res) => {
-    try {
-      const orders = await storage.getAllOrders();
-      res.json(orders);
-    } catch (error) {
-      res.status(500).json({ message: "Internal server error" });
-    }
-  });
-
-  app.delete("/api/admin/orders/:id", requireAdmin, async (req, res) => {
-    try {
-      const orderId = parseInt(req.params.id);
-      await storage.deleteOrder(orderId);
-      res.status(204).send();
-    } catch (error) {
-      res.status(500).json({ message: "Internal server error" });
-    }
-  });
-
-  // Admin RMA management
-  app.get("/api/admin/rmas", requireAdmin, async (req, res) => {
-    try {
-      const rmas = await storage.getAllRmas();
-      res.json(rmas);
-    } catch (error) {
-      res.status(500).json({ message: "Internal server error" });
-    }
-  });
-
-  app.delete("/api/admin/rmas/:id", requireAdmin, async (req, res) => {
-    try {
-      const rmaId = parseInt(req.params.id);
-      await storage.deleteRma(rmaId);
-      res.status(204).send();
-    } catch (error) {
-      res.status(500).json({ message: "Internal server error" });
-    }
-  });
-
-  // Admin support ticket management
-  app.get("/api/admin/support-tickets", requireAdmin, async (req, res) => {
-    try {
-      const tickets = await storage.getAllSupportTickets();
-      res.json(tickets);
-    } catch (error) {
-      res.status(500).json({ message: "Internal server error" });
-    }
-  });
-
-  app.delete("/api/admin/support-tickets/:id", requireAdmin, async (req, res) => {
-    try {
-      const ticketId = parseInt(req.params.id);
-      await storage.deleteSupportTicket(ticketId);
-      res.status(204).send();
-    } catch (error) {
-      res.status(500).json({ message: "Internal server error" });
-    }
-  });
-
-  // Admin water project management
-  app.post("/api/admin/water-projects", requireAdmin, async (req, res) => {
-    try {
-      const projectData = insertWaterProjectSchema.parse(req.body);
-      const project = await storage.createWaterProject(projectData);
-      res.status(201).json(project);
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: error.errors });
-      }
-      res.status(500).json({ message: "Internal server error" });
-    }
-  });
-
-  app.patch("/api/admin/water-projects/:id", requireAdmin, async (req, res) => {
-    try {
-      const projectId = parseInt(req.params.id);
-      const updateData = req.body;
-      
-      const project = await storage.updateWaterProject(projectId, updateData);
-      
-      if (!project) {
-        return res.status(404).json({ message: "Water project not found" });
-      }
-      
-      res.json(project);
-    } catch (error) {
-      res.status(500).json({ message: "Internal server error" });
-    }
-  });
-
-  app.delete("/api/admin/water-projects/:id", requireAdmin, async (req, res) => {
-    try {
-      const projectId = parseInt(req.params.id);
-      await storage.deleteWaterProject(projectId);
-      res.status(204).send();
-    } catch (error) {
-      res.status(500).json({ message: "Internal server error" });
-    }
-  });
-
-  // Admin case study management
-  app.delete("/api/admin/case-studies/:id", requireAdmin, async (req, res) => {
-    try {
-      const caseStudyId = parseInt(req.params.id);
-      await storage.deleteCaseStudy(caseStudyId);
-      res.status(204).send();
-    } catch (error) {
-      res.status(500).json({ message: "Internal server error" });
-    }
-  });
-
-  // Theme settings routes
-  const themeSettingsSchema = z.object({
-    primaryColor: z.string().default("#0D9488"),
-    secondaryColor: z.string().default("#14B8A6"),
-    accentColor: z.string().default("#2DD4BF"),
-    backgroundColor: z.string().default("#FFFFFF"),
-    headingFont: z.string().default("Inter"),
-    bodyFont: z.string().default("Inter"),
-    logoUrl: z.string().default(""),
-    companyName: z.string().default("Circular Computing")
-  });
-
-  const defaultTheme = {
-    primaryColor: "#0D9488",
-    secondaryColor: "#14B8A6",
-    accentColor: "#2DD4BF",
-    backgroundColor: "#FFFFFF",
-    headingFont: "Inter",
-    bodyFont: "Inter",
-    logoUrl: "",
-    companyName: "Circular Computing"
-  };
-
-  app.get("/api/admin/theme", requireAdmin, async (req, res) => {
-    try {
-      const settings = await storage.getThemeSettings();
-      // Merge with defaults to ensure all fields are present
-      res.json({ ...defaultTheme, ...(settings || {}) });
-    } catch (error) {
-      res.status(500).json({ message: "Internal server error" });
-    }
-  });
-
-  app.post("/api/admin/theme", requireAdmin, async (req, res) => {
-    try {
-      // Validate and apply defaults
-      const validated = themeSettingsSchema.parse(req.body);
-      const settings = await storage.saveThemeSettings(validated);
-      res.json({ ...defaultTheme, ...(settings || {}) });
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Invalid theme settings", errors: error.errors });
-      }
-      res.status(500).json({ message: "Internal server error" });
-    }
-  });
-
-  // Database connection info route
-  app.get("/api/admin/connection", requireAdmin, (req, res) => {
-    try {
-      const dbUrl = process.env.DATABASE_URL || "";
-      let maskedUrl = dbUrl;
-      
-      // Safely mask password by replacing everything between // and @ with username:****
-      try {
-        const urlObj = new URL(dbUrl);
-        if (urlObj.password) {
-          maskedUrl = dbUrl.replace(
-            new RegExp(`://${urlObj.username}:${urlObj.password.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}@`),
-            `://${urlObj.username}:****@`
-          );
-        }
-        
-        res.json({
-          development: {
-            host: urlObj.hostname,
-            port: urlObj.port || "5432",
-            database: urlObj.pathname.slice(1),
-            user: urlObj.username,
-            ssl: urlObj.searchParams.get("sslmode") === "require",
-            connectionString: maskedUrl
-          },
-          production: {
-            note: "Production database is managed separately by Replit. Use the Replit database pane to access production settings.",
-            managedBy: "Replit"
-          }
-        });
-      } catch (urlError) {
-        // Fallback if URL parsing fails
-        res.json({
-          development: {
-            host: "N/A",
-            port: "N/A",
-            database: "N/A",
-            user: "N/A",
-            ssl: false,
-            connectionString: "Unable to parse connection string"
-          },
-          production: {
-            note: "Production database is managed separately by Replit. Use the Replit database pane to access production settings.",
-            managedBy: "Replit"
-          }
-        });
-      }
-    } catch (error) {
-      res.status(500).json({ message: "Internal server error" });
-    }
-  });
 
   // ============================================
   // External CRUD API Routes with Filtering
@@ -1511,6 +1240,232 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(activities);
     } catch (error) {
       res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // ==================== DATA PUSH APIS ====================
+  // These APIs allow external systems to push data into the portal
+  // Authentication required: Use bearer token or session-based auth
+
+  // Warranty Lookup API (User-facing)
+  app.get("/api/warranties/search", async (req, res) => {
+    try {
+      const { q } = req.query;
+      
+      if (!q || typeof q !== 'string') {
+        return res.status(400).json({ 
+          found: false,
+          message: "Please provide a serial number to search" 
+        });
+      }
+
+      const warranty = await storage.searchWarranty(q);
+      
+      if (!warranty) {
+        return res.json({
+          found: false,
+          message: "No warranty found for this serial number"
+        });
+      }
+
+      const now = new Date();
+      const endDate = new Date(warranty.endDate);
+      const startDate = new Date(warranty.startDate);
+      const daysRemaining = Math.ceil((endDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+      
+      let status = 'active';
+      if (now < startDate) {
+        status = 'upcoming';
+      } else if (now > endDate) {
+        status = 'expired';
+      }
+
+      res.json({
+        found: true,
+        warranty: {
+          serialNumber: warranty.serialNumber,
+          manufacturerSerialNumber: warranty.manufacturerSerialNumber,
+          warrantyDescription: warranty.warrantyDescription,
+          startDate: warranty.startDate,
+          endDate: warranty.endDate,
+          status,
+          daysRemaining: daysRemaining > 0 ? daysRemaining : 0
+        }
+      });
+    } catch (error) {
+      res.status(500).json({ 
+        found: false,
+        message: "Internal server error" 
+      });
+    }
+  });
+
+  // Upsert Users API
+  app.post("/api/data/users/upsert", requireAdmin, async (req, res) => {
+    try {
+      const { users: usersToUpsert } = req.body;
+      
+      if (!Array.isArray(usersToUpsert)) {
+        return res.status(400).json({ 
+          success: false,
+          error: "Request must include 'users' array" 
+        });
+      }
+
+      let created = 0;
+      let updated = 0;
+      const errors: any[] = [];
+
+      for (const userData of usersToUpsert) {
+        try {
+          const existing = await storage.getUserByEmail(userData.email);
+          await storage.upsertUser(userData.email, userData);
+          if (existing) {
+            updated++;
+          } else {
+            created++;
+          }
+        } catch (error: any) {
+          errors.push({
+            email: userData.email,
+            error: error.message
+          });
+        }
+      }
+
+      res.json({
+        success: true,
+        created,
+        updated,
+        errors
+      });
+    } catch (error) {
+      res.status(500).json({ 
+        success: false,
+        error: "Internal server error" 
+      });
+    }
+  });
+
+  // Upsert Orders API
+  app.post("/api/data/orders/upsert", requireAdmin, async (req, res) => {
+    try {
+      const { orders: ordersToUpsert } = req.body;
+      
+      if (!Array.isArray(ordersToUpsert)) {
+        return res.status(400).json({ 
+          success: false,
+          error: "Request must include 'orders' array" 
+        });
+      }
+
+      let created = 0;
+      let updated = 0;
+      const errors: any[] = [];
+
+      for (const orderData of ordersToUpsert) {
+        try {
+          const { orderNumber, email, items, ...order } = orderData;
+          const existing = await storage.getOrderByNumber(orderNumber);
+          await storage.upsertOrder(orderNumber, email, order, items);
+          if (existing) {
+            updated++;
+          } else {
+            created++;
+          }
+        } catch (error: any) {
+          errors.push({
+            orderNumber: orderData.orderNumber,
+            error: error.message
+          });
+        }
+      }
+
+      res.json({
+        success: true,
+        created,
+        updated,
+        errors
+      });
+    } catch (error) {
+      res.status(500).json({ 
+        success: false,
+        error: "Internal server error" 
+      });
+    }
+  });
+
+  // Upsert RMAs API
+  app.post("/api/data/rmas/upsert", requireAdmin, async (req, res) => {
+    try {
+      const { rmas: rmasToUpsert } = req.body;
+      
+      if (!Array.isArray(rmasToUpsert)) {
+        return res.status(400).json({ 
+          success: false,
+          error: "Request must include 'rmas' array" 
+        });
+      }
+
+      let created = 0;
+      let updated = 0;
+      const errors: any[] = [];
+
+      for (const rmaData of rmasToUpsert) {
+        try {
+          const { rmaNumber, email, orderNumber, ...rma } = rmaData;
+          const existing = await storage.getRmaByNumber(rmaNumber);
+          await storage.upsertRma(rmaNumber, email, orderNumber, rma);
+          if (existing) {
+            updated++;
+          } else {
+            created++;
+          }
+        } catch (error: any) {
+          errors.push({
+            rmaNumber: rmaData.rmaNumber,
+            error: error.message
+          });
+        }
+      }
+
+      res.json({
+        success: true,
+        created,
+        updated,
+        errors
+      });
+    } catch (error) {
+      res.status(500).json({ 
+        success: false,
+        error: "Internal server error" 
+      });
+    }
+  });
+
+  // Bulk Upsert Warranties API
+  app.post("/api/data/warranties/upsert", requireAdmin, async (req, res) => {
+    try {
+      const { warranties: warrantiesToUpsert } = req.body;
+      
+      if (!Array.isArray(warrantiesToUpsert)) {
+        return res.status(400).json({ 
+          success: false,
+          error: "Request must include 'warranties' array" 
+        });
+      }
+
+      const result = await storage.bulkUpsertWarranties(warrantiesToUpsert);
+
+      res.json({
+        success: true,
+        ...result
+      });
+    } catch (error) {
+      res.status(500).json({ 
+        success: false,
+        error: "Internal server error" 
+      });
     }
   });
 
