@@ -12,6 +12,7 @@ export const users = pgTable("users", {
   email: text("email").notNull().unique(),
   phoneNumber: text("phone_number"),
   isAdmin: boolean("is_admin").notNull().default(false),
+  isActive: boolean("is_active").notNull().default(true),
   notificationPreferences: json("notification_preferences").$type<{
     orderUpdates: boolean;
     environmentalImpact: boolean;
