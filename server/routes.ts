@@ -69,6 +69,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return done(null, false, { message: "Incorrect username or password." });
         }
 
+        // Check if user is active
+        if (!user.isActive) {
+          return done(null, false, { message: "Your account has been deactivated. Please contact your administrator for assistance." });
+        }
+
         return done(null, user);
       } catch (err) {
         return done(err);
