@@ -111,24 +111,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
                       req.headers.authorization.substring(7) : null);
       
       if (!apiKey) {
+        console.log(`[API Key Auth] Missing API key for ${req.method} ${req.path}`);
         return res.status(401).json({ 
           success: false,
           error: "API key required. Provide it in X-API-Key header or Authorization: Bearer <key>" 
         });
       }
 
+      const keyPrefix = apiKey.substring(0, 11);
+      console.log(`[API Key Auth] Validating key with prefix: ${keyPrefix} for ${req.method} ${req.path}`);
+
       const validKey = await storage.validateApiKey(apiKey);
       
       if (!validKey) {
+        console.log(`[API Key Auth] FAILED - Invalid or expired key with prefix: ${keyPrefix}`);
         return res.status(401).json({ 
           success: false,
           error: "Invalid or expired API key" 
         });
       }
 
+      console.log(`[API Key Auth] SUCCESS - Valid key: ${validKey.name} (ID: ${validKey.id})`);
       // API key is valid, proceed
       next();
     } catch (error) {
+      console.error('[API Key Auth] Exception:', error);
       res.status(500).json({ 
         success: false,
         error: "Internal server error" 
