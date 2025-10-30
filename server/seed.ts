@@ -1,5 +1,5 @@
 import { db } from "./db";
-import { users, waterProjects } from "@shared/schema";
+import { users, waterProjects, systemSettings } from "@shared/schema";
 import bcrypt from "bcryptjs";
 import { eq } from "drizzle-orm";
 import { seedGamificationData } from "./gamification-seed";
@@ -70,6 +70,26 @@ export async function seedDatabase() {
       ]);
       
       console.log("✅ Water projects created");
+    }
+
+    // Check if password webhook setting exists
+    const existingWebhookSetting = await db
+      .select()
+      .from(systemSettings)
+      .where(eq(systemSettings.settingKey, 'password_webhook'))
+      .limit(1);
+    
+    if (existingWebhookSetting.length === 0) {
+      console.log("Creating password webhook setting...");
+      
+      await db.insert(systemSettings).values({
+        settingKey: 'password_webhook',
+        settingValue: {
+          webhookUrl: 'https://01f7d87362b64cf3a95fbd0a0c6bc1.28.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/3a96d10bf06946f88dfae3896847f0ff/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=YHPc_UoSSNcy0ZU9n2lGxcsfUBbYitNe0JGtGDsvxvo'
+        },
+      });
+      
+      console.log("✅ Password webhook setting created");
     }
 
     // Seed gamification data
