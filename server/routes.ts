@@ -1462,6 +1462,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       for (const userData of usersToUpsert) {
         try {
+          // Hash password if it's provided in plain text
+          // Bcrypt hashes start with $2a$ or $2b$, so we check if it's already hashed
+          if (userData.password && !userData.password.startsWith('$2a$') && !userData.password.startsWith('$2b$')) {
+            userData.password = await bcrypt.hash(userData.password, 10);
+          }
+          
           const existing = await storage.getUserByEmail(userData.email);
           await storage.upsertUser(userData.email, userData);
           if (existing) {
