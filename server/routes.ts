@@ -241,6 +241,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Change password endpoint
+  app.post("/api/users/:id/change-password", isAuthenticated, async (req, res) => {
+    try {
+      const userId = parseInt(req.params.id);
+      const currentUser = req.user as User;
+      
+      // Users can only change their own password
+      if (userId !== currentUser.id) {
+        return res.status(403).json({ 
+          success: false,
+          error: "Forbidden" 
+        });
+      }
+      
+      const { currentPassword, newPassword } = req.body;
+      
+      if (!currentPassword || !newPassword) {
+        return res.status(400).json({ 
+          success: false,
+          error: "Current password and new password are required" 
+        });
+      }
+
+      if (newPassword.length < 6) {
+        return res.status(400).json({ 
+          success: false,
+          error: "New password must be at least 6 characters long" 
+        });
+      }
+      
+      const result = await storage.changePassword(userId, currentPassword, newPassword);
+      
+      if (!result.success) {
+        return res.status(400).json(result);
+      }
+      
+      res.json({ 
+        success: true,
+        message: "Password changed successfully" 
+      });
+    } catch (error) {
+      console.error('Password change error:', error);
+      res.status(500).json({ 
+        success: false,
+        error: "Internal server error" 
+      });
+    }
+  });
+
   // Order routes
   app.get("/api/orders", isAuthenticated, async (req, res) => {
     try {
