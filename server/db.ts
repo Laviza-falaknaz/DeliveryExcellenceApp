@@ -12,7 +12,10 @@ if (!process.env.DATABASE_URL) {
   );
 }
 
-export const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+// Use connection pooler for production deployments (better performance)
+const connectionString = process.env.DATABASE_URL.replace('.c-2.us-east-2', '-pooler.c-2.us-east-2');
+
+export const pool = new Pool({ connectionString });
 export const db = drizzle({ client: pool, schema });
 
 // Graceful shutdown
