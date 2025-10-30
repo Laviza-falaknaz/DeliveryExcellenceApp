@@ -257,6 +257,7 @@ export const systemSettings = pgTable("system_settings", {
     bodyFont?: string;
     logoUrl?: string;
     companyName?: string;
+    webhookUrl?: string;
   }>(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
