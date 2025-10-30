@@ -61,12 +61,13 @@ Create or update users in bulk.
   "users": [
     {
       "username": "john.doe@company.com",
-      "password": "$2a$10$hashed_password_here",
+      "password": "PlainTextPassword123",
       "name": "John Doe",
       "company": "ABC Corporation",
       "email": "john.doe@company.com",
       "phoneNumber": "+44 7700 900123",
-      "isAdmin": false
+      "isAdmin": false,
+      "isActive": true
     }
   ]
 }
@@ -74,12 +75,13 @@ Create or update users in bulk.
 
 **Field Requirements:**
 - `username` (required): Unique username, typically email
-- `password` (required): **Must be bcrypt hashed** before sending
+- `password` (required): Can be **plain text** or bcrypt hashed. System automatically detects and hashes plain text passwords before storage
 - `name` (required): Full name
 - `company` (required): Company name
 - `email` (required): Email address (used for linking orders and RMAs)
 - `phoneNumber` (optional): Phone number with country code
 - `isAdmin` (optional): Boolean, defaults to false
+- `isActive` (optional): Boolean, defaults to true. Set to false to deactivate user account (prevents login)
 
 **Response:**
 ```json
@@ -100,16 +102,27 @@ curl -X POST https://your-portal.replit.app/api/data/users/upsert \
     "users": [
       {
         "username": "jane.smith@company.com",
-        "password": "$2a$10$N9qo8uLOickgx2ZMRZoMye",
+        "password": "SecurePassword123!",
         "name": "Jane Smith",
         "company": "Tech Corp",
         "email": "jane.smith@company.com",
         "phoneNumber": "+44 7700 900456",
-        "isAdmin": false
+        "isAdmin": false,
+        "isActive": true
       }
     ]
   }'
 ```
+
+**User Activation/Deactivation:**
+- Set `isActive: false` to deactivate a user account
+- Deactivated users cannot login and will receive the message: "Your account has been deactivated. Please contact your administrator for assistance."
+- Set `isActive: true` to reactivate a user account
+
+**Password Handling:**
+- Send passwords in **plain text** - the system automatically encrypts them with bcrypt before storage
+- The system detects if a password is already hashed (starts with `$2a$` or `$2b$`) and skips re-hashing
+- This allows your external system to send plain text passwords without needing bcrypt encryption capability
 
 ---
 
@@ -320,9 +333,10 @@ All Data Push APIs return detailed error information:
 2. **Batch Size**: Keep batches under 500 records per request for optimal performance
 3. **Error Handling**: Always check the `errors` array and retry failed records
 4. **Date Formats**: Use ISO 8601 format: `2024-10-29T10:30:00.000Z`
-5. **Password Security**: Always bcrypt hash passwords before sending (never send plain text)
-6. **Monetary Values**: Use integers in pence/cents (multiply by 100)
-7. **Idempotency**: Upsert operations are safe to retry - they won't create duplicates
+5. **Password Security**: Send passwords in plain text - the system automatically encrypts them with bcrypt before storage
+6. **User Activation**: Use `isActive: false` to deactivate user accounts and prevent login
+7. **Monetary Values**: Use integers in pence/cents (multiply by 100)
+8. **Idempotency**: Upsert operations are safe to retry - they won't create duplicates
 
 ---
 
