@@ -32,14 +32,25 @@ const notificationSchema = z.object({
   serviceReminders: z.boolean(),
 });
 
+const passwordSchema = z.object({
+  currentPassword: z.string().min(1, "Current password is required"),
+  newPassword: z.string().min(6, "New password must be at least 6 characters"),
+  confirmPassword: z.string().min(1, "Please confirm your password"),
+}).refine((data) => data.newPassword === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"],
+});
+
 type ProfileFormValues = z.infer<typeof profileSchema>;
 type NotificationFormValues = z.infer<typeof notificationSchema>;
+type PasswordFormValues = z.infer<typeof passwordSchema>;
 
 export default function Profile() {
   const { logout } = useAuth();
   const { toast } = useToast();
   const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
   const [isUpdatingNotifications, setIsUpdatingNotifications] = useState(false);
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
 
   const { data: user, isLoading } = useQuery({
     queryKey: ["/api/auth/me"],
@@ -62,6 +73,15 @@ export default function Profile() {
       environmentalImpact: true,
       charityUpdates: true,
       serviceReminders: true,
+    },
+  });
+
+  const passwordForm = useForm<PasswordFormValues>({
+    resolver: zodResolver(passwordSchema),
+    defaultValues: {
+      currentPassword: "",
+      newPassword: "",
+      confirmPassword: "",
     },
   });
 
@@ -131,6 +151,40 @@ export default function Profile() {
       });
     } finally {
       setIsUpdatingNotifications(false);
+    }
+  }
+
+  async function onPasswordSubmit(data: PasswordFormValues) {
+    try {
+      setIsChangingPassword(true);
+      const response = await apiRequest("POST", `/api/users/${user.id}/change-password`, {
+        currentPassword: data.currentPassword,
+        newPassword: data.newPassword,
+      });
+      
+      if (response.success) {
+        toast({
+          title: "Password Changed",
+          description: "Your password has been updated successfully.",
+        });
+        
+        // Reset the form
+        passwordForm.reset();
+      } else {
+        toast({
+          title: "Error",
+          description: response.error || "Failed to change password. Please try again.",
+          variant: "destructive",
+        });
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error?.error || "There was a problem changing your password. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsChangingPassword(false);
     }
   }
 
@@ -399,21 +453,71 @@ export default function Profile() {
                 <p className="text-neutral-500 text-sm mb-4">
                   For security reasons, you'll need to know your current password to set a new one
                 </p>
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="current-password">Current Password</Label>
-                    <Input id="current-password" type="password" />
-                  </div>
-                  <div>
-                    <Label htmlFor="new-password">New Password</Label>
-                    <Input id="new-password" type="password" />
-                  </div>
-                  <div>
-                    <Label htmlFor="confirm-password">Confirm New Password</Label>
-                    <Input id="confirm-password" type="password" />
-                  </div>
-                  <Button className="mt-2">Update Password</Button>
-                </div>
+                <Form {...passwordForm}>
+                  <form onSubmit={passwordForm.handleSubmit(onPasswordSubmit)} className="space-y-4">
+                    <FormField
+                      control={passwordForm.control}
+                      name="currentPassword"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Current Password</FormLabel>
+                          <FormControl>
+                            <Input 
+                              {...field} 
+                              type="password" 
+                              data-testid="input-current-password"
+                              placeholder="Enter your current password"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={passwordForm.control}
+                      name="newPassword"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>New Password</FormLabel>
+                          <FormControl>
+                            <Input 
+                              {...field} 
+                              type="password" 
+                              data-testid="input-new-password"
+                              placeholder="Enter your new password (min 6 characters)"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={passwordForm.control}
+                      name="confirmPassword"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Confirm New Password</FormLabel>
+                          <FormControl>
+                            <Input 
+                              {...field} 
+                              type="password" 
+                              data-testid="input-confirm-password"
+                              placeholder="Confirm your new password"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <Button 
+                      type="submit" 
+                      disabled={isChangingPassword}
+                      data-testid="button-change-password"
+                    >
+                      {isChangingPassword ? "Updating Password..." : "Update Password"}
+                    </Button>
+                  </form>
+                </Form>
               </div>
               
               <Separator />
@@ -427,7 +531,7 @@ export default function Profile() {
                     Signing out will end your current session. You'll need to log in again to access your account.
                   </AlertDescription>
                 </Alert>
-                <Button variant="destructive" onClick={handleLogout}>Sign Out</Button>
+                <Button variant="destructive" onClick={handleLogout} data-testid="button-logout">Sign Out</Button>
               </div>
             </CardContent>
           </Card>
