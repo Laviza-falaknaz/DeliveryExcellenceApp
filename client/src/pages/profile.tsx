@@ -52,7 +52,7 @@ export default function Profile() {
   const [isUpdatingNotifications, setIsUpdatingNotifications] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
 
-  const { data: user, isLoading } = useQuery({
+  const { data: user, isLoading } = useQuery<any>({
     queryKey: ["/api/auth/me"],
   });
 
@@ -157,7 +157,7 @@ export default function Profile() {
   async function onPasswordSubmit(data: PasswordFormValues) {
     try {
       setIsChangingPassword(true);
-      const response = await apiRequest("POST", `/api/users/${user.id}/change-password`, {
+      const response: any = await apiRequest("POST", `/api/users/${user.id}/change-password`, {
         currentPassword: data.currentPassword,
         newPassword: data.newPassword,
       });
