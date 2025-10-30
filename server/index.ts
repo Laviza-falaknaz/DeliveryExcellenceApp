@@ -42,22 +42,23 @@ app.use((req, res, next) => {
 });
 
 (async () => {
-  // Start server first, then seed database in background
-  // This prevents deployment hangs if database is slow
   const server = await registerRoutes(app);
 
-  // Seed database in background with timeout (non-blocking)
-  Promise.race([
-    seedDatabase(),
-    new Promise((_, reject) => 
-      setTimeout(() => reject(new Error('Seed timeout')), 30000)
-    )
-  ])
-    .then(() => console.log('✅ Database seeding completed'))
-    .catch((error) => {
-      console.error('⚠️ Database seeding failed or timed out:', error.message);
-      console.log('App will continue running - seed will retry on next startup');
-    });
+  // Only seed database in development, skip in production for faster deployment
+  if (app.get("env") === "development") {
+    Promise.race([
+      seedDatabase(),
+      new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Seed timeout')), 30000)
+      )
+    ])
+      .then(() => console.log('✅ Database seeding completed'))
+      .catch((error) => {
+        console.error('⚠️ Database seeding failed or timed out:', error.message);
+      });
+  } else {
+    console.log('📦 Production mode - skipping database seeding');
+  }
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
