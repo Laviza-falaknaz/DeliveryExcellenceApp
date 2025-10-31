@@ -1673,14 +1673,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       for (const rmaData of rmasToUpsert) {
         try {
-          const { rmaNumber, email, orderNumber, ...rma } = rmaData;
+          const { rmaNumber, email, serials, ...rma } = rmaData;
           
           // Convert date strings to Date objects if they exist
           if (rma.createdAt) rma.createdAt = new Date(rma.createdAt);
-          if (rma.updatedAt) rma.updatedAt = new Date(rma.updatedAt);
           
           const existing = await storage.getRmaByNumber(rmaNumber);
-          await storage.upsertRma(rmaNumber, email, orderNumber, rma);
+          
+          // Upsert RMA
+          const upsertedRma = await storage.upsertRma(rmaNumber, email, rma);
+          
+          // Upsert RMA items if serials array is provided
+          if (serials && Array.isArray(serials) && serials.length > 0) {
+            // Map serials to RMA items format
+            const rmaItems = serials.map((serial: any) => ({
+              serialNumber: serial.SerialNumber || serial.serialNumber,
+              errorDescription: serial.ErrorDescription || serial.errorDescription,
+              receivedAtWarehouseOn: serial.ReceivedAtWarehouseOn 
+                ? new Date(serial.ReceivedAtWarehouseOn) 
+                : serial.receivedAtWarehouseOn 
+                  ? new Date(serial.receivedAtWarehouseOn) 
+                  : undefined,
+              solution: serial.Solution || serial.solution,
+              reasonForReturn: serial.ReasonForReturn || serial.reasonForReturn,
+              productDetails: serial.ProductDetails || serial.productDetails,
+              relatedOrder: serial.RelatedOrder || serial.relatedOrder,
+            }));
+            
+            await storage.upsertRmaItems(upsertedRma.id, rmaItems);
+          }
+          
           if (existing) {
             updated++;
           } else {

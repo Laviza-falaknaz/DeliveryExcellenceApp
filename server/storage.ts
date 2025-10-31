@@ -161,7 +161,8 @@ export interface IStorage {
   // Upsert operations for data push APIs
   upsertUser(email: string, user: InsertUser): Promise<User>;
   upsertOrder(orderNumber: string, email: string, order: Omit<InsertOrder, 'userId'>, items?: Omit<InsertOrderItem, 'orderId'>[]): Promise<Order>;
-  upsertRma(rmaNumber: string, email: string, orderNumber: string, rma: Omit<InsertRma, 'userId' | 'orderId'>): Promise<Rma>;
+  upsertRma(rmaNumber: string, email: string, rma: Omit<InsertRma, 'userId'>): Promise<Rma>;
+  upsertRmaItems(rmaId: number, items: Omit<InsertRmaItem, 'rmaId'>[]): Promise<RmaItem[]>;
 }
 
 // Database storage implementation using Drizzle ORM - blueprint:javascript_database
@@ -957,17 +958,11 @@ export class DatabaseStorage implements IStorage {
     return resultOrder;
   }
 
-  async upsertRma(rmaNumber: string, email: string, orderNumber: string, rma: Omit<InsertRma, 'userId' | 'orderId'>): Promise<Rma> {
+  async upsertRma(rmaNumber: string, email: string, rma: Omit<InsertRma, 'userId'>): Promise<Rma> {
     // Find user by email
     const user = await this.getUserByEmail(email);
     if (!user) {
       throw new Error(`User with email ${email} not found`);
-    }
-
-    // Find order by order number
-    const order = await this.getOrderByNumber(orderNumber);
-    if (!order) {
-      throw new Error(`Order with number ${orderNumber} not found`);
     }
 
     // Check if RMA exists
@@ -976,17 +971,33 @@ export class DatabaseStorage implements IStorage {
     if (existing) {
       // Update existing RMA
       const [updated] = await db.update(rmas)
-        .set({ ...rma, userId: user.id, orderId: order.id })
+        .set({ ...rma, userId: user.id, email })
         .where(eq(rmas.id, existing.id))
         .returning();
       return updated;
     } else {
       // Create new RMA
       const [created] = await db.insert(rmas)
-        .values({ ...rma, rmaNumber, userId: user.id, orderId: order.id })
+        .values({ ...rma, rmaNumber, userId: user.id, email })
         .returning();
       return created;
     }
+  }
+
+  async upsertRmaItems(rmaId: number, items: Omit<InsertRmaItem, 'rmaId'>[]): Promise<RmaItem[]> {
+    // Delete existing items for this RMA
+    await db.delete(rmaItems).where(eq(rmaItems.rmaId, rmaId));
+    
+    // Insert new items
+    if (items.length === 0) {
+      return [];
+    }
+    
+    const insertedItems = await db.insert(rmaItems)
+      .values(items.map(item => ({ ...item, rmaId })))
+      .returning();
+    
+    return insertedItems;
   }
 
   // API Key management operations
