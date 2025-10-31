@@ -451,7 +451,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const user = req.user as User;
       const rmas = await storage.getRmasByUserId(user.id);
-      res.json(rmas);
+      
+      // Fetch items for each RMA to match frontend RmaWithItems structure
+      const rmasWithItems = await Promise.all(
+        rmas.map(async (rma) => {
+          const items = await storage.getRmaItems(rma.id);
+          return { rma, items };
+        })
+      );
+      
+      res.json(rmasWithItems);
     } catch (error) {
       res.status(500).json({ message: "Internal server error" });
     }
