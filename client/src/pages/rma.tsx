@@ -1,6 +1,5 @@
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -22,27 +21,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { 
-  Form, 
-  FormControl, 
-  FormDescription,
-  FormField, 
-  FormItem, 
-  FormLabel, 
-  FormMessage 
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
 import { formatDate } from "@/lib/utils";
-import { Camera, X, AlertCircle, ShoppingCart, Trash2, Plus } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { BrowserMultiFormatReader, NotFoundException } from "@zxing/library";
-import { Link, useLocation } from "wouter";
+import { Link } from "wouter";
 
 // Define types for RMA with items
 type RmaItem = {
@@ -70,246 +52,14 @@ type RmaWithItems = {
   items: RmaItem[];
 };
 
-const serialNumberSchema = z.object({
-  serialNumber: z.string().min(5, "Serial number must be at least 5 characters"),
-});
-
-type SerialNumberFormValues = z.infer<typeof serialNumberSchema>;
-
 export default function RMA() {
   const [selectedRma, setSelectedRma] = useState<RmaWithItems | null>(null);
   const [isRmaDetailsOpen, setIsRmaDetailsOpen] = useState(false);
-  const [isWarrantyCheckDialogOpen, setIsWarrantyCheckDialogOpen] = useState(false);
-  const [warrantyInfo, setWarrantyInfo] = useState<any>(null);
-  const [searchPerformed, setSearchPerformed] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isScanning, setIsScanning] = useState(false);
-  const [scannerError, setScannerError] = useState<string | null>(null);
   const { toast } = useToast();
-  
-  // RMA Basket state
-  const [rmaBasket, setRmaBasket] = useState<any[]>([]);
-  const [showBasket, setShowBasket] = useState(false);
-  const [, setLocation] = useLocation();
 
-  // Scanner refs
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const codeReader = useRef<BrowserMultiFormatReader | null>(null);
-
-  // Initialize scanner
-  useEffect(() => {
-    codeReader.current = new BrowserMultiFormatReader();
-    return () => {
-      if (codeReader.current) {
-        codeReader.current.reset();
-      }
-    };
-  }, []);
-  
-  // RMA Basket functions
-  const addToRmaBasket = () => {
-    if (!warrantyInfo) return;
-    
-    // Check if device already in basket
-    const alreadyExists = rmaBasket.find(item => item.serialNumber === warrantyInfo.serialNumber);
-    if (alreadyExists) {
-      toast({
-        title: "Device Already Added",
-        description: "This device is already in your RMA request basket.",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    const basketItem = {
-      id: Date.now().toString(),
-      ...warrantyInfo,
-      addedAt: new Date().toISOString()
-    };
-    
-    setRmaBasket(prev => [...prev, basketItem]);
-    toast({
-      title: "Added to RMA Request",
-      description: `${warrantyInfo.productName} (${warrantyInfo.serialNumber}) added to your RMA basket.`,
-    });
-  };
-  
-  const removeFromRmaBasket = (id: string) => {
-    setRmaBasket(prev => prev.filter(item => item.id !== id));
-    toast({
-      title: "Removed from RMA Request",
-      description: "Device removed from your RMA basket.",
-    });
-  };
-  
-  const submitRmaRequest = () => {
-    if (rmaBasket.length === 0) {
-      toast({
-        title: "No Devices Selected",
-        description: "Please add at least one device to your RMA request.",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    // Prepare basket data for transfer to warranty-claim page
-    const basketData = rmaBasket.map(device => ({
-      serialNumber: device.serialNumber,
-      productName: device.productName,
-      warrantyStatus: device.warrantyStatus
-    }));
-    
-    // Encode basket data as URL search params
-    const searchParams = new URLSearchParams();
-    searchParams.set('basket', JSON.stringify(basketData));
-    
-    // Navigate to warranty-claim page with basket data
-    setLocation(`/warranty-claim?${searchParams.toString()}`);
-    
-    // Clear basket since we're transferring to the form
-    setRmaBasket([]);
-    setShowBasket(false);
-    
-    toast({
-      title: "Redirecting to RMA Form",
-      description: `Transferring ${basketData.length} device(s) to the RMA request form.`,
-    });
-  };
-
-  const startScanner = async () => {
-    if (!codeReader.current || !videoRef.current) return;
-    
-    try {
-      setIsScanning(true);
-      setScannerError(null);
-      
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: { 
-          facingMode: 'environment',
-          width: { ideal: 1280 },
-          height: { ideal: 720 }
-        } 
-      });
-      
-      videoRef.current.srcObject = stream;
-      
-      codeReader.current.decodeFromVideoDevice(null, videoRef.current, (result, error) => {
-        if (result) {
-          const scannedText = result.getText();
-          // Handle both QR codes and alphanumeric serial numbers
-          // QR codes may contain URLs or JSON, extract serial number if needed
-          let serialNumber = scannedText;
-          
-          // If it's a URL, try to extract serial number from query params
-          if (scannedText.startsWith('http')) {
-            try {
-              const url = new URL(scannedText);
-              const serialFromUrl = url.searchParams.get('serial') || url.searchParams.get('sn');
-              if (serialFromUrl) {
-                serialNumber = serialFromUrl;
-              }
-            } catch (e) {
-              // If URL parsing fails, use the original text
-            }
-          }
-          
-          // If it's JSON, try to extract serial number
-          if (scannedText.startsWith('{')) {
-            try {
-              const parsed = JSON.parse(scannedText);
-              if (parsed.serial || parsed.serialNumber || parsed.sn) {
-                serialNumber = parsed.serial || parsed.serialNumber || parsed.sn;
-              }
-            } catch (e) {
-              // If JSON parsing fails, use the original text
-            }
-          }
-          
-          // Validate if it looks like a serial number (alphanumeric, at least 5 characters)
-          if (/^[A-Za-z0-9]{5,}$/.test(serialNumber)) {
-            serialForm.setValue('serialNumber', serialNumber);
-            stopScanner();
-            toast({
-              title: "Code Scanned Successfully",
-              description: `Serial number captured: ${serialNumber}`,
-            });
-          } else {
-            toast({
-              title: "Invalid Code",
-              description: "Please scan a valid QR code or barcode containing a serial number",
-              variant: "destructive",
-            });
-          }
-        }
-        
-        if (error && !(error instanceof NotFoundException)) {
-          console.warn('Scanner error:', error);
-        }
-      });
-      
-    } catch (error) {
-      console.error('Failed to start scanner:', error);
-      setScannerError('Failed to access camera. Please ensure camera permissions are granted.');
-      setIsScanning(false);
-    }
-  };
-
-  const stopScanner = () => {
-    if (codeReader.current) {
-      codeReader.current.reset();
-    }
-    
-    if (videoRef.current && videoRef.current.srcObject) {
-      const stream = videoRef.current.srcObject as MediaStream;
-      stream.getTracks().forEach(track => track.stop());
-      videoRef.current.srcObject = null;
-    }
-    
-    setIsScanning(false);
-    setScannerError(null);
-  };
-
-  const { data: rmas, isLoading } = useQuery<RmaWithItems[]>({
+  const { data: rmas, isLoading, error: rmaError } = useQuery<RmaWithItems[]>({
     queryKey: ["/api/rma"],
   });
-
-  const serialForm = useForm<SerialNumberFormValues>({
-    resolver: zodResolver(serialNumberSchema),
-    defaultValues: {
-      serialNumber: "",
-    },
-  });
-
-  async function onSerialSubmit(data: SerialNumberFormValues) {
-    try {
-      setIsSubmitting(true);
-      // In a real implementation, we would call an API to fetch warranty info
-      // For demo purposes, we'll simulate a response
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Simulate warranty info for demo
-      setWarrantyInfo({
-        serialNumber: data.serialNumber,
-        productName: "Circular ThinkPad T14 Gen 2",
-        purchaseDate: "2024-01-15",
-        warrantyEnd: "2027-01-15",
-        warrantyStatus: Math.random() > 0.3 ? "Active" : "Expired", // Randomly show active or expired for demo
-        additionalCoverage: "Extended Warranty with Accidental Damage Protection",
-        registrationStatus: "Registered",
-      });
-      
-      setSearchPerformed(true);
-      
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Unable to retrieve warranty information. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  }
 
   const activeRmas = rmas?.filter(rma => 
     rma.rma.status !== "completed" && rma.rma.status !== "rejected"
@@ -358,19 +108,6 @@ export default function RMA() {
         </div>
         <div className="flex gap-3 mt-4 md:mt-0">
           <Button 
-            onClick={() => setShowBasket(true)}
-            variant="outline"
-            className="relative"
-          >
-            <ShoppingCart className="h-4 w-4 mr-2" />
-            <span>RMA Basket</span>
-            {rmaBasket.length > 0 && (
-              <Badge className="absolute -top-2 -right-2 h-5 w-5 p-0 flex items-center justify-center bg-[#FF9E1C] text-black">
-                {rmaBasket.length}
-              </Badge>
-            )}
-          </Button>
-          <Button 
             onClick={() => window.open('https://circularcomputing.com/contact/', '_blank')}
             variant="outline"
           >
@@ -406,12 +143,14 @@ export default function RMA() {
               <div className="icon-circle mb-4">
                 <i className="ri-shield-check-line text-2xl"></i>
               </div>
-              <h3 className="font-semibold text-lg mb-2">Check Warranty</h3>
+              <h3 className="font-semibold text-lg mb-2">Create RMA Request</h3>
               <p className="text-neutral-600 text-sm mb-4">
-                Verify your product's warranty status before starting the RMA process.
+                Start a new RMA request for your device through our warranty claim form.
               </p>
-              <Button variant="outline" onClick={() => setIsWarrantyCheckDialogOpen(true)} >
-                Check Warranty Status
+              <Button variant="outline" asChild>
+                <Link href="/warranty-claim">
+                  Create RMA Request
+                </Link>
               </Button>
             </div>
           </CardContent>
@@ -438,6 +177,16 @@ export default function RMA() {
       <div className="mb-8">
         <h2 className="text-lg font-semibold font-poppins mb-4">Start RMA Process</h2>
 
+        {rmaError && (
+          <Alert variant="destructive" className="mb-4">
+            <i className="ri-error-warning-line h-4 w-4" />
+            <AlertTitle>Error Loading RMAs</AlertTitle>
+            <AlertDescription>
+              Failed to load your RMA requests. Please try refreshing the page or contact support if the issue persists.
+            </AlertDescription>
+          </Alert>
+        )}
+
         {isLoading ? (
           <div className="space-y-4">
             <Skeleton className="h-20 w-full" />
@@ -455,19 +204,45 @@ export default function RMA() {
                   {activeRmas.map((rmaData) => (
                     <Card key={rmaData.rma.id} className="cursor-pointer hover:border-accent/50 transition-colors" onClick={() => handleRmaClick(rmaData)}>
                       <CardContent className="p-4">
-                        <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-                          <div>
+                        <div className="flex flex-col md:flex-row md:items-start md:justify-between mb-3">
+                          <div className="flex-1">
                             <div className="flex items-center mb-2">
                               <h3 className="font-medium">RMA #{rmaData.rma.rmaNumber}</h3>
                               <Badge className={`ml-3 ${getStatusColor(rmaData.rma.status)}`}>
                                 {getStatusLabel(rmaData.rma.status)}
                               </Badge>
                             </div>
-                            <p className="text-sm text-neutral-600">
+                            <p className="text-sm text-neutral-600 mb-2">
                               {rmaData.items.length} item{rmaData.items.length !== 1 ? 's' : ''} • Email: {rmaData.rma.email}
                             </p>
+                            <div className="space-y-1">
+                              {rmaData.items.slice(0, 3).map((item, idx) => (
+                                <div key={item.id} className="text-xs bg-neutral-50 px-2 py-1 rounded space-y-0.5">
+                                  <div>
+                                    <span className="font-medium text-neutral-700">{item.serialNumber}</span> - {item.productDetails}
+                                  </div>
+                                  {item.errorDescription && (
+                                    <div className="text-neutral-500">
+                                      Issue: {item.errorDescription.substring(0, 50)}{item.errorDescription.length > 50 ? '...' : ''}
+                                    </div>
+                                  )}
+                                  {item.solution ? (
+                                    <div className="text-emerald-600 font-medium">
+                                      Solution: {item.solution}
+                                    </div>
+                                  ) : (
+                                    <div className="text-amber-600">
+                                      Pending solution
+                                    </div>
+                                  )}
+                                </div>
+                              ))}
+                              {rmaData.items.length > 3 && (
+                                <p className="text-xs text-neutral-500 italic">+{rmaData.items.length - 3} more item{rmaData.items.length - 3 !== 1 ? 's' : ''}</p>
+                              )}
+                            </div>
                           </div>
-                          <div className="mt-2 md:mt-0 text-sm text-neutral-500">
+                          <div className="mt-2 md:mt-0 md:ml-4 text-sm text-neutral-500">
                             {rmaData.rma.createdAt && `Created on ${formatDate(rmaData.rma.createdAt)}`}
                           </div>
                         </div>
@@ -488,19 +263,30 @@ export default function RMA() {
                   {completedRmas.map((rmaData) => (
                     <Card key={rmaData.rma.id} className="cursor-pointer hover:border-accent/50 transition-colors" onClick={() => handleRmaClick(rmaData)}>
                       <CardContent className="p-4">
-                        <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-                          <div>
+                        <div className="flex flex-col md:flex-row md:items-start md:justify-between mb-3">
+                          <div className="flex-1">
                             <div className="flex items-center mb-2">
                               <h3 className="font-medium">RMA #{rmaData.rma.rmaNumber}</h3>
                               <Badge className={`ml-3 ${getStatusColor(rmaData.rma.status)}`}>
                                 {getStatusLabel(rmaData.rma.status)}
                               </Badge>
                             </div>
-                            <p className="text-sm text-neutral-600">
+                            <p className="text-sm text-neutral-600 mb-2">
                               {rmaData.items.length} item{rmaData.items.length !== 1 ? 's' : ''} • Email: {rmaData.rma.email}
                             </p>
+                            <div className="space-y-1">
+                              {rmaData.items.slice(0, 3).map((item, idx) => (
+                                <div key={item.id} className="text-xs text-neutral-600 bg-neutral-50 px-2 py-1 rounded">
+                                  <span className="font-medium">{item.serialNumber}</span> - {item.productDetails}
+                                  {item.solution && <span className="text-emerald-600"> • Solution: {item.solution}</span>}
+                                </div>
+                              ))}
+                              {rmaData.items.length > 3 && (
+                                <p className="text-xs text-neutral-500 italic">+{rmaData.items.length - 3} more item{rmaData.items.length - 3 !== 1 ? 's' : ''}</p>
+                              )}
+                            </div>
                           </div>
-                          <div className="mt-2 md:mt-0 text-sm text-neutral-500">
+                          <div className="mt-2 md:mt-0 md:ml-4 text-sm text-neutral-500">
                             {rmaData.rma.createdAt && `Created on ${formatDate(rmaData.rma.createdAt)}`}
                           </div>
                         </div>
@@ -648,251 +434,6 @@ export default function RMA() {
           </CardContent>
         </Card>
       </div>
-
-      {/* Warranty Check Dialog */}
-      <Dialog open={isWarrantyCheckDialogOpen} onOpenChange={setIsWarrantyCheckDialogOpen}>
-        <DialogContent className="sm:max-w-[550px]">
-          <DialogHeader>
-            <DialogTitle>Warranty Verification</DialogTitle>
-            <DialogDescription>
-              Before proceeding with an RMA request, please verify your product's warranty status.
-            </DialogDescription>
-          </DialogHeader>
-
-          {!searchPerformed ? (
-            <div className="space-y-4">
-              <Form {...serialForm}>
-                <form onSubmit={serialForm.handleSubmit(onSerialSubmit)} className="space-y-4">
-                  <FormField
-                    control={serialForm.control}
-                    name="serialNumber"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Serial Number</FormLabel>
-                        <div className="flex gap-2">
-                          <FormControl>
-                            <Input placeholder="e.g. CC21XG45T" {...field} />
-                          </FormControl>
-                          <Button 
-                            type="button"
-                            onClick={isScanning ? stopScanner : startScanner}
-                            variant="outline"
-                            className="bg-white border-neutral-300 text-neutral-900 hover:bg-primary hover:border-primary hover:text-white transition-all duration-200 shrink-0"
-                          >
-                            {isScanning ? (
-                              <>
-                                <X className="w-4 h-4 mr-2" />
-                                Stop Scanner
-                              </>
-                            ) : (
-                              <>
-                                <Camera className="w-4 h-4 mr-2" />
-                                Scan QR/Barcode
-                              </>
-                            )}
-                          </Button>
-                          <Button type="submit" disabled={isSubmitting} className="shrink-0">
-                            {isSubmitting ? "Checking..." : "Check"}
-                          </Button>
-                        </div>
-                        <FormDescription>
-                          Scan QR codes or barcodes containing serial numbers, or enter the serial number manually. The serial number is usually found on the bottom of your device.
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </form>
-              </Form>
-              
-              {isScanning && (
-                <div className="mt-4">
-                  <div className="relative bg-black rounded-lg overflow-hidden">
-                    <video
-                      ref={videoRef}
-                      autoPlay
-                      playsInline
-                      className="w-full h-64 object-cover"
-                    />
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="w-48 h-32 border-2 border-primary bg-primary/10 rounded-lg flex items-center justify-center">
-                        <span className="text-primary text-sm font-medium">Position QR code or barcode here</span>
-                      </div>
-                    </div>
-                  </div>
-                  <p className="text-sm text-neutral-600 mt-2 text-center">
-                    Position your device's QR code, barcode, or serial number label within the highlighted area
-                  </p>
-                </div>
-              )}
-              
-              {scannerError && (
-                <Alert className="mt-4" variant="destructive">
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertTitle>Scanner Error</AlertTitle>
-                  <AlertDescription>{scannerError}</AlertDescription>
-                </Alert>
-              )}
-            </div>
-          ) : (
-            <>
-              {warrantyInfo ? (
-                <div className="py-4">
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-lg font-semibold">Warranty Status</h3>
-                      <Badge 
-                        variant={warrantyInfo.warrantyStatus === "Active" ? "default" : "secondary"} 
-                        className={warrantyInfo.warrantyStatus === "Active" ? "bg-green-100 text-green-800 hover:bg-green-100" : "bg-red-100 text-red-800 hover:bg-red-100"}
-                      >
-                        {warrantyInfo.warrantyStatus}
-                      </Badge>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <h4 className="text-sm font-medium text-neutral-500">Product</h4>
-                        <p className="text-base">{warrantyInfo.productName}</p>
-                      </div>
-                      <div>
-                        <h4 className="text-sm font-medium text-neutral-500">Serial Number</h4>
-                        <p className="text-base">{warrantyInfo.serialNumber}</p>
-                      </div>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <h4 className="text-sm font-medium text-neutral-500">Purchase Date</h4>
-                        <p className="text-base">{new Date(warrantyInfo.purchaseDate).toLocaleDateString()}</p>
-                      </div>
-                      <div>
-                        <h4 className="text-sm font-medium text-neutral-500">Warranty End Date</h4>
-                        <p className="text-base">{new Date(warrantyInfo.warrantyEnd).toLocaleDateString()}</p>
-                      </div>
-                    </div>
-                    
-                    {warrantyInfo.warrantyStatus === "Active" ? (
-                      <div className="p-4 bg-green-50 rounded-lg border border-green-100">
-                        <div className="flex items-start">
-                          <div className="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center text-green-700 mr-3">
-                            <i className="ri-check-line"></i>
-                          </div>
-                          <div>
-                            <h4 className="font-medium text-green-800">Warranty Active</h4>
-                            <p className="text-sm text-green-700 mb-2">
-                              Your product is under warranty and eligible for an RMA request.
-                            </p>
-                            <a 
-                              href="https://my-warranty.com/troubleshoot/" 
-                              target="_blank" 
-                              rel="noreferrer" 
-                              className="text-sm text-green-700 underline hover:text-green-800"
-                            >
-                              Try our troubleshooting guide before starting RMA
-                            </a>
-                          </div>
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="p-4 bg-red-50 rounded-lg border border-red-100">
-                        <div className="flex items-start">
-                          <div className="h-8 w-8 rounded-full bg-red-100 flex items-center justify-center text-red-700 mr-3">
-                            <i className="ri-close-line"></i>
-                          </div>
-                          <div>
-                            <h4 className="font-medium text-red-800">Warranty Expired</h4>
-                            <p className="text-sm text-red-700 mb-2">
-                              Your product's warranty has expired. You may still submit an RMA request, but repair services may incur additional charges.
-                            </p>
-                            <a 
-                              href="https://my-warranty.com/troubleshoot/" 
-                              target="_blank" 
-                              rel="noreferrer" 
-                              className="text-sm text-red-700 underline hover:text-red-800"
-                            >
-                              Try our troubleshooting guide first
-                            </a>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                  
-                  <DialogFooter className="mt-6">
-                    <div className="flex gap-2">
-                      <Button variant="outline" onClick={() => {
-                        setSearchPerformed(false);
-                        setWarrantyInfo(null);
-                        serialForm.reset();
-                      }}>
-                        Check Another Product
-                      </Button>
-                      <Button 
-                        onClick={addToRmaBasket}
-                        className="bg-[#08ABAB] text-white border-[#08ABAB] hover:bg-[#FF9E1C] hover:text-black hover:border-[#FF9E1C] transition-colors"
-                      >
-                        <Plus className="h-4 w-4 mr-2" />
-                        Add to RMA Request
-                      </Button>
-                    </div>
-                    <Button 
-                      onClick={() => {
-                        if (rmaBasket.length === 0) {
-                          toast({
-                            title: "No Devices Selected",
-                            description: "Please add at least one device to your RMA request before submitting.",
-                            variant: "destructive",
-                          });
-                          return;
-                        }
-                        
-                        // Prepare basket data for transfer to warranty-claim page
-                        const basketData = rmaBasket.map(device => ({
-                          serialNumber: device.serialNumber,
-                          productName: device.productName,
-                          warrantyStatus: device.warrantyStatus
-                        }));
-                        
-                        // Encode basket data as URL search params
-                        const searchParams = new URLSearchParams();
-                        searchParams.set('basket', JSON.stringify(basketData));
-                        
-                        // Navigate to warranty-claim page with basket data
-                        setLocation(`/warranty-claim?${searchParams.toString()}`);
-                        
-                        // Clear basket and close dialog
-                        setRmaBasket([]);
-                        setIsWarrantyCheckDialogOpen(false);
-                      }}
-                      variant="outline"
-                    >
-                      Submit RMA
-                    </Button>
-                  </DialogFooter>
-                </div>
-              ) : (
-                <div className="py-6">
-                  <div className="flex flex-col items-center justify-center">
-                    <div className="h-12 w-12 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 mb-4">
-                      <i className="ri-error-warning-line"></i>
-                    </div>
-                    <h3 className="text-lg font-medium mb-2">No Warranty Information Found</h3>
-                    <p className="text-neutral-600 text-center mb-4">
-                      We couldn't find warranty information for the specified serial number. Please double-check the number and try again.
-                    </p>
-                    <Button variant="outline" onClick={() => {
-                      setSearchPerformed(false);
-                      serialForm.reset();
-                    }}>
-                      Try Again
-                    </Button>
-                  </div>
-                </div>
-              )}
-            </>
-          )}
-        </DialogContent>
-      </Dialog>
 
       {/* RMA Details Dialog */}
       <Dialog open={isRmaDetailsOpen} onOpenChange={setIsRmaDetailsOpen}>
@@ -1086,87 +627,6 @@ export default function RMA() {
               </DialogFooter>
             </>
           )}
-        </DialogContent>
-      </Dialog>
-      
-      {/* RMA Basket Dialog */}
-      <Dialog open={showBasket} onOpenChange={setShowBasket}>
-        <DialogContent className="sm:max-w-[700px]">
-          <DialogHeader>
-            <DialogTitle>RMA Request Basket</DialogTitle>
-            <DialogDescription>
-              Review the devices you want to include in your RMA request. You can add more devices by checking their warranty status.
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="py-4">
-            {rmaBasket.length === 0 ? (
-              <div className="text-center py-8">
-                <ShoppingCart className="h-12 w-12 mx-auto text-neutral-400 mb-4" />
-                <h3 className="text-lg font-medium text-neutral-700 mb-2">No devices in basket</h3>
-                <p className="text-neutral-500">Check warranty status of your devices and add them to create an RMA request.</p>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between mb-4">
-                  <h4 className="font-medium">{rmaBasket.length} device(s) ready for RMA</h4>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={() => setRmaBasket([])}
-                    className="text-red-600 hover:text-red-700"
-                  >
-                    <Trash2 className="h-4 w-4 mr-1" />
-                    Clear All
-                  </Button>
-                </div>
-                
-                {rmaBasket.map((device) => (
-                  <div key={device.id} className="border rounded-lg p-4 bg-neutral-50">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <h4 className="font-medium text-sm">{device.productName}</h4>
-                        <p className="text-sm text-neutral-600 mt-1">Serial: {device.serialNumber}</p>
-                        <div className="flex items-center gap-4 mt-2">
-                          <Badge 
-                            variant={device.warrantyStatus === "Active" ? "default" : "secondary"}
-                            className={device.warrantyStatus === "Active" ? "bg-green-100 text-green-800" : ""}
-                          >
-                            {device.warrantyStatus}
-                          </Badge>
-                          <span className="text-xs text-neutral-500">
-                            Added: {new Date(device.addedAt).toLocaleDateString()}
-                          </span>
-                        </div>
-                      </div>
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        onClick={() => removeFromRmaBasket(device.id)}
-                        className="text-red-600 hover:text-red-700"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-          
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowBasket(false)}>
-              Continue Adding Devices
-            </Button>
-            {rmaBasket.length > 0 && (
-              <Button 
-                onClick={submitRmaRequest}
-                className="bg-[#08ABAB] text-white border-[#08ABAB] hover:bg-[#FF9E1C] hover:text-black hover:border-[#FF9E1C] transition-colors"
-              >
-                Continue to RMA Form ({rmaBasket.length} device{rmaBasket.length > 1 ? 's' : ''})
-              </Button>
-            )}
-          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
