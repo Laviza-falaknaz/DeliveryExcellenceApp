@@ -484,17 +484,9 @@ export default function RMA() {
                             <p className="text-sm text-neutral-600">{item.errorDescription}</p>
                           </div>
                           
-                          <div className="grid grid-cols-2 gap-2 text-sm">
-                            <div>
-                              <p className="font-medium text-neutral-700">Reason:</p>
-                              <p className="text-neutral-600">{item.reasonForReturn}</p>
-                            </div>
-                            {item.relatedOrder && (
-                              <div>
-                                <p className="font-medium text-neutral-700">Related Order:</p>
-                                <p className="text-neutral-600">{item.relatedOrder}</p>
-                              </div>
-                            )}
+                          <div className="text-sm">
+                            <p className="font-medium text-neutral-700">Reason:</p>
+                            <p className="text-neutral-600">{item.reasonForReturn}</p>
                           </div>
                           
                           {item.receivedAtWarehouseOn && (
