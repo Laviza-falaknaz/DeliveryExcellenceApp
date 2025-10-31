@@ -482,9 +482,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const user = req.user as User;
       const { email, serials, status } = req.body;
       
-      if (!email || !serials || !Array.isArray(serials) || serials.length === 0) {
-        return res.status(400).json({ message: "Email and serials array are required" });
-      }
+      // Validate request structure
+      const rmaRequestSchema = z.object({
+        email: z.string().email(),
+        status: z.string().optional(),
+        serials: z.array(z.object({
+          SerialNumber: z.string().min(1, "Serial number is required"),
+          ErrorDescription: z.string().min(1, "Error description is required"),
+          ReceivedAtWarehouseOn: z.string().nullable().optional(),
+          Solution: z.string().optional(),
+          ReasonForReturn: z.string().min(1, "Reason for return is required"),
+          ProductDetails: z.string().min(1, "Product details are required"),
+          RelatedOrder: z.string().nullable().optional(),
+        })).min(1, "At least one serial is required"),
+      });
+      
+      const validatedData = rmaRequestSchema.parse(req.body);
       
       // Generate RMA number
       const rmaNumber = `RMA-${Math.floor(10000 + Math.random() * 90000)}`;
@@ -493,24 +506,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const rmaData = insertRmaSchema.parse({
         userId: user.id,
         rmaNumber,
-        email,
-        status: status || "requested",
+        email: validatedData.email,
+        status: validatedData.status || "requested",
       });
       
       const rma = await storage.createRma(rmaData);
       
-      // Create RMA items (serials)
-      for (const serial of serials) {
-        await storage.createRmaItem({
-          rmaId: rma.id,
-          serialNumber: serial.SerialNumber,
-          errorDescription: serial.ErrorDescription,
-          receivedAtWarehouseOn: serial.ReceivedAtWarehouseOn || null,
-          solution: serial.Solution || "Pending",
-          reasonForReturn: serial.ReasonForReturn,
-          productDetails: serial.ProductDetails,
-          relatedOrder: serial.RelatedOrder || null,
-        });
+      // Create RMA items (serials) - wrapped for atomicity
+      try {
+        for (const serial of validatedData.serials) {
+          await storage.createRmaItem({
+            rmaId: rma.id,
+            serialNumber: serial.SerialNumber,
+            errorDescription: serial.ErrorDescription,
+            receivedAtWarehouseOn: serial.ReceivedAtWarehouseOn ? new Date(serial.ReceivedAtWarehouseOn) : null,
+            solution: serial.Solution || "Pending",
+            reasonForReturn: serial.ReasonForReturn,
+            productDetails: serial.ProductDetails,
+            relatedOrder: serial.RelatedOrder || null,
+          });
+        }
+      } catch (itemError) {
+        // If items creation fails, delete the RMA to avoid orphan records
+        await storage.deleteRma(rma.id);
+        throw itemError;
       }
       
       // Return RMA with items
@@ -518,8 +537,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(201).json(rmaWithItems);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: error.errors });
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
       }
+      console.error("RMA creation error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });

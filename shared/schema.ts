@@ -150,7 +150,7 @@ export const insertRmaSchema = createInsertSchema(rmas).omit({
 // RMA Items schema (serial numbers and details)
 export const rmaItems = pgTable("rma_items", {
   id: serial("id").primaryKey(),
-  rmaId: integer("rma_id").notNull().references(() => rmas.id),
+  rmaId: integer("rma_id").notNull().references(() => rmas.id, { onDelete: 'cascade' }),
   serialNumber: text("serial_number").notNull(),
   errorDescription: text("error_description").notNull(),
   receivedAtWarehouseOn: timestamp("received_at_warehouse_on"),
