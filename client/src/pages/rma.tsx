@@ -38,32 +38,46 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
-import { Rma, Order } from "@shared/schema";
 import { formatDate } from "@/lib/utils";
 import { Camera, X, AlertCircle, ShoppingCart, Trash2, Plus } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { BrowserMultiFormatReader, NotFoundException } from "@zxing/library";
 import { Link, useLocation } from "wouter";
 
+// Define types for RMA with items
+type RmaItem = {
+  id: number;
+  rmaId: number;
+  serialNumber: string;
+  errorDescription: string;
+  receivedAtWarehouseOn: Date | null;
+  solution: string | null;
+  reasonForReturn: string;
+  productDetails: string;
+  relatedOrder: string | null;
+  createdAt: Date | null;
+};
+
+type RmaWithItems = {
+  rma: {
+    id: number;
+    userId: number;
+    rmaNumber: string;
+    email: string;
+    status: string;
+    createdAt: Date | null;
+  };
+  items: RmaItem[];
+};
+
 const serialNumberSchema = z.object({
   serialNumber: z.string().min(5, "Serial number must be at least 5 characters"),
 });
 
-const rmaSchema = z.object({
-  orderId: z.coerce.number({
-    required_error: "Order is required",
-    invalid_type_error: "Order is required",
-  }),
-  reason: z.string().min(10, "Reason must be at least 10 characters"),
-  notes: z.string().optional(),
-});
-
-type RmaFormValues = z.infer<typeof rmaSchema>;
 type SerialNumberFormValues = z.infer<typeof serialNumberSchema>;
 
 export default function RMA() {
-  const [isNewRmaDialogOpen, setIsNewRmaDialogOpen] = useState(false);
-  const [selectedRma, setSelectedRma] = useState<Rma | null>(null);
+  const [selectedRma, setSelectedRma] = useState<RmaWithItems | null>(null);
   const [isRmaDetailsOpen, setIsRmaDetailsOpen] = useState(false);
   const [isWarrantyCheckDialogOpen, setIsWarrantyCheckDialogOpen] = useState(false);
   const [warrantyInfo, setWarrantyInfo] = useState<any>(null);
@@ -255,21 +269,8 @@ export default function RMA() {
     setScannerError(null);
   };
 
-  const { data: rmas, isLoading } = useQuery<Rma[]>({
+  const { data: rmas, isLoading } = useQuery<RmaWithItems[]>({
     queryKey: ["/api/rma"],
-  });
-
-  const { data: orders } = useQuery<Order[]>({
-    queryKey: ["/api/orders"],
-  });
-
-  const rmaForm = useForm<RmaFormValues>({
-    resolver: zodResolver(rmaSchema),
-    defaultValues: {
-      orderId: 0,
-      reason: "",
-      notes: "",
-    },
   });
 
   const serialForm = useForm<SerialNumberFormValues>({
@@ -310,33 +311,12 @@ export default function RMA() {
     }
   }
 
-  async function onSubmit(data: RmaFormValues) {
-    try {
-      await apiRequest("POST", "/api/rma", data);
-      queryClient.invalidateQueries({ queryKey: ["/api/rma"] });
-      
-      toast({
-        title: "RMA Request Submitted",
-        description: "Your return request has been submitted successfully after troubleshooting. Our team will contact you shortly.",
-      });
-      
-      rmaForm.reset();
-      setIsNewRmaDialogOpen(false);
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "There was a problem submitting your RMA request. Please try again.",
-        variant: "destructive",
-      });
-    }
-  }
-
   const activeRmas = rmas?.filter(rma => 
-    rma.status !== "completed" && rma.status !== "rejected"
+    rma.rma.status !== "completed" && rma.rma.status !== "rejected"
   ) || [];
   
   const completedRmas = rmas?.filter(rma => 
-    rma.status === "completed" || rma.status === "rejected"
+    rma.rma.status === "completed" || rma.rma.status === "rejected"
   ) || [];
 
   function getStatusColor(status: string): string {
@@ -364,15 +344,10 @@ export default function RMA() {
     return status.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
   }
 
-  function handleRmaClick(rma: Rma) {
+  function handleRmaClick(rma: RmaWithItems) {
     setSelectedRma(rma);
     setIsRmaDetailsOpen(true);
   }
-
-  // Get eligible orders for RMA (not cancelled or returned)
-  const eligibleOrders = orders?.filter(
-    order => order.status !== "cancelled" && order.status !== "returned"
-  ) || [];
 
   return (
     <div className="py-6 px-4 md:px-8 max-w-7xl mx-auto">
@@ -477,23 +452,23 @@ export default function RMA() {
             <TabsContent value="active">
               {activeRmas.length > 0 ? (
                 <div className="space-y-4">
-                  {activeRmas.map((rma) => (
-                    <Card key={rma.id} className="cursor-pointer hover:border-accent/50 transition-colors" onClick={() => handleRmaClick(rma)}>
+                  {activeRmas.map((rmaData) => (
+                    <Card key={rmaData.rma.id} className="cursor-pointer hover:border-accent/50 transition-colors" onClick={() => handleRmaClick(rmaData)}>
                       <CardContent className="p-4">
                         <div className="flex flex-col md:flex-row md:items-center md:justify-between">
                           <div>
                             <div className="flex items-center mb-2">
-                              <h3 className="font-medium">RMA #{rma.rmaNumber}</h3>
-                              <Badge className={`ml-3 ${getStatusColor(rma.status)}`}>
-                                {getStatusLabel(rma.status)}
+                              <h3 className="font-medium">RMA #{rmaData.rma.rmaNumber}</h3>
+                              <Badge className={`ml-3 ${getStatusColor(rmaData.rma.status)}`}>
+                                {getStatusLabel(rmaData.rma.status)}
                               </Badge>
                             </div>
                             <p className="text-sm text-neutral-600">
-                              Order #{orders?.find(o => o.id === rma.orderId)?.orderNumber || rma.orderId}
+                              {rmaData.items.length} item{rmaData.items.length !== 1 ? 's' : ''} • Email: {rmaData.rma.email}
                             </p>
                           </div>
                           <div className="mt-2 md:mt-0 text-sm text-neutral-500">
-                            Requested on {formatDate(rma.requestDate)}
+                            {rmaData.rma.createdAt && `Created on ${formatDate(rmaData.rma.createdAt)}`}
                           </div>
                         </div>
                       </CardContent>
@@ -510,26 +485,23 @@ export default function RMA() {
             <TabsContent value="completed">
               {completedRmas.length > 0 ? (
                 <div className="space-y-4">
-                  {completedRmas.map((rma) => (
-                    <Card key={rma.id} className="cursor-pointer hover:border-accent/50 transition-colors" onClick={() => handleRmaClick(rma)}>
+                  {completedRmas.map((rmaData) => (
+                    <Card key={rmaData.rma.id} className="cursor-pointer hover:border-accent/50 transition-colors" onClick={() => handleRmaClick(rmaData)}>
                       <CardContent className="p-4">
                         <div className="flex flex-col md:flex-row md:items-center md:justify-between">
                           <div>
                             <div className="flex items-center mb-2">
-                              <h3 className="font-medium">RMA #{rma.rmaNumber}</h3>
-                              <Badge className={`ml-3 ${getStatusColor(rma.status)}`}>
-                                {getStatusLabel(rma.status)}
+                              <h3 className="font-medium">RMA #{rmaData.rma.rmaNumber}</h3>
+                              <Badge className={`ml-3 ${getStatusColor(rmaData.rma.status)}`}>
+                                {getStatusLabel(rmaData.rma.status)}
                               </Badge>
                             </div>
                             <p className="text-sm text-neutral-600">
-                              Order #{orders?.find(o => o.id === rma.orderId)?.orderNumber || rma.orderId}
+                              {rmaData.items.length} item{rmaData.items.length !== 1 ? 's' : ''} • Email: {rmaData.rma.email}
                             </p>
                           </div>
                           <div className="mt-2 md:mt-0 text-sm text-neutral-500">
-                            {rma.completionDate 
-                              ? `Completed on ${formatDate(rma.completionDate)}`
-                              : `Requested on ${formatDate(rma.requestDate)}`
-                            }
+                            {rmaData.rma.createdAt && `Created on ${formatDate(rmaData.rma.createdAt)}`}
                           </div>
                         </div>
                       </CardContent>
