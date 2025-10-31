@@ -1,0 +1,48 @@
+{
+    "rmas": [
+        {
+            "rmaNumber": "RMA-09777",
+            "email": "cleo.whelan@circularcomputing.com",
+            "status": "requested",
+            "createdAt": "2025-10-29T16:17:19Z",
+            "serials": [
+                {
+                    "SerialNumber": "PF1Q4524",
+                    "ErrorDescription": "Refurbished Lenovo ThinkPad T480 Core i5 8th gen 32GB RAM 1TB SSD 14 Inch Windows 11 Pro Laptop. Battery died within 10 mins of stress test. Battery health went from 100% to 16%.",
+                    "ReceivedAtWarehouseOn": null,
+                    "Solution": "Pending",
+                    "ReasonForReturn": "Battery",
+                    "ProductDetails": "LENOVO THINKPAD T480 CORE i5 8th 32768 1024 NVMe SSD UK Windows 11 Professional",
+                    "RelatedOrder": "20560-1"
+                },
+                {
+                    "SerialNumber": "PF1KJ650",
+                    "ErrorDescription": "Refurbished Lenovo ThinkPad T480 Core i5 8th gen 32GB RAM 1TB SSD 14 Inch Windows 11 Pro Laptop. Battey discharging really quickly and was showing 100% battery health but now only showing 30%.",
+                    "ReceivedAtWarehouseOn": null,
+                    "Solution": "Pending",
+                    "ReasonForReturn": "Battery",
+                    "ProductDetails": "LENOVO THINKPAD T480 CORE i5 8th 32768 1000 SATA SSD UK Windows 11 Professional",
+                    "RelatedOrder": "20560-1"
+                },
+                {
+                    "SerialNumber": "PF1ER9RX",
+                    "ErrorDescription": "Refurbished Lenovo ThinkPad T480 Core i5 8th gen 32GB RAM 1TB SSD 14 Inch Windows 11 Pro Laptop. Unit keeps bluescreening everytime when running stress test.",
+                    "ReceivedAtWarehouseOn": null,
+                    "Solution": "Pending",
+                    "ReasonForReturn": "Technical Issue",
+                    "ProductDetails": "LENOVO THINKPAD T480 CORE i5 8th 32768 1024 SATA SSD UK Windows 11 Professional",
+                    "RelatedOrder": "20560-1"
+                },
+                {
+                    "SerialNumber": "PF168P4C",
+                    "ErrorDescription": "Refurbished Lenovo ThinkPad T480 Intel Core i5 8th gen 16GB RAM 256GB SSD 14 Inch Windows 11 Pro Lap. Battery discharged within 10 mins from stress test from 100%. Also battery health went from 100% to 28%.",
+                    "ReceivedAtWarehouseOn": null,
+                    "Solution": "Pending",
+                    "ReasonForReturn": "Battery",
+                    "ProductDetails": "LENOVO THINKPAD T480 CORE i5 8th 16384 256 NVMe SSD UK Windows 11 Professional",
+                    "RelatedOrder": "20508-1"
+                }
+            ]
+        }
+    ]
+}

@@ -136,13 +136,9 @@ export const rmaStatusEnum = pgEnum("rma_status", [
 export const rmas = pgTable("rmas", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").notNull().references(() => users.id),
-  orderId: integer("order_id").notNull().references(() => orders.id),
   rmaNumber: text("rma_number").notNull().unique(),
-  reason: text("reason").notNull(),
+  email: text("email").notNull(),
   status: rmaStatusEnum("status").notNull().default("requested"),
-  requestDate: timestamp("request_date").defaultNow(),
-  completionDate: timestamp("completion_date"),
-  notes: text("notes"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -150,6 +146,28 @@ export const insertRmaSchema = createInsertSchema(rmas).omit({
   id: true,
   createdAt: true,
 });
+
+// RMA Items schema (serial numbers and details)
+export const rmaItems = pgTable("rma_items", {
+  id: serial("id").primaryKey(),
+  rmaId: integer("rma_id").notNull().references(() => rmas.id),
+  serialNumber: text("serial_number").notNull(),
+  errorDescription: text("error_description").notNull(),
+  receivedAtWarehouseOn: timestamp("received_at_warehouse_on"),
+  solution: text("solution"),
+  reasonForReturn: text("reason_for_return").notNull(),
+  productDetails: text("product_details").notNull(),
+  relatedOrder: text("related_order"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertRmaItemSchema = createInsertSchema(rmaItems).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type RmaItem = typeof rmaItems.$inferSelect;
+export type InsertRmaItem = z.infer<typeof insertRmaItemSchema>;
 
 // Charity water project schema
 export const waterProjects = pgTable("water_projects", {

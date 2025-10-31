@@ -5,6 +5,7 @@ import {
   orderUpdates, OrderUpdate, InsertOrderUpdate,
   environmentalImpact, EnvironmentalImpact, InsertEnvironmentalImpact,
   rmas, Rma, InsertRma,
+  rmaItems, RmaItem, InsertRmaItem,
   waterProjects, WaterProject, InsertWaterProject,
   supportTickets, SupportTicket, InsertSupportTicket,
   caseStudies, CaseStudy, InsertCaseStudy,
@@ -71,6 +72,13 @@ export interface IStorage {
   getAllRmas(): Promise<Rma[]>;
   searchRmas(filters: { rmaNumber?: string; userId?: number; status?: string }): Promise<Rma[]>;
   deleteRma(id: number): Promise<void>;
+  getRmaWithItems(rmaNumber: string): Promise<{rma: Rma; items: RmaItem[]} | undefined>;
+  
+  // RMA items operations
+  getRmaItems(rmaId: number): Promise<RmaItem[]>;
+  createRmaItem(rmaItem: InsertRmaItem): Promise<RmaItem>;
+  updateRmaItem(id: number, data: Partial<RmaItem>): Promise<RmaItem | undefined>;
+  deleteRmaItem(id: number): Promise<void>;
 
   // Water project operations
   getWaterProjects(): Promise<WaterProject[]>;
@@ -354,6 +362,33 @@ export class DatabaseStorage implements IStorage {
   async updateRma(id: number, data: Partial<Rma>): Promise<Rma | undefined> {
     const [updated] = await db.update(rmas).set(data).where(eq(rmas.id, id)).returning();
     return updated || undefined;
+  }
+
+  async getRmaWithItems(rmaNumber: string): Promise<{rma: Rma; items: RmaItem[]} | undefined> {
+    const rma = await this.getRmaByNumber(rmaNumber);
+    if (!rma) return undefined;
+    
+    const items = await this.getRmaItems(rma.id);
+    return { rma, items };
+  }
+
+  // RMA items operations
+  async getRmaItems(rmaId: number): Promise<RmaItem[]> {
+    return db.select().from(rmaItems).where(eq(rmaItems.rmaId, rmaId));
+  }
+
+  async createRmaItem(insertRmaItem: InsertRmaItem): Promise<RmaItem> {
+    const [item] = await db.insert(rmaItems).values(insertRmaItem).returning();
+    return item;
+  }
+
+  async updateRmaItem(id: number, data: Partial<RmaItem>): Promise<RmaItem | undefined> {
+    const [updated] = await db.update(rmaItems).set(data).where(eq(rmaItems.id, id)).returning();
+    return updated || undefined;
+  }
+
+  async deleteRmaItem(id: number): Promise<void> {
+    await db.delete(rmaItems).where(eq(rmaItems.id, id));
   }
 
   // Water project operations
