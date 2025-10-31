@@ -643,9 +643,9 @@ curl -b cookies.txt "http://localhost:5000/api/crud/users"
 - Create users first before creating orders or RMAs
 - Ensure the email matches exactly (case-sensitive)
 
-**"Order with number X not found" error:**
-- Create the order before referencing it in RMAs
-- Verify the order number matches exactly
+**RMA with missing serials:**
+- Each RMA must include at least one serial item in the `serials` array
+- All required serial fields must be provided: SerialNumber, ErrorDescription, ReasonForReturn, ProductDetails
 
 **Date parsing errors:**
 - Use ISO 8601 format: `2024-10-29T10:30:00.000Z`
