@@ -241,7 +241,7 @@ Create or update warranty records for devices.
 
 ## 4. RMAs Upsert API
 
-Create or update Return Merchandise Authorization (RMA) requests.
+Create or update Return Merchandise Authorization (RMA) requests with multiple serial numbers per RMA.
 
 **Endpoint:** `POST /api/data/rmas/upsert`
 
@@ -252,26 +252,46 @@ Create or update Return Merchandise Authorization (RMA) requests.
     {
       "rmaNumber": "RMA-2024-001",
       "email": "john.doe@company.com",
-      "orderNumber": "ORD-2024-12345",
-      "status": "pending",
-      "issueDescription": "Laptop not powering on",
-      "resolution": null,
-      "createdAt": "2024-10-29T10:00:00.000Z",
-      "resolvedAt": null
+      "status": "requested",
+      "serials": [
+        {
+          "SerialNumber": "PF1Q4524",
+          "ErrorDescription": "Battery died within 10 mins",
+          "ReasonForReturn": "Battery",
+          "ProductDetails": "LENOVO THINKPAD T480 CORE i5",
+          "RelatedOrder": "ORD-2024-12345",
+          "Solution": "Pending",
+          "ReceivedAtWarehouseOn": "2024-10-29T14:30:00.000Z"
+        },
+        {
+          "SerialNumber": "PF1Q4525",
+          "ErrorDescription": "Screen flickering intermittently",
+          "ReasonForReturn": "Display",
+          "ProductDetails": "LENOVO THINKPAD T480 CORE i5",
+          "RelatedOrder": "ORD-2024-12345",
+          "Solution": "Pending",
+          "ReceivedAtWarehouseOn": null
+        }
+      ]
     }
   ]
 }
 ```
 
-**Field Requirements:**
+**RMA Field Requirements:**
 - `rmaNumber` (required): Unique RMA identifier
 - `email` (required): Customer email (must match existing user)
-- `orderNumber` (optional): Associated order number (must exist if provided)
-- `status` (required): One of: `pending`, `approved`, `in_transit`, `received`, `completed`, `rejected`
-- `issueDescription` (required): Description of the issue
-- `resolution` (optional): Resolution details
-- `createdAt` (required): ISO 8601 date format
-- `resolvedAt` (optional): ISO 8601 date format
+- `status` (required): One of: `requested`, `approved`, `in_transit`, `received`, `processing`, `completed`, `rejected`
+- `serials` (required): Array of serial items (at least one required)
+
+**Serial Item Field Requirements:**
+- `SerialNumber` (required): Device serial number
+- `ErrorDescription` (required): Detailed description of the fault/issue
+- `ReasonForReturn` (required): Reason category (e.g., "Battery", "Display", "Performance")
+- `ProductDetails` (required): Product make and model
+- `RelatedOrder` (optional): Associated order number
+- `Solution` (optional): Resolution status (defaults to "Pending")
+- `ReceivedAtWarehouseOn` (optional): ISO 8601 date when item was received at warehouse
 
 **Response:**
 ```json
@@ -285,8 +305,10 @@ Create or update Return Merchandise Authorization (RMA) requests.
 
 **Important Notes:**
 - Users must exist before creating RMAs
-- If `orderNumber` is provided, the order must exist in the system
+- Each RMA can contain multiple serial numbers/devices
+- All serials in an RMA are tracked independently with their own status and solution
 - RMAs are linked to users via the `email` field
+- Field names for serials use PascalCase to match external system conventions
 
 ---
 
@@ -500,9 +522,55 @@ All require session authentication (logged-in user).
 - `GET /api/orders/:orderId/updates` - Get order status updates
 
 ### RMA (Return Merchandise Authorization)
-- `GET /api/rma` - List user's RMAs
-- `GET /api/rma/:id` - Get specific RMA details
-- `POST /api/rma` - Create new RMA request
+- `GET /api/rma` - List user's RMAs with serial items
+- `GET /api/rma/:rmaNumber` - Get specific RMA details with all serial items
+- `POST /api/rma` - Create new RMA request with multiple serials
+
+**RMA Response Structure:**
+Each RMA is returned with its associated items:
+```json
+{
+  "rma": {
+    "id": 1,
+    "userId": 1,
+    "rmaNumber": "RMA-12345",
+    "email": "user@example.com",
+    "status": "requested",
+    "createdAt": "2024-10-31T00:00:00.000Z"
+  },
+  "items": [
+    {
+      "id": 1,
+      "rmaId": 1,
+      "serialNumber": "PF1Q4524",
+      "errorDescription": "Battery died within 10 mins",
+      "reasonForReturn": "Battery",
+      "productDetails": "LENOVO THINKPAD T480 CORE i5",
+      "relatedOrder": "ORD-2024-12345",
+      "solution": "Pending",
+      "receivedAtWarehouseOn": "2024-10-29T14:30:00.000Z",
+      "createdAt": "2024-10-31T00:00:00.000Z"
+    }
+  ]
+}
+```
+
+**POST /api/rma Request:**
+```json
+{
+  "email": "user@example.com",
+  "status": "requested",
+  "serials": [
+    {
+      "SerialNumber": "PF1Q4524",
+      "ErrorDescription": "Battery issue",
+      "ReasonForReturn": "Battery",
+      "ProductDetails": "LENOVO THINKPAD T480",
+      "RelatedOrder": "ORD-2024-12345"
+    }
+  ]
+}
+```
 
 ### Environmental Impact
 - `GET /api/impact` - Get user's total environmental impact
