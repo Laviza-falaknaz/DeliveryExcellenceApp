@@ -580,28 +580,31 @@ export default function RMA() {
                         </TableCell>
                       </TableRow>
                     ))
-                  ) : rmas && rmas.filter(rma => rma.status !== 'completed' && rma.status !== 'rejected').length > 0 ? (
+                  ) : rmas && rmas.filter(rma => rma.rma.status !== 'completed' && rma.rma.status !== 'rejected').length > 0 ? (
                     // Display in-progress RMAs
-                    rmas.filter(rma => rma.status !== 'completed' && rma.status !== 'rejected')
-                      .sort((a, b) => new Date(b.requestDate).getTime() - new Date(a.requestDate).getTime())
-                      .map((rma) => {
-                        const order = orders?.find(o => o.id === rma.orderId);
-                        const topic = rma.reason.length > 50 ? 
-                          `${rma.reason.substring(0, 50)}...` : 
-                          rma.reason;
+                    rmas.filter(rma => rma.rma.status !== 'completed' && rma.rma.status !== 'rejected')
+                      .sort((a, b) => {
+                        const aDate = a.rma.createdAt ? new Date(a.rma.createdAt).getTime() : 0;
+                        const bDate = b.rma.createdAt ? new Date(b.rma.createdAt).getTime() : 0;
+                        return bDate - aDate;
+                      })
+                      .map((rmaData) => {
+                        const topic = rmaData.items.length > 0 ? 
+                          `${rmaData.items.length} item(s) - ${rmaData.items[0].errorDescription.substring(0, 40)}...` : 
+                          'No items';
                         
                         return (
                           <TableRow 
-                            key={rma.id} 
+                            key={rmaData.rma.id} 
                             className="border-b border-neutral-100 hover:bg-neutral-50 cursor-pointer transition-colors"
-                            onClick={() => handleRmaClick(rma)}
+                            onClick={() => handleRmaClick(rmaData)}
                           >
                             <TableCell className="py-4 px-6 text-sm text-neutral-700">
-                              {new Date(rma.requestDate).toLocaleDateString('en-GB', {
+                              {rmaData.rma.createdAt && new Date(rmaData.rma.createdAt).toLocaleDateString('en-GB', {
                                 day: '2-digit',
                                 month: '2-digit',
                                 year: 'numeric'
-                              })} {new Date(rma.requestDate).toLocaleTimeString('en-GB', {
+                              })} {rmaData.rma.createdAt && new Date(rmaData.rma.createdAt).toLocaleTimeString('en-GB', {
                                 hour: '2-digit',
                                 minute: '2-digit',
                                 hour12: false
@@ -609,15 +612,15 @@ export default function RMA() {
                             </TableCell>
                             <TableCell className="py-4 px-6 text-sm">
                               <span className="text-primary font-medium cursor-pointer hover:underline">
-                                RMA-{rma.rmaNumber}
+                                {rmaData.rma.rmaNumber}
                               </span>
                             </TableCell>
                             <TableCell className="py-4 px-6 text-sm text-neutral-700">
                               {topic}
                             </TableCell>
                             <TableCell className="py-4 px-6">
-                              <Badge className={`text-xs ${getStatusColor(rma.status)}`}>
-                                {getStatusLabel(rma.status)}
+                              <Badge className={`text-xs ${getStatusColor(rmaData.rma.status)}`}>
+                                {getStatusLabel(rmaData.rma.status)}
                               </Badge>
                             </TableCell>
                           </TableRow>
@@ -891,141 +894,79 @@ export default function RMA() {
         </DialogContent>
       </Dialog>
 
-      {/* New RMA Dialog */}
-      <Dialog open={isNewRmaDialogOpen} onOpenChange={setIsNewRmaDialogOpen}>
-        <DialogContent className="sm:max-w-[550px]">
-          <DialogHeader>
-            <DialogTitle>Complete RMA Request</DialogTitle>
-            <DialogDescription>
-              After reviewing the troubleshooting guide, please provide details for your return or exchange request. Our team will evaluate your request and contact you with further instructions.
-            </DialogDescription>
-          </DialogHeader>
-
-          <Form {...rmaForm}>
-            <form onSubmit={rmaForm.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
-                control={rmaForm.control}
-                name="orderId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Select Order</FormLabel>
-                    <Select
-                      onValueChange={(value) => field.onChange(parseInt(value))}
-                      defaultValue={field.value ? field.value.toString() : ""}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select an order for return" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {eligibleOrders.length > 0 ? (
-                          eligibleOrders.map((order) => (
-                            <SelectItem key={order.id} value={order.id.toString()}>
-                              #{order.orderNumber} ({formatDate(order.orderDate)})
-                            </SelectItem>
-                          ))
-                        ) : (
-                          <SelectItem value="none" disabled>
-                            No eligible orders found
-                          </SelectItem>
-                        )}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={rmaForm.control}
-                name="reason"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Reason for Return</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder="Please explain why you're returning this order"
-                        className="min-h-[120px]"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={rmaForm.control}
-                name="notes"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Additional Notes (Optional)</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder="Any additional information that might be helpful"
-                        className="min-h-[80px]"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => setIsNewRmaDialogOpen(false)}>
-                  Cancel
-                </Button>
-                <Button 
-                  type="submit"
-                  variant="outline"
-                  className="bg-white text-black border-neutral-300 hover:bg-teal-600 hover:text-white hover:border-teal-600 transition-colors"
-                >
-                  Complete RMA Request
-                </Button>
-              </DialogFooter>
-            </form>
-          </Form>
-        </DialogContent>
-      </Dialog>
-
       {/* RMA Details Dialog */}
       <Dialog open={isRmaDetailsOpen} onOpenChange={setIsRmaDetailsOpen}>
-        <DialogContent className="sm:max-w-[550px]">
+        <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto">
           {selectedRma && (
             <>
               <DialogHeader>
                 <DialogTitle>
                   <div className="flex items-center justify-between">
-                    <span>RMA #{selectedRma.rmaNumber}</span>
-                    <Badge className={getStatusColor(selectedRma.status)}>
-                      {getStatusLabel(selectedRma.status)}
+                    <span>RMA #{selectedRma.rma.rmaNumber}</span>
+                    <Badge className={getStatusColor(selectedRma.rma.status)}>
+                      {getStatusLabel(selectedRma.rma.status)}
                     </Badge>
                   </div>
                 </DialogTitle>
                 <DialogDescription>
-                  Requested on {formatDate(selectedRma.requestDate)}
+                  {selectedRma.rma.createdAt && `Created on ${formatDate(selectedRma.rma.createdAt)}`}
                 </DialogDescription>
               </DialogHeader>
 
               <div className="space-y-4 py-4">
                 <div>
-                  <h3 className="font-medium mb-1">Order</h3>
-                  <p>#{orders?.find(o => o.id === selectedRma.orderId)?.orderNumber || selectedRma.orderId}</p>
+                  <h3 className="font-medium mb-1">Email</h3>
+                  <p className="text-neutral-700">{selectedRma.rma.email}</p>
                 </div>
 
+                {/* Serial Items */}
                 <div>
-                  <h3 className="font-medium mb-1">Reason for Return</h3>
-                  <p className="text-neutral-700 whitespace-pre-line">{selectedRma.reason}</p>
-                </div>
-
-                {selectedRma.notes && (
-                  <div>
-                    <h3 className="font-medium mb-1">Additional Notes</h3>
-                    <p className="text-neutral-700 whitespace-pre-line">{selectedRma.notes}</p>
+                  <h3 className="font-medium mb-3">Devices ({selectedRma.items.length})</h3>
+                  <div className="space-y-3">
+                    {selectedRma.items.map((item) => (
+                      <Card key={item.id} className="p-4">
+                        <div className="space-y-2">
+                          <div className="flex items-start justify-between">
+                            <div>
+                              <p className="font-medium">{item.productDetails}</p>
+                              <p className="text-sm text-neutral-600">Serial: {item.serialNumber}</p>
+                            </div>
+                            {item.solution && (
+                              <Badge variant="outline" className="ml-2">
+                                {item.solution}
+                              </Badge>
+                            )}
+                          </div>
+                          
+                          <div>
+                            <p className="text-sm font-medium text-neutral-700">Issue:</p>
+                            <p className="text-sm text-neutral-600">{item.errorDescription}</p>
+                          </div>
+                          
+                          <div className="grid grid-cols-2 gap-2 text-sm">
+                            <div>
+                              <p className="font-medium text-neutral-700">Reason:</p>
+                              <p className="text-neutral-600">{item.reasonForReturn}</p>
+                            </div>
+                            {item.relatedOrder && (
+                              <div>
+                                <p className="font-medium text-neutral-700">Related Order:</p>
+                                <p className="text-neutral-600">{item.relatedOrder}</p>
+                              </div>
+                            )}
+                          </div>
+                          
+                          {item.receivedAtWarehouseOn && (
+                            <div className="text-sm">
+                              <p className="font-medium text-neutral-700">Received:</p>
+                              <p className="text-neutral-600">{formatDate(item.receivedAtWarehouseOn)}</p>
+                            </div>
+                          )}
+                        </div>
+                      </Card>
+                    ))}
                   </div>
-                )}
+                </div>
 
                 {/* RMA Status Timeline */}
                 <div className="mt-6 py-4 border-t border-neutral-200">
@@ -1040,13 +981,15 @@ export default function RMA() {
                       </div>
                       <div>
                         <h4 className="font-medium">RMA Requested</h4>
-                        <p className="text-sm text-neutral-500">
-                          {formatDate(selectedRma.requestDate)} at {new Date(selectedRma.requestDate).toLocaleTimeString()}
-                        </p>
+                        {selectedRma.rma.createdAt && (
+                          <p className="text-sm text-neutral-500">
+                            {formatDate(selectedRma.rma.createdAt)} at {new Date(selectedRma.rma.createdAt).toLocaleTimeString()}
+                          </p>
+                        )}
                       </div>
                     </div>
 
-                    {selectedRma.status !== "requested" && (
+                    {selectedRma.rma.status !== "requested" && (
                       <div className="relative pl-8 pb-6">
                         <div className="absolute left-0 top-1 h-6 w-6 rounded-full bg-accent text-white flex items-center justify-center">
                           <i className="ri-check-line"></i>
@@ -1060,7 +1003,7 @@ export default function RMA() {
                       </div>
                     )}
 
-                    {(selectedRma.status === "in_transit" || selectedRma.status === "received" || selectedRma.status === "processing" || selectedRma.status === "completed") && (
+                    {(selectedRma.rma.status === "in_transit" || selectedRma.rma.status === "received" || selectedRma.rma.status === "processing" || selectedRma.rma.status === "completed") && (
                       <div className="relative pl-8 pb-6">
                         <div className="absolute left-0 top-1 h-6 w-6 rounded-full bg-accent text-white flex items-center justify-center">
                           <i className="ri-check-line"></i>
@@ -1074,7 +1017,7 @@ export default function RMA() {
                       </div>
                     )}
 
-                    {(selectedRma.status === "received" || selectedRma.status === "processing" || selectedRma.status === "completed") && (
+                    {(selectedRma.rma.status === "received" || selectedRma.rma.status === "processing" || selectedRma.rma.status === "completed") && (
                       <div className="relative pl-8 pb-6">
                         <div className="absolute left-0 top-1 h-6 w-6 rounded-full bg-accent text-white flex items-center justify-center">
                           <i className="ri-check-line"></i>
@@ -1088,7 +1031,7 @@ export default function RMA() {
                       </div>
                     )}
 
-                    {(selectedRma.status === "processing" || selectedRma.status === "completed") && (
+                    {(selectedRma.rma.status === "processing" || selectedRma.rma.status === "completed") && (
                       <div className="relative pl-8 pb-6">
                         <div className="absolute left-0 top-1 h-6 w-6 rounded-full bg-accent text-white flex items-center justify-center">
                           <i className="ri-check-line"></i>
@@ -1102,7 +1045,7 @@ export default function RMA() {
                       </div>
                     )}
 
-                    {selectedRma.status === "completed" && (
+                    {selectedRma.rma.status === "completed" && (
                       <div className="relative pl-8">
                         <div className="absolute left-0 top-1 h-6 w-6 rounded-full bg-accent text-white flex items-center justify-center">
                           <i className="ri-check-line"></i>
@@ -1112,16 +1055,11 @@ export default function RMA() {
                           <p className="text-sm text-neutral-600">
                             Your return has been processed and completed.
                           </p>
-                          {selectedRma.completionDate && (
-                            <p className="text-sm text-neutral-500">
-                              {formatDate(selectedRma.completionDate)}
-                            </p>
-                          )}
                         </div>
                       </div>
                     )}
 
-                    {selectedRma.status === "rejected" && (
+                    {selectedRma.rma.status === "rejected" && (
                       <div className="relative pl-8">
                         <div className="absolute left-0 top-1 h-6 w-6 rounded-full bg-red-500 text-white flex items-center justify-center">
                           <i className="ri-close-line"></i>
