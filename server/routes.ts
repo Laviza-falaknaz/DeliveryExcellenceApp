@@ -457,21 +457,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/rma/:id", isAuthenticated, async (req, res) => {
+  app.get("/api/rma/:rmaNumber", isAuthenticated, async (req, res) => {
     try {
-      const rmaId = parseInt(req.params.id);
-      const rma = await storage.getRma(rmaId);
+      const rmaNumber = req.params.rmaNumber;
+      const rmaWithItems = await storage.getRmaWithItems(rmaNumber);
       
-      if (!rma) {
+      if (!rmaWithItems) {
         return res.status(404).json({ message: "RMA not found" });
       }
       
       const user = req.user as User;
-      if (rma.userId !== user.id) {
+      if (rmaWithItems.rma.userId !== user.id) {
         return res.status(403).json({ message: "Forbidden" });
       }
       
-      res.json(rma);
+      res.json(rmaWithItems);
     } catch (error) {
       res.status(500).json({ message: "Internal server error" });
     }
@@ -480,26 +480,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/rma", isAuthenticated, async (req, res) => {
     try {
       const user = req.user as User;
-      const orderId = parseInt(req.body.orderId);
-      const order = await storage.getOrder(orderId);
+      const { email, serials, status } = req.body;
       
-      if (!order) {
-        return res.status(404).json({ message: "Order not found" });
+      if (!email || !serials || !Array.isArray(serials) || serials.length === 0) {
+        return res.status(400).json({ message: "Email and serials array are required" });
       }
       
-      if (order.userId !== user.id) {
-        return res.status(403).json({ message: "Forbidden" });
-      }
+      // Generate RMA number
+      const rmaNumber = `RMA-${Math.floor(10000 + Math.random() * 90000)}`;
       
-      const rmaNumber = `RMA-${crypto.randomBytes(4).toString("hex").toUpperCase()}`;
+      // Create RMA
       const rmaData = insertRmaSchema.parse({
-        ...req.body,
         userId: user.id,
         rmaNumber,
+        email,
+        status: status || "requested",
       });
       
       const rma = await storage.createRma(rmaData);
-      res.status(201).json(rma);
+      
+      // Create RMA items (serials)
+      for (const serial of serials) {
+        await storage.createRmaItem({
+          rmaId: rma.id,
+          serialNumber: serial.SerialNumber,
+          errorDescription: serial.ErrorDescription,
+          receivedAtWarehouseOn: serial.ReceivedAtWarehouseOn || null,
+          solution: serial.Solution || "Pending",
+          reasonForReturn: serial.ReasonForReturn,
+          productDetails: serial.ProductDetails,
+          relatedOrder: serial.RelatedOrder || null,
+        });
+      }
+      
+      // Return RMA with items
+      const rmaWithItems = await storage.getRmaWithItems(rma.rmaNumber);
+      res.status(201).json(rmaWithItems);
     } catch (error) {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: error.errors });
