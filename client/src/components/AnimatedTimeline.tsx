@@ -22,9 +22,7 @@ export function AnimatedTimeline({ timeline }: AnimatedTimelineProps) {
     { key: "invoiceMailed", label: "Invoice Sent", icon: FileText, animation: "check" },
     { key: "sentToWarehouse", label: "Sent to Warehouse", icon: Warehouse, animation: "spin" },
     { key: "dateFulfilled", label: "Order Fulfilled", icon: Package, animation: "pack" },
-    { key: "qualityCheckDate", label: "Quality Checked", icon: Star, animation: "sparkle" },
     { key: "dispatchDate", label: "Dispatched", icon: Truck, animation: "truck" },
-    { key: "deliveryDate", label: "Delivered", icon: Home, animation: "celebrate" },
     { key: "orderCompleted", label: "Completed", icon: ClipboardCheck, animation: "celebrate" },
   ];
 

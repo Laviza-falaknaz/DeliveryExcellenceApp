@@ -245,9 +245,7 @@ export const deliveryTimelines = pgTable("delivery_timelines", {
   invoiceMailed: timestamp("invoice_mailed"), // Date Invoice Mailed - When invoice was sent
   sentToWarehouse: timestamp("sent_to_warehouse"), // Sent to Warehouse Date - When order sent to warehouse for processing
   dateFulfilled: timestamp("date_fulfilled"), // Date Fulfilled - When warehouse completed order preparation
-  qualityCheckDate: timestamp("quality_check_date"), // Quality Check Date - When QC performed (SUGGESTED - add to your system)
   dispatchDate: timestamp("dispatch_date"), // Dispatch Date - When order left the warehouse
-  deliveryDate: timestamp("delivery_date"), // Actual Delivery Date - When customer received order (SUGGESTED - add to your system)
   orderCompleted: timestamp("order_completed"), // Completion Date - When order process fully completed
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),

@@ -1631,10 +1631,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     
     // Check timeline milestones in reverse order (most recent status first)
     if (timeline.orderCompleted) return "completed";
-    if (timeline.deliveryDate) return "delivered";
     if (timeline.dispatchDate) return "shipped";
-    if (timeline.qualityCheckDate) return "quality_check";
-    if (timeline.dateFulfilled) return "quality_check";
+    if (timeline.dateFulfilled) return "in_production";
     if (timeline.sentToWarehouse) return "in_production";
     if (timeline.paymentDate) return "processing";
     if (timeline.orderDate) return "placed";

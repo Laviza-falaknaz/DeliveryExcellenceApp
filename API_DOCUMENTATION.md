@@ -159,9 +159,7 @@ Create or update orders and automatically link them to users via email. Supports
         "invoiceMailed": "2024-10-15T15:00:00.000Z",
         "sentToWarehouse": "2024-10-16T09:00:00.000Z",
         "dateFulfilled": "2024-10-17T14:00:00.000Z",
-        "qualityCheckDate": "2024-10-18T10:00:00.000Z",
         "dispatchDate": "2024-10-19T08:00:00.000Z",
-        "deliveryDate": "2024-10-20T15:30:00.000Z",
         "orderCompleted": null
       },
       "items": [
@@ -205,13 +203,9 @@ All fields are optional and use ISO 8601 date format. **Map your system dates to
 | `paymentDate` | **Payment Date** | When payment was received | `processing` |
 | `invoiceMailed` | **Date Invoice Mailed** | When invoice was sent to customer | - |
 | `sentToWarehouse` | **Sent to Warehouse Date** | When order was sent to warehouse for processing | `in_production` |
-| `dateFulfilled` | **Date Fulfilled** | When warehouse completed order preparation | `quality_check` |
-| `qualityCheckDate` | **Quality Check Date** ⭐ | When quality checks were performed (SUGGESTED to add) | `quality_check` |
+| `dateFulfilled` | **Date Fulfilled** | When warehouse completed order preparation | `in_production` |
 | `dispatchDate` | **Dispatch Date** | When order was dispatched from warehouse | `shipped` |
-| `deliveryDate` | **Actual Delivery Date** ⭐ | When customer received the order (SUGGESTED to add) | `delivered` |
 | `orderCompleted` | - | When order process was fully completed | `completed` |
-
-⭐ **Suggested Additional Fields**: We recommend adding "Quality Check Date" and "Actual Delivery Date" to your system for more accurate timeline tracking and customer visibility.
 
 **Future Dates (Not Used in Timeline):**
 These are planning dates and should NOT be included in the timeline object:
@@ -222,13 +216,12 @@ These are planning dates and should NOT be included in the timeline object:
 **Status Determination Logic:**
 The system automatically determines status by checking timeline milestones in this priority order:
 1. If `orderCompleted` has a date → Status is `completed`
-2. If `deliveryDate` has a date → Status is `delivered`
-3. If `dispatchDate` has a date → Status is `shipped`
-4. If `qualityCheckDate` OR `dateFulfilled` has a date → Status is `quality_check`
-5. If `sentToWarehouse` has a date → Status is `in_production`
-6. If `paymentDate` has a date → Status is `processing`
-7. If `orderDate` has a date → Status is `placed`
-8. If no timeline provided → Status defaults to `placed`
+2. If `dispatchDate` has a date → Status is `shipped`
+3. If `dateFulfilled` has a date → Status is `in_production`
+4. If `sentToWarehouse` has a date → Status is `in_production`
+5. If `paymentDate` has a date → Status is `processing`
+6. If `orderDate` has a date → Status is `placed`
+7. If no timeline provided → Status defaults to `placed`
 
 **Response:**
 ```json
