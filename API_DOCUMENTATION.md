@@ -2,9 +2,9 @@
 
 ## Quick Start
 
-**Your Production API Key:** `cc_7101cbf99d27c5a98e3cefc80f79fb28b94e194a289c139b179655d8f565cb28`
+**Production API Key:** Use the API key provided by your administrator. Create new API keys through the Admin Panel → API Keys section.
 
-Use this key in all your Power Automate flows and external integrations. This key never expires unless you revoke it.
+API keys are required for all Data Push APIs and never expire unless revoked.
 
 ---
 
@@ -28,12 +28,12 @@ All Data Push APIs require API key authentication. Include your API key in one o
 
 **Option 1: X-API-Key Header (Recommended)**
 ```bash
-X-API-Key: cc_7101cbf99d27c5a98e3cefc80f79fb28b94e194a289c139b179655d8f565cb28
+X-API-Key: YOUR_API_KEY_HERE
 ```
 
 **Option 2: Authorization Bearer Token**
 ```bash
-Authorization: Bearer cc_7101cbf99d27c5a98e3cefc80f79fb28b94e194a289c139b179655d8f565cb28
+Authorization: Bearer YOUR_API_KEY_HERE
 ```
 
 ## Power Automate Configuration
@@ -44,7 +44,7 @@ When setting up HTTP requests in Power Automate:
 2. **URI**: `https://your-portal.replit.app/api/data/users/upsert`
 3. **Headers**:
    - `Content-Type`: `application/json`
-   - `X-API-Key`: `cc_7101cbf99d27c5a98e3cefc80f79fb28b94e194a289c139b179655d8f565cb28`
+   - `X-API-Key`: `YOUR_API_KEY_HERE`
 4. **Body**: Your JSON payload (see examples below)
 
 ---
@@ -97,7 +97,7 @@ Create or update users in bulk.
 ```bash
 curl -X POST https://your-portal.replit.app/api/data/users/upsert \
   -H "Content-Type: application/json" \
-  -H "X-API-Key: cc_7101cbf99d27c5a98e3cefc80f79fb28b94e194a289c139b179655d8f565cb28" \
+  -H "X-API-Key: YOUR_API_KEY_HERE" \
   -d '{
     "users": [
       {
@@ -246,9 +246,11 @@ The system automatically determines status by checking timeline milestones in th
 
 ---
 
-## 3. Warranties Upsert API
+## 3. Warranties Bulk Upload API
 
-Create or update warranty records for devices.
+**⚠️ TRUNCATE AND REPLACE:** This endpoint completely replaces the entire warranties table with your data. It truncates all existing records before inserting new ones.
+
+**Use Case:** Designed for bulk warranty data synchronization from your main system (150K+ records supported).
 
 **Endpoint:** `POST /api/data/warranties/upsert`
 
@@ -259,30 +261,62 @@ Create or update warranty records for devices.
     {
       "serialNumber": "SN123456789",
       "manufacturerSerialNumber": "DELL-MFG-987654321",
+      "areaId": "UK-SOUTH",
+      "itemId": "ITEM-12345",
       "warrantyDescription": "3-Year Premium Warranty",
       "startDate": "2024-01-01T00:00:00.000Z",
       "endDate": "2027-01-01T00:00:00.000Z"
+    },
+    {
+      "serialNumber": "SN987654321",
+      "manufacturerSerialNumber": "HP-MFG-123456789",
+      "areaId": "US-EAST",
+      "itemId": "ITEM-67890",
+      "warrantyDescription": "2-Year Standard Warranty",
+      "startDate": "2023-06-15T00:00:00.000Z",
+      "endDate": "2025-06-15T00:00:00.000Z"
     }
   ]
 }
 ```
 
 **Field Requirements:**
-- `serialNumber` (required): Unique device serial number
-- `manufacturerSerialNumber` (optional): Manufacturer's serial number
-- `warrantyDescription` (required): Warranty description
-- `startDate` (required): Warranty start date (ISO 8601)
-- `endDate` (required): Warranty end date (ISO 8601)
+- `serialNumber` (required): Unique device serial number (searchable)
+- `manufacturerSerialNumber` (required): Manufacturer's serial number (searchable)
+- `areaId` (required): Geographic area or region identifier
+- `itemId` (required): Item/SKU identifier in your system
+- `warrantyDescription` (required): Warranty description/type
+- `startDate` (required): Warranty start date (ISO 8601 format)
+- `endDate` (required): Warranty end date (ISO 8601 format)
+
+**Performance & Limits:**
+- Optimized for 150K+ records with batch processing (1000 records per batch)
+- **Complete table replacement** - All existing warranties are deleted before insert
+- Automatic validation and error reporting per record
+- Failed records are reported in `errors` array without stopping the upload
 
 **Response:**
 ```json
 {
   "success": true,
-  "created": 1,
+  "created": 150243,
   "updated": 0,
-  "errors": []
+  "errors": [
+    {
+      "serialNumber": "BAD-SERIAL-123",
+      "error": "Invalid date format for startDate"
+    }
+  ]
 }
 ```
+
+**Important Notes:**
+- **Truncate & Replace Strategy**: Every API call deletes all existing warranties before inserting new data
+- This ensures your system is the single source of truth
+- Status (active/expired) is automatically determined based on current date vs. start/end dates
+- Users can search by either `serialNumber` OR `manufacturerSerialNumber`
+- Batch processing ensures optimal performance for large datasets
+- Any validation errors are reported but don't stop the overall upload
 
 ---
 
@@ -399,28 +433,35 @@ All Data Push APIs return detailed error information:
 ## Best Practices
 
 1. **User Creation First**: Always upsert users before orders/RMAs to ensure email linking works
-2. **Batch Size**: Keep batches under 500 records per request for optimal performance
+2. **Batch Size**: 
+   - Users/Orders/RMAs: Keep batches under 500 records per request for optimal performance
+   - Warranties: Supports 150K+ records in a single request with automatic batch processing
 3. **Error Handling**: Always check the `errors` array and retry failed records
 4. **Date Formats**: Use ISO 8601 format: `2024-10-29T10:30:00.000Z`
 5. **Password Security**: Send passwords in plain text - the system automatically encrypts them with bcrypt before storage
 6. **User Activation**: Use `isActive: false` to deactivate user accounts and prevent login
 7. **Monetary Values**: Use integers in pence/cents (multiply by 100)
 8. **Idempotency**: Upsert operations are safe to retry - they won't create duplicates
+9. **Warranty Sync**: The warranties endpoint uses truncate-and-replace strategy - send your complete dataset each time
 
 ---
 
 # Warranty Lookup API
 
-Public endpoint for warranty information lookup (no authentication required).
+Public endpoint for warranty information lookup (no authentication required). Customers can search using either the serial number or manufacturer serial number.
 
 **Endpoint:** `GET /api/warranties/search?q={serialNumber}`
 
 **Parameters:**
-- `q` (required): Serial number or manufacturer serial number
+- `q` (required): Serial number OR manufacturer serial number (searches both fields)
 
-**Example:**
+**Examples:**
 ```bash
+# Search by serial number
 curl "https://your-portal.replit.app/api/warranties/search?q=SN123456789"
+
+# Search by manufacturer serial number
+curl "https://your-portal.replit.app/api/warranties/search?q=DELL-MFG-987654321"
 ```
 
 **Response (Found):**
@@ -430,6 +471,8 @@ curl "https://your-portal.replit.app/api/warranties/search?q=SN123456789"
   "warranty": {
     "serialNumber": "SN123456789",
     "manufacturerSerialNumber": "DELL-MFG-987654321",
+    "areaId": "UK-SOUTH",
+    "itemId": "ITEM-12345",
     "warrantyDescription": "3-Year Premium Warranty",
     "startDate": "2024-01-01T00:00:00.000Z",
     "endDate": "2027-01-01T00:00:00.000Z",
@@ -446,6 +489,15 @@ curl "https://your-portal.replit.app/api/warranties/search?q=SN123456789"
   "message": "No warranty found for this serial number"
 }
 ```
+
+**Status Values:**
+- `active`: Current date is between startDate and endDate
+- `upcoming`: Current date is before startDate
+- `expired`: Current date is after endDate
+
+**Auto-Determined Fields:**
+- `status`: Calculated automatically based on current date
+- `daysRemaining`: Days until warranty expires (0 if expired)
 
 ---
 
@@ -468,7 +520,7 @@ Administrators can create and manage API keys through these endpoints (requires 
 ```json
 {
   "success": true,
-  "apiKey": "cc_7101cbf99d27c5a98e3cefc80f79fb28b94e194a289c139b179655d8f565cb28",
+  "apiKey": "cc_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
   "metadata": {
     "id": 4,
     "name": "My Integration Name",
@@ -782,9 +834,4 @@ For API support or to report issues:
 
 ---
 
-**Production API Key (Save This):**
-```
-cc_7101cbf99d27c5a98e3cefc80f79fb28b94e194a289c139b179655d8f565cb28
-```
-
-Store this key securely. It provides full access to all Data Push APIs and does not expire unless revoked.
+**Note:** API keys are generated through the Admin Panel and should be stored securely. They provide full access to all Data Push APIs and do not expire unless revoked.

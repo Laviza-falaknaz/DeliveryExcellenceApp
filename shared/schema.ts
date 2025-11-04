@@ -445,6 +445,8 @@ export const warranties = pgTable("warranties", {
   id: serial("id").primaryKey(),
   serialNumber: text("serial_number").notNull(),
   manufacturerSerialNumber: text("manufacturer_serial_number").notNull(),
+  areaId: text("area_id").notNull(),
+  itemId: text("item_id").notNull(),
   warrantyDescription: text("warranty_description").notNull(),
   startDate: timestamp("start_date").notNull(),
   endDate: timestamp("end_date").notNull(),
@@ -458,8 +460,22 @@ export const insertWarrantySchema = createInsertSchema(warranties).omit({
   updatedAt: true,
 });
 
+// Bulk warranty insert schema for API (accepts array)
+export const bulkWarrantyInsertSchema = z.object({
+  warranties: z.array(z.object({
+    serialNumber: z.string().min(1),
+    manufacturerSerialNumber: z.string().min(1),
+    areaId: z.string().min(1),
+    itemId: z.string().min(1),
+    warrantyDescription: z.string().min(1),
+    startDate: z.string().datetime().or(z.date()).transform(val => typeof val === 'string' ? new Date(val) : val),
+    endDate: z.string().datetime().or(z.date()).transform(val => typeof val === 'string' ? new Date(val) : val),
+  }))
+});
+
 export type Warranty = typeof warranties.$inferSelect;
 export type InsertWarranty = z.infer<typeof insertWarrantySchema>;
+export type BulkWarrantyInsert = z.infer<typeof bulkWarrantyInsertSchema>;
 
 // API Keys schema for authentication
 export const apiKeys = pgTable("api_keys", {

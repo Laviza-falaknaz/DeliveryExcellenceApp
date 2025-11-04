@@ -20,7 +20,7 @@ import {
   apiKeys, ApiKey
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, sum, like, and } from "drizzle-orm";
+import { eq, sum, like, and, sql } from "drizzle-orm";
 
 export interface IStorage {
   // User operations
@@ -479,10 +479,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createDeliveryTimeline(insertTimeline: InsertDeliveryTimeline): Promise<DeliveryTimeline> {
-    const [timeline] = await db.insert(deliveryTimelines).values({
-      ...insertTimeline,
-      orderPlaced: true // First step is always completed
-    }).returning();
+    const [timeline] = await db.insert(deliveryTimelines).values(insertTimeline).returning();
     return timeline;
   }
 
@@ -875,29 +872,41 @@ export class DatabaseStorage implements IStorage {
   }
 
   async bulkUpsertWarranties(warrantiesToUpsert: InsertWarranty[]): Promise<{ created: number; updated: number; errors: any[] }> {
-    let created = 0;
-    let updated = 0;
     const errors: any[] = [];
-
-    for (const warranty of warrantiesToUpsert) {
-      try {
-        const existing = await this.searchWarranty(warranty.serialNumber);
-        if (existing) {
-          await this.upsertWarranty(warranty);
-          updated++;
-        } else {
-          await this.upsertWarranty(warranty);
-          created++;
+    
+    try {
+      // TRUNCATE entire warranties table for complete replacement
+      await db.execute(sql`TRUNCATE TABLE warranties RESTART IDENTITY CASCADE`);
+      
+      // Batch insert all warranties in chunks of 1000 for optimal performance
+      const batchSize = 1000;
+      let created = 0;
+      
+      for (let i = 0; i < warrantiesToUpsert.length; i += batchSize) {
+        const batch = warrantiesToUpsert.slice(i, i + batchSize);
+        try {
+          await db.insert(warranties).values(batch);
+          created += batch.length;
+        } catch (error: any) {
+          // If batch fails, try individual inserts to identify problematic records
+          for (const warranty of batch) {
+            try {
+              await db.insert(warranties).values(warranty);
+              created++;
+            } catch (individualError: any) {
+              errors.push({
+                serialNumber: warranty.serialNumber,
+                error: individualError.message
+              });
+            }
+          }
         }
-      } catch (error: any) {
-        errors.push({
-          serialNumber: warranty.serialNumber,
-          error: error.message
-        });
       }
+      
+      return { created, updated: 0, errors }; // updated is always 0 since we truncate
+    } catch (error: any) {
+      throw new Error(`Bulk warranty upload failed: ${error.message}`);
     }
-
-    return { created, updated, errors };
   }
 
   // Upsert operations for data push APIs
