@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Package, Wrench, CheckCircle2, Truck, Home, Phone, Star } from "lucide-react";
+import { Package, CheckCircle2, Truck, Home, Warehouse, ClipboardCheck, CreditCard, FileText, Star } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { DeliveryTimeline } from "@shared/schema";
 
@@ -17,14 +17,15 @@ interface AnimatedTimelineProps {
 
 export function AnimatedTimeline({ timeline }: AnimatedTimelineProps) {
   const steps: TimelineStep[] = [
-    { key: "orderPlaced", label: "Order Placed", icon: CheckCircle2, animation: "check" },
-    { key: "customerSuccessCallBooked", label: "Success Call Booked", icon: Phone, animation: "phone" },
-    { key: "orderInProgress", label: "Order In Progress", icon: Package, animation: "spin" },
-    { key: "orderBeingBuilt", label: "Being Built", icon: Wrench, animation: "build" },
-    { key: "qualityChecks", label: "Quality Checks", icon: Star, animation: "sparkle" },
-    { key: "readyForDelivery", label: "Ready for Delivery", icon: Package, animation: "pack" },
-    { key: "orderDelivered", label: "Delivered", icon: Truck, animation: "truck" },
-    { key: "orderCompleted", label: "Completed", icon: Home, animation: "celebrate" },
+    { key: "orderDate", label: "Order Placed", icon: CheckCircle2, animation: "check" },
+    { key: "paymentDate", label: "Payment Received", icon: CreditCard, animation: "check" },
+    { key: "invoiceMailed", label: "Invoice Sent", icon: FileText, animation: "check" },
+    { key: "sentToWarehouse", label: "Sent to Warehouse", icon: Warehouse, animation: "spin" },
+    { key: "dateFulfilled", label: "Order Fulfilled", icon: Package, animation: "pack" },
+    { key: "qualityCheckDate", label: "Quality Checked", icon: Star, animation: "sparkle" },
+    { key: "dispatchDate", label: "Dispatched", icon: Truck, animation: "truck" },
+    { key: "deliveryDate", label: "Delivered", icon: Home, animation: "celebrate" },
+    { key: "orderCompleted", label: "Completed", icon: ClipboardCheck, animation: "celebrate" },
   ];
 
   // Find current active step

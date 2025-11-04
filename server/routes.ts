@@ -1625,18 +1625,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Helper function to determine order status from timeline
+  // Helper function to determine order status from timeline based on actual system dates
   const determineOrderStatus = (timeline: any): string => {
     if (!timeline) return "placed";
     
     // Check timeline milestones in reverse order (most recent status first)
     if (timeline.orderCompleted) return "completed";
-    if (timeline.orderDelivered) return "delivered";
-    if (timeline.readyForDelivery) return "shipped";
-    if (timeline.qualityChecks) return "quality_check";
-    if (timeline.orderBeingBuilt) return "in_production";
-    if (timeline.orderInProgress) return "processing";
-    if (timeline.orderPlaced) return "placed";
+    if (timeline.deliveryDate) return "delivered";
+    if (timeline.dispatchDate) return "shipped";
+    if (timeline.qualityCheckDate) return "quality_check";
+    if (timeline.dateFulfilled) return "quality_check";
+    if (timeline.sentToWarehouse) return "in_production";
+    if (timeline.paymentDate) return "processing";
+    if (timeline.orderDate) return "placed";
     
     return "placed";
   };

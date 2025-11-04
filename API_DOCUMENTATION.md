@@ -154,15 +154,15 @@ Create or update orders and automatically link them to users via email. Supports
         "country": "United Kingdom"
       },
       "timeline": {
-        "orderPlaced": "2024-10-15T10:30:00.000Z",
-        "customerSuccessCallBooked": "2024-10-16T09:00:00.000Z",
-        "orderInProgress": "2024-10-16T14:00:00.000Z",
-        "orderBeingBuilt": "2024-10-17T10:00:00.000Z",
-        "qualityChecks": "2024-10-18T11:00:00.000Z",
-        "readyForDelivery": "2024-10-19T08:00:00.000Z",
-        "orderDelivered": "2024-10-20T15:30:00.000Z",
-        "orderCompleted": null,
-        "rateYourExperience": null
+        "orderDate": "2024-10-15T10:30:00.000Z",
+        "paymentDate": "2024-10-15T14:00:00.000Z",
+        "invoiceMailed": "2024-10-15T15:00:00.000Z",
+        "sentToWarehouse": "2024-10-16T09:00:00.000Z",
+        "dateFulfilled": "2024-10-17T14:00:00.000Z",
+        "qualityCheckDate": "2024-10-18T10:00:00.000Z",
+        "dispatchDate": "2024-10-19T08:00:00.000Z",
+        "deliveryDate": "2024-10-20T15:30:00.000Z",
+        "orderCompleted": null
       },
       "items": [
         {
@@ -195,28 +195,39 @@ Create or update orders and automatically link them to users via email. Supports
 - `items` (optional): Array of order items
 
 **Timeline Object (Optional but Recommended):**
-The timeline field tracks order progress with timestamps for each milestone. **The order status is automatically determined from these dates** - the system checks the timeline in reverse order and sets the status based on the most recent completed milestone.
+The timeline field tracks order progress with timestamps for each milestone based on your actual system dates. **The order status is automatically determined from these dates** - the system checks the timeline in reverse order and sets the status based on the most recent completed milestone.
 
-All fields are optional and use ISO 8601 date format:
-- `orderPlaced`: When the order was placed → Status: `placed`
-- `customerSuccessCallBooked`: When customer success call was scheduled
-- `orderInProgress`: When order processing started → Status: `processing`
-- `orderBeingBuilt`: When order assembly/building started → Status: `in_production`
-- `qualityChecks`: When quality checks were performed → Status: `quality_check`
-- `readyForDelivery`: When order was ready for shipment → Status: `shipped`
-- `orderDelivered`: When order was delivered to customer → Status: `delivered`
-- `orderCompleted`: When order was marked as complete → Status: `completed`
-- `rateYourExperience`: When customer was prompted to rate their experience
+All fields are optional and use ISO 8601 date format. **Map your system dates to these fields:**
+
+| Timeline Field | Your System Date | Description | Status Triggered |
+|----------------|------------------|-------------|------------------|
+| `orderDate` | **Order Date** | When the order was placed | `placed` |
+| `paymentDate` | **Payment Date** | When payment was received | `processing` |
+| `invoiceMailed` | **Date Invoice Mailed** | When invoice was sent to customer | - |
+| `sentToWarehouse` | **Sent to Warehouse Date** | When order was sent to warehouse for processing | `in_production` |
+| `dateFulfilled` | **Date Fulfilled** | When warehouse completed order preparation | `quality_check` |
+| `qualityCheckDate` | **Quality Check Date** ⭐ | When quality checks were performed (SUGGESTED to add) | `quality_check` |
+| `dispatchDate` | **Dispatch Date** | When order was dispatched from warehouse | `shipped` |
+| `deliveryDate` | **Actual Delivery Date** ⭐ | When customer received the order (SUGGESTED to add) | `delivered` |
+| `orderCompleted` | - | When order process was fully completed | `completed` |
+
+⭐ **Suggested Additional Fields**: We recommend adding "Quality Check Date" and "Actual Delivery Date" to your system for more accurate timeline tracking and customer visibility.
+
+**Future Dates (Not Used in Timeline):**
+These are planning dates and should NOT be included in the timeline object:
+- Expected Shipping Date
+- Agreed Delivery Date  
+- Payment Due Date
 
 **Status Determination Logic:**
-The system automatically determines status by checking timeline milestones in this order:
+The system automatically determines status by checking timeline milestones in this priority order:
 1. If `orderCompleted` has a date → Status is `completed`
-2. If `orderDelivered` has a date → Status is `delivered`
-3. If `readyForDelivery` has a date → Status is `shipped`
-4. If `qualityChecks` has a date → Status is `quality_check`
-5. If `orderBeingBuilt` has a date → Status is `in_production`
-6. If `orderInProgress` has a date → Status is `processing`
-7. If `orderPlaced` has a date → Status is `placed`
+2. If `deliveryDate` has a date → Status is `delivered`
+3. If `dispatchDate` has a date → Status is `shipped`
+4. If `qualityCheckDate` OR `dateFulfilled` has a date → Status is `quality_check`
+5. If `sentToWarehouse` has a date → Status is `in_production`
+6. If `paymentDate` has a date → Status is `processing`
+7. If `orderDate` has a date → Status is `placed`
 8. If no timeline provided → Status defaults to `placed`
 
 **Response:**

@@ -236,23 +236,19 @@ export const insertCaseStudySchema = createInsertSchema(caseStudies).omit({
   createdAt: true,
 });
 
-// Delivery Timeline - stores timestamps for each milestone
+// Delivery Timeline - stores timestamps for each milestone based on actual system dates
 export const deliveryTimelines = pgTable("delivery_timelines", {
   id: serial("id").primaryKey(),
   orderId: integer("order_id").references(() => orders.id).notNull(),
-  orderPlaced: timestamp("order_placed"),
-  customerSuccessCallBooked: timestamp("customer_success_call_booked"),
-  rateYourExperience: timestamp("rate_your_experience"),
-  customerSuccessIntroCall: timestamp("customer_success_intro_call"),
-  orderInProgress: timestamp("order_in_progress"),
-  orderBeingBuilt: timestamp("order_being_built"),
-  qualityChecks: timestamp("quality_checks"),
-  readyForDelivery: timestamp("ready_for_delivery"),
-  orderDelivered: timestamp("order_delivered"),
-  rateYourProduct: timestamp("rate_your_product"),
-  customerSuccessCallBookedPost: timestamp("customer_success_call_booked_post"),
-  customerSuccessCheckIn: timestamp("customer_success_check_in"),
-  orderCompleted: timestamp("order_completed"),
+  orderDate: timestamp("order_date"), // Order Date - When order was placed
+  paymentDate: timestamp("payment_date"), // Payment Date - When payment was received  
+  invoiceMailed: timestamp("invoice_mailed"), // Date Invoice Mailed - When invoice was sent
+  sentToWarehouse: timestamp("sent_to_warehouse"), // Sent to Warehouse Date - When order sent to warehouse for processing
+  dateFulfilled: timestamp("date_fulfilled"), // Date Fulfilled - When warehouse completed order preparation
+  qualityCheckDate: timestamp("quality_check_date"), // Quality Check Date - When QC performed (SUGGESTED - add to your system)
+  dispatchDate: timestamp("dispatch_date"), // Dispatch Date - When order left the warehouse
+  deliveryDate: timestamp("delivery_date"), // Actual Delivery Date - When customer received order (SUGGESTED - add to your system)
+  orderCompleted: timestamp("order_completed"), // Completion Date - When order process fully completed
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
