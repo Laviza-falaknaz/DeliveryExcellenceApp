@@ -1625,6 +1625,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Helper function to determine order status from timeline
+  const determineOrderStatus = (timeline: any): string => {
+    if (!timeline) return "placed";
+    
+    // Check timeline milestones in reverse order (most recent status first)
+    if (timeline.orderCompleted) return "completed";
+    if (timeline.orderDelivered) return "delivered";
+    if (timeline.readyForDelivery) return "shipped";
+    if (timeline.qualityChecks) return "quality_check";
+    if (timeline.orderBeingBuilt) return "in_production";
+    if (timeline.orderInProgress) return "processing";
+    if (timeline.orderPlaced) return "placed";
+    
+    return "placed";
+  };
+
   // Upsert Orders API
   app.post("/api/data/orders/upsert", requireApiKey, async (req, res) => {
     try {
@@ -1649,6 +1665,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
           if (order.orderDate) order.orderDate = new Date(order.orderDate);
           if (order.estimatedDelivery) order.estimatedDelivery = new Date(order.estimatedDelivery);
           
+          // Process timeline data if provided
+          let processedTimeline: any = null;
+          if (timeline && typeof timeline === 'object') {
+            processedTimeline = {};
+            // Convert timeline date strings to Date objects
+            for (const [key, value] of Object.entries(timeline)) {
+              if (value && typeof value === 'string') {
+                processedTimeline[key] = new Date(value);
+              } else if (value instanceof Date) {
+                processedTimeline[key] = value;
+              }
+            }
+          }
+          
+          // Automatically determine status from timeline (overrides any provided status)
+          if (processedTimeline) {
+            order.status = determineOrderStatus(processedTimeline);
+          } else if (!order.status) {
+            order.status = "placed";
+          }
+          
           // Convert dates in order items if they exist
           const processedItems = items?.map((item: any) => {
             if (item.warrantyEndDate) {
@@ -1660,19 +1697,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const existing = await storage.getOrderByNumber(orderNumber);
           const upsertedOrder = await storage.upsertOrder(orderNumber, email, order, processedItems);
           
-          // Handle timeline data if provided
-          if (timeline && typeof timeline === 'object') {
-            const processedTimeline: any = {};
-            // Convert timeline date strings to Date objects
-            for (const [key, value] of Object.entries(timeline)) {
-              if (value && typeof value === 'string') {
-                processedTimeline[key] = new Date(value);
-              } else if (value instanceof Date) {
-                processedTimeline[key] = value;
-              }
-            }
-            
-            // Upsert delivery timeline
+          // Upsert delivery timeline if provided
+          if (processedTimeline) {
             const existingTimeline = await storage.getDeliveryTimeline(upsertedOrder.id);
             if (existingTimeline) {
               await storage.updateDeliveryTimeline(upsertedOrder.id, processedTimeline);

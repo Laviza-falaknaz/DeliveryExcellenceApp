@@ -141,7 +141,6 @@ Create or update orders and automatically link them to users via email. Supports
       "email": "john.doe@company.com",
       "customerName": "John Doe",
       "orderDate": "2024-10-15T10:30:00.000Z",
-      "status": "shipped",
       "currency": "GBP",
       "totalAmount": 1299,
       "savedAmount": 300,
@@ -185,27 +184,40 @@ Create or update orders and automatically link them to users via email. Supports
 - `email` (required): Customer email (must match a user in the system)
 - `customerName` (optional): Customer display name
 - `orderDate` (required): ISO 8601 date format
-- `status` (required): One of: `placed`, `processing`, `in_production`, `quality_check`, `shipped`, `delivered`, `completed`, `cancelled`, `returned`
+- `status` (optional): **Auto-determined from timeline** - Do not include this field. Status is automatically calculated based on timeline milestones
 - `currency` (optional): One of: `USD`, `GBP`, `EUR`, `AED`. Defaults to `GBP`
 - `totalAmount` (required): Integer (in minor units - pence/cents/fils, e.g., 1299 = £12.99 or $12.99)
 - `savedAmount` (required): Integer (savings vs new price in minor units)
 - `estimatedDelivery` (optional): ISO 8601 date format
 - `trackingNumber` (optional): Shipping tracking number
 - `shippingAddress` (optional): Full address object
-- `timeline` (optional): Delivery timeline object with timestamp milestones (see below)
+- `timeline` (optional): Delivery timeline object with timestamp milestones (see below). Status is automatically determined from these dates
 - `items` (optional): Array of order items
 
-**Timeline Object (Optional):**
-The timeline field tracks order progress with timestamps for each milestone. All fields are optional and use ISO 8601 date format:
-- `orderPlaced`: When the order was placed
+**Timeline Object (Optional but Recommended):**
+The timeline field tracks order progress with timestamps for each milestone. **The order status is automatically determined from these dates** - the system checks the timeline in reverse order and sets the status based on the most recent completed milestone.
+
+All fields are optional and use ISO 8601 date format:
+- `orderPlaced`: When the order was placed → Status: `placed`
 - `customerSuccessCallBooked`: When customer success call was scheduled
-- `orderInProgress`: When order processing started
-- `orderBeingBuilt`: When order assembly/building started
-- `qualityChecks`: When quality checks were performed
-- `readyForDelivery`: When order was ready for shipment
-- `orderDelivered`: When order was delivered to customer
-- `orderCompleted`: When order was marked as complete
+- `orderInProgress`: When order processing started → Status: `processing`
+- `orderBeingBuilt`: When order assembly/building started → Status: `in_production`
+- `qualityChecks`: When quality checks were performed → Status: `quality_check`
+- `readyForDelivery`: When order was ready for shipment → Status: `shipped`
+- `orderDelivered`: When order was delivered to customer → Status: `delivered`
+- `orderCompleted`: When order was marked as complete → Status: `completed`
 - `rateYourExperience`: When customer was prompted to rate their experience
+
+**Status Determination Logic:**
+The system automatically determines status by checking timeline milestones in this order:
+1. If `orderCompleted` has a date → Status is `completed`
+2. If `orderDelivered` has a date → Status is `delivered`
+3. If `readyForDelivery` has a date → Status is `shipped`
+4. If `qualityChecks` has a date → Status is `quality_check`
+5. If `orderBeingBuilt` has a date → Status is `in_production`
+6. If `orderInProgress` has a date → Status is `processing`
+7. If `orderPlaced` has a date → Status is `placed`
+8. If no timeline provided → Status defaults to `placed`
 
 **Response:**
 ```json
@@ -222,9 +234,11 @@ The timeline field tracks order progress with timestamps for each milestone. All
 - Orders are linked to users via the `email` field
 - All monetary amounts are in minor units (pence/cents/fils) - multiply by 100
 - Currency field determines how amounts are displayed in the portal
+- **Status is automatically determined from timeline** - Do not include a `status` field in your request
 - Timeline milestones enable gamified delivery tracking visualization
 - Dates must be in ISO 8601 format with timezone
 - Timeline milestones can be null or omitted for future milestones
+- Only include timeline dates for milestones that have actually occurred - the system will determine the current status automatically
 
 ---
 
