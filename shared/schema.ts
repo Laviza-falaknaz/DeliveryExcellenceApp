@@ -53,6 +53,7 @@ export const orders = pgTable("orders", {
   status: orderStatusEnum("status").notNull().default("placed"),
   totalAmount: integer("total_amount").notNull(),
   savedAmount: integer("saved_amount").notNull(),
+  currency: text("currency").notNull().default("GBP"), // USD, GBP, EUR, AED, etc.
   orderDate: timestamp("order_date").defaultNow(),
   estimatedDelivery: timestamp("estimated_delivery"),
   trackingNumber: text("tracking_number"),
@@ -235,23 +236,23 @@ export const insertCaseStudySchema = createInsertSchema(caseStudies).omit({
   createdAt: true,
 });
 
-// Delivery Timeline
+// Delivery Timeline - stores timestamps for each milestone
 export const deliveryTimelines = pgTable("delivery_timelines", {
   id: serial("id").primaryKey(),
   orderId: integer("order_id").references(() => orders.id).notNull(),
-  orderPlaced: boolean("order_placed").default(false),
-  customerSuccessCallBooked: boolean("customer_success_call_booked").default(false),
-  rateYourExperience: boolean("rate_your_experience").default(false),
-  customerSuccessIntroCall: boolean("customer_success_intro_call").default(false),
-  orderInProgress: boolean("order_in_progress").default(false),
-  orderBeingBuilt: boolean("order_being_built").default(false),
-  qualityChecks: boolean("quality_checks").default(false),
-  readyForDelivery: boolean("ready_for_delivery").default(false),
-  orderDelivered: boolean("order_delivered").default(false),
-  rateYourProduct: boolean("rate_your_product").default(false),
-  customerSuccessCallBookedPost: boolean("customer_success_call_booked_post").default(false),
-  customerSuccessCheckIn: boolean("customer_success_check_in").default(false),
-  orderCompleted: boolean("order_completed").default(false),
+  orderPlaced: timestamp("order_placed"),
+  customerSuccessCallBooked: timestamp("customer_success_call_booked"),
+  rateYourExperience: timestamp("rate_your_experience"),
+  customerSuccessIntroCall: timestamp("customer_success_intro_call"),
+  orderInProgress: timestamp("order_in_progress"),
+  orderBeingBuilt: timestamp("order_being_built"),
+  qualityChecks: timestamp("quality_checks"),
+  readyForDelivery: timestamp("ready_for_delivery"),
+  orderDelivered: timestamp("order_delivered"),
+  rateYourProduct: timestamp("rate_your_product"),
+  customerSuccessCallBookedPost: timestamp("customer_success_call_booked_post"),
+  customerSuccessCheckIn: timestamp("customer_success_check_in"),
+  orderCompleted: timestamp("order_completed"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

@@ -410,6 +410,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get delivery timeline for an order
+  app.get("/api/orders/:orderId/timeline", isAuthenticated, async (req, res) => {
+    try {
+      const orderId = parseInt(req.params.orderId);
+      const order = await storage.getOrder(orderId);
+      
+      if (!order) {
+        return res.status(404).json({ message: "Order not found" });
+      }
+      
+      const user = req.user as User;
+      if (order.userId !== user.id) {
+        return res.status(403).json({ message: "Forbidden" });
+      }
+      
+      const timeline = await storage.getDeliveryTimeline(orderId);
+      res.json(timeline || {});
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Environmental impact routes
   app.get("/api/impact", isAuthenticated, async (req, res) => {
     try {
@@ -1621,7 +1643,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       for (const orderData of ordersToUpsert) {
         try {
-          const { orderNumber, email, items, ...order } = orderData;
+          const { orderNumber, email, items, timeline, ...order } = orderData;
           
           // Convert date strings to Date objects
           if (order.orderDate) order.orderDate = new Date(order.orderDate);
@@ -1636,7 +1658,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
           });
           
           const existing = await storage.getOrderByNumber(orderNumber);
-          await storage.upsertOrder(orderNumber, email, order, processedItems);
+          const upsertedOrder = await storage.upsertOrder(orderNumber, email, order, processedItems);
+          
+          // Handle timeline data if provided
+          if (timeline && typeof timeline === 'object') {
+            const processedTimeline: any = {};
+            // Convert timeline date strings to Date objects
+            for (const [key, value] of Object.entries(timeline)) {
+              if (value && typeof value === 'string') {
+                processedTimeline[key] = new Date(value);
+              } else if (value instanceof Date) {
+                processedTimeline[key] = value;
+              }
+            }
+            
+            // Upsert delivery timeline
+            const existingTimeline = await storage.getDeliveryTimeline(upsertedOrder.id);
+            if (existingTimeline) {
+              await storage.updateDeliveryTimeline(upsertedOrder.id, processedTimeline);
+            } else {
+              await storage.createDeliveryTimeline({ ...processedTimeline, orderId: upsertedOrder.id });
+            }
+          }
+          
           if (existing) {
             updated++;
           } else {

@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Order, OrderItem, OrderUpdate } from "@shared/schema";
+import { Order, OrderItem, OrderUpdate, DeliveryTimeline } from "@shared/schema";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -23,6 +23,8 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Eye, Download, FileText, Package, Hash, FileCheck } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
+import { formatPrice } from "@/lib/currency";
+import { AnimatedTimeline } from "@/components/AnimatedTimeline";
 
 export default function Orders() {
   const { orders, isLoadingOrders, getActiveOrders, getPastOrders } = useOrders();
@@ -45,6 +47,12 @@ export default function Orders() {
   // Fetch order updates for timeline
   const { data: orderUpdates = [], isLoading: isLoadingUpdates } = useQuery<OrderUpdate[]>({
     queryKey: [`/api/orders/${selectedOrder?.id}/updates`],
+    enabled: !!selectedOrder && isOrderDetailsOpen,
+  });
+
+  // Fetch delivery timeline for animated timeline
+  const { data: deliveryTimeline, isLoading: isLoadingTimeline } = useQuery<DeliveryTimeline>({
+    queryKey: [`/api/orders/${selectedOrder?.id}/timeline`],
     enabled: !!selectedOrder && isOrderDetailsOpen,
   });
 
@@ -449,8 +457,8 @@ export default function Orders() {
                                   </div>
                                 </TableCell>
                                 <TableCell className="text-center">x{item.quantity}</TableCell>
-                                <TableCell className="text-right">£{(item.unitPrice / 100).toFixed(2)}</TableCell>
-                                <TableCell className="text-right font-medium">£{(item.totalPrice / 100).toFixed(2)}</TableCell>
+                                <TableCell className="text-right">{formatPrice(item.unitPrice, selectedOrder?.currency)}</TableCell>
+                                <TableCell className="text-right font-medium">{formatPrice(item.totalPrice, selectedOrder?.currency)}</TableCell>
                               </TableRow>
                             ))}
                           </TableBody>
@@ -461,11 +469,11 @@ export default function Orders() {
                         <div className="space-y-2">
                           <div className="flex justify-between text-sm">
                             <span>Subtotal</span>
-                            <span>£{(calculateOrderTotal() / 100).toFixed(2)}</span>
+                            <span>{formatPrice(calculateOrderTotal(), selectedOrder?.currency)}</span>
                           </div>
                           <div className="flex justify-between text-sm font-medium text-lg">
                             <span>Total Paid by Customer</span>
-                            <span>£{selectedOrder ? (selectedOrder.totalAmount / 100).toFixed(2) : '0.00'}</span>
+                            <span>{selectedOrder ? formatPrice(selectedOrder.totalAmount, selectedOrder.currency) : formatPrice(0)}</span>
                           </div>
                           <div className="flex justify-between items-center pt-2">
                             <span className="text-sm">Payment Status</span>
@@ -479,48 +487,22 @@ export default function Orders() {
                   </CardContent>
                 </Card>
 
-                {/* Timeline */}
+                {/* Animated Delivery Timeline */}
                 <Card>
                   <CardHeader>
-                    <CardTitle className="text-base">Timeline</CardTitle>
+                    <CardTitle className="text-base">Delivery Timeline</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    {isLoadingUpdates ? (
+                    {isLoadingTimeline ? (
                       <div className="space-y-3">
-                        {Array.from({ length: 3 }).map((_, i) => (
-                          <Skeleton key={i} className="h-12 w-full" />
+                        {Array.from({ length: 4 }).map((_, i) => (
+                          <Skeleton key={i} className="h-32 w-full" />
                         ))}
                       </div>
-                    ) : orderUpdates.length > 0 ? (
-                      <div className="space-y-4">
-                        {orderUpdates
-                          .sort((a, b) => new Date(b.timestamp || 0).getTime() - new Date(a.timestamp || 0).getTime())
-                          .map((update, index) => (
-                          <div key={update.id} className="flex items-start space-x-3">
-                            <div className="flex flex-col items-center">
-                              <div className={`h-2 w-2 rounded-full ${index === 0 ? 'bg-[#08ABAB]' : 'bg-neutral-300'}`} />
-                              {index < orderUpdates.length - 1 && (
-                                <div className="w-0.5 h-full bg-neutral-200 my-1" style={{ minHeight: '20px' }} />
-                              )}
-                            </div>
-                            <div className="flex-1 pb-4">
-                              <div className="flex items-start justify-between">
-                                <div>
-                                  <Badge className={`${getStatusColor(update.status)} text-xs mb-1`}>
-                                    {getStatusLabel(update.status)}
-                                  </Badge>
-                                  <p className="text-sm text-neutral-700">{update.message}</p>
-                                </div>
-                                <span className="text-xs text-neutral-500">
-                                  {update.timestamp ? formatUKDate(update.timestamp) : 'N/A'}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
+                    ) : deliveryTimeline ? (
+                      <AnimatedTimeline timeline={deliveryTimeline} />
                     ) : (
-                      <p className="text-neutral-500 text-center py-4">No timeline updates yet</p>
+                      <p className="text-neutral-500 text-center py-4">No timeline data available</p>
                     )}
                   </CardContent>
                 </Card>
