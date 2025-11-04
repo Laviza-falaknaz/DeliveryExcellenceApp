@@ -128,7 +128,7 @@ curl -X POST https://your-portal.replit.app/api/data/users/upsert \
 
 ## 2. Orders Upsert API
 
-Create or update orders and automatically link them to users via email.
+Create or update orders and automatically link them to users via email. Supports multi-currency and timestamp-based delivery timeline tracking.
 
 **Endpoint:** `POST /api/data/orders/upsert`
 
@@ -142,6 +142,7 @@ Create or update orders and automatically link them to users via email.
       "customerName": "John Doe",
       "orderDate": "2024-10-15T10:30:00.000Z",
       "status": "shipped",
+      "currency": "GBP",
       "totalAmount": 1299,
       "savedAmount": 300,
       "estimatedDelivery": "2024-10-20T00:00:00.000Z",
@@ -152,6 +153,17 @@ Create or update orders and automatically link them to users via email.
         "state": "Greater London",
         "zipCode": "SW1A 1AA",
         "country": "United Kingdom"
+      },
+      "timeline": {
+        "orderPlaced": "2024-10-15T10:30:00.000Z",
+        "customerSuccessCallBooked": "2024-10-16T09:00:00.000Z",
+        "orderInProgress": "2024-10-16T14:00:00.000Z",
+        "orderBeingBuilt": "2024-10-17T10:00:00.000Z",
+        "qualityChecks": "2024-10-18T11:00:00.000Z",
+        "readyForDelivery": "2024-10-19T08:00:00.000Z",
+        "orderDelivered": "2024-10-20T15:30:00.000Z",
+        "orderCompleted": null,
+        "rateYourExperience": null
       },
       "items": [
         {
@@ -174,12 +186,26 @@ Create or update orders and automatically link them to users via email.
 - `customerName` (optional): Customer display name
 - `orderDate` (required): ISO 8601 date format
 - `status` (required): One of: `placed`, `processing`, `in_production`, `quality_check`, `shipped`, `delivered`, `completed`, `cancelled`, `returned`
-- `totalAmount` (required): Integer (in pence/cents, e.g., 1299 = £12.99)
-- `savedAmount` (required): Integer (savings vs new price)
+- `currency` (optional): One of: `USD`, `GBP`, `EUR`, `AED`. Defaults to `GBP`
+- `totalAmount` (required): Integer (in minor units - pence/cents/fils, e.g., 1299 = £12.99 or $12.99)
+- `savedAmount` (required): Integer (savings vs new price in minor units)
 - `estimatedDelivery` (optional): ISO 8601 date format
 - `trackingNumber` (optional): Shipping tracking number
 - `shippingAddress` (optional): Full address object
+- `timeline` (optional): Delivery timeline object with timestamp milestones (see below)
 - `items` (optional): Array of order items
+
+**Timeline Object (Optional):**
+The timeline field tracks order progress with timestamps for each milestone. All fields are optional and use ISO 8601 date format:
+- `orderPlaced`: When the order was placed
+- `customerSuccessCallBooked`: When customer success call was scheduled
+- `orderInProgress`: When order processing started
+- `orderBeingBuilt`: When order assembly/building started
+- `qualityChecks`: When quality checks were performed
+- `readyForDelivery`: When order was ready for shipment
+- `orderDelivered`: When order was delivered to customer
+- `orderCompleted`: When order was marked as complete
+- `rateYourExperience`: When customer was prompted to rate their experience
 
 **Response:**
 ```json
@@ -194,8 +220,11 @@ Create or update orders and automatically link them to users via email.
 **Important Notes:**
 - Users must exist before creating orders (upsert users first)
 - Orders are linked to users via the `email` field
-- All monetary amounts are in pence/cents (multiply by 100)
+- All monetary amounts are in minor units (pence/cents/fils) - multiply by 100
+- Currency field determines how amounts are displayed in the portal
+- Timeline milestones enable gamified delivery tracking visualization
 - Dates must be in ISO 8601 format with timezone
+- Timeline milestones can be null or omitted for future milestones
 
 ---
 
@@ -520,6 +549,7 @@ All require session authentication (logged-in user).
 - `GET /api/orders/:id` - Get specific order details
 - `GET /api/orders/:orderId/items` - Get order items
 - `GET /api/orders/:orderId/updates` - Get order status updates
+- `GET /api/orders/:orderId/timeline` - Get delivery timeline with timestamp milestones
 
 ### RMA (Return Merchandise Authorization)
 - `GET /api/rma` - List user's RMAs with serial items
@@ -589,7 +619,28 @@ Each RMA is returned with its associated items:
 - `GET /api/case-studies` - List environmental case studies
 
 ### Delivery Timeline
-- `GET /api/delivery-timeline/:orderId` - Get delivery timeline for order
+- `GET /api/orders/:orderId/timeline` - Get gamified delivery timeline with timestamp milestones
+
+**Timeline Response:**
+```json
+{
+  "id": 1,
+  "orderId": 123,
+  "orderPlaced": "2024-10-15T10:30:00.000Z",
+  "customerSuccessCallBooked": "2024-10-16T09:00:00.000Z",
+  "orderInProgress": "2024-10-16T14:00:00.000Z",
+  "orderBeingBuilt": "2024-10-17T10:00:00.000Z",
+  "qualityChecks": "2024-10-18T11:00:00.000Z",
+  "readyForDelivery": "2024-10-19T08:00:00.000Z",
+  "orderDelivered": "2024-10-20T15:30:00.000Z",
+  "orderCompleted": null,
+  "rateYourExperience": null,
+  "createdAt": "2024-10-15T10:30:00.000Z",
+  "updatedAt": "2024-10-20T15:30:00.000Z"
+}
+```
+
+The timeline enables visualization of order progress with animated milestone tracking in the customer portal.
 
 ---
 
@@ -674,7 +725,14 @@ For API support or to report issues:
 
 ## Changelog
 
-### Version 2.1 (October 2025) - Current
+### Version 2.2 (November 2025) - Current
+- ✅ Multi-currency support (USD, GBP, EUR, AED) for orders
+- ✅ Timestamp-based delivery timeline tracking (replaces boolean flags)
+- ✅ Gamified delivery timeline visualization with animated milestones
+- ✅ New endpoint: `GET /api/orders/:orderId/timeline`
+- ✅ Timeline field in Orders Upsert API for granular progress tracking
+
+### Version 2.1 (October 2025)
 - ✅ API Key authentication for data push APIs
 - ✅ Support for both X-API-Key and Authorization Bearer headers
 - ✅ Admin API key management endpoints
