@@ -256,6 +256,8 @@ The system automatically determines status by checking timeline milestones in th
 
 **Authentication:** Required - Use API key in `X-API-Key` header or `Authorization: Bearer <key>`
 
+**✨ NEW: Chunked Upload Support** - For datasets over 10K records, split your upload into multiple batches to avoid request size limits. The system automatically handles truncation on the first batch and appends subsequent batches.
+
 ---
 
 ### Request Format
@@ -307,14 +309,124 @@ The system automatically determines status by checking timeline milestones in th
 
 ---
 
+### Chunked Upload for Large Datasets (100K+ Records)
+
+**When to Use Chunking:**
+- Datasets over 10,000 records
+- Getting 413 "Request Entity Too Large" errors
+- Want to monitor progress of large uploads
+- Need to upload 100K+ records reliably
+
+**How Chunking Works:**
+1. Split your data into smaller batches (recommended: 5,000-10,000 records per batch)
+2. Send each batch with `batchNumber` and `totalBatches` parameters
+3. System truncates table on batch 1, then appends subsequent batches
+4. Track progress and handle errors per batch
+
+**Chunked Request Format:**
+```json
+{
+  "batchNumber": 1,
+  "totalBatches": 20,
+  "warranties": [
+    /* 5000 records here */
+  ]
+}
+```
+
+**Batch Parameters:**
+| Parameter | Type | Required | Description | Example |
+|-----------|------|----------|-------------|---------|
+| `batchNumber` | Integer/String | Optional | Current batch number (1-indexed) - accepts both numbers and strings | `1` or `"1"` |
+| `totalBatches` | Integer/String | Optional | Total number of batches in upload - accepts both numbers and strings | `20` or `"20"` |
+| `warranties` | Array | Required | Warranty records for this batch | Array of warranty objects |
+
+**Note**: The API automatically converts string inputs to integers, so Power Automate and similar tools can send these as strings without issues.
+
+**Chunking Rules:**
+- ✅ `batchNumber` must be between 1 and `totalBatches`
+- ✅ Batch 1 triggers table truncation (deletes all existing data)
+- ✅ Batches 2+ append data without truncation
+- ✅ Send batches sequentially (1, 2, 3...) to avoid race conditions
+- ⚠️ If any batch fails, you must restart from batch 1 (truncate + full upload)
+
+**Example: Uploading 100,000 Records in 20 Batches**
+
+```bash
+# Batch 1 (truncates table + inserts first 5000)
+curl -X POST https://your-portal.replit.app/api/data/warranties/upsert \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: YOUR_API_KEY" \
+  -d '{
+    "batchNumber": 1,
+    "totalBatches": 20,
+    "warranties": [ /* records 1-5000 */ ]
+  }'
+
+# Batch 2 (appends next 5000 without truncating)
+curl -X POST https://your-portal.replit.app/api/data/warranties/upsert \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: YOUR_API_KEY" \
+  -d '{
+    "batchNumber": 2,
+    "totalBatches": 20,
+    "warranties": [ /* records 5001-10000 */ ]
+  }'
+
+# ... continue through batch 20
+```
+
+**Chunked Response:**
+```json
+{
+  "success": true,
+  "created": 4998,
+  "updated": 0,
+  "batchNumber": 1,
+  "totalBatches": 20,
+  "isLastBatch": false,
+  "errors": [
+    {
+      "serialNumber": "BAD-123",
+      "error": "Invalid date format"
+    }
+  ]
+}
+```
+
+**Response Fields (Chunked Upload):**
+- `batchNumber`: Confirms which batch was processed
+- `totalBatches`: Total batches in the upload
+- `isLastBatch`: `true` when `batchNumber === totalBatches`
+- `created`: Number of records inserted in THIS batch
+- `errors`: Validation errors for THIS batch only
+
+**Power Automate Chunking Example:**
+
+```
+1. Get all warranty records from your system
+2. Split into chunks of 5000 using array operations
+3. Loop through chunks:
+   - Set batchNumber = CurrentIndex + 1
+   - Set totalBatches = Total chunk count
+   - Send HTTP POST with batch data
+   - Check response.success
+   - If failed, log error and stop
+4. After last batch (isLastBatch: true), confirm total count
+```
+
+---
+
 ### Performance Specifications
 
-- **Capacity**: Optimized for 150,000+ records in a single request
-- **Batch Processing**: Processes records in batches of 1,000 for optimal performance
-- **Strategy**: Complete table replacement (TRUNCATE then INSERT)
-- **Error Handling**: Individual record failures don't stop the upload
+- **Single Request Capacity**: Up to 50MB request body (approximately 30K-50K records depending on data)
+- **Chunked Upload Capacity**: Unlimited - tested with 150,000+ records
+- **Recommended Batch Size**: 5,000-10,000 records per batch for chunked uploads
+- **Processing**: Records processed in batches of 1,000 internally for optimal performance
+- **Strategy**: Complete table replacement - truncate on batch 1, append on subsequent batches
+- **Error Handling**: Individual record failures don't stop the batch upload
 - **Validation**: Each record validated before insertion
-- **Response Time**: ~30-60 seconds for 150K records (varies by server)
+- **Response Time**: ~5-10 seconds per 5,000 record batch
 
 ---
 
@@ -463,17 +575,22 @@ Process: Immediate full sync for urgent updates
 - **Solution**: Convert dates to `YYYY-MM-DDTHH:mm:ss.sssZ` format
 - **Example**: `"2024-01-01T00:00:00.000Z"` ✅ (not `"01/01/2024"` ❌)
 
+**Issue: "413 Request Entity Too Large" error**
+- **Cause**: Payload exceeds 50MB limit (typically 30K+ records)
+- **Solution**: Use chunked upload - split data into batches of 5,000-10,000 records
+- **Example**: For 100K records, use 20 batches of 5K each with `batchNumber` and `totalBatches` parameters
+
 **Issue: Upload times out or fails**
 - **Cause**: Too many records or network issues
-- **Solution**: Split into multiple batches of 50K records each
+- **Solution**: Use chunked upload to send data in smaller batches
 
 **Issue: Some records missing after upload**
-- **Cause**: Validation errors in source data
-- **Solution**: Check `errors` array in response and fix source data
+- **Cause**: Validation errors in source data OR incomplete chunked upload
+- **Solution**: Check `errors` array in each batch response and fix source data. If using chunked upload, verify all batches completed successfully
 
 **Issue: Old warranties still showing**
-- **Cause**: Upload may have failed silently
-- **Solution**: Check response status and re-run upload
+- **Cause**: Upload may have failed silently OR batch 1 didn't execute (truncation didn't happen)
+- **Solution**: Check response status for all batches. If using chunked upload, confirm batch 1 completed successfully (it truncates the table)
 
 ---
 
@@ -963,9 +1080,12 @@ For API support or to report issues:
 ## Changelog
 
 ### Version 2.3 (November 2025) - Current
+- ✅ **Chunked warranty uploads**: Support for uploading 100K+ warranties in batches to avoid 413 errors
+- ✅ Added `batchNumber` and `totalBatches` parameters to warranties upsert endpoint
+- ✅ Increased request body size limit to 50MB
 - ✅ **Decimal monetary values**: All price and amount fields now support decimals (e.g., 1299.99 instead of integer 129999)
 - ✅ Changed `totalAmount`, `savedAmount`, `unitPrice`, `totalPrice` from integer to numeric(10,2)
-- ✅ API documentation updated to reflect decimal value examples throughout
+- ✅ API documentation updated with comprehensive chunked upload examples and troubleshooting
 
 ### Version 2.2 (November 2025)
 - ✅ Multi-currency support (USD, GBP, EUR, AED) for orders

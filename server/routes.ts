@@ -1810,15 +1810,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Bulk Upsert Warranties API
+  // Bulk Upsert Warranties API with Chunking Support
   app.post("/api/data/warranties/upsert", requireApiKey, async (req, res) => {
     try {
-      const { warranties: warrantiesToUpsert } = req.body;
+      const { 
+        warranties: warrantiesToUpsert,
+        batchNumber: batchNumberRaw = 1,
+        totalBatches: totalBatchesRaw = 1
+      } = req.body;
       
       if (!Array.isArray(warrantiesToUpsert)) {
         return res.status(400).json({ 
           success: false,
           error: "Request must include 'warranties' array" 
+        });
+      }
+
+      // Coerce batch parameters to integers (handles string inputs from Power Automate, etc.)
+      const batchNumber = parseInt(String(batchNumberRaw), 10);
+      const totalBatches = parseInt(String(totalBatchesRaw), 10);
+
+      // Validate batch parameters are valid integers
+      if (isNaN(batchNumber) || isNaN(totalBatches)) {
+        return res.status(400).json({
+          success: false,
+          error: "batchNumber and totalBatches must be valid integers"
+        });
+      }
+
+      // Validate batch parameters are in valid range
+      if (batchNumber < 1 || batchNumber > totalBatches) {
+        return res.status(400).json({
+          success: false,
+          error: `Invalid batchNumber ${batchNumber}. Must be between 1 and ${totalBatches}`
         });
       }
 
@@ -1849,12 +1873,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
-      // Upsert validated warranties
-      const result = await storage.bulkUpsertWarranties(validatedWarranties);
+      // Upsert validated warranties with truncate flag for first batch
+      const shouldTruncate = batchNumber === 1;
+      const result = await storage.bulkUpsertWarranties(validatedWarranties, shouldTruncate);
 
       res.json({
         success: true,
         ...result,
+        batchNumber,
+        totalBatches,
+        isLastBatch: batchNumber === totalBatches,
         errors: [...result.errors, ...validationErrors]
       });
     } catch (error) {

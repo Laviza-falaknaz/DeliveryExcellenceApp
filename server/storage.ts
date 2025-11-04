@@ -156,7 +156,7 @@ export interface IStorage {
   // Warranty operations
   searchWarranty(query: string): Promise<Warranty | undefined>;
   upsertWarranty(warranty: InsertWarranty): Promise<Warranty>;
-  bulkUpsertWarranties(warranties: InsertWarranty[]): Promise<{ created: number; updated: number; errors: any[] }>;
+  bulkUpsertWarranties(warranties: InsertWarranty[], truncate?: boolean): Promise<{ created: number; updated: number; errors: any[] }>;
 
   // Upsert operations for data push APIs
   upsertUser(email: string, user: InsertUser): Promise<User>;
@@ -871,12 +871,14 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
-  async bulkUpsertWarranties(warrantiesToUpsert: InsertWarranty[]): Promise<{ created: number; updated: number; errors: any[] }> {
+  async bulkUpsertWarranties(warrantiesToUpsert: InsertWarranty[], truncate: boolean = true): Promise<{ created: number; updated: number; errors: any[] }> {
     const errors: any[] = [];
     
     try {
-      // TRUNCATE entire warranties table for complete replacement
-      await db.execute(sql`TRUNCATE TABLE warranties RESTART IDENTITY CASCADE`);
+      // TRUNCATE entire warranties table for complete replacement (only on first batch)
+      if (truncate) {
+        await db.execute(sql`TRUNCATE TABLE warranties RESTART IDENTITY CASCADE`);
+      }
       
       // Batch insert all warranties in chunks of 1000 for optimal performance
       const batchSize = 1000;
@@ -903,7 +905,7 @@ export class DatabaseStorage implements IStorage {
         }
       }
       
-      return { created, updated: 0, errors }; // updated is always 0 since we truncate
+      return { created, updated: 0, errors }; // updated is always 0 with truncate-replace strategy
     } catch (error: any) {
       throw new Error(`Bulk warranty upload failed: ${error.message}`);
     }

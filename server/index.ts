@@ -5,8 +5,8 @@ import path from "path";
 import { seedDatabase } from "./seed";
 
 const app = express();
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.json({ limit: '50mb' })); // Increased limit for bulk uploads
+app.use(express.urlencoded({ extended: false, limit: '50mb' }));
 
 // Serve attached assets
 app.use('/attached_assets', express.static(path.resolve(import.meta.dirname, '../attached_assets')));
