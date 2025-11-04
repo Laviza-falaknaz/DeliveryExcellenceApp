@@ -216,6 +216,12 @@ export default function Orders() {
                   <TableHead className="text-left font-medium text-neutral-600 py-4 px-6 cursor-pointer hover:text-neutral-900 transition-colors">
                     Order Status ↓
                   </TableHead>
+                  <TableHead className="text-left font-medium text-neutral-600 py-4 px-6">
+                    Currency
+                  </TableHead>
+                  <TableHead className="text-right font-medium text-neutral-600 py-4 px-6">
+                    Total Amount
+                  </TableHead>
                   <TableHead className="text-left font-medium text-neutral-600 py-4 px-6 cursor-pointer hover:text-neutral-900 transition-colors">
                     Expected Shipping Date ↓
                   </TableHead>
@@ -237,6 +243,12 @@ export default function Orders() {
                       </TableCell>
                       <TableCell className="py-4 px-6">
                         <Skeleton className="h-4 w-28" />
+                      </TableCell>
+                      <TableCell className="py-4 px-6">
+                        <Skeleton className="h-4 w-16" />
+                      </TableCell>
+                      <TableCell className="py-4 px-6">
+                        <Skeleton className="h-4 w-24" />
                       </TableCell>
                       <TableCell className="py-4 px-6">
                         <Skeleton className="h-4 w-32" />
@@ -274,6 +286,12 @@ export default function Orders() {
                             {getStatusLabel(order.status)}
                           </Badge>
                         </TableCell>
+                        <TableCell className="py-4 px-6 text-sm font-medium text-neutral-700">
+                          {order.currency || 'GBP'}
+                        </TableCell>
+                        <TableCell className="py-4 px-6 text-sm font-semibold text-right text-neutral-900">
+                          {formatPrice(order.totalAmount, order.currency)}
+                        </TableCell>
                         <TableCell className="py-4 px-6 text-sm text-neutral-700">
                           {order.estimatedDelivery ? formatUKDate(order.estimatedDelivery) : 'TBC'}
                         </TableCell>
@@ -293,7 +311,7 @@ export default function Orders() {
                 ) : (
                   // Empty state
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center py-12">
+                    <TableCell colSpan={7} className="text-center py-12">
                       <div className="flex flex-col items-center">
                         <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[#e0f2f2] text-[#08ABAB] mb-3">
                           <i className="ri-inbox-line text-2xl"></i>
