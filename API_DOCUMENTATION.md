@@ -142,8 +142,8 @@ Create or update orders and automatically link them to users via email. Supports
       "customerName": "John Doe",
       "orderDate": "2024-10-15T10:30:00.000Z",
       "currency": "GBP",
-      "totalAmount": 1299,
-      "savedAmount": 300,
+      "totalAmount": 1299.99,
+      "savedAmount": 300.50,
       "estimatedDelivery": "2024-10-20T00:00:00.000Z",
       "trackingNumber": "1Z999AA10123456784",
       "shippingAddress": {
@@ -167,8 +167,8 @@ Create or update orders and automatically link them to users via email. Supports
           "productName": "Dell Latitude 7420",
           "productDescription": "14-inch FHD, Intel i7, 16GB RAM, 512GB SSD",
           "quantity": 2,
-          "unitPrice": 649,
-          "totalPrice": 1298,
+          "unitPrice": 649.99,
+          "totalPrice": 1299.98,
           "imageUrl": "https://example.com/laptop.jpg"
         }
       ]
@@ -184,8 +184,8 @@ Create or update orders and automatically link them to users via email. Supports
 - `orderDate` (required): ISO 8601 date format
 - `status` (optional): **Auto-determined from timeline** - Do not include this field. Status is automatically calculated based on timeline milestones
 - `currency` (optional): One of: `USD`, `GBP`, `EUR`, `AED`. Defaults to `GBP`
-- `totalAmount` (required): Integer (in minor units - pence/cents/fils, e.g., 1299 = £12.99 or $12.99)
-- `savedAmount` (required): Integer (savings vs new price in minor units)
+- `totalAmount` (required): Decimal number (e.g., 1299.99 for £1,299.99 or $1,299.99)
+- `savedAmount` (required): Decimal number (savings vs new price, e.g., 300.50)
 - `estimatedDelivery` (optional): ISO 8601 date format
 - `trackingNumber` (optional): Shipping tracking number
 - `shippingAddress` (optional): Full address object
@@ -236,7 +236,7 @@ The system automatically determines status by checking timeline milestones in th
 **Important Notes:**
 - Users must exist before creating orders (upsert users first)
 - Orders are linked to users via the `email` field
-- All monetary amounts are in minor units (pence/cents/fils) - multiply by 100
+- All monetary amounts are decimal numbers (e.g., 1299.99 for £1,299.99 or $1,299.99)
 - Currency field determines how amounts are displayed in the portal
 - **Status is automatically determined from timeline** - Do not include a `status` field in your request
 - Timeline milestones enable gamified delivery tracking visualization
@@ -607,7 +607,7 @@ All Data Push APIs return detailed error information:
 4. **Date Formats**: Use ISO 8601 format: `2024-10-29T10:30:00.000Z`
 5. **Password Security**: Send passwords in plain text - the system automatically encrypts them with bcrypt before storage
 6. **User Activation**: Use `isActive: false` to deactivate user accounts and prevent login
-7. **Monetary Values**: Use integers in pence/cents (multiply by 100)
+7. **Monetary Values**: Use decimal numbers (e.g., 1299.99 for £1,299.99 or $1,299.99)
 8. **Idempotency**: Upsert operations are safe to retry - they won't create duplicates
 9. **Warranty Sync**: The warranties endpoint uses truncate-and-replace strategy - send your complete dataset each time
 
@@ -940,8 +940,8 @@ curl -b cookies.txt "http://localhost:5000/api/crud/users"
 - Include the `T` separator and `Z` timezone
 
 **Monetary value errors:**
-- Use integers only (no decimals)
-- Values are in pence/cents (multiply pounds/dollars by 100)
+- Use decimal numbers for prices and amounts (e.g., 1299.99, not 129999)
+- Values represent the actual amount in the currency (£1,299.99 or $1,299.99)
 
 ### Rate Limiting
 
@@ -962,7 +962,12 @@ For API support or to report issues:
 
 ## Changelog
 
-### Version 2.2 (November 2025) - Current
+### Version 2.3 (November 2025) - Current
+- ✅ **Decimal monetary values**: All price and amount fields now support decimals (e.g., 1299.99 instead of integer 129999)
+- ✅ Changed `totalAmount`, `savedAmount`, `unitPrice`, `totalPrice` from integer to numeric(10,2)
+- ✅ API documentation updated to reflect decimal value examples throughout
+
+### Version 2.2 (November 2025)
 - ✅ Multi-currency support (USD, GBP, EUR, AED) for orders
 - ✅ Timestamp-based delivery timeline tracking (replaces boolean flags)
 - ✅ Gamified delivery timeline visualization with animated milestones
