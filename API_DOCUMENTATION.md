@@ -248,11 +248,17 @@ The system automatically determines status by checking timeline milestones in th
 
 ## 3. Warranties Bulk Upload API
 
-**⚠️ TRUNCATE AND REPLACE:** This endpoint completely replaces the entire warranties table with your data. It truncates all existing records before inserting new ones.
+**⚠️ TRUNCATE AND REPLACE:** This endpoint completely replaces the entire warranties table with your data. It truncates all existing records before inserting new ones. This is designed for complete database synchronization from your authoritative warranty system.
 
-**Use Case:** Designed for bulk warranty data synchronization from your main system (150K+ records supported).
+**Use Case:** Designed for bulk warranty data synchronization from your main system (150K+ records supported). Ideal for scheduled daily/weekly syncs from your ERP or warranty management system.
 
 **Endpoint:** `POST /api/data/warranties/upsert`
+
+**Authentication:** Required - Use API key in `X-API-Key` header or `Authorization: Bearer <key>`
+
+---
+
+### Request Format
 
 **Request Body:**
 ```json
@@ -280,22 +286,41 @@ The system automatically determines status by checking timeline milestones in th
 }
 ```
 
-**Field Requirements:**
-- `serialNumber` (required): Unique device serial number (searchable)
-- `manufacturerSerialNumber` (required): Manufacturer's serial number (searchable)
-- `areaId` (required): Geographic area or region identifier
-- `itemId` (required): Item/SKU identifier in your system
-- `warrantyDescription` (required): Warranty description/type
-- `startDate` (required): Warranty start date (ISO 8601 format)
-- `endDate` (required): Warranty end date (ISO 8601 format)
+---
 
-**Performance & Limits:**
-- Optimized for 150K+ records with batch processing (1000 records per batch)
-- **Complete table replacement** - All existing warranties are deleted before insert
-- Automatic validation and error reporting per record
-- Failed records are reported in `errors` array without stopping the upload
+### Field Requirements
 
-**Response:**
+| Field | Type | Required | Description | Example |
+|-------|------|----------|-------------|---------|
+| `serialNumber` | String | ✅ Yes | Device serial number (searchable by customers) | `"SN123456789"` |
+| `manufacturerSerialNumber` | String | ✅ Yes | Manufacturer's serial number (also searchable) | `"DELL-MFG-987654321"` |
+| `areaId` | String | ✅ Yes | Geographic region or area identifier | `"UK-SOUTH"`, `"US-EAST"` |
+| `itemId` | String | ✅ Yes | Internal item/SKU/product identifier | `"ITEM-12345"` |
+| `warrantyDescription` | String | ✅ Yes | Human-readable warranty type/description | `"3-Year Premium Warranty"` |
+| `startDate` | ISO 8601 | ✅ Yes | Warranty start date (with timezone) | `"2024-01-01T00:00:00.000Z"` |
+| `endDate` | ISO 8601 | ✅ Yes | Warranty end date (with timezone) | `"2027-01-01T00:00:00.000Z"` |
+
+**Date Format Requirements:**
+- Must use ISO 8601 format: `YYYY-MM-DDTHH:mm:ss.sssZ`
+- Include timezone (use `Z` for UTC or specific timezone like `+00:00`)
+- Example: `"2024-01-01T00:00:00.000Z"` or `"2024-01-01T00:00:00+00:00"`
+
+---
+
+### Performance Specifications
+
+- **Capacity**: Optimized for 150,000+ records in a single request
+- **Batch Processing**: Processes records in batches of 1,000 for optimal performance
+- **Strategy**: Complete table replacement (TRUNCATE then INSERT)
+- **Error Handling**: Individual record failures don't stop the upload
+- **Validation**: Each record validated before insertion
+- **Response Time**: ~30-60 seconds for 150K records (varies by server)
+
+---
+
+### Response Format
+
+**Success Response:**
 ```json
 {
   "success": true,
@@ -304,19 +329,161 @@ The system automatically determines status by checking timeline milestones in th
   "errors": [
     {
       "serialNumber": "BAD-SERIAL-123",
-      "error": "Invalid date format for startDate"
+      "error": "serialNumber: String must contain at least 1 character(s)"
+    },
+    {
+      "serialNumber": "INVALID-DATE-456",
+      "error": "startDate: Invalid date format"
     }
   ]
 }
 ```
 
-**Important Notes:**
-- **Truncate & Replace Strategy**: Every API call deletes all existing warranties before inserting new data
-- This ensures your system is the single source of truth
-- Status (active/expired) is automatically determined based on current date vs. start/end dates
-- Users can search by either `serialNumber` OR `manufacturerSerialNumber`
-- Batch processing ensures optimal performance for large datasets
-- Any validation errors are reported but don't stop the overall upload
+**Response Fields:**
+- `success`: Always `true` if request was processed (even with errors)
+- `created`: Number of warranty records successfully inserted
+- `updated`: Always `0` (truncate-replace strategy doesn't update)
+- `errors`: Array of records that failed validation with error details
+
+**Error Response (Authentication Failed):**
+```json
+{
+  "success": false,
+  "error": "API key required. Provide it in X-API-Key header or Authorization: Bearer <key>"
+}
+```
+
+---
+
+### Example: cURL Request
+
+```bash
+curl -X POST https://your-portal.replit.app/api/data/warranties/upsert \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: YOUR_API_KEY_HERE" \
+  -d '{
+    "warranties": [
+      {
+        "serialNumber": "TEST-12345",
+        "manufacturerSerialNumber": "DELL-TEST-67890",
+        "areaId": "UK-LONDON",
+        "itemId": "SKU-LAPTOP-001",
+        "warrantyDescription": "3-Year Business Warranty",
+        "startDate": "2024-01-01T00:00:00.000Z",
+        "endDate": "2027-01-01T00:00:00.000Z"
+      }
+    ]
+  }'
+```
+
+---
+
+### Example: Power Automate HTTP Action
+
+**HTTP Method:** `POST`
+
+**URI:**
+```
+https://your-portal.replit.app/api/data/warranties/upsert
+```
+
+**Headers:**
+```json
+{
+  "Content-Type": "application/json",
+  "X-API-Key": "YOUR_API_KEY_HERE"
+}
+```
+
+**Body:**
+```json
+{
+  "warranties": @{body('Parse_Warranty_CSV')}
+}
+```
+
+---
+
+### Important Notes & Best Practices
+
+⚠️ **Critical Behaviors:**
+1. **Complete Table Replacement**: Every API call deletes ALL existing warranties before inserting new data
+2. **Atomic Operation**: Either all valid records are inserted, or none (database transaction)
+3. **No Partial Updates**: You cannot update individual records - you must send the complete dataset
+
+✅ **Best Practices:**
+1. **Schedule Regular Syncs**: Set up automated daily/weekly syncs from your source system
+2. **Send Complete Dataset**: Always send your entire warranty database, not just changes
+3. **Monitor Errors Array**: Check response for validation errors and fix source data
+4. **Test with Small Batches First**: Test with 10-100 records before full 150K upload
+5. **Use Consistent Date Format**: Ensure all dates are in ISO 8601 format with timezone
+6. **Validate Before Upload**: Pre-validate your data to minimize errors
+
+📊 **Auto-Determined Fields:**
+The system automatically calculates these fields based on your data:
+- **Status**: `active`, `upcoming`, or `expired` (based on current date vs. start/end dates)
+- **Days Remaining**: Calculated from current date to end date
+- **Never include these in your request** - they're computed in real-time when customers search
+
+🔍 **Customer Search Capability:**
+Customers can search warranties using either:
+- Serial Number (`serialNumber` field)
+- Manufacturer Serial Number (`manufacturerSerialNumber` field)
+
+Both fields are indexed for fast searching even with 150K+ records.
+
+---
+
+### Common Integration Patterns
+
+**1. Daily Full Sync (Recommended)**
+```
+Schedule: Every day at 2:00 AM
+Process: Export all warranties from ERP → Send to API → Verify response
+```
+
+**2. Weekly Full Sync**
+```
+Schedule: Every Sunday at midnight
+Process: Full database export → Bulk upload → Error report review
+```
+
+**3. On-Demand Sync**
+```
+Trigger: Manual button click in admin panel
+Process: Immediate full sync for urgent updates
+```
+
+---
+
+### Troubleshooting
+
+**Issue: "Invalid date format" errors**
+- **Cause**: Dates not in ISO 8601 format
+- **Solution**: Convert dates to `YYYY-MM-DDTHH:mm:ss.sssZ` format
+- **Example**: `"2024-01-01T00:00:00.000Z"` ✅ (not `"01/01/2024"` ❌)
+
+**Issue: Upload times out or fails**
+- **Cause**: Too many records or network issues
+- **Solution**: Split into multiple batches of 50K records each
+
+**Issue: Some records missing after upload**
+- **Cause**: Validation errors in source data
+- **Solution**: Check `errors` array in response and fix source data
+
+**Issue: Old warranties still showing**
+- **Cause**: Upload may have failed silently
+- **Solution**: Check response status and re-run upload
+
+---
+
+### Testing Recommendations
+
+1. **Start Small**: Test with 5-10 records first
+2. **Verify Truncation**: Confirm old data is removed
+3. **Check Errors**: Review `errors` array in response
+4. **Test Search**: Verify customers can find warranties by both serial numbers
+5. **Monitor Performance**: Time the upload and monitor server response
 
 ---
 

@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Users, ShoppingCart, Wrench, HelpCircle, Droplets, FileText, Palette, Database, Trophy } from "lucide-react";
+import { Users, ShoppingCart, Wrench, HelpCircle, Droplets, FileText, Palette, Database, Trophy, Key } from "lucide-react";
 import { UserManagement } from "./admin/user-management";
 import { OrderManagement } from "./admin/order-management";
 import { RMAManagement } from "./admin/rma-management";
@@ -11,6 +11,7 @@ import { CaseStudyManagement } from "./admin/case-study-management";
 import { ThemeSettings } from "./admin/theme-settings";
 import { ConnectionSettings } from "./admin/connection-settings";
 import GamificationManagement from "./admin/gamification-management";
+import { ApiKeyManagement } from "./admin/api-key-management";
 
 export function AdminDashboard() {
   const { data: stats } = useQuery({
@@ -72,7 +73,7 @@ export function AdminDashboard() {
         </div>
 
         <Tabs defaultValue="users" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-9">
+          <TabsList className="grid w-full grid-cols-10">
             <TabsTrigger value="users" data-testid="tab-users">
               <Users className="mr-2 h-4 w-4" />
               Users
@@ -100,6 +101,10 @@ export function AdminDashboard() {
             <TabsTrigger value="gamification" data-testid="tab-gamification">
               <Trophy className="mr-2 h-4 w-4" />
               Gamification
+            </TabsTrigger>
+            <TabsTrigger value="api-keys" data-testid="tab-api-keys">
+              <Key className="mr-2 h-4 w-4" />
+              API Keys
             </TabsTrigger>
             <TabsTrigger value="theme" data-testid="tab-theme">
               <Palette className="mr-2 h-4 w-4" />
@@ -137,6 +142,10 @@ export function AdminDashboard() {
 
           <TabsContent value="gamification" className="space-y-4">
             <GamificationManagement />
+          </TabsContent>
+
+          <TabsContent value="api-keys" className="space-y-4">
+            <ApiKeyManagement />
           </TabsContent>
 
           <TabsContent value="theme" className="space-y-4">
