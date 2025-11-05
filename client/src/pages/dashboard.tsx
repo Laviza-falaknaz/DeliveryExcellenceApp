@@ -52,6 +52,9 @@ export default function Dashboard() {
   // Get recent unlocked achievements (top 3)
   const recentAchievements = userAchievements.slice(0, 3);
   
+  // Get recent activities
+  const recentActivities = activityLog;
+  
   // Generate deterministic trend data for impact cards (memoized to prevent re-renders)
   const impactTrends = useMemo(() => {
     if (!impact) return null;
