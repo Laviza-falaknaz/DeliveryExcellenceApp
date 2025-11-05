@@ -14,10 +14,41 @@ import GamificationManagement from "./admin/gamification-management";
 import { ApiKeyManagement } from "./admin/api-key-management";
 import { AdminSettings } from "./admin/admin-settings";
 
+interface AdminSettingsData {
+  visibleTabs: string[];
+  rmaNotificationEmails: string[];
+  newUserAlertEmails: string[];
+}
+
+const ALL_TABS = [
+  { id: "users", label: "Users", icon: Users, component: UserManagement },
+  { id: "orders", label: "Orders", icon: ShoppingCart, component: OrderManagement },
+  { id: "rmas", label: "RMAs", icon: Wrench, component: RMAManagement },
+  { id: "tickets", label: "Tickets", icon: HelpCircle, component: SupportTicketManagement },
+  { id: "water-projects", label: "Water Projects", icon: Droplets, component: WaterProjectManagement },
+  { id: "case-studies", label: "Case Studies", icon: FileText, component: CaseStudyManagement },
+  { id: "gamification", label: "Gamification", icon: Trophy, component: GamificationManagement },
+  { id: "api-keys", label: "API Keys", icon: Key, component: ApiKeyManagement },
+  { id: "theme", label: "Theme", icon: Palette, component: ThemeSettings },
+  { id: "connection", label: "Connection", icon: Database, component: ConnectionSettings },
+];
+
 export function AdminDashboard() {
   const { data: stats } = useQuery({
     queryKey: ["/api/admin/stats"],
   });
+
+  const { data: adminSettings } = useQuery<AdminSettingsData>({
+    queryKey: ["/api/admin/settings"],
+  });
+
+  // Filter tabs based on settings, default to showing all if not configured
+  const visibleTabs = adminSettings?.visibleTabs || ALL_TABS.map(t => t.id);
+  const filteredTabs = ALL_TABS.filter(tab => visibleTabs.includes(tab.id));
+  
+  // Calculate grid columns based on number of visible tabs + settings tab
+  const totalTabs = filteredTabs.length + 1; // +1 for Settings tab
+  const gridCols = Math.min(totalTabs, 11); // Max 11 columns
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -73,93 +104,31 @@ export function AdminDashboard() {
           </Card>
         </div>
 
-        <Tabs defaultValue="users" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-11">
-            <TabsTrigger value="users" data-testid="tab-users">
-              <Users className="mr-2 h-4 w-4" />
-              Users
-            </TabsTrigger>
-            <TabsTrigger value="orders" data-testid="tab-orders">
-              <ShoppingCart className="mr-2 h-4 w-4" />
-              Orders
-            </TabsTrigger>
-            <TabsTrigger value="rmas" data-testid="tab-rmas">
-              <Wrench className="mr-2 h-4 w-4" />
-              RMAs
-            </TabsTrigger>
-            <TabsTrigger value="tickets" data-testid="tab-tickets">
-              <HelpCircle className="mr-2 h-4 w-4" />
-              Tickets
-            </TabsTrigger>
-            <TabsTrigger value="water-projects" data-testid="tab-water-projects">
-              <Droplets className="mr-2 h-4 w-4" />
-              Water Projects
-            </TabsTrigger>
-            <TabsTrigger value="case-studies" data-testid="tab-case-studies">
-              <FileText className="mr-2 h-4 w-4" />
-              Case Studies
-            </TabsTrigger>
-            <TabsTrigger value="gamification" data-testid="tab-gamification">
-              <Trophy className="mr-2 h-4 w-4" />
-              Gamification
-            </TabsTrigger>
-            <TabsTrigger value="api-keys" data-testid="tab-api-keys">
-              <Key className="mr-2 h-4 w-4" />
-              API Keys
-            </TabsTrigger>
-            <TabsTrigger value="theme" data-testid="tab-theme">
-              <Palette className="mr-2 h-4 w-4" />
-              Theme
-            </TabsTrigger>
-            <TabsTrigger value="connection" data-testid="tab-connection">
-              <Database className="mr-2 h-4 w-4" />
-              Connection
-            </TabsTrigger>
+        <Tabs defaultValue={filteredTabs[0]?.id || "settings"} className="space-y-4">
+          <TabsList className={`grid w-full`} style={{ gridTemplateColumns: `repeat(${gridCols}, minmax(0, 1fr))` }}>
+            {filteredTabs.map((tab) => {
+              const Icon = tab.icon;
+              return (
+                <TabsTrigger key={tab.id} value={tab.id} data-testid={`tab-${tab.id}`}>
+                  <Icon className="mr-2 h-4 w-4" />
+                  {tab.label}
+                </TabsTrigger>
+              );
+            })}
             <TabsTrigger value="settings" data-testid="tab-settings">
               <Settings className="mr-2 h-4 w-4" />
               Settings
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="users" className="space-y-4">
-            <UserManagement />
-          </TabsContent>
-
-          <TabsContent value="orders" className="space-y-4">
-            <OrderManagement />
-          </TabsContent>
-
-          <TabsContent value="rmas" className="space-y-4">
-            <RMAManagement />
-          </TabsContent>
-
-          <TabsContent value="tickets" className="space-y-4">
-            <SupportTicketManagement />
-          </TabsContent>
-
-          <TabsContent value="water-projects" className="space-y-4">
-            <WaterProjectManagement />
-          </TabsContent>
-
-          <TabsContent value="case-studies" className="space-y-4">
-            <CaseStudyManagement />
-          </TabsContent>
-
-          <TabsContent value="gamification" className="space-y-4">
-            <GamificationManagement />
-          </TabsContent>
-
-          <TabsContent value="api-keys" className="space-y-4">
-            <ApiKeyManagement />
-          </TabsContent>
-
-          <TabsContent value="theme" className="space-y-4">
-            <ThemeSettings />
-          </TabsContent>
-
-          <TabsContent value="connection" className="space-y-4">
-            <ConnectionSettings />
-          </TabsContent>
+          {filteredTabs.map((tab) => {
+            const Component = tab.component;
+            return (
+              <TabsContent key={tab.id} value={tab.id} className="space-y-4">
+                <Component />
+              </TabsContent>
+            );
+          })}
 
           <TabsContent value="settings" className="space-y-4">
             <AdminSettings />
