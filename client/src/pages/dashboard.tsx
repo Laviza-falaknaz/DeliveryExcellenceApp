@@ -2,20 +2,15 @@ import { useQuery } from "@tanstack/react-query";
 import { useImpact } from "@/hooks/use-impact";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link, useLocation } from "wouter";
 import { Progress } from "@/components/ui/progress";
-import { useState } from "react";
 import { 
-  Trophy, Package, ShieldCheck, Target, 
-  TrendingUp, Award, Box, Wrench, Leaf, BarChart3, Zap, CheckCircle2, Clock
+  Trophy, Package, ShieldCheck, Target, Award, 
+  TrendingUp, Droplet, Leaf, Recycle, Users, 
+  ChevronRight, FileText, MessageSquare, Clock,
+  Zap, Star, BarChart3
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
-import { EcoSphere } from "@/components/dashboard/eco-sphere";
-import { DynamicBackground } from "@/components/dashboard/dynamic-background";
-import { OrbitalPanel } from "@/components/dashboard/orbital-panel";
-import { WelcomeMessage } from "@/components/dashboard/welcome-message";
-import { EcoChallenge } from "@/components/dashboard/eco-challenge";
 
 interface User {
   id: number;
@@ -63,8 +58,6 @@ interface Order {
 
 export default function Dashboard() {
   const [, setLocation] = useLocation();
-  const [warrantySearch, setWarrantySearch] = useState("");
-  const [showProgressModal, setShowProgressModal] = useState(false);
   
   const { data: user } = useQuery<User>({
     queryKey: ["/api/auth/me"],
@@ -81,381 +74,423 @@ export default function Dashboard() {
   const { data: orders = [] } = useQuery<Order[]>({
     queryKey: ["/api/orders"],
   });
-
-  const { data: rmas = [] } = useQuery<{ rma: RMA }[]>({
-    queryKey: ["/api/rma"],
-  });
   
-  const { impact, isLoadingImpact } = useImpact();
+  const { impact } = useImpact();
   
-  const activeOrders = orders.filter(o => 
-    !['delivered', 'completed', 'cancelled'].includes(o.status)
-  );
+  const recentOrders = orders.slice(0, 3);
+
+  const tierNames = ['Bronze Partner', 'Silver Partner', 'Gold Partner', 'Platinum Partner', 'Diamond Partner'];
+  const tierName = tierNames[Math.min(Math.floor((userProgress?.level || 1) / 2), 4)];
   
-  const activeRMAs = rmas.filter(r => 
-    !['resolved', 'closed', 'completed'].includes(r.rma.status)
-  ).slice(0, 3);
-
-  const handleWarrantySearch = () => {
-    if (warrantySearch.trim()) {
-      setLocation(`/warranty?q=${encodeURIComponent(warrantySearch.trim())}`);
-    }
-  };
-
-  // Calculate overall progress for background gradient (0-100)
-  const overallProgress = Math.min(
-    ((impact?.carbonSaved || 0) / 10) + ((userProgress?.level || 1) * 5), 
-    100
-  );
-
-  const statusColors: Record<string, string> = {
-    pending: 'text-yellow-300 bg-yellow-400/20 border-yellow-400/30',
-    processing: 'text-blue-300 bg-blue-400/20 border-blue-400/30',
-    shipped: 'text-cyan-300 bg-cyan-400/20 border-cyan-400/30',
-    delivered: 'text-emerald-300 bg-emerald-400/20 border-emerald-400/30',
-    approved: 'text-emerald-300 bg-emerald-400/20 border-emerald-400/30',
-    in_progress: 'text-blue-300 bg-blue-400/20 border-blue-400/30'
-  };
+  // Weekly target calculation
+  const weeklyTarget = 50; // kg CO2
+  const weeklyProgress = Math.min(((impact?.carbonSaved || 0) % weeklyTarget) / weeklyTarget * 100, 100);
 
   return (
-    <div className="relative w-full h-screen overflow-hidden">
-      
-      {/* Dynamic Gradient Background */}
-      <DynamicBackground progress={overallProgress} />
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto p-6">
+        
+        {/* Header */}
+        <div className="mb-6">
+          <h1 className="text-3xl font-semibold text-gray-900">Dashboard</h1>
+          <p className="text-gray-600 mt-1">Welcome back! Here's your sustainability impact overview</p>
+        </div>
 
-      {/* Welcome Message */}
-      <WelcomeMessage 
-        userName={user?.name?.split(' ')[0] || 'there'} 
-        totalImpact={impact?.carbonSaved || 0}
-      />
+        {/* Tier Banner */}
+        <Card className="mb-6 overflow-hidden shadow-sm border border-gray-200">
+          <div className="bg-teal-600 text-white p-6">
+            <div className="flex items-start justify-between">
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-1">
+                  <Star className="h-5 w-5" />
+                  <span className="text-sm font-medium">Tier {userProgress?.level || 1}</span>
+                </div>
+                <h2 className="text-2xl font-bold mb-1">{tierName}</h2>
+                <div className="flex items-center gap-2 mb-3">
+                  <Trophy className="h-4 w-4" />
+                  <span className="text-base">{userProgress?.totalPoints || 0} Credits</span>
+                </div>
+                <p className="text-sm text-white/90 mb-3">Welcome to your sustainability dashboard overview.</p>
+                <div className="flex items-center gap-2 text-sm mb-1">
+                  <span>Progress to Gold Partner</span>
+                  <span className="font-medium">{((userProgress?.totalPoints || 0) % 1000) / 10}%</span>
+                </div>
+                <div className="w-64">
+                  <Progress value={((userProgress?.totalPoints || 0) % 1000) / 10} className="h-1.5 bg-white/20" />
+                </div>
+              </div>
 
-      {/* Central Eco-Sphere */}
-      <div className="absolute inset-0 flex items-center justify-center">
-        <EcoSphere
-          level={userProgress?.level || 1}
-          xp={userProgress?.totalPoints || 0}
-          streak={userProgress?.currentStreak || 0}
-          achievements={userAchievements.length}
-          carbonSaved={impact?.carbonSaved || 0}
-          waterProvided={impact?.waterProvided || 0}
-          familiesHelped={impact?.familiesHelped || 0}
-          onSphereClick={() => setShowProgressModal(true)}
-        />
-      </div>
+              <div className="flex gap-6">
+                <div className="text-center px-4">
+                  <div className="text-sm text-white/80 mb-1">Engagement</div>
+                  <div className="text-3xl font-bold mb-1">{userProgress?.currentStreak || 0}</div>
+                  <div className="text-xs text-white/80">Days Active</div>
+                  <Badge className="mt-2 bg-white/20 text-white hover:bg-white/30 border-0">
+                    Excellent
+                  </Badge>
+                </div>
 
-      {/* Orbital Panel: Active Orders - Top Left */}
-      {activeOrders.length > 0 && (
-        <OrbitalPanel 
-          title="Active Orders" 
-          icon={Package} 
-          position="top-left"
-          accentColor="emerald"
-        >
-          <div className="space-y-3 max-h-64 overflow-y-auto">
-            {activeOrders.slice(0, 3).map((order) => (
-              <Link key={order.id} href={`/orders/${order.id}`}>
-                <motion.div
-                  className="p-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 cursor-pointer transition-all"
-                  whileHover={{ x: 5 }}
-                  data-testid={`order-${order.id}`}
-                >
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-white/90 font-medium text-sm">
-                        {order.orderNumber}
-                      </p>
-                      <p className="text-white/60 text-xs mt-1">
-                        {order.status}
-                      </p>
-                    </div>
-                    <Badge className={statusColors[order.status] || 'text-white/70 bg-white/10'}>
-                      {order.status}
+                <div className="text-center px-4">
+                  <div className="text-sm text-white/80 mb-1">Environmental Equivalent</div>
+                  <div className="text-3xl font-bold mb-1">{(impact?.carbonSaved || 0).toFixed(0)}</div>
+                  <div className="text-xs text-white/80">Tons CO₂ Saved</div>
+                </div>
+
+                <div className="text-center px-4">
+                  <div className="text-sm text-white/80 mb-1">&nbsp;</div>
+                  <div className="text-3xl font-bold mb-1">8</div>
+                  <div className="text-xs text-white/80">Plants Grown Equiv.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </Card>
+
+        {/* Main Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          
+          {/* Left Column - 2/3 width */}
+          <div className="lg:col-span-2 space-y-6">
+            
+            {/* Weekly Sustainability Target */}
+            <Card className="shadow-sm border border-gray-200">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="bg-amber-100 p-2 rounded-lg">
+                    <Target className="h-5 w-5 text-amber-600" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-gray-900">Weekly Sustainability Target</h3>
+                    <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100 mt-1">
+                      In Progress
                     </Badge>
                   </div>
-                </motion.div>
-              </Link>
-            ))}
-            {activeOrders.length > 3 && (
-              <Button 
-                variant="ghost" 
-                className="w-full text-emerald-300 hover:text-emerald-200 hover:bg-emerald-400/10"
-                onClick={() => setLocation('/orders')}
-                data-testid="button-view-all-orders"
-              >
-                View All Orders ({activeOrders.length})
-              </Button>
-            )}
-          </div>
-        </OrbitalPanel>
-      )}
-
-      {/* Orbital Panel: Impact Metrics - Top Right */}
-      <OrbitalPanel 
-        title="Your Impact" 
-        icon={Leaf} 
-        position="top-right"
-        accentColor="cyan"
-      >
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <span className="text-white/70 text-sm">Carbon Saved</span>
-            <span className="text-emerald-300 font-semibold">
-              {(impact?.carbonSaved || 0).toLocaleString()} kg
-            </span>
-          </div>
-          <div className="flex items-center justify-between">
-            <span className="text-white/70 text-sm">Water Provided</span>
-            <span className="text-cyan-300 font-semibold">
-              {(impact?.waterProvided || 0).toLocaleString()} L
-            </span>
-          </div>
-          <div className="flex items-center justify-between">
-            <span className="text-white/70 text-sm">Families Helped</span>
-            <span className="text-amber-300 font-semibold">
-              {impact?.familiesHelped || 0}
-            </span>
-          </div>
-          <Button 
-            className="w-full bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 border border-cyan-400/30"
-            onClick={() => setLocation('/impact')}
-            data-testid="button-view-impact"
-          >
-            View Full Impact Report
-          </Button>
-        </div>
-      </OrbitalPanel>
-
-      {/* Orbital Panel: Achievements - Bottom Left */}
-      <OrbitalPanel 
-        title="Achievements" 
-        icon={Trophy} 
-        position="bottom-left"
-        accentColor="gold"
-      >
-        <div className="space-y-3 max-h-64 overflow-y-auto">
-          {userAchievements.slice(0, 3).map((ua) => (
-            <motion.div
-              key={ua.id}
-              className="p-3 rounded-xl bg-white/5 border border-white/10"
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              data-testid={`achievement-${ua.achievement.id}`}
-            >
-              <div className="flex items-center gap-3">
-                <div className="text-2xl">{ua.achievement.icon}</div>
-                <div className="flex-1">
-                  <p className="text-white/90 font-medium text-sm">
-                    {ua.achievement.name}
-                  </p>
-                  <p className="text-amber-300 text-xs">
-                    +{ua.achievement.pointsAwarded} XP
-                  </p>
                 </div>
-              </div>
-            </motion.div>
-          ))}
-          <Button 
-            variant="ghost" 
-            className="w-full text-amber-300 hover:text-amber-200 hover:bg-amber-400/10"
-            onClick={() => setLocation('/achievements')}
-            data-testid="button-view-achievements"
-          >
-            View All Achievements
-          </Button>
-        </div>
-      </OrbitalPanel>
 
-      {/* Orbital Panel: Warranty Search - Bottom Right */}
-      <OrbitalPanel 
-        title="Warranty Check" 
-        icon={ShieldCheck} 
-        position="bottom-right"
-        accentColor="teal"
-      >
-        <div className="space-y-3">
-          <div className="flex gap-2">
-            <Input
-              placeholder="Enter serial number..."
-              value={warrantySearch}
-              onChange={(e) => setWarrantySearch(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleWarrantySearch()}
-              className="bg-white/5 border-white/20 text-white placeholder:text-white/40 focus:border-teal-400/50"
-              data-testid="input-warranty-search"
-            />
-            <Button 
-              onClick={handleWarrantySearch}
-              className="bg-teal-500/20 hover:bg-teal-500/30 text-teal-300 border border-teal-400/30"
-              data-testid="button-search-warranty"
-            >
-              <ShieldCheck className="h-4 w-4" />
-            </Button>
-          </div>
-          
-          {activeRMAs.length > 0 && (
-            <div className="mt-4">
-              <p className="text-white/60 text-xs mb-2">Active RMAs:</p>
-              {activeRMAs.map((rma) => (
-                <Link key={rma.rma.id} href={`/rma/${rma.rma.id}`}>
-                  <motion.div
-                    className="p-2 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 cursor-pointer mb-2"
-                    whileHover={{ x: 5 }}
-                    data-testid={`rma-${rma.rma.id}`}
-                  >
-                    <p className="text-white/90 text-sm">{rma.rma.rmaNumber}</p>
-                    <p className="text-white/60 text-xs">{rma.rma.status}</p>
-                  </motion.div>
-                </Link>
-              ))}
-            </div>
-          )}
-        </div>
-      </OrbitalPanel>
+                <p className="text-gray-600 mb-4">
+                  Contribute to saving {weeklyTarget}kg of CO₂ through sustainable procurement
+                </p>
 
-      {/* Orbital Panel: Progress Stats - Left */}
-      <OrbitalPanel 
-        title="Your Progress" 
-        icon={TrendingUp} 
-        position="left"
-        accentColor="emerald"
-        expandable={false}
-      >
-        <div className="space-y-4">
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-white/70 text-sm">Level {userProgress?.level || 1}</span>
-              <span className="text-emerald-300 text-sm font-semibold">
-                {((userProgress?.totalPoints || 0) % 1000)} / 1000 XP
-              </span>
-            </div>
-            <Progress 
-              value={((userProgress?.totalPoints || 0) % 1000) / 10} 
-              className="h-2 bg-white/10"
-            />
-          </div>
-          
-          <div className="flex items-center gap-2">
-            <Zap className="h-5 w-5 text-amber-400" />
-            <span className="text-white/90">
-              {userProgress?.currentStreak || 0} day streak
-            </span>
-          </div>
+                <div className="mb-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium text-gray-700">
+                      Progress: {((impact?.carbonSaved || 0) % weeklyTarget).toFixed(1)}kg / {weeklyTarget}kg
+                    </span>
+                    <span className="text-sm font-bold text-gray-900">{weeklyProgress.toFixed(0)}%</span>
+                  </div>
+                  <Progress value={weeklyProgress} className="h-3 bg-gray-200" />
+                </div>
 
-          <div className="flex items-center gap-2">
-            <Trophy className="h-5 w-5 text-amber-400" />
-            <span className="text-white/90">
-              {userAchievements.length} achievements
-            </span>
-          </div>
-        </div>
-      </OrbitalPanel>
-
-      {/* Orbital Panel: Quick Actions - Right */}
-      <OrbitalPanel 
-        title="Quick Actions" 
-        icon={Target} 
-        position="right"
-        accentColor="teal"
-        expandable={false}
-      >
-        <div className="space-y-2">
-          <Button
-            className="w-full justify-start bg-white/5 hover:bg-white/10 text-white border border-white/10"
-            onClick={() => setLocation('/orders')}
-            data-testid="button-track-order"
-          >
-            <Package className="h-4 w-4 mr-2" />
-            Track Order
-          </Button>
-          
-          <Button
-            className="w-full justify-start bg-white/5 hover:bg-white/10 text-white border border-white/10"
-            onClick={() => setLocation('/rma')}
-            data-testid="button-start-return"
-          >
-            <Wrench className="h-4 w-4 mr-2" />
-            Start Return
-          </Button>
-          
-          <Button
-            className="w-full justify-start bg-white/5 hover:bg-white/10 text-white border border-white/10"
-            onClick={() => setLocation('/impact')}
-            data-testid="button-sustainability"
-          >
-            <BarChart3 className="h-4 w-4 mr-2" />
-            Sustainability
-          </Button>
-        </div>
-      </OrbitalPanel>
-
-      {/* Daily Eco Challenge */}
-      <EcoChallenge userName={user?.name?.split(' ')[0] || 'there'} />
-
-      {/* Progress Modal */}
-      <AnimatePresence>
-        {showProgressModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center"
-            onClick={() => setShowProgressModal(false)}
-          >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-gradient-to-br from-emerald-500/20 to-teal-600/20 backdrop-blur-xl rounded-3xl p-8 border border-white/20 shadow-2xl max-w-md w-full mx-4"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <h2 className="text-2xl font-bold text-white mb-6">Your Progress</h2>
-              
-              <div className="space-y-6">
-                <div>
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-white/80">Level</span>
-                    <span className="text-3xl font-bold text-emerald-300">
-                      {userProgress?.level || 1}
+                <div className="flex items-center justify-between bg-amber-50 rounded-lg p-3">
+                  <div className="flex items-center gap-2">
+                    <Trophy className="h-4 w-4 text-amber-600" />
+                    <span className="text-sm font-medium text-amber-900">
+                      Reward: Recognition Award & Partnership Credit
                     </span>
                   </div>
-                  <Progress 
-                    value={((userProgress?.totalPoints || 0) % 1000) / 10} 
-                    className="h-3 bg-white/10"
-                  />
-                  <p className="text-white/60 text-sm mt-2">
-                    {((userProgress?.totalPoints || 0) % 1000)} / 1000 XP to next level
-                  </p>
+                  <Button 
+                    size="sm" 
+                    className="bg-amber-500 hover:bg-amber-600 text-white"
+                    onClick={() => setLocation('/impact')}
+                    data-testid="button-view-progress"
+                  >
+                    View Progress
+                  </Button>
                 </div>
+              </CardContent>
+            </Card>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="p-4 rounded-xl bg-white/5 border border-white/10">
-                    <Zap className="h-6 w-6 text-amber-400 mb-2" />
-                    <p className="text-2xl font-bold text-white">
-                      {userProgress?.currentStreak || 0}
-                    </p>
-                    <p className="text-white/60 text-sm">Day Streak</p>
-                  </div>
-                  
-                  <div className="p-4 rounded-xl bg-white/5 border border-white/10">
-                    <Trophy className="h-6 w-6 text-amber-400 mb-2" />
-                    <p className="text-2xl font-bold text-white">
-                      {userAchievements.length}
-                    </p>
-                    <p className="text-white/60 text-sm">Achievements</p>
-                  </div>
-                </div>
+            {/* Sustainability Metrics */}
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <TrendingUp className="h-5 w-5" />
+                Sustainability Metrics
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                
+                <Card className="shadow-sm border border-gray-200">
+                  <CardContent className="p-6">
+                    <div className="bg-green-50 w-12 h-12 rounded-lg flex items-center justify-center mb-3">
+                      <Leaf className="h-6 w-6 text-green-600" />
+                    </div>
+                    <div className="text-2xl font-bold text-gray-900 mb-1">
+                      {(impact?.carbonSaved || 0).toFixed(0)} kg
+                    </div>
+                    <div className="text-sm text-gray-600 mb-2">CO₂ Emissions Prevented</div>
+                    <div className="text-xs text-green-600">
+                      +{Math.floor((impact?.carbonSaved || 0) * 0.1)}% this month
+                    </div>
+                  </CardContent>
+                </Card>
 
-                <Button
-                  className="w-full bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-400/30"
-                  onClick={() => setShowProgressModal(false)}
-                  data-testid="button-close-progress"
-                >
-                  Close
-                </Button>
+                <Card className="shadow-sm border border-gray-200">
+                  <CardContent className="p-6">
+                    <div className="bg-blue-50 w-12 h-12 rounded-lg flex items-center justify-center mb-3">
+                      <Droplet className="h-6 w-6 text-blue-600" />
+                    </div>
+                    <div className="text-2xl font-bold text-gray-900 mb-1">
+                      {(impact?.waterProvided || 0).toFixed(0)} L
+                    </div>
+                    <div className="text-sm text-gray-600 mb-2">Water Resources Saved</div>
+                    <div className="text-xs text-blue-600">
+                      +{Math.floor((impact?.waterProvided || 0) * 0.08)}% this month
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="shadow-sm border border-gray-200">
+                  <CardContent className="p-6">
+                    <div className="bg-yellow-50 w-12 h-12 rounded-lg flex items-center justify-center mb-3">
+                      <Recycle className="h-6 w-6 text-yellow-700" />
+                    </div>
+                    <div className="text-2xl font-bold text-gray-900 mb-1">
+                      {(impact?.mineralsSaved || 0).toFixed(0)} kg
+                    </div>
+                    <div className="text-sm text-gray-600 mb-2">Raw Materials Preserved</div>
+                    <div className="text-xs text-yellow-700">
+                      +{Math.floor((impact?.mineralsSaved || 0) * 0.12)}% this month
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            </div>
+
+            {/* Recent Orders */}
+            <Card className="shadow-sm border border-gray-200">
+              <CardHeader className="border-b bg-gray-50">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                    <Package className="h-5 w-5" />
+                    Recent Orders
+                  </CardTitle>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="text-teal-600 hover:text-teal-700 hover:bg-teal-50"
+                    onClick={() => setLocation('/orders')}
+                    data-testid="button-view-all-orders"
+                  >
+                    View All
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent className="p-0">
+                {recentOrders.length === 0 ? (
+                  <div className="p-8 text-center text-gray-500">
+                    <Package className="h-12 w-12 mx-auto mb-3 opacity-20" />
+                    <p>No orders found</p>
+                    <Button 
+                      variant="link" 
+                      className="text-teal-600 mt-2"
+                      onClick={() => setLocation('/orders')}
+                      data-testid="link-browse-inventory"
+                    >
+                      Browse Inventory
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="divide-y">
+                    {recentOrders.map((order) => (
+                      <Link key={order.id} href={`/orders/${order.id}`}>
+                        <div 
+                          className="p-4 hover:bg-gray-50 transition-colors cursor-pointer"
+                          data-testid={`order-${order.id}`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-3 mb-1">
+                                <span className="font-medium text-gray-900">
+                                  {order.orderNumber}
+                                </span>
+                                <Badge className="bg-teal-100 text-teal-700 hover:bg-teal-100">
+                                  {order.status}
+                                </Badge>
+                              </div>
+                              <div className="text-sm text-gray-600">
+                                {new Date(order.orderDate).toLocaleDateString()} • {order.currency} {order.totalAmount}
+                              </div>
+                            </div>
+                            <ChevronRight className="h-5 w-5 text-gray-400" />
+                          </div>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Achievements */}
+            <Card className="shadow-sm border border-gray-200">
+              <CardHeader className="border-b bg-gray-50">
+                <CardTitle className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                  <Trophy className="h-5 w-5" />
+                  Achievements
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-6">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                  {userAchievements.slice(0, 4).map((ua) => (
+                    <div 
+                      key={ua.id} 
+                      className="text-center p-4 rounded-lg bg-white hover:bg-gray-50 transition-colors cursor-pointer border border-gray-200"
+                      data-testid={`achievement-${ua.achievement.id}`}
+                    >
+                      <div className="text-4xl mb-2">{ua.achievement.icon}</div>
+                      <div className="text-sm font-medium text-gray-900 mb-1">
+                        {ua.achievement.name}
+                      </div>
+                      <div className="text-xs text-gray-500">{ua.achievement.pointsAwarded} points</div>
+                    </div>
+                  ))}
+                  {userAchievements.length === 0 && (
+                    <>
+                      <div className="text-center p-4 rounded-lg bg-gray-50 border border-dashed border-gray-300">
+                        <div className="text-4xl mb-2 opacity-30">🏆</div>
+                        <div className="text-xs text-gray-500">First Purchase</div>
+                      </div>
+                      <div className="text-center p-4 rounded-lg bg-gray-50 border border-dashed border-gray-300">
+                        <div className="text-4xl mb-2 opacity-30">🌍</div>
+                        <div className="text-xs text-gray-500">Environmental Impact</div>
+                      </div>
+                      <div className="text-center p-4 rounded-lg bg-gray-50 border border-dashed border-gray-300">
+                        <div className="text-4xl mb-2 opacity-30">⭐</div>
+                        <div className="text-xs text-gray-500">Engagement Excellence</div>
+                      </div>
+                      <div className="text-center p-4 rounded-lg bg-gray-50 border border-dashed border-gray-300">
+                        <div className="text-4xl mb-2 opacity-30">🔥</div>
+                        <div className="text-xs text-gray-500">Water Champion</div>
+                      </div>
+                    </>
+                  )}
+                </div>
+                <Button 
+                  variant="outline" 
+                  className="w-full mt-4 border-gray-300 hover:bg-gray-50"
+                  onClick={() => setLocation('/achievements')}
+                  data-testid="button-view-achievements"
+                >
+                  View All Achievements
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Right Column - 1/3 width */}
+          <div className="space-y-6">
+            
+            {/* Quick Actions */}
+            <Card className="shadow-sm border border-gray-200">
+              <CardHeader className="border-b bg-gray-50">
+                <CardTitle className="text-lg font-semibold text-gray-900">Quick Actions</CardTitle>
+              </CardHeader>
+              <CardContent className="p-4 space-y-2">
+                <Button 
+                  className="w-full justify-start bg-blue-500 hover:bg-blue-600 text-white"
+                  onClick={() => setLocation('/orders')}
+                  data-testid="button-track-order"
+                >
+                  <Package className="h-4 w-4 mr-2" />
+                  Track Order
+                </Button>
+                
+                <Button 
+                  className="w-full justify-start bg-emerald-500 hover:bg-emerald-600 text-white"
+                  onClick={() => setLocation('/impact')}
+                  data-testid="button-view-impact"
+                >
+                  <Leaf className="h-4 w-4 mr-2" />
+                  View Impact
+                </Button>
+
+                <div className="pt-2 border-t mt-4">
+                  <h4 className="text-sm font-medium text-gray-700 mb-2">More Actions</h4>
+                  
+                  <button 
+                    className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-50 text-sm flex items-center gap-2 transition-colors"
+                    onClick={() => setLocation('/support')}
+                    data-testid="link-support-center"
+                  >
+                    <ShieldCheck className="h-4 w-4 text-gray-600" />
+                    <span className="text-gray-700">Support Center</span>
+                  </button>
+
+                  <button 
+                    className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-50 text-sm flex items-center gap-2 transition-colors"
+                    onClick={() => setLocation('/warranty')}
+                    data-testid="link-documents"
+                  >
+                    <FileText className="h-4 w-4 text-gray-600" />
+                    <span className="text-gray-700">Documents</span>
+                  </button>
+
+                  <button 
+                    className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-50 text-sm flex items-center gap-2 transition-colors"
+                    onClick={() => setLocation('/support')}
+                    data-testid="link-messages"
+                  >
+                    <MessageSquare className="h-4 w-4 text-gray-600" />
+                    <span className="text-gray-700">Messages</span>
+                  </button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Weekly Goal */}
+            <Card className="shadow-sm border border-gray-200">
+              <CardHeader className="border-b bg-gray-50">
+                <CardTitle className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                  <Target className="h-5 w-5 text-amber-600" />
+                  Weekly Goal
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-4">
+                <div className="mb-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm text-gray-600">Actions This Week</span>
+                    <span className="text-2xl font-bold text-teal-600">3/5</span>
+                  </div>
+                  <Progress value={60} className="h-2 bg-gray-200" />
+                  <p className="text-xs text-gray-500 mt-2">2 days left</p>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-sm">
+                    <div className="w-5 h-5 rounded-full bg-teal-100 flex items-center justify-center flex-shrink-0">
+                      <div className="w-2 h-2 rounded-full bg-teal-600"></div>
+                    </div>
+                    <span className="text-gray-700">Track an order</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <div className="w-5 h-5 rounded-full bg-teal-100 flex items-center justify-center flex-shrink-0">
+                      <div className="w-2 h-2 rounded-full bg-teal-600"></div>
+                    </div>
+                    <span className="text-gray-700">View impact report</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <div className="w-5 h-5 rounded-full bg-teal-100 flex items-center justify-center flex-shrink-0">
+                      <div className="w-2 h-2 rounded-full bg-teal-600"></div>
+                    </div>
+                    <span className="text-gray-700">Check sustainability metrics</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm opacity-50">
+                    <div className="w-5 h-5 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
+                      <div className="w-2 h-2 rounded-full bg-gray-400"></div>
+                    </div>
+                    <span className="text-gray-500">Submit feedback</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm opacity-50">
+                    <div className="w-5 h-5 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
+                      <div className="w-2 h-2 rounded-full bg-gray-400"></div>
+                    </div>
+                    <span className="text-gray-500">Share impact on social</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
