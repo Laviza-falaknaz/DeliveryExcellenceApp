@@ -1,25 +1,22 @@
 import { useQuery } from "@tanstack/react-query";
 import { useOrders } from "@/hooks/use-orders";
 import { useImpact } from "@/hooks/use-impact";
-import ImpactCard from "@/components/dashboard/impact-card";
-import OrderCard from "@/components/dashboard/order-card";
-import WaterImpact from "@/components/dashboard/water-impact";
-import CaseStudyBanner from "@/components/dashboard/case-study-banner";
-import SupportResources from "@/components/dashboard/support-resources";
-import NotificationBanner from "@/components/dashboard/notification-banner";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Link } from "wouter";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Link, useLocation } from "wouter";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useState, useMemo } from "react";
-import { Trophy, Zap, Flame, Package, Droplets, Sparkles } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import { Separator } from "@/components/ui/separator";
+import { useState } from "react";
+import { 
+  Trophy, Zap, Flame, Package, Droplets, Sparkles, 
+  Search, QrCode, Leaf, ShieldCheck, Target, 
+  TrendingUp, Award, ChevronRight, AlertCircle, CheckCircle2,
+  Clock, Box, Wrench
+} from "lucide-react";
 import { motion } from "framer-motion";
-import carbonIcon from "@assets/Carbon Icon CC_1757591684851.png";
-import mineralsIcon from "@assets/Minerals Saved Icon CC _1757591709661.png";
-import resourceIcon from "@assets/Resource Pres Icon CC_1757592358474.png";
-import waterIcon from "@assets/CC_Icons_Weight increased-152_1759311452405.png";
-import waterDropletsIcon from "@assets/Minerals Saved Icon CC _1759311586728.png";
 
 interface User {
   id: number;
@@ -48,7 +45,27 @@ interface UserAchievement {
   unlockedAt: string;
 }
 
+interface RMA {
+  id: number;
+  rmaNumber: string;
+  status: string;
+  createdAt: string;
+}
+
+interface Order {
+  id: number;
+  orderNumber: string;
+  status: string;
+  totalAmount: string;
+  currency: string;
+  orderDate: string;
+  estimatedDelivery?: string;
+}
+
 export default function Dashboard() {
+  const [, setLocation] = useLocation();
+  const [warrantySearch, setWarrantySearch] = useState("");
+  
   const { data: user } = useQuery<User>({
     queryKey: ["/api/auth/me"],
   });
@@ -60,381 +77,427 @@ export default function Dashboard() {
   const { data: userAchievements = [] } = useQuery<UserAchievement[]>({
     queryKey: ["/api/gamification/user-achievements"],
   });
+
+  const { data: orders = [] } = useQuery<Order[]>({
+    queryKey: ["/api/orders"],
+  });
+
+  const { data: rmas = [] } = useQuery<{ rma: RMA }[]>({
+    queryKey: ["/api/rma"],
+  });
   
-  const { getMostRecentActiveOrder, getPastOrders, isLoadingOrders } = useOrders();
   const { impact, isLoadingImpact } = useImpact();
   
-  const [notificationVisible, setNotificationVisible] = useState(true);
+  // Filter active orders (not delivered/completed)
+  const activeOrders = orders.filter(o => 
+    !['delivered', 'completed', 'cancelled'].includes(o.status)
+  );
   
-  // Check if there's an active order to display in notification
-  const activeOrder = getMostRecentActiveOrder();
-  const pastOrders = getPastOrders();
-  const recentPastOrder = pastOrders.length > 0 ? pastOrders[0] : null;
-
-  // Used for notification banner
-  const orderForNotification = activeOrder || recentPastOrder;
+  // Filter active RMAs (not completed/closed)
+  const activeRMAs = rmas.filter(r => 
+    !['resolved', 'closed', 'completed'].includes(r.rma.status)
+  ).slice(0, 3);
   
-  // Get recent unlocked achievements (top 3)
-  const recentAchievements = userAchievements.slice(0, 3);
-  
-  // Generate deterministic trend data for impact cards (memoized to prevent re-renders)
-  const impactTrends = useMemo(() => {
-    if (!impact) return null;
-    
-    const generateTrend = (baseValue: number, seed: number) => {
-      // Deterministic pseudo-random based on seed
-      const seededRandom = (s: number) => {
-        const x = Math.sin(s) * 10000;
-        return x - Math.floor(x);
-      };
-      
-      return Array.from({ length: 7 }, (_, i) => 
-        baseValue * (0.7 + seededRandom(seed + i) * 0.6)
-      );
-    };
+  // Calculate next level info
+  const nextLevelXP = userProgress ? (userProgress.level * 1000) : 1000;
+  const currentLevelXP = userProgress ? ((userProgress.level - 1) * 1000) : 0;
+  const progressToNextLevel = userProgress 
+    ? ((userProgress.totalPoints - currentLevelXP) / (nextLevelXP - currentLevelXP)) * 100 
+    : 0;
 
-    return {
-      carbon: generateTrend(impact.carbonSaved, 1),
-      water: generateTrend(impact.familiesHelped, 2),
-      minerals: generateTrend(impact.mineralsSaved, 3),
-      waterSaved: generateTrend(impact.waterSaved || 0, 4)
-    };
-  }, [impact]);
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1
-      }
+  const handleWarrantySearch = () => {
+    if (warrantySearch.trim()) {
+      setLocation(`/warranty?q=${encodeURIComponent(warrantySearch.trim())}`);
     }
   };
 
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0 }
-  };
-
   return (
-    <div className="py-4 px-4 md:px-6 max-w-[1600px] mx-auto">
-      {/* Compact Header */}
-      <motion.div 
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="mb-6"
-      >
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-neutral-900 mb-1">
-              Welcome back, {user?.name?.split(' ')[0] || 'User'}! 👋
-            </h1>
-            <p className="text-sm text-neutral-600">Track your sustainability journey</p>
-          </div>
-          <div className="flex items-center gap-2">
-            {userProgress && (
-              <>
-                <Badge className="bg-gradient-to-r from-[#08ABAB] to-emerald-500 text-white border-none">
-                  <Trophy className="h-3 w-3 mr-1" />
-                  Lvl {userProgress.level}
-                </Badge>
-                {userProgress.currentStreak > 0 && (
-                  <Badge className="bg-gradient-to-r from-orange-500 to-red-500 text-white border-none">
-                    <Flame className="h-3 w-3 mr-1" />
-                    {userProgress.currentStreak}d
-                  </Badge>
-                )}
-              </>
-            )}
-          </div>
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-neutral-50 to-neutral-100">
+      <div className="max-w-[1440px] mx-auto p-6 space-y-6">
         
-        {/* Compact XP Bar */}
-        {userProgress && (
-          <motion.div 
-            initial={{ scaleX: 0 }}
-            animate={{ scaleX: 1 }}
-            className="mt-3 bg-white rounded-full p-1.5 shadow-sm border border-neutral-200"
-          >
-            <div className="flex items-center justify-between px-2 mb-1">
-              <span className="text-xs font-medium text-neutral-600">XP Progress</span>
-              <span className="text-xs font-bold text-[#08ABAB]">{userProgress.totalPoints} XP</span>
-            </div>
-            <div className="h-1.5 bg-neutral-100 rounded-full overflow-hidden">
-              <motion.div 
-                initial={{ width: 0 }}
-                animate={{ width: `${Math.min((userProgress.totalPoints % 1000) / 10, 100)}%` }}
-                transition={{ duration: 1, ease: "easeOut" }}
-                className="h-full bg-gradient-to-r from-[#08ABAB] to-emerald-500"
-              />
-            </div>
-          </motion.div>
-        )}
-      </motion.div>
-
-      {orderForNotification && notificationVisible && (
+        {/* Journey Hub - Hero Section */}
         <motion.div
-          initial={{ opacity: 0, y: -10 }}
+          initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <NotificationBanner
-            message={
-              activeOrder
-                ? `Your order #${activeOrder.orderNumber} is being ${activeOrder.status.replace('_', ' ')}!`
-                : `Your order #${recentPastOrder?.orderNumber} has been completed!`
-            }
-            subText={
-              activeOrder && activeOrder.estimatedDelivery
-                ? `Estimated delivery: ${new Date(activeOrder.estimatedDelivery).toLocaleDateString('en-US', { 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric' 
-                  })}`
-                : "Thank you for your purchase!"
-            }
-            isVisible={notificationVisible}
-            onClose={() => setNotificationVisible(false)}
-          />
-        </motion.div>
-      )}
-
-      {/* Main Grid Layout */}
-      <motion.div 
-        variants={containerVariants}
-        initial="hidden"
-        animate="show"
-        className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4"
-      >
-        {/* Left Column - Impact Cards (2 columns on large screens) */}
-        <motion.div variants={itemVariants} className="lg:col-span-2">
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-lg font-semibold text-neutral-900 flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-emerald-600" />
-              Environmental Impact
-            </h2>
-            <Badge variant="outline" className="text-xs">Last 7 days</Badge>
-          </div>
-          
-          {isLoadingImpact ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {[1, 2, 3, 4].map((i) => (
-                <Skeleton key={i} className="h-40 w-full rounded-lg" />
-              ))}
-            </div>
-          ) : impact ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <ImpactCard
-                title="Carbon Saved"
-                value={impact.carbonSaved}
-                unit="g"
-                icon="ri-plant-line"
-                iconImage={carbonIcon}
-                iconColor="text-emerald-600"
-                iconBgColor="bg-emerald-100"
-                progress={65}
-                footnote1={`${impact.treesEquivalent} trees`}
-                trend={impactTrends?.carbon}
-                trendColor="#10b981"
-              />
-              <ImpactCard
-                title="Water Provided"
-                value={impact.familiesHelped}
-                unit="families"
-                icon="ri-water-flash-line"
-                iconImage={waterIcon}
-                iconColor="text-cyan-600"
-                iconBgColor="bg-cyan-100"
-                progress={78}
-                footnote1="1 week supply"
-                trend={impactTrends?.water}
-                trendColor="#06b6d4"
-              />
-              <ImpactCard
-                title="Resources Preserved"
-                value={impact.mineralsSaved}
-                unit="g"
-                icon="ri-recycle-line"
-                iconImage={resourceIcon}
-                iconColor="text-orange-600"
-                iconBgColor="bg-orange-100"
-                progress={45}
-                footnote1="Rare earth metals"
-                trend={impactTrends?.minerals}
-                trendColor="#ea580c"
-              />
-              <ImpactCard
-                title="Water Saved"
-                value={impact.waterSaved || 0}
-                unit="litres"
-                icon="ri-drop-line"
-                iconImage={waterDropletsIcon}
-                iconColor="text-blue-600"
-                iconBgColor="bg-blue-100"
-                progress={55}
-                footnote1="Through reuse"
-                trend={impactTrends?.waterSaved}
-                trendColor="#2563eb"
-              />
-            </div>
-          ) : (
-            <div className="p-6 text-center bg-white rounded-lg shadow-sm border border-neutral-200">
-              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-emerald-100 mb-3">
-                <i className="ri-seedling-line text-2xl text-emerald-600"></i>
-              </div>
-              <h3 className="text-sm font-medium text-neutral-700">No impact data yet</h3>
-              <p className="text-xs text-neutral-500 mt-1">Start your journey by placing an order</p>
-            </div>
-          )}
-        </motion.div>
-
-        {/* Right Column - Quick Actions & Achievements */}
-        <motion.div variants={itemVariants} className="space-y-4">
-          {/* Sustainability Quiz Card */}
-          <Link href="/quiz">
-            <Card className="cursor-pointer hover:shadow-lg transition-all duration-300 bg-gradient-to-br from-purple-50 to-blue-50 border-purple-200 hover:border-purple-400 overflow-hidden">
-              <CardContent className="p-4">
-                <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0">
-                    <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center shadow-md">
-                      <i className="ri-gamepad-line text-2xl text-white"></i>
-                    </div>
+          <Card className="bg-gradient-to-br from-[#08ABAB] to-emerald-600 border-none text-white overflow-hidden relative">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-32 -mt-32" />
+            <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full -ml-24 -mb-24" />
+            
+            <CardContent className="p-8 relative z-10">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
+                {/* Welcome & Progress */}
+                <div className="lg:col-span-2 space-y-4">
+                  <div>
+                    <h1 className="text-3xl font-bold mb-2">
+                      Welcome back, {user?.name?.split(' ')[0] || 'User'}! 👋
+                    </h1>
+                    <p className="text-white/90">Your sustainable tech journey at a glance</p>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h3 className="text-sm font-bold text-neutral-900">Quiz Challenge</h3>
-                      <Badge className="bg-gradient-to-r from-orange-500 to-red-500 text-white border-none text-xs px-1.5 py-0">
-                        New
-                      </Badge>
+
+                  {userProgress && (
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2">
+                          <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center border-2 border-white/30">
+                            <Trophy className="h-8 w-8" />
+                          </div>
+                          <div>
+                            <div className="text-sm opacity-90">Level</div>
+                            <div className="text-2xl font-bold">{userProgress.level}</div>
+                          </div>
+                        </div>
+                        
+                        {userProgress.currentStreak > 0 && (
+                          <>
+                            <Separator orientation="vertical" className="h-12 bg-white/30" />
+                            <div className="flex items-center gap-2">
+                              <Flame className="h-6 w-6" />
+                              <div>
+                                <div className="text-sm opacity-90">Streak</div>
+                                <div className="text-2xl font-bold">{userProgress.currentStreak} days</div>
+                              </div>
+                            </div>
+                          </>
+                        )}
+                        
+                        <Separator orientation="vertical" className="h-12 bg-white/30" />
+                        <div className="flex items-center gap-2">
+                          <Zap className="h-6 w-6" />
+                          <div>
+                            <div className="text-sm opacity-90">Total XP</div>
+                            <div className="text-2xl font-bold">{userProgress.totalPoints.toLocaleString()}</div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-sm">
+                          <span>Progress to Level {userProgress.level + 1}</span>
+                          <span>{Math.round(progressToNextLevel)}%</span>
+                        </div>
+                        <Progress value={progressToNextLevel} className="h-3 bg-white/20" />
+                        <div className="text-xs opacity-75">
+                          {nextLevelXP - userProgress.totalPoints} XP needed
+                        </div>
+                      </div>
                     </div>
-                    <p className="text-xs text-neutral-600 mb-2">
-                      Test your sustainability knowledge
-                    </p>
-                    <div className="flex items-center gap-3 text-xs">
-                      <span className="flex items-center gap-1">
-                        <i className="ri-question-line text-purple-600"></i>
-                        8 questions
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Zap className="h-3 w-3 text-orange-500" />
-                        <span className="font-bold text-orange-600">100 XP</span>
-                      </span>
-                    </div>
-                  </div>
+                  )}
                 </div>
-              </CardContent>
-            </Card>
-          </Link>
 
-          {/* Recent Achievements */}
-          {recentAchievements.length > 0 && (
-            <Card className="border-neutral-200">
-              <CardHeader className="pb-3 pt-4 px-4">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-semibold text-neutral-900 flex items-center gap-2">
-                    <Trophy className="h-4 w-4 text-[#08ABAB]" />
-                    Recent Achievements
-                  </h3>
+                {/* Quick Actions */}
+                <div className="space-y-3">
+                  <h3 className="text-sm font-semibold opacity-90 mb-3">Quick Actions</h3>
+                  <Link href="/quiz">
+                    <Button className="w-full bg-white text-[#08ABAB] hover:bg-white/90 justify-between group">
+                      <span className="flex items-center gap-2">
+                        <Sparkles className="h-4 w-4" />
+                        Sustainability Quiz
+                      </span>
+                      <ChevronRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                    </Button>
+                  </Link>
+                  <Link href="/warranty">
+                    <Button variant="outline" className="w-full border-white/30 text-white hover:bg-white/10 justify-between group">
+                      <span className="flex items-center gap-2">
+                        <ShieldCheck className="h-4 w-4" />
+                        Check Warranty
+                      </span>
+                      <ChevronRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                    </Button>
+                  </Link>
                   <Link href="/achievements">
-                    <Button variant="ghost" size="sm" className="h-7 text-xs">
+                    <Button variant="outline" className="w-full border-white/30 text-white hover:bg-white/10 justify-between group">
+                      <span className="flex items-center gap-2">
+                        <Award className="h-4 w-4" />
+                        View Achievements
+                      </span>
+                      <ChevronRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          
+          {/* Left Column - Lifecycle (Orders, RMAs, Warranty) */}
+          <div className="lg:col-span-2 space-y-6">
+            
+            {/* Active Orders */}
+            <Card>
+              <CardHeader className="pb-4">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center gap-2">
+                    <Package className="h-5 w-5 text-[#08ABAB]" />
+                    Active Orders
+                  </CardTitle>
+                  <Link href="/orders">
+                    <Button variant="ghost" size="sm">
                       View All
+                      <ChevronRight className="h-4 w-4 ml-1" />
                     </Button>
                   </Link>
                 </div>
               </CardHeader>
-              <CardContent className="px-4 pb-4 space-y-2">
-                {recentAchievements.slice(0, 2).map((userAchievement) => {
-                  const achievement = userAchievement.achievement;
-                  return (
-                    <div
-                      key={userAchievement.id}
-                      className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-lg p-3 border border-emerald-200"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-gradient-to-br from-[#08ABAB] to-emerald-500 flex items-center justify-center shadow-sm">
-                          <i className={`${achievement.icon} text-lg text-white`}></i>
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <h4 className="text-xs font-bold text-neutral-900 truncate">{achievement.name}</h4>
-                          <div className="flex items-center gap-2 mt-1">
-                            <Badge className="bg-orange-500 text-white border-none text-xs px-1.5 py-0">
-                              <Zap className="h-2.5 w-2.5 mr-0.5" />
-                              +{achievement.pointsAwarded}
-                            </Badge>
+              <CardContent>
+                {activeOrders.length > 0 ? (
+                  <div className="space-y-3">
+                    {activeOrders.slice(0, 3).map((order) => (
+                      <Link key={order.id} href={`/orders/${order.orderNumber}`}>
+                        <div className="p-4 rounded-lg border border-neutral-200 hover:border-[#08ABAB] hover:shadow-md transition-all cursor-pointer">
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center gap-2">
+                              <Badge variant="outline" className="bg-[#08ABAB]/10 text-[#08ABAB] border-[#08ABAB]/30">
+                                #{order.orderNumber}
+                              </Badge>
+                              <Badge className={
+                                order.status === 'shipped' ? 'bg-blue-500' :
+                                order.status === 'processing' ? 'bg-yellow-500' :
+                                'bg-neutral-500'
+                              }>
+                                {order.status.replace('_', ' ')}
+                              </Badge>
+                            </div>
+                            <div className="text-sm font-semibold">
+                              {order.currency} {parseFloat(order.totalAmount).toFixed(2)}
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-4 text-xs text-neutral-600">
+                            <span className="flex items-center gap-1">
+                              <Clock className="h-3 w-3" />
+                              {new Date(order.orderDate).toLocaleDateString()}
+                            </span>
+                            {order.estimatedDelivery && (
+                              <span className="flex items-center gap-1">
+                                <Box className="h-3 w-3" />
+                                Est. {new Date(order.estimatedDelivery).toLocaleDateString()}
+                              </span>
+                            )}
                           </div>
                         </div>
-                      </div>
-                    </div>
-                  );
-                })}
+                      </Link>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-neutral-500">
+                    <Package className="h-12 w-12 mx-auto mb-3 text-neutral-300" />
+                    <p className="text-sm">No active orders</p>
+                  </div>
+                )}
               </CardContent>
             </Card>
-          )}
-        </motion.div>
-      </motion.div>
 
-      {/* Second Row - Orders & Water Impact */}
-      <motion.div 
-        variants={containerVariants}
-        initial="hidden"
-        animate="show"
-        className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4"
-      >
-        {/* Orders */}
-        <motion.div variants={itemVariants}>
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-lg font-semibold text-neutral-900 flex items-center gap-2">
-              <Package className="h-5 w-5 text-[#08ABAB]" />
-              Recent Orders
-            </h2>
-            <Link href="/orders">
-              <Button variant="ghost" size="sm" className="h-8 text-xs">
-                View All
-              </Button>
-            </Link>
+            {/* Active RMAs */}
+            <Card>
+              <CardHeader className="pb-4">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center gap-2">
+                    <Wrench className="h-5 w-5 text-orange-600" />
+                    Active Warranty Cases
+                  </CardTitle>
+                  <Link href="/rma">
+                    <Button variant="ghost" size="sm">
+                      View All
+                      <ChevronRight className="h-4 w-4 ml-1" />
+                    </Button>
+                  </Link>
+                </div>
+              </CardHeader>
+              <CardContent>
+                {activeRMAs.length > 0 ? (
+                  <div className="space-y-3">
+                    {activeRMAs.map((rmaItem) => (
+                      <Link key={rmaItem.rma.id} href={`/rma/${rmaItem.rma.rmaNumber}`}>
+                        <div className="p-4 rounded-lg border border-neutral-200 hover:border-orange-500 hover:shadow-md transition-all cursor-pointer">
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center gap-2">
+                              <Badge variant="outline" className="bg-orange-50 text-orange-600 border-orange-200">
+                                {rmaItem.rma.rmaNumber}
+                              </Badge>
+                              <Badge className="bg-orange-500">
+                                {rmaItem.rma.status}
+                              </Badge>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-1 text-xs text-neutral-600">
+                            <Clock className="h-3 w-3" />
+                            Opened {new Date(rmaItem.rma.createdAt).toLocaleDateString()}
+                          </div>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-neutral-500">
+                    <CheckCircle2 className="h-12 w-12 mx-auto mb-3 text-green-300" />
+                    <p className="text-sm">No active warranty cases</p>
+                    <p className="text-xs mt-1">All your products are running smoothly!</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Warranty Lookup */}
+            <Card className="bg-gradient-to-br from-blue-50 to-cyan-50 border-blue-200">
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center gap-2">
+                  <ShieldCheck className="h-5 w-5 text-blue-600" />
+                  Check Warranty Status
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <p className="text-sm text-neutral-600">
+                    Enter your serial number to check warranty status and coverage
+                  </p>
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="Enter serial number..."
+                      value={warrantySearch}
+                      onChange={(e) => setWarrantySearch(e.target.value)}
+                      onKeyDown={(e) => e.key === 'Enter' && handleWarrantySearch()}
+                      className="flex-1 bg-white"
+                    />
+                    <Button onClick={handleWarrantySearch} className="bg-blue-600 hover:bg-blue-700">
+                      <Search className="h-4 w-4" />
+                    </Button>
+                    <Link href="/warranty">
+                      <Button variant="outline" title="Scan QR Code">
+                        <QrCode className="h-4 w-4" />
+                      </Button>
+                    </Link>
+                  </div>
+                  <div className="flex items-start gap-2 text-xs text-neutral-600 bg-white/50 p-3 rounded-lg">
+                    <AlertCircle className="h-4 w-4 flex-shrink-0 mt-0.5 text-blue-600" />
+                    <div>
+                      <p className="font-medium text-neutral-900">Where to find your serial number?</p>
+                      <p className="mt-1">Check the label on the back or bottom of your device, or scan the QR code</p>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
-          {isLoadingOrders ? (
-            <Skeleton className="h-64 w-full rounded-lg" />
-          ) : activeOrder ? (
-            <OrderCard order={activeOrder} />
-          ) : recentPastOrder ? (
-            <OrderCard order={recentPastOrder} isPast={true} />
-          ) : (
-            <div className="p-8 text-center bg-white rounded-lg shadow-sm border border-neutral-200">
-              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[#08ABAB]/10 mb-3">
-                <Package className="h-6 w-6 text-[#08ABAB]" />
-              </div>
-              <h3 className="text-sm font-medium text-neutral-700">No orders yet</h3>
-              <p className="text-xs text-neutral-500 mt-1">Your recent orders will appear here</p>
-            </div>
-          )}
-        </motion.div>
 
-        {/* Water Impact */}
-        <motion.div variants={itemVariants}>
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-lg font-semibold text-neutral-900 flex items-center gap-2">
-              <Droplets className="h-5 w-5 text-cyan-600" />
-              Water Impact
-            </h2>
+          {/* Right Column - Progress & Impact */}
+          <div className="space-y-6">
+            
+            {/* Gamification Hub */}
+            {userAchievements.length > 0 && (
+              <Card className="border-[#08ABAB]/30">
+                <CardHeader className="pb-4">
+                  <CardTitle className="flex items-center gap-2">
+                    <Trophy className="h-5 w-5 text-[#08ABAB]" />
+                    Latest Achievement
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {userAchievements.slice(0, 1).map((userAchievement) => {
+                    const achievement = userAchievement.achievement;
+                    return (
+                      <div key={userAchievement.id} className="space-y-3">
+                        <div className="flex items-center gap-4">
+                          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#08ABAB] to-emerald-500 flex items-center justify-center shadow-lg">
+                            <i className={`${achievement.icon} text-2xl text-white`}></i>
+                          </div>
+                          <div className="flex-1">
+                            <h3 className="font-bold text-neutral-900">{achievement.name}</h3>
+                            <p className="text-sm text-neutral-600 mt-1">{achievement.description}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center justify-between p-3 bg-orange-50 rounded-lg border border-orange-200">
+                          <span className="text-sm text-neutral-700">XP Earned</span>
+                          <Badge className="bg-orange-500 text-white">
+                            <Zap className="h-3 w-3 mr-1" />
+                            +{achievement.pointsAwarded}
+                          </Badge>
+                        </div>
+                        <Link href="/achievements">
+                          <Button variant="outline" className="w-full">
+                            View All Achievements
+                            <ChevronRight className="h-4 w-4 ml-1" />
+                          </Button>
+                        </Link>
+                      </div>
+                    );
+                  })}
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Impact Pulse */}
+            <Card className="bg-gradient-to-br from-emerald-50 to-green-50 border-emerald-200">
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center gap-2">
+                  <Leaf className="h-5 w-5 text-emerald-600" />
+                  Impact Summary
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {isLoadingImpact ? (
+                  <Skeleton className="h-32 w-full" />
+                ) : impact ? (
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="bg-white rounded-lg p-3 border border-emerald-200">
+                      <div className="text-2xl font-bold text-emerald-600">{impact.carbonSaved}g</div>
+                      <div className="text-xs text-neutral-600">Carbon Saved</div>
+                    </div>
+                    <div className="bg-white rounded-lg p-3 border border-cyan-200">
+                      <div className="text-2xl font-bold text-cyan-600">{impact.familiesHelped}</div>
+                      <div className="text-xs text-neutral-600">Families Helped</div>
+                    </div>
+                    <div className="bg-white rounded-lg p-3 border border-orange-200">
+                      <div className="text-2xl font-bold text-orange-600">{impact.mineralsSaved}g</div>
+                      <div className="text-xs text-neutral-600">Resources Saved</div>
+                    </div>
+                    <div className="bg-white rounded-lg p-3 border border-blue-200">
+                      <div className="text-2xl font-bold text-blue-600">{impact.treesEquivalent}</div>
+                      <div className="text-xs text-neutral-600">Trees Equiv.</div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-center py-6 text-neutral-500">
+                    <Leaf className="h-10 w-10 mx-auto mb-2 text-neutral-300" />
+                    <p className="text-xs">No impact data yet</p>
+                  </div>
+                )}
+                <Link href="/impact">
+                  <Button variant="outline" className="w-full mt-4">
+                    View Full Report
+                    <TrendingUp className="h-4 w-4 ml-1" />
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+
+            {/* Support & Resources */}
+            <Card>
+              <CardHeader className="pb-4">
+                <CardTitle className="text-base">Need Help?</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <Link href="/support">
+                  <Button variant="outline" className="w-full justify-start" size="sm">
+                    <i className="ri-customer-service-line mr-2"></i>
+                    Contact Support
+                  </Button>
+                </Link>
+                <Link href="/quiz">
+                  <Button variant="outline" className="w-full justify-start" size="sm">
+                    <i className="ri-lightbulb-line mr-2"></i>
+                    Learn More
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
           </div>
-          <WaterImpact />
-        </motion.div>
-      </motion.div>
-
-      {/* Third Row - Case Study & Support */}
-      <motion.div 
-        variants={containerVariants}
-        initial="hidden"
-        animate="show"
-        className="grid grid-cols-1 lg:grid-cols-2 gap-4"
-      >
-        <motion.div variants={itemVariants}>
-          <CaseStudyBanner />
-        </motion.div>
-        <motion.div variants={itemVariants}>
-          <SupportResources />
-        </motion.div>
-      </motion.div>
+        </div>
+      </div>
     </div>
   );
 }
