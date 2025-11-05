@@ -445,6 +445,7 @@ export const warranties = pgTable("warranties", {
   id: serial("id").primaryKey(),
   serialNumber: text("serial_number").notNull(),
   manufacturerSerialNumber: text("manufacturer_serial_number").notNull(),
+  productDescription: text("product_description").notNull(), // Product name/description
   areaId: text("area_id").notNull(),
   itemId: text("item_id").notNull(),
   warrantyDescription: text("warranty_description").notNull(),
@@ -465,6 +466,7 @@ export const bulkWarrantyInsertSchema = z.object({
   warranties: z.array(z.object({
     serialNumber: z.string().min(1),
     manufacturerSerialNumber: z.string().min(1),
+    productDescription: z.string().min(1),
     areaId: z.string().min(1),
     itemId: z.string().min(1),
     warrantyDescription: z.string().min(1),

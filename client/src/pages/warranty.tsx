@@ -249,20 +249,28 @@ export default function Warranty() {
   async function onSerialSubmit(data: z.infer<typeof serialNumberSchema>) {
     try {
       setIsSubmitting(true);
-      // In a real implementation, we would call an API to fetch warranty info
-      // For demo purposes, we'll simulate a response
-      await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Simulate warranty info for demo
-      setWarrantyInfo({
-        serialNumber: data.serialNumber,
-        productName: "Circular ThinkPad T14 Gen 2",
-        purchaseDate: "2024-01-15",
-        warrantyEnd: "2027-01-15",
-        warrantyStatus: "Active",
-        additionalCoverage: "Extended Warranty with Accidental Damage Protection",
-        registrationStatus: "Registered",
-      });
+      // Call the actual API to fetch warranty info
+      const response = await fetch(`/api/warranties/search?q=${encodeURIComponent(data.serialNumber)}`);
+      const result = await response.json();
+      
+      if (result.found && result.warranty) {
+        // Map API response to UI format
+        setWarrantyInfo({
+          serialNumber: result.warranty.serialNumber,
+          productName: result.warranty.productDescription,
+          purchaseDate: result.warranty.startDate,
+          warrantyEnd: result.warranty.endDate,
+          warrantyStatus: result.warranty.status === 'active' ? 'Active' : 
+                        result.warranty.status === 'expired' ? 'Expired' : 'Upcoming',
+          additionalCoverage: result.warranty.warrantyDescription,
+          registrationStatus: "Registered",
+          daysRemaining: result.warranty.daysRemaining,
+        });
+      } else {
+        // No warranty found
+        setWarrantyInfo(null);
+      }
       
       setSearchPerformed(true);
       
@@ -272,6 +280,8 @@ export default function Warranty() {
         description: "Unable to retrieve warranty information. Please try again.",
         variant: "destructive",
       });
+      setWarrantyInfo(null);
+      setSearchPerformed(true);
     } finally {
       setIsSubmitting(false);
     }

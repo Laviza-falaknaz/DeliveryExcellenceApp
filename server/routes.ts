@@ -1557,6 +1557,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         warranty: {
           serialNumber: warranty.serialNumber,
           manufacturerSerialNumber: warranty.manufacturerSerialNumber,
+          productDescription: warranty.productDescription,
           areaId: warranty.areaId,
           itemId: warranty.itemId,
           warrantyDescription: warranty.warrantyDescription,

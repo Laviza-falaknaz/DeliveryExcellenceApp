@@ -269,6 +269,7 @@ The system automatically determines status by checking timeline milestones in th
     {
       "serialNumber": "SN123456789",
       "manufacturerSerialNumber": "DELL-MFG-987654321",
+      "productDescription": "Dell Latitude 7420 14-inch Laptop",
       "areaId": "UK-SOUTH",
       "itemId": "ITEM-12345",
       "warrantyDescription": "3-Year Premium Warranty",
@@ -278,6 +279,7 @@ The system automatically determines status by checking timeline milestones in th
     {
       "serialNumber": "SN987654321",
       "manufacturerSerialNumber": "HP-MFG-123456789",
+      "productDescription": "HP EliteBook 840 G8",
       "areaId": "US-EAST",
       "itemId": "ITEM-67890",
       "warrantyDescription": "2-Year Standard Warranty",
@@ -296,6 +298,7 @@ The system automatically determines status by checking timeline milestones in th
 |-------|------|----------|-------------|---------|
 | `serialNumber` | String | ✅ Yes | Device serial number (searchable by customers) | `"SN123456789"` |
 | `manufacturerSerialNumber` | String | ✅ Yes | Manufacturer's serial number (also searchable) | `"DELL-MFG-987654321"` |
+| `productDescription` | String | ✅ Yes | Product name/description (displayed to customers) | `"Dell Latitude 7420 14-inch Laptop"` |
 | `areaId` | String | ✅ Yes | Geographic region or area identifier | `"UK-SOUTH"`, `"US-EAST"` |
 | `itemId` | String | ✅ Yes | Internal item/SKU/product identifier | `"ITEM-12345"` |
 | `warrantyDescription` | String | ✅ Yes | Human-readable warranty type/description | `"3-Year Premium Warranty"` |
