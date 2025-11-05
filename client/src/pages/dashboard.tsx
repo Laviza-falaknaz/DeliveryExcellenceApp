@@ -61,10 +61,6 @@ export default function Dashboard() {
     queryKey: ["/api/gamification/user-achievements"],
   });
   
-  const { data: activityLog = [] } = useQuery({
-    queryKey: ["/api/gamification/activity-log"],
-  });
-  
   const { getMostRecentActiveOrder, getPastOrders, isLoadingOrders } = useOrders();
   const { impact, isLoadingImpact } = useImpact();
   
@@ -80,9 +76,6 @@ export default function Dashboard() {
   
   // Get recent unlocked achievements (top 3)
   const recentAchievements = userAchievements.slice(0, 3);
-  
-  // Get recent activities
-  const recentActivities = activityLog;
   
   // Generate deterministic trend data for impact cards (memoized to prevent re-renders)
   const impactTrends = useMemo(() => {
