@@ -1509,6 +1509,57 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ==================== ADMIN SETTINGS ====================
+  // Admin portal configuration settings
+
+  // Get admin settings (visible tabs and notification emails)
+  app.get("/api/admin/settings", requireAdmin, async (req, res) => {
+    try {
+      const setting = await storage.getSystemSetting('admin_portal');
+      
+      // Default settings if none exist
+      const defaultSettings = {
+        visibleTabs: ['users', 'orders', 'rmas', 'tickets', 'water-projects', 'case-studies', 'gamification', 'api-keys', 'theme', 'connection'],
+        rmaNotificationEmails: [],
+        newUserAlertEmails: [],
+      };
+
+      const settings = setting?.settingValue || defaultSettings;
+      res.json(settings);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Save admin settings
+  app.post("/api/admin/settings", requireAdmin, async (req, res) => {
+    try {
+      const settingsSchema = z.object({
+        visibleTabs: z.array(z.string()),
+        rmaNotificationEmails: z.array(z.string().email()),
+        newUserAlertEmails: z.array(z.string().email()),
+      });
+
+      const validatedSettings = settingsSchema.parse(req.body);
+      
+      await storage.setSystemSetting('admin_portal', validatedSettings);
+      
+      res.json({
+        success: true,
+        message: "Settings saved successfully",
+        settings: validatedSettings,
+      });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ 
+          message: "Validation error", 
+          errors: error.errors 
+        });
+      }
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // ==================== API KEY MANAGEMENT ====================
   // Admin endpoints to generate and manage API keys for data push APIs
 

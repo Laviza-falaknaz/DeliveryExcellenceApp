@@ -281,6 +281,7 @@ export const systemSettings = pgTable("system_settings", {
   id: serial("id").primaryKey(),
   settingKey: text("setting_key").notNull().unique(),
   settingValue: json("setting_value").$type<{
+    // Theme settings
     primaryColor?: string;
     secondaryColor?: string;
     accentColor?: string;
@@ -290,6 +291,10 @@ export const systemSettings = pgTable("system_settings", {
     logoUrl?: string;
     companyName?: string;
     webhookUrl?: string;
+    // Admin portal settings
+    visibleTabs?: string[]; // Array of tab IDs that should be visible
+    rmaNotificationEmails?: string[]; // Email addresses to notify on RMA requests
+    newUserAlertEmails?: string[]; // Email addresses to notify on new user creation
   }>(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
