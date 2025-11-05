@@ -1,8 +1,8 @@
 // Currency formatting utilities
 
-export function formatPrice(amountInMinorUnits: number, currency: string = 'GBP'): string {
-  // Convert minor units (pence/cents) to major units (pounds/dollars)
-  const amount = amountInMinorUnits / 100;
+export function formatPrice(amount: number | string, currency: string = 'GBP'): string {
+  // Convert to number if string (handles database numeric type which may return as string)
+  const numericAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
   
   const currencySymbols: Record<string, string> = {
     'GBP': '£',
@@ -13,7 +13,7 @@ export function formatPrice(amountInMinorUnits: number, currency: string = 'GBP'
   
   const symbol = currencySymbols[currency.toUpperCase()] || currency + ' ';
   
-  return `${symbol}${amount.toLocaleString('en-GB', { 
+  return `${symbol}${numericAmount.toLocaleString('en-GB', { 
     minimumFractionDigits: 2,
     maximumFractionDigits: 2 
   })}`;
