@@ -8,11 +8,13 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Upload, FileText, X, Camera, QrCode } from "lucide-react";
+import { Upload, FileText, X, Camera, QrCode, AlertTriangle } from "lucide-react";
 import { BrowserMultiFormatReader, NotFoundException } from "@zxing/library";
 import { useQuery } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
 
 const warrantyClaimSchema = z.object({
   fullName: z.string().min(2, "Full name must be at least 2 characters"),
@@ -42,15 +44,20 @@ export default function WarrantyClaim() {
   const [isScanning, setIsScanning] = useState(false);
   const [isScannerOpen, setIsScannerOpen] = useState(false);
   const [scannerError, setScannerError] = useState<string | null>(null);
+  const [originalEmail, setOriginalEmail] = useState<string>("");
+  const [showEmailChangeDialog, setShowEmailChangeDialog] = useState(false);
+  const [emailChangeDecision, setEmailChangeDecision] = useState<'track' | 'new' | null>(null);
+  const [pendingSubmitData, setPendingSubmitData] = useState<WarrantyClaimFormValues | null>(null);
   
   // Fetch current user data
   const { data: currentUser } = useQuery<{
+    id: number;
     name: string;
     email: string;
     company: string;
     phoneNumber?: string;
   }>({
-    queryKey: ["/api/user"],
+    queryKey: ["/api/auth/me"],
   });
   
   // Parse basket data from URL params
@@ -113,6 +120,7 @@ export default function WarrantyClaim() {
       form.setValue('email', currentUser.email || "");
       form.setValue('phone', currentUser.phoneNumber || "");
       form.setValue('recipientContactNumber', currentUser.phoneNumber || "");
+      setOriginalEmail(currentUser.email || "");
     }
   }, [currentUser, form]);
   
@@ -253,31 +261,67 @@ export default function WarrantyClaim() {
   };
 
   async function onSubmit(data: WarrantyClaimFormValues) {
+    // Check if email has been changed
+    if (data.email !== originalEmail && originalEmail) {
+      setPendingSubmitData(data);
+      setShowEmailChangeDialog(true);
+      return;
+    }
+
+    // If email hasn't changed or decision has been made, proceed with submission
+    await submitRMA(data);
+  }
+
+  async function submitRMA(data: WarrantyClaimFormValues) {
     try {
       setIsSubmitting(true);
       
-      // In a real implementation, we would send this data to the API
-      // For now, we'll simulate the submission
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      const rmaData = {
+        ...data,
+        userId: currentUser?.id,
+        emailChanged: data.email !== originalEmail,
+        trackWithCurrentUser: emailChangeDecision === 'track' || data.email === originalEmail,
+        fileAttachment: uploadedFile ? {
+          name: uploadedFile.name,
+          size: uploadedFile.size,
+          type: uploadedFile.type
+        } : null
+      };
+
+      // Submit RMA request
+      await apiRequest("POST", "/api/rmas", rmaData);
       
       toast({
-        title: "Warranty Claim Submitted",
-        description: "Your warranty claim has been submitted successfully. Our team will review it and contact you shortly.",
+        title: "RMA Request Submitted",
+        description: emailChangeDecision === 'new' 
+          ? "Your RMA request has been submitted. A new account will be created once approved by management."
+          : "Your RMA request has been submitted successfully. Our team will review it and contact you shortly.",
       });
       
       form.reset();
       setUploadedFile(null);
+      setEmailChangeDecision(null);
+      setPendingSubmitData(null);
       
     } catch (error) {
       toast({
         title: "Error",
-        description: "Unable to submit your warranty claim. Please try again.",
+        description: "Unable to submit your RMA request. Please try again.",
         variant: "destructive",
       });
     } finally {
       setIsSubmitting(false);
     }
   }
+
+  const handleEmailChangeDecision = (decision: 'track' | 'new') => {
+    setEmailChangeDecision(decision);
+    setShowEmailChangeDialog(false);
+    
+    if (pendingSubmitData) {
+      submitRMA(pendingSubmitData);
+    }
+  };
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -721,6 +765,53 @@ export default function WarrantyClaim() {
           </Form>
         </CardContent>
       </Card>
+
+      {/* Email Change Confirmation Dialog */}
+      <AlertDialog open={showEmailChangeDialog} onOpenChange={setShowEmailChangeDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="w-5 h-5 text-amber-500" />
+              Email Address Changed
+            </AlertDialogTitle>
+            <AlertDialogDescription className="space-y-3">
+              <p>
+                You've changed your email address from <strong>{originalEmail}</strong> to <strong>{pendingSubmitData?.email}</strong>.
+              </p>
+              <p>
+                Would you still like to track this RMA under your current account?
+              </p>
+              <ul className="list-disc list-inside text-sm space-y-1 ml-2">
+                <li><strong>Yes</strong> - RMA will be linked to your current account ({originalEmail})</li>
+                <li><strong>No</strong> - A new account will be created for {pendingSubmitData?.email} (requires management approval)</li>
+              </ul>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => {
+              setShowEmailChangeDialog(false);
+              setPendingSubmitData(null);
+              setEmailChangeDecision(null);
+            }}>
+              Cancel
+            </AlertDialogCancel>
+            <Button
+              variant="outline"
+              onClick={() => handleEmailChangeDecision('new')}
+              data-testid="button-create-new-account"
+            >
+              Create New Account
+            </Button>
+            <AlertDialogAction
+              onClick={() => handleEmailChangeDecision('track')}
+              data-testid="button-track-current"
+              className="bg-primary hover:bg-primary/90"
+            >
+              Track with Current Account
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

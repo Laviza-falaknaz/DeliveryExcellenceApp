@@ -508,6 +508,109 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // New warranty claim RMA endpoint (from warranty claim form)
+  app.post("/api/rmas", isAuthenticated, async (req, res) => {
+    try {
+      const user = req.user as User;
+      
+      const warrantyClaimSchema = z.object({
+        fullName: z.string(),
+        companyName: z.string(),
+        email: z.string().email(),
+        phone: z.string(),
+        address: z.string(),
+        deliveryAddress: z.string(),
+        recipientContactNumber: z.string(),
+        countryOfPurchase: z.string(),
+        numberOfProducts: z.number(),
+        productMakeModel: z.string(),
+        manufacturerSerialNumber: z.string(),
+        inHouseSerialNumber: z.string(),
+        faultDescription: z.string(),
+        consent: z.boolean(),
+        userId: z.number().optional(),
+        emailChanged: z.boolean().optional(),
+        trackWithCurrentUser: z.boolean().optional(),
+        fileAttachment: z.object({
+          name: z.string(),
+          size: z.number(),
+          type: z.string(),
+        }).nullable().optional(),
+      });
+      
+      const validatedData = warrantyClaimSchema.parse(req.body);
+      
+      // Determine which user ID to use for the RMA
+      let targetUserId = user.id;
+      
+      // If email changed and user doesn't want to track with current account
+      if (validatedData.emailChanged && !validatedData.trackWithCurrentUser) {
+        // Create pending user for new email (requires admin approval)
+        try {
+          const newUser = await storage.createUser({
+            username: validatedData.email,
+            password: 'PENDING_APPROVAL', // Placeholder - will need to be set by admin
+            name: validatedData.fullName,
+            company: validatedData.companyName,
+            email: validatedData.email,
+            phoneNumber: validatedData.phone,
+            isAdmin: false,
+            isActive: false, // Inactive until approved
+            notificationPreferences: {
+              orderUpdates: true,
+              environmentalImpact: true,
+              charityUpdates: true,
+              serviceReminders: true,
+            },
+          });
+          
+          targetUserId = newUser.id;
+          
+          // TODO: Send email notification to admin about new user approval needed
+          console.log(`New user created (pending approval): ${validatedData.email} for RMA request`);
+        } catch (userError) {
+          console.error('Failed to create new user:', userError);
+          return res.status(500).json({ message: "Failed to create new user account" });
+        }
+      }
+      
+      // Generate RMA number
+      const rmaNumber = `RMA-${Math.floor(10000 + Math.random() * 90000)}`;
+      
+      // Create RMA
+      const rmaData = insertRmaSchema.parse({
+        userId: targetUserId,
+        rmaNumber,
+        email: validatedData.email,
+        status: "requested",
+      });
+      
+      const rma = await storage.createRma(rmaData);
+      
+      // Create RMA item
+      await storage.createRmaItem({
+        rmaId: rma.id,
+        serialNumber: validatedData.manufacturerSerialNumber,
+        errorDescription: validatedData.faultDescription,
+        receivedAtWarehouseOn: null,
+        solution: "Pending",
+        reasonForReturn: validatedData.faultDescription,
+        productDetails: `${validatedData.productMakeModel} - In-house SN: ${validatedData.inHouseSerialNumber}`,
+        relatedOrder: null,
+      });
+      
+      // Return RMA with items
+      const rmaWithItems = await storage.getRmaWithItems(rma.rmaNumber);
+      res.status(201).json(rmaWithItems);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
+      console.error("Warranty claim RMA creation error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   app.post("/api/rma", isAuthenticated, async (req, res) => {
     try {
       const user = req.user as User;
