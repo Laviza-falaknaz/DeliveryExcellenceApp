@@ -542,6 +542,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Determine which user ID to use for the RMA
       let targetUserId = user.id;
+      let newUserCreated = false;
       
       // If email changed and user doesn't want to track with current account
       if (validatedData.emailChanged && !validatedData.trackWithCurrentUser) {
@@ -565,8 +566,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           });
           
           targetUserId = newUser.id;
+          newUserCreated = true;
           
-          // TODO: Send email notification to admin about new user approval needed
           console.log(`New user created (pending approval): ${validatedData.email} for RMA request`);
         } catch (userError) {
           console.error('Failed to create new user:', userError);
@@ -598,6 +599,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
         productDetails: `${validatedData.productMakeModel} - In-house SN: ${validatedData.inHouseSerialNumber}`,
         relatedOrder: null,
       });
+      
+      // Send email notifications asynchronously (don't block response)
+      (async () => {
+        try {
+          const { sendRmaNotification, sendNewUserNotification } = await import('./email-service.js');
+          
+          // Get admin settings for notification emails
+          const adminSettings = await storage.getSystemSetting('admin_portal');
+          
+          // Send RMA notification
+          if (adminSettings?.settingValue?.rmaNotificationEmails) {
+            await sendRmaNotification(
+              adminSettings.settingValue.rmaNotificationEmails,
+              {
+                rmaNumber: rma.rmaNumber,
+                customerName: validatedData.fullName,
+                customerEmail: validatedData.email,
+                productDetails: validatedData.productMakeModel,
+                serialNumber: validatedData.manufacturerSerialNumber,
+                faultDescription: validatedData.faultDescription,
+              }
+            );
+          }
+          
+          // Send new user notification if applicable
+          if (newUserCreated && adminSettings?.settingValue?.newUserAlertEmails) {
+            await sendNewUserNotification(
+              adminSettings.settingValue.newUserAlertEmails,
+              {
+                userName: validatedData.fullName,
+                userEmail: validatedData.email,
+                userCompany: validatedData.companyName,
+                rmaNumber: rma.rmaNumber,
+              }
+            );
+          }
+        } catch (emailError) {
+          console.error('Failed to send email notifications:', emailError);
+          // Don't fail the request if email sending fails
+        }
+      })();
       
       // Return RMA with items
       const rmaWithItems = await storage.getRmaWithItems(rma.rmaNumber);
