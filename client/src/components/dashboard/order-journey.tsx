@@ -1,7 +1,7 @@
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useAnimationControls } from "framer-motion";
 import { useState, useEffect } from "react";
 import { DeliveryTimeline } from "@shared/schema";
-import { Package, Truck, Building2, FileText, CreditCard, CheckCircle2, Leaf, Droplet, Recycle, Trophy, Star, Zap } from "lucide-react";
+import { CheckCircle2, Sparkles, Leaf } from "lucide-react";
 
 interface OrderJourneyProps {
   timeline: DeliveryTimeline | null;
@@ -12,673 +12,1071 @@ interface OrderJourneyProps {
   };
 }
 
-interface JourneyStage {
+interface Stage {
   id: string;
   label: string;
+  subtitle: string;
   date: Date | null;
-  icon: any;
-  landmarkColor: string;
-  achievementBadge: string;
-  environmentalBoost: string;
-  position: number; // 0-100 for path positioning
+  position: number;
 }
 
-// Particle Effect Component
-function ParticleEffect({ color }: { color: string }) {
+// Particle Burst Effect
+function ParticleBurst({ color, density = 12 }: { color: string; density?: number }) {
   return (
     <div className="absolute inset-0 pointer-events-none">
-      {[...Array(8)].map((_, i) => (
-        <motion.div
-          key={i}
-          className="absolute w-2 h-2 rounded-full"
-          style={{ backgroundColor: color, top: "50%", left: "50%" }}
-          initial={{ opacity: 1, scale: 1 }}
-          animate={{
-            x: Math.cos((i / 8) * Math.PI * 2) * 60,
-            y: Math.sin((i / 8) * Math.PI * 2) * 60,
-            opacity: 0,
-            scale: 0
-          }}
-          transition={{
-            duration: 1.5,
-            repeat: Infinity,
-            delay: i * 0.1
-          }}
-        />
-      ))}
-    </div>
-  );
-}
-
-// Achievement Badge Component
-function AchievementBadge({ label, icon, unlocked, color }: { label: string; icon: any; unlocked: boolean; color: string }) {
-  const Icon = icon;
-  
-  if (!unlocked) {
-    return (
-      <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-neutral-200 text-neutral-400 text-xs">
-        <div className="w-4 h-4 rounded-full bg-neutral-300 flex items-center justify-center">
-          <div className="w-2 h-2 bg-neutral-400 rounded-full" />
-        </div>
-        <span>Locked</span>
-      </div>
-    );
-  }
-
-  return (
-    <motion.div
-      initial={{ scale: 0, rotate: -180 }}
-      animate={{ scale: 1, rotate: 0 }}
-      transition={{ type: "spring", stiffness: 200 }}
-      className="flex items-center gap-2 px-3 py-2 rounded-full text-white text-xs font-medium shadow-lg"
-      style={{ backgroundColor: color }}
-    >
-      <motion.div
-        animate={{ rotate: [0, 360] }}
-        transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-      >
-        <Icon className="w-4 h-4" />
-      </motion.div>
-      <span>{label}</span>
-    </motion.div>
-  );
-}
-
-// Isometric Landmark Component
-function IsometricLandmark({ stage, isCompleted, isCurrent }: { stage: JourneyStage; isCompleted: boolean; isCurrent: boolean }) {
-  const Icon = stage.icon;
-  
-  return (
-    <div className="relative">
-      {/* Particles for completed stages */}
-      {isCompleted && <ParticleEffect color={stage.landmarkColor} />}
-      
-      {/* Main Landmark Building */}
-      <motion.div
-        className="relative"
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        whileHover={{ y: -8 }}
-        transition={{ type: "spring", stiffness: 300 }}
-      >
-        {/* Building Shadow */}
-        <div 
-          className="absolute bottom-0 left-1/2 -translate-x-1/2 w-20 h-3 rounded-full blur-md"
-          style={{ backgroundColor: isCompleted || isCurrent ? stage.landmarkColor : "#d1d5db", opacity: 0.4 }}
-        />
-        
-        {/* Isometric Building */}
-        <svg width="100" height="120" viewBox="0 0 100 120" className="relative z-10">
-          {/* Building Base (Front Face) */}
-          <motion.path
-            d="M20 80 L50 60 L80 80 L80 110 L50 130 L20 110 Z"
-            fill={isCompleted || isCurrent ? stage.landmarkColor : "#e5e7eb"}
-            initial={{ opacity: 0.3 }}
-            animate={{ opacity: isCompleted || isCurrent ? 1 : 0.3 }}
-          />
-          
-          {/* Building Left Face */}
-          <motion.path
-            d="M20 80 L50 60 L50 90 L20 110 Z"
-            fill={isCompleted || isCurrent ? stage.landmarkColor : "#d1d5db"}
-            style={{ opacity: 0.7 }}
-            initial={{ opacity: 0.2 }}
-            animate={{ opacity: isCompleted || isCurrent ? 0.7 : 0.2 }}
-          />
-          
-          {/* Building Right Face */}
-          <motion.path
-            d="M50 60 L80 80 L80 110 L50 90 Z"
-            fill={isCompleted || isCurrent ? stage.landmarkColor : "#9ca3af"}
-            style={{ opacity: 0.5 }}
-            initial={{ opacity: 0.15 }}
-            animate={{ opacity: isCompleted || isCurrent ? 0.5 : 0.15 }}
-          />
-          
-          {/* Building Top (Roof) */}
-          <motion.path
-            d="M50 40 L70 50 L50 60 L30 50 Z"
-            fill={isCompleted || isCurrent ? stage.landmarkColor : "#d1d5db"}
-            initial={{ opacity: 0.4 }}
-            animate={{ opacity: isCompleted || isCurrent ? 0.9 : 0.4 }}
-          />
-          
-          {/* Roof Connection to Building */}
-          <path
-            d="M30 50 L50 40 L50 60 L30 70 Z"
-            fill={isCompleted || isCurrent ? stage.landmarkColor : "#9ca3af"}
-            style={{ opacity: 0.6 }}
-          />
-          <path
-            d="M50 40 L70 50 L70 70 L50 60 Z"
-            fill={isCompleted || isCurrent ? stage.landmarkColor : "#6b7280"}
-            style={{ opacity: 0.4 }}
-          />
-          
-          {/* Icon on Building */}
-          <foreignObject x="35" y="75" width="30" height="30">
-            <div className="w-full h-full flex items-center justify-center">
-              <Icon 
-                className={`w-6 h-6 ${isCompleted || isCurrent ? "text-white" : "text-neutral-400"}`}
-                strokeWidth={2.5}
-              />
-            </div>
-          </foreignObject>
-          
-          {/* Pulsing Ring for Current Stage */}
-          {isCurrent && (
-            <>
-              <motion.circle
-                cx="50"
-                cy="90"
-                r="45"
-                fill="none"
-                stroke={stage.landmarkColor}
-                strokeWidth="2"
-                animate={{ r: [40, 50], opacity: [0.8, 0] }}
-                transition={{ duration: 1.5, repeat: Infinity }}
-              />
-              <motion.circle
-                cx="50"
-                cy="90"
-                r="45"
-                fill="none"
-                stroke={stage.landmarkColor}
-                strokeWidth="2"
-                animate={{ r: [40, 50], opacity: [0.8, 0] }}
-                transition={{ duration: 1.5, repeat: Infinity, delay: 0.5 }}
-              />
-            </>
-          )}
-        </svg>
-        
-        {/* Completion Checkmark */}
-        {isCompleted && (
+      {[...Array(density)].map((_, i) => {
+        const angle = (i / density) * Math.PI * 2;
+        const distance = 40 + Math.random() * 30;
+        return (
           <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center shadow-lg"
-          >
-            <CheckCircle2 className="w-5 h-5 text-white" />
-          </motion.div>
-        )}
-      </motion.div>
+            key={i}
+            className="absolute w-1.5 h-1.5 rounded-full"
+            style={{
+              backgroundColor: color,
+              left: "50%",
+              top: "50%",
+              boxShadow: `0 0 8px ${color}`
+            }}
+            initial={{ opacity: 0, scale: 0, x: 0, y: 0 }}
+            animate={{
+              opacity: [0, 1, 0],
+              scale: [0, 1.5, 0],
+              x: Math.cos(angle) * distance,
+              y: Math.sin(angle) * distance
+            }}
+            transition={{
+              duration: 1.2,
+              repeat: Infinity,
+              delay: i * 0.08,
+              ease: "easeOut"
+            }}
+          />
+        );
+      })}
     </div>
   );
 }
 
-// Animated Delivery Vehicle
-function DeliveryVehicle({ progress, isMoving }: { progress: number; isMoving: boolean }) {
+// Glow Effect
+function GlowRing({ color, intensity = 1 }: { color: string; intensity?: number }) {
   return (
-    <motion.div
-      className="absolute top-1/2 -translate-y-1/2 z-20"
-      style={{ left: `${progress}%` }}
-      animate={isMoving ? { x: [0, 3, 0] } : {}}
-      transition={isMoving ? { duration: 0.5, repeat: Infinity } : {}}
-    >
-      <svg width="60" height="40" viewBox="0 0 60 40" className="drop-shadow-xl">
-        {/* Truck Body */}
-        <rect x="15" y="10" width="30" height="18" rx="2" fill="#10b981" />
-        <rect x="45" y="12" width="10" height="14" rx="1" fill="#059669" />
+    <>
+      <motion.div
+        className="absolute inset-0 rounded-full"
+        style={{
+          boxShadow: `0 0 ${20 * intensity}px ${color}, 0 0 ${40 * intensity}px ${color}`,
+          opacity: 0.6
+        }}
+        animate={{
+          scale: [1, 1.1, 1],
+          opacity: [0.4, 0.7, 0.4]
+        }}
+        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+      />
+      <motion.div
+        className="absolute inset-0 rounded-full"
+        style={{
+          boxShadow: `0 0 ${30 * intensity}px ${color}`,
+          opacity: 0.4
+        }}
+        animate={{
+          scale: [1, 1.2, 1],
+          opacity: [0.3, 0.6, 0.3]
+        }}
+        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+      />
+    </>
+  );
+}
+
+// Stage 1: Order Confirmed - Glowing Purchase Button with Sparks
+function OrderConfirmedAnimation({ isActive, isCompleted }: { isActive: boolean; isCompleted: boolean }) {
+  return (
+    <div className="relative w-32 h-32">
+      {(isActive || isCompleted) && <ParticleBurst color="#10b981" density={8} />}
+      
+      <motion.div
+        className="relative w-full h-full rounded-full flex items-center justify-center"
+        style={{
+          background: isActive || isCompleted
+            ? "linear-gradient(135deg, #10b981 0%, #059669 100%)"
+            : "linear-gradient(135deg, #d1d5db 0%, #9ca3af 100%)"
+        }}
+        initial={{ scale: 0.9 }}
+        animate={isActive ? {
+          scale: [1, 1.1, 1],
+        } : { scale: 1 }}
+        transition={{ duration: 1.5, repeat: isActive ? Infinity : 0 }}
+      >
+        {(isActive || isCompleted) && <GlowRing color="#10b981" intensity={isActive ? 1.5 : 0.8} />}
         
-        {/* Windshield */}
-        <path d="M47 13 L52 13 L52 22 L47 22" fill="#d1fae5" opacity="0.7" />
-        
-        {/* Cargo Box */}
-        <rect x="18" y="12" width="24" height="14" fill="#047857" opacity="0.3" />
-        
-        {/* Package Icon */}
-        <rect x="26" y="16" width="8" height="6" fill="#fbbf24" stroke="#f59e0b" strokeWidth="0.5" />
-        
-        {/* Wheels */}
-        <motion.circle
-          cx="25"
-          cy="30"
-          r="5"
-          fill="#1f2937"
-          animate={isMoving ? { rotate: 360 } : {}}
-          transition={isMoving ? { duration: 1, repeat: Infinity, ease: "linear" } : {}}
-        />
-        <circle cx="25" cy="30" r="3" fill="#6b7280" />
-        
-        <motion.circle
-          cx="50"
-          cy="30"
-          r="5"
-          fill="#1f2937"
-          animate={isMoving ? { rotate: 360 } : {}}
-          transition={isMoving ? { duration: 1, repeat: Infinity, ease: "linear" } : {}}
-        />
-        <circle cx="50" cy="30" r="3" fill="#6b7280" />
-        
-        {/* Motion Lines */}
-        {isMoving && (
+        {/* Purchase Button */}
+        <motion.div
+          className="relative w-16 h-16 rounded-xl flex items-center justify-center"
+          style={{
+            background: isActive || isCompleted ? "#fff" : "#e5e7eb",
+            boxShadow: isActive || isCompleted ? "0 8px 20px rgba(16, 185, 129, 0.4)" : "none"
+          }}
+          animate={isActive ? {
+            y: [0, -3, 0],
+          } : {}}
+          transition={{ duration: 0.8, repeat: isActive ? Infinity : 0 }}
+        >
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+            <path
+              d="M6 8L8 4H24L26 8M6 8H26M6 8L8 24H24L26 8M12 12V20M16 12V20M20 12V20"
+              stroke={isActive || isCompleted ? "#10b981" : "#9ca3af"}
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </motion.div>
+
+        {/* Spark Effects */}
+        {isActive && (
           <>
-            <motion.line
-              x1="5"
-              y1="15"
-              x2="12"
-              y2="15"
-              stroke="#10b981"
-              strokeWidth="2"
-              strokeLinecap="round"
-              animate={{ x1: [5, -5], x2: [12, 2], opacity: [1, 0] }}
-              transition={{ duration: 0.6, repeat: Infinity }}
-            />
-            <motion.line
-              x1="5"
-              y1="20"
-              x2="12"
-              y2="20"
-              stroke="#10b981"
-              strokeWidth="2"
-              strokeLinecap="round"
-              animate={{ x1: [5, -5], x2: [12, 2], opacity: [1, 0] }}
-              transition={{ duration: 0.6, repeat: Infinity, delay: 0.2 }}
-            />
+            {[...Array(6)].map((_, i) => (
+              <motion.div
+                key={i}
+                className="absolute w-1 h-1 rounded-full bg-yellow-400"
+                style={{
+                  left: "50%",
+                  top: "50%",
+                  boxShadow: "0 0 4px #fbbf24"
+                }}
+                animate={{
+                  x: Math.cos((i / 6) * Math.PI * 2) * 50,
+                  y: Math.sin((i / 6) * Math.PI * 2) * 50,
+                  opacity: [1, 0],
+                  scale: [1, 0]
+                }}
+                transition={{
+                  duration: 1,
+                  repeat: Infinity,
+                  delay: i * 0.15,
+                  ease: "easeOut"
+                }}
+              />
+            ))}
           </>
         )}
-      </svg>
+      </motion.div>
+    </div>
+  );
+}
+
+// Stage 2: Sent to Warehouse - Eco-Crate on Conveyor with Robotic Arm
+function SentToWarehouseAnimation({ isActive, isCompleted }: { isActive: boolean; isCompleted: boolean }) {
+  return (
+    <div className="relative w-32 h-32">
+      {(isActive || isCompleted) && <ParticleBurst color="#3b82f6" density={10} />}
       
-      {/* Exhaust Puff */}
-      {isMoving && (
+      <motion.div
+        className="relative w-full h-full rounded-full flex items-center justify-center"
+        style={{
+          background: isActive || isCompleted
+            ? "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)"
+            : "linear-gradient(135deg, #1f2937 0%, #374151 100%)"
+        }}
+      >
+        {(isActive || isCompleted) && <GlowRing color="#3b82f6" intensity={isActive ? 1.5 : 0.8} />}
+        
+        {/* Conveyor Belt */}
+        <svg width="120" height="120" viewBox="0 0 120 120" className="absolute">
+          <motion.line
+            x1="20"
+            y1="80"
+            x2="100"
+            y2="80"
+            stroke={isActive || isCompleted ? "#1d4ed8" : "#4b5563"}
+            strokeWidth="3"
+            strokeDasharray="8 4"
+            animate={isActive ? { strokeDashoffset: [0, -12] } : {}}
+            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+          />
+        </svg>
+
+        {/* Robotic Arm */}
+        {isActive && (
+          <motion.svg
+            width="80"
+            height="80"
+            viewBox="0 0 80 80"
+            className="absolute"
+            style={{ right: "10%", top: "10%" }}
+            animate={{
+              rotate: [0, -15, 0]
+            }}
+            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+          >
+            <motion.line
+              x1="60"
+              y1="20"
+              x2="60"
+              y2="50"
+              stroke="#6b7280"
+              strokeWidth="4"
+              strokeLinecap="round"
+              animate={{ y2: [50, 60, 50] }}
+              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+            />
+            <motion.line
+              x1="60"
+              y1="50"
+              x2="40"
+              y2="60"
+              stroke="#9ca3af"
+              strokeWidth="4"
+              strokeLinecap="round"
+              animate={{ x2: [40, 30, 40], y2: [60, 70, 60] }}
+              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+            />
+            <motion.circle
+              cx="40"
+              cy="60"
+              r="3"
+              fill="#3b82f6"
+              animate={{ cx: [40, 30, 40], cy: [60, 70, 60] }}
+              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+            />
+          </motion.svg>
+        )}
+
+        {/* Eco-Crate */}
         <motion.div
-          className="absolute -left-4 top-1/2 w-3 h-3 rounded-full bg-neutral-300"
-          animate={{
-            x: [-10, -20],
-            y: [-5, -15],
-            scale: [0.5, 1.5],
-            opacity: [0.6, 0]
+          className="relative"
+          initial={{ x: -40, y: 10 }}
+          animate={isActive ? {
+            x: [-40, 0],
+            y: [10, 0]
+          } : { x: 0, y: 0 }}
+          transition={isActive ? {
+            duration: 1.5,
+            repeat: Infinity,
+            repeatDelay: 1.5,
+            ease: "easeInOut"
+          } : {}}
+        >
+          <svg width="48" height="48" viewBox="0 0 48 48">
+            <rect
+              x="8"
+              y="12"
+              width="32"
+              height="24"
+              rx="2"
+              fill={isActive || isCompleted ? "#10b981" : "#6b7280"}
+              opacity="0.9"
+            />
+            <rect x="12" y="16" width="10" height="8" fill={isActive || isCompleted ? "#fff" : "#4b5563"} opacity="0.3" />
+            <rect x="26" y="16" width="10" height="8" fill={isActive || isCompleted ? "#fff" : "#4b5563"} opacity="0.3" />
+            <path d="M16 12 L24 8 L32 12" stroke={isActive || isCompleted ? "#047857" : "#4b5563"} strokeWidth="2" fill="none" />
+            <circle cx="24" cy="22" r="3" fill="#fbbf24" />
+          </svg>
+        </motion.div>
+
+        {/* Energy Trail */}
+        {isActive && (
+          <motion.div
+            className="absolute w-16 h-1 rounded-full"
+            style={{
+              background: "linear-gradient(90deg, transparent 0%, #10b981 50%, #3b82f6 100%)",
+              left: "20%",
+              top: "50%"
+            }}
+            animate={{
+              x: [-20, 40],
+              opacity: [0, 1, 0]
+            }}
+            transition={{
+              duration: 1.5,
+              repeat: Infinity,
+              ease: "linear"
+            }}
+          />
+        )}
+      </motion.div>
+    </div>
+  );
+}
+
+// Stage 3: Dispatched - Electric Truck/Drone Zoom with Camera Shake
+function DispatchedAnimation({ isActive, isCompleted }: { isActive: boolean; isCompleted: boolean }) {
+  return (
+    <div className="relative w-32 h-32">
+      {(isActive || isCompleted) && <ParticleBurst color="#06b6d4" density={12} />}
+      
+      <motion.div
+        className="relative w-full h-full rounded-full flex items-center justify-center overflow-hidden"
+        style={{
+          background: isActive || isCompleted
+            ? "linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)"
+            : "linear-gradient(135deg, #1f2937 0%, #374151 100%)"
+        }}
+        animate={isActive ? {
+          rotate: [0, 3, -3, 2, -2, 0],
+          x: [0, 2, -2, 1, -1, 0],
+          y: [0, -1, 1, -1, 1, 0]
+        } : {}}
+        transition={{ duration: 0.5, repeat: isActive ? Infinity : 0, repeatDelay: 1 }}
+      >
+        {(isActive || isCompleted) && <GlowRing color="#06b6d4" intensity={isActive ? 1.5 : 0.8} />}
+        
+        {/* Electric Truck */}
+        <motion.svg
+          width="64"
+          height="64"
+          viewBox="0 0 64 64"
+          initial={{ x: -80 }}
+          animate={isActive ? {
+            x: [-80, 0, 80, -80],
+          } : { x: 0 }}
+          transition={isActive ? {
+            duration: 2.5,
+            repeat: Infinity,
+            ease: [0.65, 0, 0.35, 1]
+          } : {}}
+        >
+          {/* Truck Body */}
+          <rect x="16" y="20" width="32" height="18" rx="2" fill={isActive || isCompleted ? "#10b981" : "#9ca3af"} />
+          <rect x="48" y="24" width="10" height="12" rx="1" fill={isActive || isCompleted ? "#059669" : "#6b7280"} />
+          <rect x="20" y="24" width="24" height="10" fill={isActive || isCompleted ? "#047857" : "#6b7280"} opacity="0.3" />
+          
+          {/* Windshield */}
+          <path d="M50 25 L54 25 L54 33 L50 33" fill="#a5f3fc" opacity="0.7" />
+          
+          {/* Lightning Bolt (Electric) */}
+          <path d="M32 26 L30 30 L32 30 L30 34 L34 30 L32 30 L34 26 Z" fill="#fbbf24" />
+          
+          {/* Wheels */}
+          <motion.circle
+            cx="26"
+            cy="40"
+            r="5"
+            fill="#1f2937"
+            animate={isActive ? { rotate: 360 } : {}}
+            transition={{ duration: 0.5, repeat: Infinity, ease: "linear" }}
+          />
+          <circle cx="26" cy="40" r="3" fill="#6b7280" />
+          
+          <motion.circle
+            cx="52"
+            cy="40"
+            r="5"
+            fill="#1f2937"
+            animate={isActive ? { rotate: 360 } : {}}
+            transition={{ duration: 0.5, repeat: Infinity, ease: "linear" }}
+          />
+          <circle cx="52" cy="40" r="3" fill="#6b7280" />
+        </motion.svg>
+
+        {/* Exhaust/Energy Trail */}
+        {isActive && (
+          <>
+            {[...Array(4)].map((_, i) => (
+              <motion.div
+                key={i}
+                className="absolute w-3 h-3 rounded-full"
+                style={{
+                  background: "radial-gradient(circle, #10b981 0%, transparent 70%)",
+                  left: "20%",
+                  top: "50%"
+                }}
+                animate={{
+                  x: [-30, -60],
+                  y: [0, -10],
+                  scale: [0.5, 1.5],
+                  opacity: [0.8, 0]
+                }}
+                transition={{
+                  duration: 0.8,
+                  repeat: Infinity,
+                  delay: i * 0.2,
+                  ease: "easeOut"
+                }}
+              />
+            ))}
+          </>
+        )}
+      </motion.div>
+    </div>
+  );
+}
+
+// Stage 4: Invoice Sent - Holographic Envelope
+function InvoiceSentAnimation({ isActive, isCompleted }: { isActive: boolean; isCompleted: boolean }) {
+  return (
+    <div className="relative w-32 h-32">
+      {(isActive || isCompleted) && <ParticleBurst color="#f59e0b" density={10} />}
+      
+      <motion.div
+        className="relative w-full h-full rounded-full flex items-center justify-center"
+        style={{
+          background: isActive || isCompleted
+            ? "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)"
+            : "linear-gradient(135deg, #d1d5db 0%, #9ca3af 100%)"
+        }}
+      >
+        {(isActive || isCompleted) && <GlowRing color="#f59e0b" intensity={isActive ? 1.5 : 0.8} />}
+        
+        {/* Envelope with Arc Motion - Multi-Keyframe Path */}
+        <motion.svg
+          width="56"
+          height="56"
+          viewBox="0 0 56 56"
+          initial={{ x: 80, y: -40, rotate: 25, opacity: 0 }}
+          animate={isActive || isCompleted ? {
+            x: [80, 40, 10, 0],
+            y: [-40, -50, -20, 0],
+            rotate: [25, 15, 5, 0],
+            opacity: [0, 0.7, 0.9, 1]
+          } : {
+            x: 80,
+            y: -40,
+            rotate: 25,
+            opacity: 0.3
           }}
-          transition={{ duration: 1, repeat: Infinity }}
-        />
-      )}
-    </motion.div>
+          transition={{
+            duration: 1.2,
+            ease: [0.34, 1.56, 0.64, 1],
+            times: [0, 0.3, 0.7, 1]
+          }}
+        >
+          {/* Envelope Body */}
+          <rect
+            x="8"
+            y="16"
+            width="40"
+            height="28"
+            rx="2"
+            fill={isActive || isCompleted ? "#fff" : "#e5e7eb"}
+            stroke={isActive || isCompleted ? "#f59e0b" : "#9ca3af"}
+            strokeWidth="2"
+          />
+          
+          {/* Envelope Flap */}
+          <motion.path
+            d="M8 16 L28 32 L48 16"
+            fill="none"
+            stroke={isActive || isCompleted ? "#f59e0b" : "#9ca3af"}
+            strokeWidth="2"
+            strokeLinecap="round"
+            initial={{ pathLength: 0 }}
+            animate={{ pathLength: isActive || isCompleted ? 1 : 0.3 }}
+            transition={{ duration: 0.8, delay: 0.3 }}
+          />
+          
+          {/* Document Lines */}
+          <line x1="14" y1="24" x2="42" y2="24" stroke={isActive || isCompleted ? "#d97706" : "#9ca3af"} strokeWidth="2" opacity="0.5" />
+          <line x1="14" y1="30" x2="42" y2="30" stroke={isActive || isCompleted ? "#d97706" : "#9ca3af"} strokeWidth="2" opacity="0.5" />
+          <line x1="14" y1="36" x2="35" y2="36" stroke={isActive || isCompleted ? "#d97706" : "#9ca3af"} strokeWidth="2" opacity="0.5" />
+        </motion.svg>
+
+        {/* Light Burst on Open */}
+        {isActive && (
+          <motion.div
+            className="absolute w-20 h-20 rounded-full"
+            style={{
+              background: "radial-gradient(circle, #fbbf24 0%, transparent 70%)",
+              opacity: 0.6
+            }}
+            animate={{
+              scale: [0, 1.5],
+              opacity: [0.8, 0]
+            }}
+            transition={{
+              duration: 1.5,
+              repeat: Infinity,
+              ease: "easeOut"
+            }}
+          />
+        )}
+      </motion.div>
+    </div>
+  );
+}
+
+// Stage 5: Payment Confirmed - Credit Card Flip & Pulse
+function PaymentConfirmedAnimation({ isActive, isCompleted }: { isActive: boolean; isCompleted: boolean }) {
+  return (
+    <div className="relative w-32 h-32">
+      {(isActive || isCompleted) && <ParticleBurst color="#ec4899" density={12} />}
+      
+      <motion.div
+        className="relative w-full h-full rounded-full flex items-center justify-center"
+        style={{
+          background: isActive || isCompleted
+            ? "linear-gradient(135deg, #ec4899 0%, #db2777 100%)"
+            : "linear-gradient(135deg, #d1d5db 0%, #9ca3af 100%)"
+        }}
+        animate={isActive ? {
+          scale: [1, 1.1, 1],
+        } : {}}
+        transition={{ duration: 1.5, repeat: isActive ? Infinity : 0 }}
+      >
+        {(isActive || isCompleted) && <GlowRing color="#ec4899" intensity={isActive ? 1.5 : 0.8} />}
+        
+        {/* Credit Card */}
+        <motion.div
+          style={{ perspective: "1000px" }}
+          className="relative"
+        >
+          <motion.svg
+            width="64"
+            height="40"
+            viewBox="0 0 64 40"
+            style={{ transformStyle: "preserve-3d" }}
+            animate={isActive ? {
+              rotateY: [0, 180, 360],
+            } : {}}
+            transition={{
+              duration: 2,
+              repeat: isActive ? Infinity : 0,
+              ease: "easeInOut"
+            }}
+          >
+            <rect
+              x="2"
+              y="2"
+              width="60"
+              height="36"
+              rx="4"
+              fill={isActive || isCompleted ? "#fff" : "#e5e7eb"}
+              stroke={isActive || isCompleted ? "#ec4899" : "#9ca3af"}
+              strokeWidth="2"
+            />
+            <rect x="2" y="8" width="60" height="8" fill={isActive || isCompleted ? "#1f2937" : "#6b7280"} />
+            <rect x="8" y="22" width="16" height="10" rx="2" fill={isActive || isCompleted ? "#fbbf24" : "#9ca3af"} />
+            <circle cx="52" cy="27" r="6" fill={isActive || isCompleted ? "#ec4899" : "#9ca3af"} opacity="0.3" />
+          </motion.svg>
+        </motion.div>
+
+        {/* Floating Particles */}
+        {isActive && (
+          <>
+            {[...Array(8)].map((_, i) => (
+              <motion.div
+                key={i}
+                className="absolute w-1 h-1 rounded-full bg-pink-300"
+                style={{
+                  left: "50%",
+                  top: "50%"
+                }}
+                animate={{
+                  x: Math.cos((i / 8) * Math.PI * 2) * (20 + Math.random() * 10),
+                  y: Math.sin((i / 8) * Math.PI * 2) * (20 + Math.random() * 10) - 10,
+                  opacity: [0, 1, 0],
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  delay: i * 0.2,
+                  ease: "easeInOut"
+                }}
+              />
+            ))}
+          </>
+        )}
+      </motion.div>
+    </div>
+  );
+}
+
+// Stage 6: Fulfilled - Laptop Powers On with Green Aura
+function FulfilledAnimation({ isActive, isCompleted }: { isActive: boolean; isCompleted: boolean }) {
+  return (
+    <div className="relative w-32 h-32">
+      {(isActive || isCompleted) && <ParticleBurst color="#10b981" density={16} />}
+      
+      <motion.div
+        className="relative w-full h-full rounded-full flex items-center justify-center"
+        style={{
+          background: (isActive || isCompleted)
+            ? "linear-gradient(135deg, #10b981 0%, #059669 100%)"
+            : "linear-gradient(135deg, #1f2937 0%, #374151 100%)"
+        }}
+        initial={{ scale: 0.9 }}
+        animate={(isActive || isCompleted) ? {
+          scale: [1, 1.15, 1],
+        } : {}}
+        transition={{ duration: 2, repeat: (isActive || isCompleted) ? Infinity : 0 }}
+      >
+        {(isActive || isCompleted) && <GlowRing color="#10b981" intensity={isActive ? 1.8 : 1.2} />}
+        
+        {/* Laptop */}
+        <motion.svg
+          width="64"
+          height="64"
+          viewBox="0 0 64 64"
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={(isActive || isCompleted) ? {
+            opacity: 1,
+            scale: 1
+          } : {
+            opacity: 0.3,
+            scale: 0.8
+          }}
+          transition={{ duration: 1, ease: "easeOut" }}
+        >
+          {/* Laptop Base */}
+          <path
+            d="M12 38 L52 38 L52 26 L12 26 Z"
+            fill={isCompleted ? "#a5f3d0" : "#e5e7eb"}
+            stroke={isCompleted ? "#059669" : "#9ca3af"}
+            strokeWidth="2"
+          />
+          
+          {/* Screen Glow */}
+          {(isActive || isCompleted) && (
+            <rect
+              x="16"
+              y="28"
+              width="32"
+              height="8"
+              fill="#10b981"
+              opacity="0.6"
+            />
+          )}
+          
+          {/* Keyboard Base */}
+          <path
+            d="M8 38 L12 38 L52 38 L56 38 L58 44 L6 44 Z"
+            fill={(isActive || isCompleted) ? "#047857" : "#6b7280"}
+          />
+          
+          {/* Power Button */}
+          <motion.circle
+            cx="32"
+            cy="32"
+            r="3"
+            fill={(isActive || isCompleted) ? "#10b981" : "#6b7280"}
+            animate={(isActive || isCompleted) ? {
+              opacity: [1, 0.5, 1],
+            } : {}}
+            transition={{ duration: 1.5, repeat: Infinity }}
+          />
+        </motion.svg>
+
+        {/* Holographic Light Rays */}
+        {(isActive || isCompleted) && (
+          <>
+            {[...Array(6)].map((_, i) => (
+              <motion.div
+                key={i}
+                className="absolute w-0.5 h-16 rounded-full"
+                style={{
+                  background: "linear-gradient(180deg, #10b981 0%, transparent 100%)",
+                  left: "50%",
+                  top: "50%",
+                  transformOrigin: "bottom",
+                  rotate: `${i * 60}deg`
+                }}
+                initial={{ scaleY: 0, opacity: 0 }}
+                animate={{
+                  scaleY: [0, 1, 0],
+                  opacity: [0, 0.8, 0]
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  delay: i * 0.2,
+                  ease: "easeOut"
+                }}
+              />
+            ))}
+          </>
+        )}
+
+        {/* Floating Leaves/Sparkles */}
+        {(isActive || isCompleted) && (
+          <>
+            {[...Array(8)].map((_, i) => (
+              <motion.div
+                key={i}
+                className="absolute"
+                style={{
+                  left: `${30 + Math.random() * 40}%`,
+                  top: `${60 + Math.random() * 20}%`
+                }}
+                animate={{
+                  y: [-20, -60],
+                  x: [0, (Math.random() - 0.5) * 20],
+                  opacity: [0, 1, 0],
+                  rotate: [0, 360]
+                }}
+                transition={{
+                  duration: 3,
+                  repeat: Infinity,
+                  delay: i * 0.4,
+                  ease: "easeOut"
+                }}
+              >
+                <Leaf className="w-3 h-3 text-emerald-400" />
+              </motion.div>
+            ))}
+          </>
+        )}
+      </motion.div>
+    </div>
   );
 }
 
 export default function OrderJourney({ timeline, environmentalImpact }: OrderJourneyProps) {
-  const [selectedStage, setSelectedStage] = useState<string | null>(null);
-
-  const stages: JourneyStage[] = [
+  const stages: Stage[] = [
     {
       id: "orderConfirmed",
       label: "Order Confirmed",
+      subtitle: "Your order has been placed successfully",
       date: timeline?.orderDate || null,
-      icon: Package,
-      landmarkColor: "#8b5cf6",
-      achievementBadge: "Order Placed",
-      environmentalBoost: "+5 Impact Points",
-      position: 5
+      position: 0
     },
     {
       id: "sentToWarehouse",
-      label: "Warehouse Processing",
+      label: "Sent to Warehouse",
+      subtitle: "Processing at our eco-fulfillment center",
       date: timeline?.sentToWarehouse || null,
-      icon: Building2,
-      landmarkColor: "#3b82f6",
-      achievementBadge: "Ready to Ship",
-      environmentalBoost: "+10 Impact Points",
-      position: 25
+      position: 1
     },
     {
       id: "dispatched",
-      label: "En Route",
+      label: "Dispatched",
+      subtitle: "Your device is on its way",
       date: timeline?.dispatchDate || null,
-      icon: Truck,
-      landmarkColor: "#06b6d4",
-      achievementBadge: "On the Move",
-      environmentalBoost: "+15 Impact Points",
-      position: 45
+      position: 2
     },
     {
       id: "invoiceSent",
       label: "Invoice Sent",
+      subtitle: "Digital invoice delivered to your inbox",
       date: timeline?.invoiceMailed || null,
-      icon: FileText,
-      landmarkColor: "#f59e0b",
-      achievementBadge: "Paperwork Done",
-      environmentalBoost: "+5 Impact Points",
-      position: 65
+      position: 3
     },
     {
       id: "paymentConfirmed",
       label: "Payment Confirmed",
+      subtitle: "Transaction successfully processed",
       date: timeline?.paymentDate || null,
-      icon: CreditCard,
-      landmarkColor: "#ec4899",
-      achievementBadge: "All Set",
-      environmentalBoost: "+10 Impact Points",
-      position: 82
+      position: 4
     },
     {
       id: "fulfilled",
-      label: "Delivered",
+      label: "Fulfilled",
+      subtitle: "Your sustainable laptop is ready!",
       date: timeline?.dateFulfilled || null,
-      icon: CheckCircle2,
-      landmarkColor: "#10b981",
-      achievementBadge: "Journey Complete",
-      environmentalBoost: "+25 Impact Points",
-      position: 95
+      position: 5
     }
   ];
 
   const completedStages = stages.filter(stage => stage.date !== null);
   const currentStageIndex = completedStages.length;
-  const currentStage = stages[currentStageIndex];
-  const overallProgress = (completedStages.length / stages.length) * 100;
-  const vehiclePosition = completedStages.length > 0 
-    ? stages[completedStages.length - 1].position 
-    : 0;
+  const isComplete = completedStages.length === stages.length;
+  const progress = (completedStages.length / stages.length) * 100;
+
+  const getStageAnimation = (stageId: string, isActive: boolean, isCompleted: boolean) => {
+    switch (stageId) {
+      case "orderConfirmed":
+        return <OrderConfirmedAnimation isActive={isActive} isCompleted={isCompleted} />;
+      case "sentToWarehouse":
+        return <SentToWarehouseAnimation isActive={isActive} isCompleted={isCompleted} />;
+      case "dispatched":
+        return <DispatchedAnimation isActive={isActive} isCompleted={isCompleted} />;
+      case "invoiceSent":
+        return <InvoiceSentAnimation isActive={isActive} isCompleted={isCompleted} />;
+      case "paymentConfirmed":
+        return <PaymentConfirmedAnimation isActive={isActive} isCompleted={isCompleted} />;
+      case "fulfilled":
+        return <FulfilledAnimation isActive={isActive} isCompleted={isCompleted} />;
+      default:
+        return null;
+    }
+  };
 
   const formatDate = (date: Date | null) => {
     if (!date) return null;
     const d = new Date(date);
-    return d.toLocaleDateString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+    return d.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit"
+    });
   };
 
-  const totalImpactPoints = completedStages.length * 10;
-  const isComplete = completedStages.length === stages.length;
-
   return (
-    <div className="py-8 px-4">
-      {/* Header */}
-      <div className="text-center mb-8">
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-semibold mb-3"
-        >
-          <Trophy className="w-5 h-5" />
-          <span>Journey Progress: {Math.round(overallProgress)}%</span>
-          <Star className="w-5 h-5" />
-        </motion.div>
-        <h2 className="text-3xl font-bold text-neutral-900 mb-2">Your Sustainable Delivery Journey</h2>
-        <p className="text-neutral-600">Track your device as it travels through our eco-friendly fulfillment process</p>
+    <div className="relative py-12 px-4 overflow-hidden">
+      {/* Animated Background Gradient - Dark Eco-Luxury Theme */}
+      <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-gray-900 to-neutral-900" />
+      <div className="absolute inset-0 bg-gradient-to-br from-emerald-900/30 via-teal-900/20 to-cyan-900/30" />
+      
+      {/* Particle Flow Background - Neon Accent */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {[...Array(20)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute w-1 h-1 rounded-full"
+            style={{
+              background: ["#10b981", "#06b6d4", "#3b82f6"][i % 3],
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              opacity: 0.4,
+              boxShadow: "0 0 4px currentColor"
+            }}
+            animate={{
+              y: [0, -100],
+              opacity: [0, 0.4, 0]
+            }}
+            transition={{
+              duration: 3 + Math.random() * 2,
+              repeat: Infinity,
+              delay: Math.random() * 3,
+              ease: "linear"
+            }}
+          />
+        ))}
       </div>
 
-      {/* Impact Points Display */}
-      <motion.div
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        className="max-w-md mx-auto mb-8 p-4 rounded-2xl bg-gradient-to-br from-emerald-50 to-teal-50 border-2 border-emerald-200"
-      >
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-full bg-emerald-500 flex items-center justify-center">
-              <Leaf className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <div className="text-2xl font-bold text-emerald-700">{totalImpactPoints} Points</div>
-              <div className="text-sm text-emerald-600">Environmental Impact Earned</div>
-            </div>
-          </div>
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-          >
-            <Recycle className="w-8 h-8 text-emerald-500" />
-          </motion.div>
-        </div>
-      </motion.div>
+      {/* Header */}
+      <div className="relative text-center mb-12">
+        <motion.h2
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-4xl font-bold bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent mb-3"
+          style={{ textShadow: "0 0 30px rgba(16, 185, 129, 0.3)" }}
+        >
+          Your Sustainable Journey
+        </motion.h2>
+        <p className="text-neutral-300 text-lg">Eco-luxury delivery in progress</p>
+      </div>
 
-      {/* Journey Map Container */}
-      <div className="relative max-w-6xl mx-auto bg-gradient-to-b from-sky-50 to-emerald-50 rounded-3xl p-8 shadow-xl overflow-hidden">
-        {/* Background Pattern */}
-        <div className="absolute inset-0 opacity-10">
-          <svg width="100%" height="100%">
-            <defs>
-              <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-                <circle cx="20" cy="20" r="1" fill="#10b981" />
-              </pattern>
-            </defs>
-            <rect width="100%" height="100%" fill="url(#grid)" />
-          </svg>
-        </div>
-
-        {/* Progress Bar Track */}
-        <div className="relative h-2 bg-neutral-200 rounded-full mb-16 overflow-hidden">
+      {/* Progress Path */}
+      <div className="relative max-w-5xl mx-auto mb-16">
+        <div className="relative h-2 bg-neutral-200/50 backdrop-blur-sm rounded-full overflow-hidden">
           <motion.div
-            className="absolute inset-y-0 left-0 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 rounded-full"
+            className="absolute inset-y-0 left-0 rounded-full"
+            style={{
+              background: "linear-gradient(90deg, #10b981 0%, #06b6d4 50%, #ec4899 100%)"
+            }}
             initial={{ width: 0 }}
-            animate={{ width: `${overallProgress}%` }}
+            animate={{ width: `${progress}%` }}
             transition={{ duration: 1.5, ease: "easeOut" }}
-          />
-          <motion.div
-            className="absolute inset-y-0 left-0 bg-gradient-to-r from-emerald-400 to-teal-400 rounded-full"
-            initial={{ width: 0 }}
-            animate={{ width: `${overallProgress}%` }}
-            transition={{ duration: 1.5, ease: "easeOut" }}
-            style={{ opacity: 0.5 }}
           >
+            {/* Shimmer Effect */}
             <motion.div
-              className="absolute inset-0 bg-white"
+              className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-40"
               animate={{ x: ["-100%", "200%"] }}
-              transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-              style={{ width: "50%" }}
+              transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
             />
           </motion.div>
         </div>
 
-        {/* Journey Path with Landmarks */}
-        <div className="relative h-64 mb-12">
-          {/* Winding Path SVG */}
-          <svg className="absolute inset-0 w-full h-full" preserveAspectRatio="none">
-            <defs>
-              <linearGradient id="pathGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="#10b981" stopOpacity="0.3" />
-                <stop offset={`${overallProgress}%`} stopColor="#10b981" stopOpacity="1" />
-                <stop offset={`${overallProgress}%`} stopColor="#d1d5db" stopOpacity="0.5" />
-                <stop offset="100%" stopColor="#d1d5db" stopOpacity="0.3" />
-              </linearGradient>
-            </defs>
-            
-            {/* Background Path */}
-            <motion.path
-              d="M 0 130 Q 150 80, 300 130 T 600 130 Q 750 80, 900 130 T 1200 130"
-              fill="none"
-              stroke="#e5e7eb"
-              strokeWidth="8"
-              strokeLinecap="round"
-            />
-            
-            {/* Active Path */}
-            <motion.path
-              d="M 0 130 Q 150 80, 300 130 T 600 130 Q 750 80, 900 130 T 1200 130"
-              fill="none"
-              stroke="url(#pathGradient)"
-              strokeWidth="8"
-              strokeLinecap="round"
-              initial={{ pathLength: 0 }}
-              animate={{ pathLength: overallProgress / 100 }}
-              transition={{ duration: 2, ease: "easeInOut" }}
-            />
-          </svg>
+        {/* Progress Percentage */}
+        <motion.div
+          className="absolute -top-10 px-4 py-2 rounded-full text-sm font-semibold text-white shadow-lg"
+          style={{
+            background: "linear-gradient(135deg, #10b981 0%, #06b6d4 100%)",
+            left: `${progress}%`,
+            transform: "translateX(-50%)"
+          }}
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+        >
+          {Math.round(progress)}% Complete
+        </motion.div>
+      </div>
 
-          {/* Delivery Vehicle */}
-          <DeliveryVehicle progress={vehiclePosition} isMoving={currentStageIndex < stages.length && currentStageIndex > 0} />
-
-          {/* Landmarks */}
-          {stages.map((stage, index) => {
-            const isCompleted = stage.date !== null;
-            const isCurrent = index === currentStageIndex;
-            
-            return (
+      {/* Timeline Stages */}
+      <div className="relative max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8">
+        {stages.map((stage, index) => {
+          const isCompleted = stage.date !== null;
+          const isCurrent = index === currentStageIndex && !isComplete;
+          
+          return (
+            <motion.div
+              key={stage.id}
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{
+                delay: index * 0.2,
+                duration: 1,
+                ease: [0.34, 1.56, 0.64, 1]
+              }}
+              className="relative flex flex-col items-center"
+            >
+              {/* Stage Number */}
               <motion.div
-                key={stage.id}
-                className="absolute cursor-pointer"
+                className="absolute -top-6 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold z-10"
                 style={{
-                  left: `${stage.position}%`,
-                  top: "50%",
-                  transform: "translate(-50%, -50%)"
+                  background: isCompleted || isCurrent
+                    ? "linear-gradient(135deg, #10b981 0%, #059669 100%)"
+                    : "linear-gradient(135deg, #d1d5db 0%, #9ca3af 100%)",
+                  color: isCompleted || isCurrent ? "#fff" : "#6b7280",
+                  boxShadow: isCompleted || isCurrent ? "0 4px 12px rgba(16, 185, 129, 0.3)" : "none"
                 }}
-                onClick={() => setSelectedStage(selectedStage === stage.id ? null : stage.id)}
-                initial={{ opacity: 0, y: 50 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.15 }}
+                whileHover={{ scale: 1.1 }}
               >
-                <IsometricLandmark stage={stage} isCompleted={isCompleted} isCurrent={isCurrent} />
+                {index + 1}
               </motion.div>
-            );
-          })}
-        </div>
 
-        {/* Stage Details */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-          {stages.map((stage, index) => {
-            const isCompleted = stage.date !== null;
-            const isCurrent = index === currentStageIndex;
-            const Icon = stage.icon;
+              {/* Stage Animation */}
+              <div className="relative mb-4">
+                {getStageAnimation(stage.id, isCurrent, isCompleted)}
+                
+                {/* Checkmark for Completed */}
+                {isCompleted && !isCurrent && (
+                  <motion.div
+                    initial={{ scale: 0, rotate: -180 }}
+                    animate={{ scale: 1, rotate: 0 }}
+                    className="absolute -top-2 -right-2 w-10 h-10 rounded-full bg-emerald-500 flex items-center justify-center shadow-lg z-20"
+                  >
+                    <CheckCircle2 className="w-6 h-6 text-white" />
+                  </motion.div>
+                )}
+              </div>
 
-            return (
+              {/* Stage Info - Glassmorphism Card */}
               <motion.div
-                key={stage.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 + index * 0.1 }}
                 className={`
-                  relative p-4 rounded-xl border-2 text-center transition-all
-                  ${isCompleted ? "bg-white border-emerald-300 shadow-lg" :
-                    isCurrent ? "bg-white border-teal-300 shadow-xl ring-4 ring-teal-100" :
-                    "bg-neutral-50 border-neutral-200"}
+                  relative p-4 rounded-2xl text-center min-h-[140px] w-full
+                  ${isCompleted || isCurrent
+                    ? "bg-neutral-800/70 backdrop-blur-md border-2 border-emerald-500/50 shadow-xl"
+                    : "bg-neutral-900/40 backdrop-blur-sm border-2 border-neutral-700/30"}
                 `}
+                whileHover={isCompleted || isCurrent ? { y: -4, scale: 1.02 } : {}}
+                transition={{ type: "spring", stiffness: 300 }}
               >
-                {/* Stage Icon Badge */}
-                <div className={`
-                  w-12 h-12 mx-auto mb-3 rounded-full flex items-center justify-center
-                  ${isCompleted ? "bg-gradient-to-br from-emerald-400 to-emerald-600" :
-                    isCurrent ? "bg-gradient-to-br from-teal-400 to-teal-600" :
-                    "bg-neutral-200"}
-                `}>
-                  <Icon className={`w-6 h-6 ${isCompleted || isCurrent ? "text-white" : "text-neutral-400"}`} />
-                </div>
+                {/* Soft Glow Border */}
+                {(isCompleted || isCurrent) && (
+                  <div
+                    className="absolute inset-0 rounded-2xl opacity-20"
+                    style={{
+                      boxShadow: "inset 0 0 20px #10b981"
+                    }}
+                  />
+                )}
 
-                {/* Stage Label */}
                 <h4 className={`
-                  font-bold mb-2 text-sm
-                  ${isCompleted ? "text-neutral-900" :
-                    isCurrent ? "text-teal-700" :
-                    "text-neutral-400"}
+                  text-sm font-bold mb-2
+                  ${isCompleted || isCurrent ? "text-white" : "text-neutral-500"}
                 `}>
                   {stage.label}
                 </h4>
+                
+                <p className={`
+                  text-xs mb-3
+                  ${isCompleted || isCurrent ? "text-neutral-300" : "text-neutral-600"}
+                `}>
+                  {stage.subtitle}
+                </p>
 
-                {/* Achievement Badge */}
-                <div className="mb-3">
-                  <AchievementBadge
-                    label={stage.achievementBadge}
-                    icon={isCompleted ? Star : isCurrent ? Zap : Trophy}
-                    unlocked={isCompleted || isCurrent}
-                    color={stage.landmarkColor}
-                  />
-                </div>
-
-                {/* Date */}
+                {/* Date or Status */}
                 {isCompleted && (
-                  <div className="text-xs text-neutral-600 font-medium">
+                  <div className="text-xs font-medium text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full inline-block">
                     {formatDate(stage.date)}
                   </div>
                 )}
-
-                {/* Current Stage Indicator */}
+                
                 {isCurrent && (
                   <motion.div
                     animate={{ opacity: [0.5, 1, 0.5] }}
                     transition={{ duration: 2, repeat: Infinity }}
-                    className="text-xs text-teal-600 font-bold mt-2"
+                    className="text-xs font-semibold text-teal-600 bg-teal-50 px-3 py-1 rounded-full inline-block"
                   >
                     In Progress...
                   </motion.div>
                 )}
 
-                {/* Environmental Boost */}
-                {(isCompleted || isCurrent) && (
-                  <div className="mt-2 text-xs font-medium text-emerald-600 flex items-center justify-center gap-1">
-                    <Leaf className="w-3 h-3" />
-                    {stage.environmentalBoost}
+                {!isCompleted && !isCurrent && (
+                  <div className="text-xs text-neutral-400 bg-neutral-100 px-3 py-1 rounded-full inline-block">
+                    Pending
                   </div>
                 )}
               </motion.div>
-            );
-          })}
-        </div>
+            </motion.div>
+          );
+        })}
       </div>
 
       {/* Completion Celebration */}
       <AnimatePresence>
-        {isComplete && environmentalImpact && (
+        {isComplete && (
           <motion.div
             initial={{ opacity: 0, scale: 0.8, y: 50 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.8 }}
-            className="mt-12 max-w-4xl mx-auto"
+            transition={{ type: "spring", stiffness: 200, delay: 0.5 }}
+            className="relative mt-20 max-w-4xl mx-auto"
           >
-            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-500 p-12 text-white shadow-2xl">
-              {/* Confetti Effect */}
+            <div className="relative overflow-hidden rounded-3xl p-12 text-center" style={{
+              background: "linear-gradient(135deg, #10b981 0%, #06b6d4 50%, #ec4899 100%)"
+            }}>
+              {/* Confetti */}
               <div className="absolute inset-0 overflow-hidden">
-                {[...Array(20)].map((_, i) => (
+                {[...Array(30)].map((_, i) => (
                   <motion.div
                     key={i}
-                    className="absolute w-3 h-3 rounded-full"
+                    className="absolute w-2 h-2 rounded-full"
                     style={{
-                      backgroundColor: ["#fbbf24", "#f59e0b", "#10b981", "#06b6d4"][i % 4],
+                      backgroundColor: ["#fbbf24", "#10b981", "#06b6d4", "#ec4899"][i % 4],
                       left: `${Math.random() * 100}%`,
                       top: -20
                     }}
                     animate={{
                       y: [0, 600],
-                      rotate: [0, 360],
+                      rotate: [0, 360 * (Math.random() > 0.5 ? 1 : -1)],
                       opacity: [1, 0]
                     }}
                     transition={{
                       duration: 3 + Math.random() * 2,
                       repeat: Infinity,
-                      delay: Math.random() * 2
+                      delay: Math.random() * 2,
+                      ease: "linear"
                     }}
                   />
                 ))}
               </div>
 
-              <div className="relative z-10 text-center">
+              <div className="relative z-10">
                 <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ type: "spring", delay: 0.2 }}
+                  initial={{ scale: 0, rotate: -180 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  transition={{ type: "spring", delay: 0.6 }}
                   className="text-7xl mb-6"
                 >
                   🎉
                 </motion.div>
-                <h3 className="text-4xl font-bold mb-4">Journey Complete!</h3>
-                <p className="text-xl mb-8 text-white/90">You've completed your sustainable delivery journey</p>
+                
+                <h3 className="text-4xl font-bold text-white mb-4">Eco-Mission Complete!</h3>
+                <p className="text-xl text-white/90 mb-8 flex items-center justify-center gap-2">
+                  Your order is ready <Leaf className="w-6 h-6" /> <Sparkles className="w-6 h-6" />
+                </p>
 
-                <div className="grid grid-cols-3 gap-6 bg-white/20 backdrop-blur-lg rounded-2xl p-8">
-                  <div className="text-center">
-                    <Leaf className="w-8 h-8 mx-auto mb-3" />
-                    <div className="text-4xl font-bold mb-2">{environmentalImpact.carbonSaved.toFixed(1)}kg</div>
-                    <div className="text-white/90 text-sm">CO₂ Saved</div>
+                {environmentalImpact && (
+                  <div className="grid grid-cols-3 gap-6 bg-white/20 backdrop-blur-lg rounded-2xl p-8">
+                    <div className="text-center">
+                      <Leaf className="w-8 h-8 mx-auto mb-3 text-white" />
+                      <div className="text-4xl font-bold text-white mb-2">
+                        {environmentalImpact.carbonSaved.toFixed(1)}kg
+                      </div>
+                      <div className="text-white/90 text-sm">CO₂ Saved</div>
+                    </div>
+                    <div className="text-center border-x border-white/30">
+                      <Sparkles className="w-8 h-8 mx-auto mb-3 text-white" />
+                      <div className="text-4xl font-bold text-white mb-2">
+                        {environmentalImpact.waterProvided.toLocaleString()}L
+                      </div>
+                      <div className="text-white/90 text-sm">Water Provided</div>
+                    </div>
+                    <div className="text-center">
+                      <svg className="w-8 h-8 mx-auto mb-3 text-white" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
+                      </svg>
+                      <div className="text-4xl font-bold text-white mb-2">
+                        {environmentalImpact.mineralsSaved.toFixed(1)}kg
+                      </div>
+                      <div className="text-white/90 text-sm">Minerals Saved</div>
+                    </div>
                   </div>
-                  <div className="text-center border-x border-white/30">
-                    <Droplet className="w-8 h-8 mx-auto mb-3" />
-                    <div className="text-4xl font-bold mb-2">{environmentalImpact.waterProvided.toLocaleString()}L</div>
-                    <div className="text-white/90 text-sm">Water Provided</div>
-                  </div>
-                  <div className="text-center">
-                    <Recycle className="w-8 h-8 mx-auto mb-3" />
-                    <div className="text-4xl font-bold mb-2">{environmentalImpact.mineralsSaved.toFixed(1)}kg</div>
-                    <div className="text-white/90 text-sm">Minerals Saved</div>
-                  </div>
-                </div>
-
-                <motion.div
-                  initial={{ y: 20, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.5 }}
-                  className="mt-8 flex items-center justify-center gap-3 text-lg"
-                >
-                  <Trophy className="w-6 h-6" />
-                  <span className="font-semibold">Total Impact: {totalImpactPoints} Points Earned!</span>
-                  <Star className="w-6 h-6" />
-                </motion.div>
+                )}
               </div>
             </div>
           </motion.div>

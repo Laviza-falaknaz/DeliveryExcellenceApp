@@ -1,0 +1,125 @@
+Build a high-end, cinematic, gamified order timeline in React that dynamically reads live order data from the database. The timeline should follow this fixed sequence:
+
+Order Confirmed → Sent to Warehouse → Dispatched → Invoice Sent → Payment Confirmed → Fulfilled
+
+1️⃣ Cinematic Stage Animations (Exact Motion & Effects)
+
+Order Confirmed
+
+Animation: glowing purchase button clicks, sparks flying outward
+
+Motion: small pulse with scale bounce, glow intensity ramps up over 0.5s
+
+Particle effect: subtle green spark bursts around the icon
+
+Sent to Warehouse
+
+Animation: eco-green crate moves along a conveyor, robotic arm lifts it
+
+Motion: smooth left-to-right translation, ease-in-out, slight bounce at end
+
+Particle effect: light trail of energy behind the crate
+
+Dispatched
+
+Animation: sleek electric truck/drone zooms along a curved path
+
+Motion: acceleration curve, small camera-like shake when leaving hub
+
+Particle effect: glowing exhaust or energy trail
+
+Invoice Sent
+
+Animation: holographic envelope flies in from side, opens to reveal glowing document
+
+Motion: smooth arc, slight rotation
+
+Particle effect: soft light burst when envelope opens
+
+Payment Confirmed
+
+Animation: floating credit card flips, glows, and pulses
+
+Motion: flip animation along Y-axis, pulse scale ±10%
+
+Particle effect: small floating particles around card
+
+Fulfilled
+
+Animation: laptop powers on, green aura spreads, holographic light rays
+
+Motion: subtle zoom-in + glow ramp, micro particle bursts
+
+End-stage effect: leaves or sparkles float outward (eco-luxury effect)
+
+2️⃣ Stage Status & Transitions
+
+Current Stage: glowing, gently pulsing, with subtle bounce
+
+Completed Stages: solid emerald green with checkmark animation
+
+Pending Stages: dim gray with subtle glow
+
+Transitions between stages: sequential fade + slide + particle flow
+
+Timing: each stage animation duration: 1–1.5s, sequential delay 0.2–0.3s for cinematic pacing
+
+3️⃣ Visual Style & UI
+
+Theme: eco-luxury + futuristic (emerald green, silver, black, soft neon accents)
+
+Typography: sleek sans-serif, modern, minimal, premium feel
+
+Background: animated gradient or particle flow, subtle moving particles for depth
+
+UI elements: glassmorphism panels, soft shadows, glowing borders
+
+Micro-interactions: hover or tap reveals info about each stage (e.g., “Your laptop is being tested for quality assurance”)
+
+Boost Button: optional “Boost Delivery” → accelerates animations + adds energy trail
+
+4️⃣ Gamification & Feedback
+
+Sound cues: soft chime, spark, or whoosh per stage completion
+
+Progress Path: curved or vertical path that lights up dynamically as stages complete
+
+End Screen: “🎉 Delivered! Eco-mission complete — your order is ready 🌱”
+
+Celebration animation: particle burst, leaves, sparkles, glowing halo
+
+5️⃣ Animation & Motion Details
+
+Smooth easing: ease-in-out for all stage transitions
+
+Glow intensity ramps: completed stage (0 → 100%), current stage pulse ±20% intensity
+
+Particle density: subtle for micro-feedback, dense for milestone completion
+
+Sequential animations: no overlapping except particle trails
+
+Optional camera-like motion: slight zoom or pan on the current stage to create “mission cinematic” feel
+
+6️⃣ Tech Stack
+
+React (functional components)
+
+TailwindCSS
+
+Framer Motion or GSAP for all animations
+
+Optional: Lottie JSON for high-quality effects
+
+Fully responsive: mobile + desktop
+
+7️⃣ Deliverable
+
+Ready-to-run React app
+
+Dynamically reads live order data from DB
+
+Implements full cinematic stage animations, particle effects, glow, motion, and sequential storytelling
+
+Looks eco-luxury, futuristic, gamified, and premium
+
+Provides wow factor every time a user checks their order
