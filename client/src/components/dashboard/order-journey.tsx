@@ -877,7 +877,7 @@ export default function OrderJourney({ timeline, environmentalImpact }: OrderJou
       </div>
 
       {/* Timeline Stages */}
-      <div className="relative max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6">
+      <div className="relative max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6 lg:gap-8">
         {stages.map((stage, index) => {
           const isCompleted = stage.date !== null;
           const isCurrent = index === currentStageIndex && !isComplete;
@@ -896,7 +896,7 @@ export default function OrderJourney({ timeline, environmentalImpact }: OrderJou
             >
               {/* Stage Number */}
               <motion.div
-                className="absolute -top-6 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold z-10"
+                className="absolute -top-6 w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold z-10"
                 style={{
                   background: isCompleted || isCurrent
                     ? "linear-gradient(135deg, #10b981 0%, #059669 100%)"
@@ -910,7 +910,7 @@ export default function OrderJourney({ timeline, environmentalImpact }: OrderJou
               </motion.div>
 
               {/* Stage Animation */}
-              <div className="relative mb-4">
+              <div className="relative mb-4 mt-2">
                 {getStageAnimation(stage.id, isCurrent, isCompleted)}
                 
                 {/* Checkmark for Completed */}
@@ -928,7 +928,7 @@ export default function OrderJourney({ timeline, environmentalImpact }: OrderJou
               {/* Stage Info - Card */}
               <motion.div
                 className={`
-                  relative p-3 md:p-4 rounded-xl text-center min-h-[120px] md:min-h-[140px] w-full
+                  relative p-4 md:p-5 rounded-xl text-center min-h-[160px] w-full
                   ${isCompleted || isCurrent
                     ? "bg-white/90 backdrop-blur-sm border-2 border-emerald-400 shadow-lg"
                     : "bg-white/50 backdrop-blur-sm border-2 border-neutral-200"}
@@ -947,14 +947,14 @@ export default function OrderJourney({ timeline, environmentalImpact }: OrderJou
                 )}
 
                 <h4 className={`
-                  text-xs md:text-sm font-bold mb-1 md:mb-2
+                  text-sm md:text-base font-bold mb-2
                   ${isCompleted || isCurrent ? "text-neutral-900" : "text-neutral-500"}
                 `}>
                   {stage.label}
                 </h4>
                 
                 <p className={`
-                  text-xs mb-2 md:mb-3
+                  text-xs md:text-sm mb-3 leading-relaxed
                   ${isCompleted || isCurrent ? "text-neutral-600" : "text-neutral-400"}
                 `}>
                   {stage.subtitle}
@@ -962,7 +962,7 @@ export default function OrderJourney({ timeline, environmentalImpact }: OrderJou
 
                 {/* Date or Status */}
                 {isCompleted && (
-                  <div className="text-xs font-medium text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full inline-block">
+                  <div className="text-xs md:text-sm font-medium text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-full inline-block">
                     {formatDate(stage.date)}
                   </div>
                 )}
@@ -971,14 +971,14 @@ export default function OrderJourney({ timeline, environmentalImpact }: OrderJou
                   <motion.div
                     animate={{ opacity: [0.5, 1, 0.5] }}
                     transition={{ duration: 2, repeat: Infinity }}
-                    className="text-xs font-semibold text-teal-600 bg-teal-50 px-3 py-1 rounded-full inline-block"
+                    className="text-xs md:text-sm font-semibold text-teal-600 bg-teal-50 px-3 py-1.5 rounded-full inline-block"
                   >
                     In Progress...
                   </motion.div>
                 )}
 
                 {!isCompleted && !isCurrent && (
-                  <div className="text-xs text-neutral-400 bg-neutral-100 px-3 py-1 rounded-full inline-block">
+                  <div className="text-xs md:text-sm text-neutral-400 bg-neutral-100 px-3 py-1.5 rounded-full inline-block">
                     Pending
                   </div>
                 )}
