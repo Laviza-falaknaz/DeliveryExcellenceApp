@@ -92,6 +92,31 @@ export async function seedDatabase() {
       console.log("✅ Password webhook setting created");
     }
 
+    // Check if sustainability metrics setting exists
+    const existingSustainabilitySetting = await db
+      .select()
+      .from(systemSettings)
+      .where(eq(systemSettings.settingKey, 'sustainability_metrics'))
+      .limit(1);
+    
+    if (existingSustainabilitySetting.length === 0) {
+      console.log("Creating sustainability metrics setting...");
+      
+      await db.insert(systemSettings).values({
+        settingKey: 'sustainability_metrics',
+        settingValue: {
+          carbonReductionPerLaptop: 316000, // 316 KGS in grams
+          resourcePreservationPerLaptop: 1200000, // 1200 KGS in grams
+          waterSavedPerLaptop: 190000, // 190,000 liters
+          eWasteReductionPercentage: 0, // 0% e-waste
+          familiesHelpedPerLaptop: 1, // 1 family per laptop
+          treesEquivalentPerLaptop: 3, // Equivalent to 3 trees per laptop
+        },
+      });
+      
+      console.log("✅ Sustainability metrics setting created");
+    }
+
     // Seed gamification data
     await seedGamificationData();
 

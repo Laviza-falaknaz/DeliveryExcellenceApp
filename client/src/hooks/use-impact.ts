@@ -75,7 +75,7 @@ export function useImpact() {
   // Get list of countries from water projects
   function getWaterProjectCountries() {
     if (!waterProjects) return [];
-    return [...new Set(waterProjects.map(project => project.location))];
+    return Array.from(new Set(waterProjects.map(project => project.location)));
   }
 
   // Check if user has already submitted a case study

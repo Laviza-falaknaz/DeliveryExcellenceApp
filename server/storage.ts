@@ -134,6 +134,7 @@ export interface IStorage {
   // System settings operations
   getSystemSetting(key: string): Promise<SystemSetting | undefined>;
   setSystemSetting(key: string, value: any): Promise<SystemSetting>;
+  recalculateAllEnvironmentalImpact(): Promise<{ updated: number; errors: number }>;
 
   // Password operations
   changePassword(userId: number, currentPassword: string, newPassword: string): Promise<{ success: boolean; error?: string }>;
@@ -1073,7 +1074,92 @@ export class DatabaseStorage implements IStorage {
       }
     }
 
+    // Auto-calculate environmental impact based on quantity
+    await this.calculateAndUpdateEnvironmentalImpact(resultOrder.id, user.id);
+
     return resultOrder;
+  }
+
+  // Recalculate environmental impact for all orders (called when metrics are updated)
+  async recalculateAllEnvironmentalImpact(): Promise<{ updated: number; errors: number }> {
+    let updated = 0;
+    let errors = 0;
+
+    try {
+      // Get all orders
+      const allOrders = await db.select().from(orders);
+
+      for (const order of allOrders) {
+        try {
+          await this.calculateAndUpdateEnvironmentalImpact(order.id, order.userId);
+          updated++;
+        } catch (error) {
+          console.error(`Error recalculating impact for order ${order.id}:`, error);
+          errors++;
+        }
+      }
+    } catch (error) {
+      console.error('Error in recalculateAllEnvironmentalImpact:', error);
+    }
+
+    return { updated, errors };
+  }
+
+  // Helper function to calculate and update environmental impact for an order
+  async calculateAndUpdateEnvironmentalImpact(orderId: number, userId: number): Promise<void> {
+    try {
+      // Get sustainability metrics from system settings
+      const settingsData = await this.getSystemSetting('sustainability_metrics');
+      const metrics = settingsData?.settingValue || {
+        carbonReductionPerLaptop: 316000,
+        resourcePreservationPerLaptop: 1200000,
+        waterSavedPerLaptop: 190000,
+        eWasteReductionPercentage: 0,
+        familiesHelpedPerLaptop: 1,
+        treesEquivalentPerLaptop: 3,
+      };
+
+      // Get order items to calculate total quantity
+      const items = await this.getOrderItems(orderId);
+      const totalQuantity = items.reduce((sum, item) => sum + (item.quantity || 1), 0);
+
+      // Calculate impact based on quantity
+      const carbonSaved = Math.round((metrics.carbonReductionPerLaptop ?? 316000) * totalQuantity);
+      const waterProvided = Math.round((metrics.waterSavedPerLaptop ?? 190000) * totalQuantity);
+      const mineralsSaved = Math.round((metrics.resourcePreservationPerLaptop ?? 1200000) * totalQuantity);
+      const treesEquivalent = Math.round((metrics.treesEquivalentPerLaptop ?? 3) * totalQuantity);
+      const familiesHelped = Math.round((metrics.familiesHelpedPerLaptop ?? 1) * totalQuantity);
+
+      // Check if impact record exists for this order
+      const existingImpact = await this.getEnvironmentalImpactByOrderId(orderId);
+
+      if (existingImpact) {
+        // Update existing impact
+        await db.update(environmentalImpact)
+          .set({
+            carbonSaved,
+            waterProvided,
+            mineralsSaved,
+            treesEquivalent,
+            familiesHelped,
+          })
+          .where(eq(environmentalImpact.id, existingImpact.id));
+      } else {
+        // Create new impact record
+        await this.createEnvironmentalImpact({
+          userId,
+          orderId,
+          carbonSaved,
+          waterProvided,
+          mineralsSaved,
+          treesEquivalent,
+          familiesHelped,
+        });
+      }
+    } catch (error) {
+      console.error('Error calculating environmental impact:', error);
+      // Don't throw error to prevent order creation from failing
+    }
   }
 
   async upsertRma(rmaNumber: string, email: string, rma: Omit<InsertRma, 'userId'>): Promise<Rma> {

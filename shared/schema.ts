@@ -339,6 +339,13 @@ export const systemSettings = pgTable("system_settings", {
     visibleTabs?: string[]; // Array of tab IDs that should be visible
     rmaNotificationEmails?: string[]; // Email addresses to notify on RMA requests
     newUserAlertEmails?: string[]; // Email addresses to notify on new user creation
+    // Sustainability metrics per laptop (in grams for carbon/minerals, liters for water)
+    carbonReductionPerLaptop?: number; // in grams (e.g., 316000 for 316 KGS)
+    resourcePreservationPerLaptop?: number; // in grams (e.g., 1200000 for 1200 KGS)
+    waterSavedPerLaptop?: number; // in liters (e.g., 190000)
+    eWasteReductionPercentage?: number; // percentage (e.g., 0 for 0%)
+    familiesHelpedPerLaptop?: number; // number of families (e.g., 1)
+    treesEquivalentPerLaptop?: number; // number of trees equivalent
   }>(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

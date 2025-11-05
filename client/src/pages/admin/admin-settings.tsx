@@ -19,6 +19,7 @@ const AVAILABLE_TABS = [
   { id: "case-studies", label: "Case Studies", description: "Customer case studies" },
   { id: "gamification", label: "Gamification", description: "Achievement and rewards management" },
   { id: "api-keys", label: "API Keys", description: "API key management" },
+  { id: "sustainability", label: "Sustainability", description: "Environmental impact metrics configuration" },
   { id: "theme", label: "Theme", description: "Theme and branding settings" },
   { id: "connection", label: "Connection", description: "Database connection settings" },
 ];

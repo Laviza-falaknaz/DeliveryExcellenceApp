@@ -1602,7 +1602,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Default settings if none exist
       const defaultSettings = {
-        visibleTabs: ['users', 'orders', 'rmas', 'tickets', 'water-projects', 'case-studies', 'gamification', 'api-keys', 'theme', 'connection'],
+        visibleTabs: ['users', 'orders', 'rmas', 'tickets', 'water-projects', 'case-studies', 'gamification', 'api-keys', 'sustainability', 'theme', 'connection'],
         rmaNotificationEmails: [],
         newUserAlertEmails: [],
       };
@@ -1631,6 +1631,65 @@ export async function registerRoutes(app: Express): Promise<Server> {
         success: true,
         message: "Settings saved successfully",
         settings: validatedSettings,
+      });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ 
+          message: "Validation error", 
+          errors: error.errors 
+        });
+      }
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Get sustainability metrics settings
+  app.get("/api/admin/sustainability-metrics", requireAdmin, async (req, res) => {
+    try {
+      const setting = await storage.getSystemSetting('sustainability_metrics');
+      
+      // Default metrics if none exist (per laptop)
+      const defaultMetrics = {
+        carbonReductionPerLaptop: 316000, // 316 KGS in grams
+        resourcePreservationPerLaptop: 1200000, // 1200 KGS in grams
+        waterSavedPerLaptop: 190000, // 190,000 liters
+        eWasteReductionPercentage: 0, // 0% e-waste
+        familiesHelpedPerLaptop: 1, // 1 family
+        treesEquivalentPerLaptop: 3, // 3 trees equivalent
+      };
+
+      const metrics = setting?.settingValue || defaultMetrics;
+      res.json(metrics);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Update sustainability metrics settings
+  app.put("/api/admin/sustainability-metrics", requireAdmin, async (req, res) => {
+    try {
+      const metricsSchema = z.object({
+        carbonReductionPerLaptop: z.number().min(0),
+        resourcePreservationPerLaptop: z.number().min(0),
+        waterSavedPerLaptop: z.number().min(0),
+        eWasteReductionPercentage: z.number().min(0).max(100),
+        familiesHelpedPerLaptop: z.number().min(0),
+        treesEquivalentPerLaptop: z.number().min(0),
+      });
+
+      const validatedMetrics = metricsSchema.parse(req.body);
+      
+      await storage.setSystemSetting('sustainability_metrics', validatedMetrics);
+      
+      // Recalculate environmental impact for all existing orders with new metrics
+      const recalcResult = await storage.recalculateAllEnvironmentalImpact();
+      console.log(`Recalculated environmental impact: ${recalcResult.updated} orders updated, ${recalcResult.errors} errors`);
+      
+      res.json({
+        success: true,
+        message: "Sustainability metrics updated successfully",
+        metrics: validatedMetrics,
+        recalculated: recalcResult,
       });
     } catch (error) {
       if (error instanceof z.ZodError) {
