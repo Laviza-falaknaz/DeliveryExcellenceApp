@@ -21,7 +21,7 @@ export default function OrderCard({ order, isPast = false }: OrderCardProps) {
     enabled: expanded,
   });
 
-  const { data: orderUpdates } = useQuery({
+  const { data: orderUpdates } = useQuery<any[]>({
     queryKey: [`/api/orders/${order.id}/updates`],
     enabled: expanded && order.status !== "completed" && order.status !== "cancelled",
   });
@@ -51,7 +51,7 @@ export default function OrderCard({ order, isPast = false }: OrderCardProps) {
               Order #{order.orderNumber}
             </h3>
             <p className="text-sm text-neutral-500">
-              Ordered on {formatDate(order.orderDate)}
+              Ordered on {order.orderDate ? formatDate(order.orderDate) : 'N/A'}
             </p>
           </div>
           <div className="mt-2 sm:mt-0">
@@ -87,10 +87,10 @@ export default function OrderCard({ order, isPast = false }: OrderCardProps) {
               </p>
             </div>
             <div className="mt-4 md:mt-0 md:ml-auto text-right">
-              <p className="font-semibold">{formatCurrency(item.totalPrice)}</p>
-              {order.savedAmount > 0 && (
+              <p className="font-semibold">{formatCurrency(Number(item.totalPrice))}</p>
+              {Number(order.savedAmount) > 0 && (
                 <p className="text-sm text-success">
-                  Saved {formatCurrency(order.savedAmount)} vs new
+                  Saved {formatCurrency(Number(order.savedAmount))} vs new
                 </p>
               )}
             </div>
@@ -102,9 +102,9 @@ export default function OrderCard({ order, isPast = false }: OrderCardProps) {
             <OrderJourney 
               timeline={timeline || null} 
               environmentalImpact={environmentalImpact ? {
-                carbonSaved: environmentalImpact.carbonSaved || 0,
-                waterProvided: environmentalImpact.waterProvided || 0,
-                mineralsSaved: environmentalImpact.mineralsSaved || 0,
+                carbonSaved: Number(environmentalImpact.carbonSaved) || 0,
+                waterProvided: Number(environmentalImpact.waterProvided) || 0,
+                mineralsSaved: Number(environmentalImpact.mineralsSaved) || 0,
               } : undefined}
             />
 
