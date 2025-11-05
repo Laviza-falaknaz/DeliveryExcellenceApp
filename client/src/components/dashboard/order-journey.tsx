@@ -767,7 +767,21 @@ export default function OrderJourney({ timeline, environmentalImpact }: OrderJou
     }
   ];
 
-  const completedStages = stages.filter(stage => stage.date !== null);
+  // Helper function to check if a stage should be marked as completed
+  // A stage is complete if it has a date OR if any later stage has a date
+  const isStageCompleted = (index: number): boolean => {
+    // Check if current stage has a date
+    if (stages[index].date !== null) return true;
+    
+    // Check if any later stage has a date
+    for (let i = index + 1; i < stages.length; i++) {
+      if (stages[i].date !== null) return true;
+    }
+    
+    return false;
+  };
+
+  const completedStages = stages.filter((_, index) => isStageCompleted(index));
   const currentStageIndex = completedStages.length;
   const isComplete = completedStages.length === stages.length;
   const progress = (completedStages.length / stages.length) * 100;
@@ -879,7 +893,7 @@ export default function OrderJourney({ timeline, environmentalImpact }: OrderJou
       {/* Timeline Stages */}
       <div className="relative max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6 lg:gap-8">
         {stages.map((stage, index) => {
-          const isCompleted = stage.date !== null;
+          const isCompleted = isStageCompleted(index);
           const isCurrent = index === currentStageIndex && !isComplete;
           
           return (
