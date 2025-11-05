@@ -817,7 +817,7 @@ export default function OrderJourney({ timeline, environmentalImpact }: OrderJou
   };
 
   return (
-    <div className="relative py-8 px-4 overflow-hidden bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 rounded-lg">
+    <div className="relative py-8 px-4 overflow-hidden rounded-lg">
       {/* Subtle Particle Flow Background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-30">
         {[...Array(15)].map((_, i) => (
