@@ -24,7 +24,8 @@ import { Separator } from "@/components/ui/separator";
 import { Eye, Download, FileText, Package, Hash, FileCheck } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { formatPrice } from "@/lib/currency";
-import { AnimatedTimeline } from "@/components/AnimatedTimeline";
+import OrderJourney from "@/components/dashboard/order-journey";
+import { EnvironmentalImpact } from "@shared/schema";
 
 export default function Orders() {
   const { orders, isLoadingOrders, getActiveOrders, getPastOrders } = useOrders();
@@ -53,6 +54,12 @@ export default function Orders() {
   // Fetch delivery timeline for animated timeline
   const { data: deliveryTimeline, isLoading: isLoadingTimeline } = useQuery<DeliveryTimeline>({
     queryKey: [`/api/orders/${selectedOrder?.id}/timeline`],
+    enabled: !!selectedOrder && isOrderDetailsOpen,
+  });
+
+  // Fetch environmental impact for the order
+  const { data: environmentalImpact } = useQuery<EnvironmentalImpact>({
+    queryKey: [`/api/orders/${selectedOrder?.id}/environmental-impact`],
     enabled: !!selectedOrder && isOrderDetailsOpen,
   });
 
@@ -505,25 +512,39 @@ export default function Orders() {
                   </CardContent>
                 </Card>
 
-                {/* Animated Delivery Timeline */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-base">Delivery Timeline</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    {isLoadingTimeline ? (
+                {/* Gamified Delivery Journey */}
+                {isLoadingTimeline ? (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-base">Delivery Journey</CardTitle>
+                    </CardHeader>
+                    <CardContent>
                       <div className="space-y-3">
                         {Array.from({ length: 4 }).map((_, i) => (
                           <Skeleton key={i} className="h-32 w-full" />
                         ))}
                       </div>
-                    ) : deliveryTimeline ? (
-                      <AnimatedTimeline timeline={deliveryTimeline} />
-                    ) : (
+                    </CardContent>
+                  </Card>
+                ) : deliveryTimeline ? (
+                  <OrderJourney 
+                    timeline={deliveryTimeline} 
+                    environmentalImpact={environmentalImpact ? {
+                      carbonSaved: environmentalImpact.carbonSaved,
+                      waterProvided: environmentalImpact.waterProvided,
+                      mineralsSaved: environmentalImpact.mineralsSaved
+                    } : undefined}
+                  />
+                ) : (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-base">Delivery Journey</CardTitle>
+                    </CardHeader>
+                    <CardContent>
                       <p className="text-neutral-500 text-center py-4">No timeline data available</p>
-                    )}
-                  </CardContent>
-                </Card>
+                    </CardContent>
+                  </Card>
+                )}
               </div>
             </div>
           </ScrollArea>
