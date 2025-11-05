@@ -3,10 +3,19 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { EnvironmentalImpact, WaterProject, CaseStudy, InsertCaseStudy } from "@shared/schema";
 
+interface ImpactData {
+  carbonSaved: number;
+  waterProvided: number;
+  waterSaved?: number;
+  mineralsSaved: number;
+  treesEquivalent: number;
+  familiesHelped: number;
+}
+
 export function useImpact() {
   const { toast } = useToast();
 
-  const { data: impact, isLoading: isLoadingImpact } = useQuery({
+  const { data: impact, isLoading: isLoadingImpact } = useQuery<ImpactData>({
     queryKey: ["/api/impact"],
   });
 
