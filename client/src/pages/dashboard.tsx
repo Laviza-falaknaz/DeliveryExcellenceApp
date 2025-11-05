@@ -231,6 +231,50 @@ export default function Dashboard() {
         )}
       </section>
 
+      {/* Achievements Section */}
+      {recentAchievements.length > 0 && (
+        <section className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-bold font-poppins text-neutral-900">Recent Achievements</h2>
+            <Link href="/achievements">
+              <Button variant="outline" size="sm">
+                View All
+              </Button>
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {recentAchievements.map((userAchievement) => {
+              const achievement = userAchievement.achievement;
+              return (
+                <div
+                  key={userAchievement.id}
+                  className="bg-gradient-to-br from-white to-emerald-50 border border-emerald-200 rounded-xl p-6 hover:shadow-lg transition-all duration-300"
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="flex-shrink-0 w-16 h-16 rounded-full bg-gradient-to-br from-[#08ABAB] to-emerald-500 flex items-center justify-center shadow-lg">
+                      <i className={`${achievement.icon} text-3xl text-white`}></i>
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-bold text-neutral-900 mb-1">{achievement.name}</h3>
+                      <p className="text-sm text-neutral-600 mb-2">{achievement.description}</p>
+                      <div className="flex items-center gap-2 text-xs">
+                        <Badge className="bg-gradient-to-r from-orange-500 to-orange-600 text-white border-none">
+                          <Zap className="h-3 w-3 mr-1" />
+                          +{achievement.pointsAwarded} XP
+                        </Badge>
+                        <span className="text-neutral-500">
+                          Unlocked {new Date(userAchievement.unlockedAt).toLocaleDateString()}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
       {/* Orders Section */}
       <section className="mb-8">
         <div className="flex items-center justify-between mb-4">
@@ -265,6 +309,70 @@ export default function Dashboard() {
         
         <WaterImpact />
       </section>
+
+      {/* Activity Feed Section */}
+      {recentActivities.length > 0 && (
+        <section className="mb-8">
+          <h2 className="text-xl font-bold font-poppins text-neutral-900 mb-4">Recent Activity</h2>
+          <div className="bg-white rounded-xl shadow-sm border border-neutral-200 overflow-hidden">
+            <div className="divide-y divide-neutral-200">
+              {recentActivities.slice(0, 5).map((activity) => {
+                const getActivityIcon = (type: string) => {
+                  switch (type) {
+                    case 'order_placed': return 'ri-shopping-cart-line';
+                    case 'order_dispatched': return 'ri-truck-line';
+                    case 'order_delivered': return 'ri-checkbox-circle-line';
+                    case 'achievement_unlocked': return 'ri-trophy-line';
+                    case 'level_up': return 'ri-trophy-line';
+                    case 'impact_milestone': return 'ri-leaf-line';
+                    default: return 'ri-information-line';
+                  }
+                };
+                
+                const getActivityColor = (type: string) => {
+                  switch (type) {
+                    case 'order_placed': return 'bg-blue-100 text-blue-600';
+                    case 'order_dispatched': return 'bg-purple-100 text-purple-600';
+                    case 'order_delivered': return 'bg-green-100 text-green-600';
+                    case 'achievement_unlocked': return 'bg-yellow-100 text-yellow-600';
+                    case 'level_up': return 'bg-orange-100 text-orange-600';
+                    case 'impact_milestone': return 'bg-emerald-100 text-emerald-600';
+                    default: return 'bg-neutral-100 text-neutral-600';
+                  }
+                };
+                
+                return (
+                  <div key={activity.id} className="p-4 hover:bg-neutral-50 transition-colors">
+                    <div className="flex items-start gap-4">
+                      <div className={`flex-shrink-0 w-10 h-10 rounded-full ${getActivityColor(activity.activityType)} flex items-center justify-center`}>
+                        <i className={`${getActivityIcon(activity.activityType)} text-lg`}></i>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-neutral-900">{activity.description}</p>
+                        <p className="text-xs text-neutral-500 mt-1">
+                          {new Date(activity.activityDate).toLocaleDateString('en-GB', {
+                            day: 'numeric',
+                            month: 'short',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
+                        </p>
+                      </div>
+                      {activity.pointsEarned > 0 && (
+                        <Badge className="bg-gradient-to-r from-orange-500 to-orange-600 text-white border-none flex-shrink-0">
+                          <Zap className="h-3 w-3 mr-1" />
+                          +{activity.pointsEarned} XP
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Case Study Section */}
       <section className="mb-8">
