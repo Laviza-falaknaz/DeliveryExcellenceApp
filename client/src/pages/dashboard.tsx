@@ -5,17 +5,16 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Link, useLocation } from "wouter";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Progress } from "@/components/ui/progress";
 import { useState } from "react";
 import { 
-  Trophy, Zap, Flame, Package, Sparkles, 
-  Search, QrCode, Leaf, ShieldCheck, Target, 
-  TrendingUp, Award, ChevronRight, AlertCircle, CheckCircle2,
-  Clock, Box, Wrench, ArrowRight, Play, Recycle
+  Trophy, Zap, Flame, Package, 
+  Search, QrCode, ShieldCheck, Target, 
+  TrendingUp, Award, ChevronRight, CheckCircle2,
+  Clock, Box, Wrench, ArrowRight, Play, Recycle, Droplet,
+  Leaf, Star, BarChart3
 } from "lucide-react";
 import { motion } from "framer-motion";
-import EcoTree from "@/components/dashboard/eco-tree";
 
 interface User {
   id: number;
@@ -105,6 +104,8 @@ export default function Dashboard() {
     ? ((userProgress.totalPoints - currentLevelXP) / (nextLevelXP - currentLevelXP)) * 100 
     : 0;
 
+  const recentAchievements = userAchievements.slice(0, 3);
+
   const handleWarrantySearch = () => {
     if (warrantySearch.trim()) {
       setLocation(`/warranty?q=${encodeURIComponent(warrantySearch.trim())}`);
@@ -112,183 +113,172 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50/30">
-      <div className="max-w-7xl mx-auto p-4 md:p-6 space-y-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
+      <div className="max-w-7xl mx-auto p-6 space-y-8">
         
-        {/* Compact Stats Bar */}
+        {/* Hero Section */}
         <motion.div 
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="grid grid-cols-2 md:grid-cols-4 gap-3"
-        >
-          <Card className="bg-gradient-to-br from-violet-500 to-purple-600 border-none text-white shadow-lg">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="text-xs font-medium opacity-90 mb-1">Level</div>
-                  <div className="text-2xl font-bold">{userProgress?.level || 1}</div>
-                </div>
-                <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
-                  <Trophy className="h-6 w-6" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-orange-500 to-red-500 border-none text-white shadow-lg">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="text-xs font-medium opacity-90 mb-1">Streak</div>
-                  <div className="text-2xl font-bold">{userProgress?.currentStreak || 0}</div>
-                </div>
-                <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
-                  <Flame className="h-6 w-6" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-emerald-500 to-teal-600 border-none text-white shadow-lg">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="text-xs font-medium opacity-90 mb-1">Total XP</div>
-                  <div className="text-2xl font-bold">{userProgress?.totalPoints || 0}</div>
-                </div>
-                <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
-                  <Zap className="h-6 w-6" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-blue-500 to-cyan-600 border-none text-white shadow-lg">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="text-xs font-medium opacity-90 mb-1">Progress</div>
-                  <div className="text-2xl font-bold">{Math.round(progressToNextLevel)}%</div>
-                </div>
-                <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
-                  <Target className="h-6 w-6" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
-
-        {/* Eco Tree Visualization */}
-        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="grid grid-cols-1 lg:grid-cols-5 gap-6"
+          className="space-y-4"
         >
-          {/* Tree Container */}
-          <div className="lg:col-span-2 h-[500px]">
-            <EcoTree 
-              xp={userProgress?.totalPoints || 0}
-              achievements={userAchievements.length}
-              completedOrders={completedOrders.length}
-              familiesHelped={impact?.familiesHelped || 0}
-              currentStreak={userProgress?.currentStreak || 0}
-            />
+          <div className="flex items-start justify-between">
+            <div>
+              <h1 className="text-4xl font-bold text-neutral-900 mb-2">
+                Welcome back, {user?.name?.split(' ')[0] || 'there'}
+              </h1>
+              <p className="text-neutral-600 text-lg">
+                Here's your sustainability journey overview
+              </p>
+            </div>
+            <Link href="/achievements">
+              <Button variant="outline" className="gap-2" data-testid="button-view-achievements">
+                <Award className="h-4 w-4" />
+                Achievements
+              </Button>
+            </Link>
           </div>
-          
-          {/* XP Progress & Welcome */}
-          <div className="lg:col-span-3 space-y-4">
-            <Card className="shadow-sm border-2 border-violet-200">
+
+          {/* Progress Stats Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <Card className="border-2 border-violet-100 bg-gradient-to-br from-violet-50 to-white">
               <CardContent className="p-6">
-                <div className="mb-4">
-                  <h2 className="text-2xl font-bold text-neutral-900 mb-1">
-                    Welcome back, {user?.name?.split(' ')[0] || 'there'}! 🌿
-                  </h2>
-                  <p className="text-neutral-600">
-                    Your eco-tree is growing! Keep earning XP to watch it flourish.
-                  </p>
-                </div>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium text-neutral-700">
-                    Level {userProgress?.level || 1} → Level {(userProgress?.level || 1) + 1}
-                  </span>
-                  <span className="text-sm font-semibold text-violet-600">
-                    {((userProgress?.totalPoints || 0) - currentLevelXP).toLocaleString()} / {(nextLevelXP - currentLevelXP).toLocaleString()} XP
-                  </span>
-                </div>
-                <div className="relative h-4 bg-neutral-100 rounded-full overflow-hidden mb-4">
-                  <motion.div 
-                    className="absolute inset-y-0 left-0 bg-gradient-to-r from-violet-500 to-purple-600 rounded-full"
-                    initial={{ width: 0 }}
-                    animate={{ width: `${progressToNextLevel}%` }}
-                    transition={{ duration: 1, ease: "easeOut" }}
-                  />
-                </div>
-                <div className="grid grid-cols-3 gap-3 text-xs">
-                  <div className="text-center p-2 bg-green-50 rounded-lg">
-                    <div className="text-lg font-bold text-green-600">{(userProgress?.totalPoints || 0) * 2}</div>
-                    <div className="text-neutral-600">🍃 Leaves</div>
+                <div className="flex items-center gap-4">
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center flex-shrink-0">
+                    <Trophy className="h-7 w-7 text-white" />
                   </div>
-                  <div className="text-center p-2 bg-pink-50 rounded-lg">
-                    <div className="text-lg font-bold text-pink-600">{userAchievements.length}</div>
-                    <div className="text-neutral-600">🌸 Flowers</div>
+                  <div className="flex-1">
+                    <p className="text-sm text-neutral-600 mb-0.5">Level</p>
+                    <p className="text-3xl font-bold text-neutral-900">{userProgress?.level || 1}</p>
                   </div>
-                  <div className="text-center p-2 bg-blue-50 rounded-lg">
-                    <div className="text-lg font-bold text-blue-600">{impact?.familiesHelped || 0}</div>
-                    <div className="text-neutral-600">💧 Water Drops</div>
+                </div>
+                <div className="mt-4">
+                  <div className="flex items-center justify-between text-xs text-neutral-600 mb-1.5">
+                    <span>Progress</span>
+                    <span className="font-semibold">{Math.round(progressToNextLevel)}%</span>
+                  </div>
+                  <Progress value={progressToNextLevel} className="h-2" />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-2 border-orange-100 bg-gradient-to-br from-orange-50 to-white">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-4">
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center flex-shrink-0">
+                    <Flame className="h-7 w-7 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm text-neutral-600 mb-0.5">Streak</p>
+                    <p className="text-3xl font-bold text-neutral-900">{userProgress?.currentStreak || 0}</p>
+                    <p className="text-xs text-neutral-500">days active</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
-            
-            {/* Quick Game Actions */}
-            <div className="grid grid-cols-2 gap-3">
-              <Link href="/quiz">
-                <Button className="w-full bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-white h-16" data-testid="button-play-quiz-hero">
-                  <div className="text-left flex-1">
-                    <div className="font-bold">Play Quiz</div>
-                    <div className="text-xs opacity-90">+100 XP</div>
+
+            <Card className="border-2 border-emerald-100 bg-gradient-to-br from-emerald-50 to-white">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-4">
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center flex-shrink-0">
+                    <Zap className="h-7 w-7 text-white" />
                   </div>
-                  <Play className="h-5 w-5" />
-                </Button>
-              </Link>
-              <Link href="/sorting-game">
-                <Button className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white h-16" data-testid="button-play-game-hero">
-                  <div className="text-left flex-1">
-                    <div className="font-bold">Sorting Game</div>
-                    <div className="text-xs opacity-90">+120 XP</div>
+                  <div className="flex-1">
+                    <p className="text-sm text-neutral-600 mb-0.5">Total XP</p>
+                    <p className="text-3xl font-bold text-neutral-900">{userProgress?.totalPoints || 0}</p>
+                    <p className="text-xs text-neutral-500">{((userProgress?.totalPoints || 0) - currentLevelXP).toLocaleString()} / {(nextLevelXP - currentLevelXP).toLocaleString()} to next</p>
                   </div>
-                  <Recycle className="h-5 w-5" />
-                </Button>
-              </Link>
-            </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-2 border-blue-100 bg-gradient-to-br from-blue-50 to-white">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-4">
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center flex-shrink-0">
+                    <Star className="h-7 w-7 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm text-neutral-600 mb-0.5">Achievements</p>
+                    <p className="text-3xl font-bold text-neutral-900">{userAchievements.length}</p>
+                    <p className="text-xs text-neutral-500">unlocked</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </motion.div>
 
-        {/* Main Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           
-          {/* Left Column - Orders & RMAs (8 cols) */}
-          <div className="lg:col-span-8 space-y-6">
+          {/* Left Column - Orders & Quick Actions */}
+          <div className="lg:col-span-2 space-y-6">
             
+            {/* Interactive Learning */}
+            <Card className="border-2 border-violet-100">
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center gap-2">
+                  <Play className="h-5 w-5 text-violet-600" />
+                  Interactive Learning
+                </CardTitle>
+                <p className="text-sm text-neutral-600">Earn XP and learn about sustainability</p>
+              </CardHeader>
+              <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <Link href="/quiz">
+                  <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                    <Card className="border-2 border-violet-200 bg-gradient-to-br from-violet-500 to-purple-600 text-white cursor-pointer" data-testid="card-quiz">
+                      <CardContent className="p-6">
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
+                            <Target className="h-6 w-6" />
+                          </div>
+                          <Badge className="bg-white/30 hover:bg-white/30 text-white border-0">+100 XP</Badge>
+                        </div>
+                        <h3 className="font-bold text-lg mb-1">Sustainability Quiz</h3>
+                        <p className="text-sm text-violet-100">Test your knowledge on circular computing</p>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                </Link>
+
+                <Link href="/sorting-game">
+                  <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                    <Card className="border-2 border-emerald-200 bg-gradient-to-br from-emerald-500 to-teal-600 text-white cursor-pointer" data-testid="card-sorting-game">
+                      <CardContent className="p-6">
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
+                            <Recycle className="h-6 w-6" />
+                          </div>
+                          <Badge className="bg-white/30 hover:bg-white/30 text-white border-0">+120 XP</Badge>
+                        </div>
+                        <h3 className="font-bold text-lg mb-1">Waste Sorting Game</h3>
+                        <p className="text-sm text-emerald-100">Learn proper e-waste categorization</p>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                </Link>
+              </CardContent>
+            </Card>
+
             {/* Active Orders */}
-            <Card className="shadow-sm">
-              <CardHeader className="border-b bg-gradient-to-r from-neutral-50 to-white">
+            <Card>
+              <CardHeader className="border-b">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#08ABAB] to-emerald-500 flex items-center justify-center">
                       <Package className="h-5 w-5 text-white" />
                     </div>
                     <div>
-                      <CardTitle className="text-lg">Active Orders</CardTitle>
-                      <p className="text-xs text-neutral-500 mt-0.5">Track your in-progress shipments</p>
+                      <CardTitle>Active Orders</CardTitle>
+                      <p className="text-sm text-neutral-500 mt-0.5">Track your in-progress shipments</p>
                     </div>
                   </div>
                   {activeOrders.length > 3 && (
                     <Link href="/orders">
                       <Button variant="ghost" size="sm" className="gap-1" data-testid="button-view-all-orders">
                         View All
-                        <ArrowRight className="h-3.5 w-3.5" />
+                        <ArrowRight className="h-4 w-4" />
                       </Button>
                     </Link>
                   )}
@@ -356,74 +346,8 @@ export default function Dashboard() {
               </CardContent>
             </Card>
 
-            {/* Active RMAs */}
-            <Card className="shadow-sm">
-              <CardHeader className="border-b bg-gradient-to-r from-orange-50 to-white">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center">
-                      <Wrench className="h-5 w-5 text-white" />
-                    </div>
-                    <div>
-                      <CardTitle className="text-lg">Warranty Cases</CardTitle>
-                      <p className="text-xs text-neutral-500 mt-0.5">Manage your active support requests</p>
-                    </div>
-                  </div>
-                  {activeRMAs.length > 0 && (
-                    <Link href="/rma">
-                      <Button variant="ghost" size="sm" className="gap-1" data-testid="button-view-all-rmas">
-                        View All
-                        <ArrowRight className="h-3.5 w-3.5" />
-                      </Button>
-                    </Link>
-                  )}
-                </div>
-              </CardHeader>
-              <CardContent className="p-0">
-                {activeRMAs.length > 0 ? (
-                  <div className="divide-y">
-                    {activeRMAs.map((rmaItem) => (
-                      <Link key={rmaItem.rma.id} href={`/rma/${rmaItem.rma.rmaNumber}`}>
-                        <motion.div
-                          whileHover={{ backgroundColor: "rgb(255, 247, 237)" }}
-                          className="p-5 cursor-pointer transition-colors"
-                          data-testid={`rma-card-${rmaItem.rma.rmaNumber}`}
-                        >
-                          <div className="flex items-center justify-between gap-4">
-                            <div className="flex items-center gap-4 flex-1">
-                              <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-orange-100 to-red-100 flex items-center justify-center flex-shrink-0">
-                                <Wrench className="h-5 w-5 text-orange-600" />
-                              </div>
-                              <div className="flex-1">
-                                <div className="flex items-center gap-2 mb-1.5">
-                                  <span className="font-semibold text-neutral-900">{rmaItem.rma.rmaNumber}</span>
-                                  <Badge className="bg-orange-100 text-orange-700 hover:bg-orange-100" variant="secondary">
-                                    {rmaItem.rma.status}
-                                  </Badge>
-                                </div>
-                                <div className="text-xs text-neutral-600">
-                                  Opened {new Date(rmaItem.rma.createdAt).toLocaleDateString()}
-                                </div>
-                              </div>
-                            </div>
-                            <ChevronRight className="h-5 w-5 text-neutral-400" />
-                          </div>
-                        </motion.div>
-                      </Link>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-12 text-neutral-500">
-                    <CheckCircle2 className="h-12 w-12 mx-auto mb-3 text-green-400" />
-                    <p className="text-sm font-medium">No active cases</p>
-                    <p className="text-xs mt-1">All products running smoothly 🎉</p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
             {/* Warranty Lookup */}
-            <Card className="shadow-sm border-2 border-blue-100 bg-gradient-to-br from-blue-50/50 to-cyan-50/50">
+            <Card className="border-2 border-blue-100 bg-gradient-to-br from-blue-50/50 to-white">
               <CardContent className="p-6">
                 <div className="flex items-start gap-4 mb-4">
                   <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center flex-shrink-0">
@@ -461,167 +385,171 @@ export default function Dashboard() {
             </Card>
           </div>
 
-          {/* Right Column - Quick Actions & Stats (4 cols) */}
-          <div className="lg:col-span-4 space-y-6">
+          {/* Right Column - Stats & Achievements */}
+          <div className="space-y-6">
             
-            {/* Quick Actions */}
-            <Card className="shadow-sm">
-              <CardHeader className="border-b">
-                <CardTitle className="text-base">Quick Actions</CardTitle>
+            {/* Environmental Impact */}
+            <Card className="border-2 border-emerald-100">
+              <CardHeader className="border-b bg-gradient-to-br from-emerald-50 to-white">
+                <CardTitle className="flex items-center gap-2">
+                  <Leaf className="h-5 w-5 text-emerald-600" />
+                  Your Impact
+                </CardTitle>
               </CardHeader>
-              <CardContent className="p-4 space-y-2">
-                <Link href="/quiz">
-                  <Button className="w-full bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-white justify-start gap-2 h-11" data-testid="button-play-quiz">
-                    <Play className="h-4 w-4" />
-                    <span className="flex-1 text-left">Play Sustainability Quiz</span>
-                    <Badge className="bg-white/20 hover:bg-white/20 text-white border-0">+100 XP</Badge>
-                  </Button>
-                </Link>
-                <Link href="/sorting-game">
-                  <Button className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white justify-start gap-2 h-11" data-testid="button-play-sorting-game">
-                    <Recycle className="h-4 w-4" />
-                    <span className="flex-1 text-left">Waste Sorting Game</span>
-                    <Badge className="bg-white/20 hover:bg-white/20 text-white border-0">+120 XP</Badge>
-                  </Button>
-                </Link>
-                <Link href="/warranty">
-                  <Button variant="outline" className="w-full justify-start gap-2 border-2 h-11" data-testid="button-check-warranty">
-                    <ShieldCheck className="h-4 w-4" />
-                    <span className="flex-1 text-left">Check Warranty</span>
-                  </Button>
-                </Link>
-                <Link href="/achievements">
-                  <Button variant="outline" className="w-full justify-start gap-2 border-2 h-11" data-testid="button-achievements">
-                    <Award className="h-4 w-4" />
-                    <span className="flex-1 text-left">View Achievements</span>
-                  </Button>
-                </Link>
+              <CardContent className="p-6 space-y-4">
                 <Link href="/impact">
-                  <Button variant="outline" className="w-full justify-start gap-2 border-2 h-11" data-testid="button-view-impact">
-                    <Leaf className="h-4 w-4" />
-                    <span className="flex-1 text-left">Track Impact</span>
+                  <motion.div whileHover={{ scale: 1.02 }} className="cursor-pointer">
+                    <div className="p-4 rounded-xl bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200">
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className="w-10 h-10 rounded-lg bg-green-500 flex items-center justify-center">
+                          <TrendingUp className="h-5 w-5 text-white" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-sm text-neutral-600">CO₂ Saved</p>
+                          <p className="text-2xl font-bold text-neutral-900">{impact?.carbonSaved || 0} kg</p>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                </Link>
+
+                <div className="p-4 rounded-xl bg-gradient-to-br from-blue-50 to-cyan-50 border border-blue-200">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="w-10 h-10 rounded-lg bg-blue-500 flex items-center justify-center">
+                      <Droplet className="h-5 w-5 text-white" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm text-neutral-600">Water Provided</p>
+                      <p className="text-2xl font-bold text-neutral-900">{impact?.waterProvided || 0} L</p>
+                    </div>
+                  </div>
+                  <p className="text-xs text-neutral-600 mt-2">
+                    Helping {impact?.familiesHelped || 0} families access clean water
+                  </p>
+                </div>
+
+                <Link href="/impact">
+                  <Button variant="outline" className="w-full gap-2" data-testid="button-view-full-impact">
+                    <BarChart3 className="h-4 w-4" />
+                    View Full Impact Report
                   </Button>
                 </Link>
               </CardContent>
             </Card>
 
-            {/* Latest Achievement */}
-            {userAchievements.length > 0 && (
-              <Card className="shadow-sm border-2 border-amber-200 bg-gradient-to-br from-amber-50 to-orange-50">
-                <CardHeader className="border-b border-amber-200/50 pb-3">
-                  <CardTitle className="text-base flex items-center gap-2">
-                    <Trophy className="h-5 w-5 text-amber-600" />
-                    Latest Achievement
+            {/* Recent Achievements */}
+            <Card className="border-2 border-yellow-100">
+              <CardHeader className="border-b bg-gradient-to-br from-yellow-50 to-white">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center gap-2">
+                    <Award className="h-5 w-5 text-yellow-600" />
+                    Recent Achievements
                   </CardTitle>
-                </CardHeader>
-                <CardContent className="p-4">
-                  {userAchievements.slice(0, 1).map((userAchievement) => {
-                    const achievement = userAchievement.achievement;
-                    return (
-                      <div key={userAchievement.id} className="space-y-3">
-                        <div className="flex items-start gap-3">
-                          <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center flex-shrink-0">
-                            <i className={`${achievement.icon} text-2xl text-white`}></i>
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <h4 className="font-bold text-neutral-900 mb-1">{achievement.name}</h4>
-                            <p className="text-sm text-neutral-600 leading-snug">{achievement.description}</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center justify-between p-3 bg-gradient-to-r from-orange-100 to-amber-100 rounded-lg border border-orange-200">
-                          <span className="text-sm font-medium text-neutral-700">XP Earned</span>
-                          <Badge className="bg-gradient-to-r from-orange-500 to-red-500 hover:bg-gradient-to-r text-white border-0">
-                            <Zap className="h-3 w-3 mr-1" />
-                            +{achievement.pointsAwarded}
-                          </Badge>
-                        </div>
-                        <Link href="/achievements">
-                          <Button variant="outline" className="w-full border-2 border-amber-300 hover:bg-amber-100" data-testid="button-view-all-achievements">
-                            View All Achievements
-                          </Button>
-                        </Link>
-                      </div>
-                    );
-                  })}
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Impact Summary */}
-            <Card className="shadow-sm border-2 border-emerald-200 bg-gradient-to-br from-emerald-50 to-green-50">
-              <CardHeader className="border-b border-emerald-200/50 pb-3">
-                <CardTitle className="text-base flex items-center gap-2">
-                  <Leaf className="h-5 w-5 text-emerald-600" />
-                  Impact Summary
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-4">
-                {isLoadingImpact ? (
-                  <div className="space-y-3">
-                    {[1, 2].map((i) => (
-                      <Skeleton key={i} className="h-16 rounded-lg" />
-                    ))}
-                  </div>
-                ) : impact ? (
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between p-3 bg-white rounded-lg border-2 border-emerald-200">
-                      <div>
-                        <div className="text-xs text-neutral-600 mb-1">Carbon Saved</div>
-                        <div className="text-2xl font-bold text-emerald-600">{impact.carbonSaved}g</div>
-                      </div>
-                      <div className="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center">
-                        <Leaf className="h-6 w-6 text-emerald-600" />
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between p-3 bg-white rounded-lg border-2 border-cyan-200">
-                      <div>
-                        <div className="text-xs text-neutral-600 mb-1">Families Helped</div>
-                        <div className="text-2xl font-bold text-cyan-600">{impact.familiesHelped}</div>
-                      </div>
-                      <div className="w-12 h-12 rounded-full bg-cyan-100 flex items-center justify-center">
-                        <i className="ri-water-flash-line text-2xl text-cyan-600"></i>
-                      </div>
-                    </div>
-                    <Link href="/impact">
-                      <Button variant="outline" className="w-full border-2 border-emerald-300 hover:bg-emerald-100" data-testid="button-view-full-impact-report">
-                        View Full Impact Report
-                        <TrendingUp className="h-4 w-4 ml-2" />
+                  {recentAchievements.length > 0 && (
+                    <Link href="/achievements">
+                      <Button variant="ghost" size="sm" className="gap-1" data-testid="button-view-all-achievements">
+                        View All
+                        <ArrowRight className="h-4 w-4" />
                       </Button>
                     </Link>
+                  )}
+                </div>
+              </CardHeader>
+              <CardContent className="p-0">
+                {recentAchievements.length > 0 ? (
+                  <div className="divide-y">
+                    {recentAchievements.map((userAchievement) => (
+                      <div key={userAchievement.id} className="p-4">
+                        <div className="flex items-start gap-3">
+                          <div className="text-3xl flex-shrink-0">{userAchievement.achievement.icon}</div>
+                          <div className="flex-1 min-w-0">
+                            <div className="font-semibold text-neutral-900 mb-0.5">
+                              {userAchievement.achievement.name}
+                            </div>
+                            <p className="text-sm text-neutral-600 mb-2">
+                              {userAchievement.achievement.description}
+                            </p>
+                            <div className="flex items-center gap-2">
+                              <Badge className="bg-yellow-100 text-yellow-700 hover:bg-yellow-100">
+                                +{userAchievement.achievement.pointsAwarded} XP
+                              </Badge>
+                              <span className="text-xs text-neutral-500">
+                                {new Date(userAchievement.unlockedAt).toLocaleDateString()}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 ) : (
-                  <div className="text-center py-6 text-neutral-500">
-                    <Leaf className="h-10 w-10 mx-auto mb-2 text-neutral-300" />
-                    <p className="text-xs">No impact data yet</p>
+                  <div className="text-center py-12 text-neutral-500">
+                    <Award className="h-12 w-12 mx-auto mb-3 text-neutral-300" />
+                    <p className="text-sm font-medium">No achievements yet</p>
+                    <p className="text-xs mt-1">Complete activities to earn your first achievement!</p>
                   </div>
                 )}
               </CardContent>
             </Card>
 
-            {/* Support */}
-            <Card className="shadow-sm">
-              <CardHeader className="border-b pb-3">
-                <CardTitle className="text-base">Need Help?</CardTitle>
+            {/* Active RMAs */}
+            <Card>
+              <CardHeader className="border-b">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Wrench className="h-5 w-5 text-orange-600" />
+                    <CardTitle>Warranty Cases</CardTitle>
+                  </div>
+                  {activeRMAs.length > 0 && (
+                    <Link href="/rma">
+                      <Button variant="ghost" size="sm" className="gap-1" data-testid="button-view-all-rmas">
+                        View All
+                        <ArrowRight className="h-4 w-4" />
+                      </Button>
+                    </Link>
+                  )}
+                </div>
               </CardHeader>
-              <CardContent className="p-4 space-y-2">
-                <Link href="/support">
-                  <Button variant="outline" className="w-full justify-start gap-2 border-2" size="sm" data-testid="button-contact-support">
-                    <i className="ri-customer-service-line text-base"></i>
-                    Contact Support
-                  </Button>
-                </Link>
-                <Link href="/quiz">
-                  <Button variant="outline" className="w-full justify-start gap-2 border-2" size="sm" data-testid="button-learn-earn-xp">
-                    <i className="ri-lightbulb-line text-base"></i>
-                    Learn & Earn XP
-                  </Button>
-                </Link>
-                <Link href="/impact">
-                  <Button variant="outline" className="w-full justify-start gap-2 border-2" size="sm" data-testid="button-track-impact">
-                    <Leaf className="h-4 w-4" />
-                    Track Your Impact
-                  </Button>
-                </Link>
+              <CardContent className="p-0">
+                {activeRMAs.length > 0 ? (
+                  <div className="divide-y">
+                    {activeRMAs.map((rmaItem) => (
+                      <Link key={rmaItem.rma.id} href={`/rma/${rmaItem.rma.rmaNumber}`}>
+                        <motion.div
+                          whileHover={{ backgroundColor: "rgb(255, 247, 237)" }}
+                          className="p-4 cursor-pointer transition-colors"
+                          data-testid={`rma-card-${rmaItem.rma.rmaNumber}`}
+                        >
+                          <div className="flex items-center justify-between gap-4">
+                            <div className="flex items-center gap-3 flex-1">
+                              <div className="w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center flex-shrink-0">
+                                <Wrench className="h-4 w-4 text-orange-600" />
+                              </div>
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-1">
+                                  <span className="font-semibold text-sm text-neutral-900">{rmaItem.rma.rmaNumber}</span>
+                                  <Badge className="bg-orange-100 text-orange-700 hover:bg-orange-100 text-xs" variant="secondary">
+                                    {rmaItem.rma.status}
+                                  </Badge>
+                                </div>
+                                <div className="text-xs text-neutral-600">
+                                  {new Date(rmaItem.rma.createdAt).toLocaleDateString()}
+                                </div>
+                              </div>
+                            </div>
+                            <ChevronRight className="h-4 w-4 text-neutral-400" />
+                          </div>
+                        </motion.div>
+                      </Link>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-neutral-500">
+                    <CheckCircle2 className="h-10 w-10 mx-auto mb-2 text-green-400" />
+                    <p className="text-sm font-medium">No active cases</p>
+                    <p className="text-xs mt-1">All systems running smoothly</p>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>
