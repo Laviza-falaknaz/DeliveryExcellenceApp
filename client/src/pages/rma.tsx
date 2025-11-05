@@ -26,6 +26,32 @@ import { formatDate } from "@/lib/utils";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Link } from "wouter";
 
+// Define types for RMA request logs
+type RmaRequestLog = {
+  id: number;
+  userId: number;
+  requestNumber: string;
+  fullName: string;
+  companyName: string;
+  email: string;
+  phone: string;
+  address: string;
+  deliveryAddress: string;
+  recipientContactNumber: string;
+  countryOfPurchase: string;
+  numberOfProducts: number;
+  productMakeModel: string;
+  manufacturerSerialNumber: string;
+  inHouseSerialNumber: string;
+  faultDescription: string;
+  fileAttachment: { name: string; size: number; type: string } | null;
+  status: "submitted" | "approved" | "declined";
+  rmaNumber: string | null;
+  declineReason: string | null;
+  createdAt: Date | null;
+  processedAt: Date | null;
+};
+
 // Define types for RMA with items
 type RmaItem = {
   id: number;
@@ -54,9 +80,17 @@ type RmaWithItems = {
 
 export default function RMA() {
   const [selectedRma, setSelectedRma] = useState<RmaWithItems | null>(null);
+  const [selectedRequest, setSelectedRequest] = useState<RmaRequestLog | null>(null);
   const [isRmaDetailsOpen, setIsRmaDetailsOpen] = useState(false);
+  const [isRequestDetailsOpen, setIsRequestDetailsOpen] = useState(false);
   const { toast } = useToast();
 
+  // Fetch RMA request logs (submitted/approved/declined)
+  const { data: requestLogs, isLoading: requestLogsLoading } = useQuery<RmaRequestLog[]>({
+    queryKey: ["/api/rma-requests"],
+  });
+
+  // Fetch actual RMAs (in progress/completed)
   const { data: rmas, isLoading, error: rmaError } = useQuery<RmaWithItems[]>({
     queryKey: ["/api/rma"],
   });
@@ -71,10 +105,14 @@ export default function RMA() {
 
   function getStatusColor(status: string): string {
     switch (status) {
+      case "submitted":
+        return "bg-blue-100 text-blue-800";
       case "requested":
         return "bg-blue-100 text-blue-800";
       case "approved":
         return "bg-green-100 text-green-800";
+      case "declined":
+        return "bg-red-100 text-red-800";
       case "in_transit":
         return "bg-purple-100 text-purple-800";
       case "received":
@@ -97,6 +135,11 @@ export default function RMA() {
   function handleRmaClick(rma: RmaWithItems) {
     setSelectedRma(rma);
     setIsRmaDetailsOpen(true);
+  }
+
+  function handleRequestClick(request: RmaRequestLog) {
+    setSelectedRequest(request);
+    setIsRequestDetailsOpen(true);
   }
 
   return (
@@ -187,17 +230,72 @@ export default function RMA() {
           </Alert>
         )}
 
-        {isLoading ? (
+        {isLoading || requestLogsLoading ? (
           <div className="space-y-4">
             <Skeleton className="h-20 w-full" />
             <Skeleton className="h-20 w-full" />
           </div>
-        ) : rmas && rmas.length > 0 ? (
-          <Tabs defaultValue="active" className="w-full">
+        ) : (rmas && rmas.length > 0) || (requestLogs && requestLogs.length > 0) ? (
+          <Tabs defaultValue="requests" className="w-full">
             <TabsList className="mb-4">
-              <TabsTrigger value="active">Active RMAs ({activeRmas.length})</TabsTrigger>
-              <TabsTrigger value="completed">Completed RMAs ({completedRmas.length})</TabsTrigger>
+              <TabsTrigger value="requests">Submitted Requests ({requestLogs?.length || 0})</TabsTrigger>
+              <TabsTrigger value="active">In Progress ({activeRmas.length})</TabsTrigger>
+              <TabsTrigger value="completed">Completed ({completedRmas.length})</TabsTrigger>
             </TabsList>
+            <TabsContent value="requests">
+              {requestLogs && requestLogs.length > 0 ? (
+                <div className="space-y-4">
+                  {requestLogs.map((request) => (
+                    <Card key={request.id} className="cursor-pointer hover:border-accent/50 transition-colors" onClick={() => handleRequestClick(request)}>
+                      <CardContent className="p-4">
+                        <div className="flex flex-col md:flex-row md:items-start md:justify-between mb-3">
+                          <div className="flex-1">
+                            <div className="flex items-center mb-2">
+                              <h3 className="font-medium">Request #{request.requestNumber}</h3>
+                              <Badge className={`ml-3 ${getStatusColor(request.status)}`}>
+                                {getStatusLabel(request.status)}
+                              </Badge>
+                            </div>
+                            <p className="text-sm text-neutral-600 mb-2">
+                              {request.productMakeModel} • Serial: {request.manufacturerSerialNumber}
+                            </p>
+                            <div className="text-xs bg-neutral-50 px-2 py-1 rounded space-y-0.5">
+                              <div className="text-neutral-700">
+                                <span className="font-medium">Email:</span> {request.email}
+                              </div>
+                              <div className="text-neutral-500">
+                                Issue: {request.faultDescription.substring(0, 80)}{request.faultDescription.length > 80 ? '...' : ''}
+                              </div>
+                              {request.status === 'approved' && request.rmaNumber && (
+                                <div className="text-emerald-600 font-medium">
+                                  Approved - RMA #{request.rmaNumber} created
+                                </div>
+                              )}
+                              {request.status === 'declined' && request.declineReason && (
+                                <div className="text-red-600 font-medium">
+                                  Declined: {request.declineReason}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                          <div className="mt-2 md:mt-0 md:ml-4 text-sm text-neutral-500">
+                            {request.createdAt && `Submitted ${formatDate(request.createdAt)}`}
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              ) : (
+                <div className="p-8 text-center bg-white rounded-xl shadow-sm border border-neutral-200">
+                  <h3 className="text-lg font-medium text-neutral-700">No submitted requests</h3>
+                  <p className="text-neutral-500 mt-2">You haven't submitted any warranty claim requests yet.</p>
+                  <Button variant="outline" className="mt-4" asChild>
+                    <Link href="/warranty-claim">Create New Request</Link>
+                  </Button>
+                </div>
+              )}
+            </TabsContent>
             <TabsContent value="active">
               {activeRmas.length > 0 ? (
                 <div className="space-y-4">
@@ -616,6 +714,157 @@ export default function RMA() {
                 <Button asChild>
                   <a href="https://circularcomputing.com/contact/" target="_blank" rel="noreferrer">Contact Support</a>
                 </Button>
+              </DialogFooter>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Request Details Dialog */}
+      <Dialog open={isRequestDetailsOpen} onOpenChange={setIsRequestDetailsOpen}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          {selectedRequest && (
+            <>
+              <DialogHeader>
+                <DialogTitle>Request Details: {selectedRequest.requestNumber}</DialogTitle>
+                <DialogDescription>
+                  Status: <Badge className={getStatusColor(selectedRequest.status)}>{getStatusLabel(selectedRequest.status)}</Badge>
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="space-y-6">
+                {/* Status Information */}
+                {selectedRequest.status === 'submitted' && (
+                  <Alert className="bg-blue-50 border-blue-200">
+                    <i className="ri-information-line h-4 w-4 text-blue-600" />
+                    <AlertTitle>Request Submitted</AlertTitle>
+                    <AlertDescription>
+                      Your warranty claim request is being reviewed. You'll be notified once it's processed.
+                    </AlertDescription>
+                  </Alert>
+                )}
+                
+                {selectedRequest.status === 'approved' && selectedRequest.rmaNumber && (
+                  <Alert className="bg-green-50 border-green-200">
+                    <i className="ri-check-line h-4 w-4 text-green-600" />
+                    <AlertTitle>Request Approved</AlertTitle>
+                    <AlertDescription>
+                      Your request has been approved and RMA #{selectedRequest.rmaNumber} has been created. Check the "In Progress" tab to track it.
+                    </AlertDescription>
+                  </Alert>
+                )}
+                
+                {selectedRequest.status === 'declined' && (
+                  <Alert variant="destructive">
+                    <i className="ri-error-warning-line h-4 w-4" />
+                    <AlertTitle>Request Declined</AlertTitle>
+                    <AlertDescription>
+                      {selectedRequest.declineReason || "Your request was declined. Please contact support for more information."}
+                    </AlertDescription>
+                  </Alert>
+                )}
+
+                {/* Customer Information */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <h4 className="font-medium text-sm text-neutral-500">Full Name</h4>
+                    <p className="text-sm">{selectedRequest.fullName}</p>
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-sm text-neutral-500">Company</h4>
+                    <p className="text-sm">{selectedRequest.companyName}</p>
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-sm text-neutral-500">Email</h4>
+                    <p className="text-sm">{selectedRequest.email}</p>
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-sm text-neutral-500">Phone</h4>
+                    <p className="text-sm">{selectedRequest.phone}</p>
+                  </div>
+                </div>
+
+                {/* Product Information */}
+                <div className="border-t pt-4">
+                  <h3 className="font-medium mb-3">Product Information</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <h4 className="font-medium text-sm text-neutral-500">Product</h4>
+                      <p className="text-sm">{selectedRequest.productMakeModel}</p>
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-sm text-neutral-500">Quantity</h4>
+                      <p className="text-sm">{selectedRequest.numberOfProducts}</p>
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-sm text-neutral-500">Manufacturer Serial</h4>
+                      <p className="text-sm">{selectedRequest.manufacturerSerialNumber}</p>
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-sm text-neutral-500">In-house Serial</h4>
+                      <p className="text-sm">{selectedRequest.inHouseSerialNumber}</p>
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-sm text-neutral-500">Country of Purchase</h4>
+                      <p className="text-sm">{selectedRequest.countryOfPurchase}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Fault Description */}
+                <div className="border-t pt-4">
+                  <h3 className="font-medium mb-2">Fault Description</h3>
+                  <p className="text-sm text-neutral-600 bg-neutral-50 p-3 rounded">{selectedRequest.faultDescription}</p>
+                </div>
+
+                {/* Delivery Information */}
+                <div className="border-t pt-4">
+                  <h3 className="font-medium mb-3">Delivery Information</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <h4 className="font-medium text-sm text-neutral-500">Pickup Address</h4>
+                      <p className="text-sm">{selectedRequest.address}</p>
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-sm text-neutral-500">Delivery Address</h4>
+                      <p className="text-sm">{selectedRequest.deliveryAddress}</p>
+                    </div>
+                    <div className="col-span-2">
+                      <h4 className="font-medium text-sm text-neutral-500">Recipient Contact</h4>
+                      <p className="text-sm">{selectedRequest.recipientContactNumber}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Timestamps */}
+                <div className="border-t pt-4">
+                  <div className="grid grid-cols-2 gap-4 text-sm text-neutral-500">
+                    {selectedRequest.createdAt && (
+                      <div>
+                        <span className="font-medium">Submitted:</span> {formatDate(selectedRequest.createdAt)}
+                      </div>
+                    )}
+                    {selectedRequest.processedAt && (
+                      <div>
+                        <span className="font-medium">Processed:</span> {formatDate(selectedRequest.processedAt)}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setIsRequestDetailsOpen(false)}>
+                  Close
+                </Button>
+                {selectedRequest.status === 'approved' && selectedRequest.rmaNumber && (
+                  <Button onClick={() => {
+                    setIsRequestDetailsOpen(false);
+                    // Switch to In Progress tab
+                  }}>
+                    View RMA
+                  </Button>
+                )}
               </DialogFooter>
             </>
           )}

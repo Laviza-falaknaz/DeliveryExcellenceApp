@@ -488,6 +488,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get all RMA request logs for the authenticated user
+  app.get("/api/rma-requests", isAuthenticated, async (req, res) => {
+    try {
+      const user = req.user as User;
+      const requestLogs = await storage.getRmaRequestLogsByUserId(user.id);
+      res.json(requestLogs);
+    } catch (error) {
+      console.error("Error fetching RMA request logs:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Get specific RMA request log by request number
+  app.get("/api/rma-request/:requestNumber", isAuthenticated, async (req, res) => {
+    try {
+      const requestNumber = req.params.requestNumber;
+      const requestLog = await storage.getRmaRequestLogByNumber(requestNumber);
+      
+      if (!requestLog) {
+        return res.status(404).json({ message: "Request not found" });
+      }
+      
+      const user = req.user as User;
+      if (requestLog.userId !== user.id) {
+        return res.status(403).json({ message: "Forbidden" });
+      }
+      
+      res.json(requestLog);
+    } catch (error) {
+      console.error("Error fetching RMA request log:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   app.get("/api/rma/:rmaNumber", isAuthenticated, async (req, res) => {
     try {
       const rmaNumber = req.params.rmaNumber;
@@ -509,6 +543,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // New warranty claim RMA endpoint (from warranty claim form)
+  // This creates a request log and sends email, but doesn't create actual RMA yet
   app.post("/api/rmas", isAuthenticated, async (req, res) => {
     try {
       const user = req.user as User;
@@ -540,7 +575,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const validatedData = warrantyClaimSchema.parse(req.body);
       
-      // Determine which user ID to use for the RMA
+      // Determine which user ID to use for the request
       let targetUserId = user.id;
       let newUserCreated = false;
       
@@ -575,29 +610,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      // Generate RMA number
-      const rmaNumber = `RMA-${Math.floor(10000 + Math.random() * 90000)}`;
+      // Generate request number
+      const requestNumber = `REQ-${Math.floor(10000 + Math.random() * 90000)}`;
       
-      // Create RMA
-      const rmaData = insertRmaSchema.parse({
+      // Create RMA request log (not an actual RMA yet)
+      const requestLog = await storage.createRmaRequestLog({
         userId: targetUserId,
-        rmaNumber,
+        requestNumber,
+        fullName: validatedData.fullName,
+        companyName: validatedData.companyName,
         email: validatedData.email,
-        status: "requested",
-      });
-      
-      const rma = await storage.createRma(rmaData);
-      
-      // Create RMA item
-      await storage.createRmaItem({
-        rmaId: rma.id,
-        serialNumber: validatedData.manufacturerSerialNumber,
-        errorDescription: validatedData.faultDescription,
-        receivedAtWarehouseOn: null,
-        solution: "Pending",
-        reasonForReturn: validatedData.faultDescription,
-        productDetails: `${validatedData.productMakeModel} - In-house SN: ${validatedData.inHouseSerialNumber}`,
-        relatedOrder: null,
+        phone: validatedData.phone,
+        address: validatedData.address,
+        deliveryAddress: validatedData.deliveryAddress,
+        recipientContactNumber: validatedData.recipientContactNumber,
+        countryOfPurchase: validatedData.countryOfPurchase,
+        numberOfProducts: validatedData.numberOfProducts,
+        productMakeModel: validatedData.productMakeModel,
+        manufacturerSerialNumber: validatedData.manufacturerSerialNumber,
+        inHouseSerialNumber: validatedData.inHouseSerialNumber,
+        faultDescription: validatedData.faultDescription,
+        fileAttachment: validatedData.fileAttachment || null,
+        status: "submitted",
+        rmaNumber: null,
+        declineReason: null,
+        processedAt: null,
       });
       
       // Send email notifications asynchronously (don't block response)
@@ -608,12 +645,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
           // Get admin settings for notification emails
           const adminSettings = await storage.getSystemSetting('admin_portal');
           
-          // Send RMA notification
+          // Send RMA request notification
           if (adminSettings?.settingValue?.rmaNotificationEmails) {
             await sendRmaNotification(
               adminSettings.settingValue.rmaNotificationEmails,
               {
-                rmaNumber: rma.rmaNumber,
+                rmaNumber: requestLog.requestNumber,
                 customerName: validatedData.fullName,
                 customerEmail: validatedData.email,
                 productDetails: validatedData.productMakeModel,
@@ -631,7 +668,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 userName: validatedData.fullName,
                 userEmail: validatedData.email,
                 userCompany: validatedData.companyName,
-                rmaNumber: rma.rmaNumber,
+                rmaNumber: requestLog.requestNumber,
               }
             );
           }
@@ -641,9 +678,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       })();
       
-      // Return RMA with items
-      const rmaWithItems = await storage.getRmaWithItems(rma.rmaNumber);
-      res.status(201).json(rmaWithItems);
+      // Return request log (not an RMA)
+      res.status(201).json({
+        requestNumber: requestLog.requestNumber,
+        status: requestLog.status,
+        createdAt: requestLog.createdAt,
+        message: "Your warranty claim request has been submitted successfully. You will be notified once it is reviewed.",
+      });
     } catch (error) {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: "Validation error", errors: error.errors });

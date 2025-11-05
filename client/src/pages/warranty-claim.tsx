@@ -288,14 +288,12 @@ export default function WarrantyClaim() {
         } : null
       };
 
-      // Submit RMA request
-      await apiRequest("POST", "/api/rmas", rmaData);
+      // Submit RMA request (creates request log, not actual RMA)
+      const response: any = await apiRequest("POST", "/api/rmas", rmaData);
       
       toast({
-        title: "RMA Request Submitted",
-        description: emailChangeDecision === 'new' 
-          ? "Your RMA request has been submitted. A new account will be created once approved by management."
-          : "Your RMA request has been submitted successfully. Our team will review it and contact you shortly.",
+        title: "Request Submitted Successfully",
+        description: response?.message || "Your warranty claim request has been submitted. You'll be notified once it's reviewed.",
       });
       
       form.reset();
@@ -306,7 +304,7 @@ export default function WarrantyClaim() {
     } catch (error) {
       toast({
         title: "Error",
-        description: "Unable to submit your RMA request. Please try again.",
+        description: "Unable to submit your warranty claim request. Please try again.",
         variant: "destructive",
       });
     } finally {

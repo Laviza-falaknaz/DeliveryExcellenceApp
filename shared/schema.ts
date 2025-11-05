@@ -170,6 +170,50 @@ export const insertRmaItemSchema = createInsertSchema(rmaItems).omit({
 export type RmaItem = typeof rmaItems.$inferSelect;
 export type InsertRmaItem = z.infer<typeof insertRmaItemSchema>;
 
+// RMA Request Log schema (tracks submitted requests before RMA creation)
+export const rmaRequestStatusEnum = pgEnum("rma_request_status", [
+  "submitted",
+  "approved",
+  "declined",
+]);
+
+export const rmaRequestLogs = pgTable("rma_request_logs", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id),
+  requestNumber: text("request_number").notNull().unique(),
+  fullName: text("full_name").notNull(),
+  companyName: text("company_name").notNull(),
+  email: text("email").notNull(),
+  phone: text("phone").notNull(),
+  address: text("address").notNull(),
+  deliveryAddress: text("delivery_address").notNull(),
+  recipientContactNumber: text("recipient_contact_number").notNull(),
+  countryOfPurchase: text("country_of_purchase").notNull(),
+  numberOfProducts: integer("number_of_products").notNull(),
+  productMakeModel: text("product_make_model").notNull(),
+  manufacturerSerialNumber: text("manufacturer_serial_number").notNull(),
+  inHouseSerialNumber: text("in_house_serial_number").notNull(),
+  faultDescription: text("fault_description").notNull(),
+  fileAttachment: json("file_attachment").$type<{
+    name: string;
+    size: number;
+    type: string;
+  } | null>(),
+  status: rmaRequestStatusEnum("status").notNull().default("submitted"),
+  rmaNumber: text("rma_number"), // Populated when request is approved and RMA is created
+  declineReason: text("decline_reason"),
+  createdAt: timestamp("created_at").defaultNow(),
+  processedAt: timestamp("processed_at"),
+});
+
+export const insertRmaRequestLogSchema = createInsertSchema(rmaRequestLogs).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type RmaRequestLog = typeof rmaRequestLogs.$inferSelect;
+export type InsertRmaRequestLog = z.infer<typeof insertRmaRequestLogSchema>;
+
 // Charity water project schema
 export const waterProjects = pgTable("water_projects", {
   id: serial("id").primaryKey(),

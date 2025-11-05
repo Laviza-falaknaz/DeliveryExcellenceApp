@@ -6,6 +6,7 @@ import {
   environmentalImpact, EnvironmentalImpact, InsertEnvironmentalImpact,
   rmas, Rma, InsertRma,
   rmaItems, RmaItem, InsertRmaItem,
+  rmaRequestLogs, RmaRequestLog, InsertRmaRequestLog,
   waterProjects, WaterProject, InsertWaterProject,
   supportTickets, SupportTicket, InsertSupportTicket,
   caseStudies, CaseStudy, InsertCaseStudy,
@@ -80,6 +81,14 @@ export interface IStorage {
   createRmaItem(rmaItem: InsertRmaItem): Promise<RmaItem>;
   updateRmaItem(id: number, data: Partial<RmaItem>): Promise<RmaItem | undefined>;
   deleteRmaItem(id: number): Promise<void>;
+
+  // RMA request log operations
+  getRmaRequestLog(id: number): Promise<RmaRequestLog | undefined>;
+  getRmaRequestLogByNumber(requestNumber: string): Promise<RmaRequestLog | undefined>;
+  getRmaRequestLogsByUserId(userId: number): Promise<RmaRequestLog[]>;
+  createRmaRequestLog(requestLog: InsertRmaRequestLog): Promise<RmaRequestLog>;
+  updateRmaRequestLog(id: number, data: Partial<RmaRequestLog>): Promise<RmaRequestLog | undefined>;
+  getAllRmaRequestLogs(): Promise<RmaRequestLog[]>;
 
   // Water project operations
   getWaterProjects(): Promise<WaterProject[]>;
@@ -399,6 +408,35 @@ export class DatabaseStorage implements IStorage {
 
   async deleteRmaItem(id: number): Promise<void> {
     await db.delete(rmaItems).where(eq(rmaItems.id, id));
+  }
+
+  // RMA request log operations
+  async getRmaRequestLog(id: number): Promise<RmaRequestLog | undefined> {
+    const [log] = await db.select().from(rmaRequestLogs).where(eq(rmaRequestLogs.id, id));
+    return log;
+  }
+
+  async getRmaRequestLogByNumber(requestNumber: string): Promise<RmaRequestLog | undefined> {
+    const [log] = await db.select().from(rmaRequestLogs).where(eq(rmaRequestLogs.requestNumber, requestNumber));
+    return log;
+  }
+
+  async getRmaRequestLogsByUserId(userId: number): Promise<RmaRequestLog[]> {
+    return db.select().from(rmaRequestLogs).where(eq(rmaRequestLogs.userId, userId));
+  }
+
+  async createRmaRequestLog(insertRequestLog: InsertRmaRequestLog): Promise<RmaRequestLog> {
+    const [log] = await db.insert(rmaRequestLogs).values(insertRequestLog).returning();
+    return log;
+  }
+
+  async updateRmaRequestLog(id: number, data: Partial<RmaRequestLog>): Promise<RmaRequestLog | undefined> {
+    const [log] = await db.update(rmaRequestLogs).set(data).where(eq(rmaRequestLogs.id, id)).returning();
+    return log;
+  }
+
+  async getAllRmaRequestLogs(): Promise<RmaRequestLog[]> {
+    return db.select().from(rmaRequestLogs);
   }
 
   // Water project operations
