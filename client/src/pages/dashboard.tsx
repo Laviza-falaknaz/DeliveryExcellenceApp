@@ -94,7 +94,7 @@ export default function Dashboard() {
   const tierName = tierNames[Math.min(Math.floor((userProgress?.level || 1) / 2), 4)];
   
   const weeklyTarget = 50;
-  const weeklyProgress = Math.min(((impact?.carbonSaved || 0) % weeklyTarget) / weeklyTarget * 100, 100);
+  const weeklyProgress = Math.min((((impact?.carbonSaved || 0) / 1000) % weeklyTarget) / weeklyTarget * 100, 100);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-teal-50">
@@ -139,8 +139,8 @@ export default function Dashboard() {
 
                 <div className="text-center px-3 bg-white/10 rounded-lg py-2">
                   <div className="text-xs text-white/80 mb-0.5">CO₂ Saved</div>
-                  <div className="text-2xl font-bold">{(impact?.carbonSaved || 0).toFixed(0)}</div>
-                  <div className="text-xs text-white/80">Tons Total</div>
+                  <div className="text-2xl font-bold">{((impact?.carbonSaved || 0) / 1000).toFixed(0)}</div>
+                  <div className="text-xs text-white/80">KG Total</div>
                 </div>
 
                 <div className="text-center px-3 bg-white/10 rounded-lg py-2">
@@ -173,11 +173,11 @@ export default function Dashboard() {
                       <Leaf className="h-5 w-5 text-green-700" />
                     </div>
                     <div className="text-2xl font-bold text-gray-900 mb-0.5">
-                      {(impact?.carbonSaved || 0).toFixed(0)} kg
+                      {((impact?.carbonSaved || 0) / 1000).toFixed(0)} kg
                     </div>
                     <div className="text-sm text-gray-600 mb-1">CO₂ Prevented</div>
                     <div className="text-xs text-green-700 font-medium">
-                      +{Math.floor((impact?.carbonSaved || 0) * 0.1)}% this month
+                      +{Math.floor(((impact?.carbonSaved || 0) / 1000) * 0.1)}% this month
                     </div>
                   </CardContent>
                 </Card>
@@ -203,11 +203,11 @@ export default function Dashboard() {
                       <Recycle className="h-5 w-5 text-amber-700" />
                     </div>
                     <div className="text-2xl font-bold text-gray-900 mb-0.5">
-                      {(impact?.mineralsSaved || 0).toFixed(0)} kg
+                      {((impact?.mineralsSaved || 0) / 1000).toFixed(0)} kg
                     </div>
                     <div className="text-sm text-gray-600 mb-1">Materials Saved</div>
                     <div className="text-xs text-amber-700 font-medium">
-                      +{Math.floor((impact?.mineralsSaved || 0) * 0.12)}% this month
+                      +{Math.floor(((impact?.mineralsSaved || 0) / 1000) * 0.12)}% this month
                     </div>
                   </CardContent>
                 </Card>
@@ -484,13 +484,13 @@ export default function Dashboard() {
                 </div>
 
                 <p className="text-sm text-gray-700 mb-3">
-                  Save {weeklyTarget}kg CO₂ this week
+                  Save {weeklyTarget} kg CO₂ this week
                 </p>
 
                 <div className="mb-3">
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-xs font-medium text-gray-700">
-                      {((impact?.carbonSaved || 0) % weeklyTarget).toFixed(1)}kg / {weeklyTarget}kg
+                      {(((impact?.carbonSaved || 0) / 1000) % weeklyTarget).toFixed(1)} kg / {weeklyTarget} kg
                     </span>
                     <span className="text-xs font-bold text-amber-800">{weeklyProgress.toFixed(0)}%</span>
                   </div>

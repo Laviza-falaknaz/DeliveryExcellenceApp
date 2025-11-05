@@ -347,7 +347,7 @@ export default function ESGReport() {
               <div>
                 <p className="text-neutral-600 text-sm">Total Carbon Saved</p>
                 <h3 className="text-2xl font-bold mt-1">
-                  {formatEnvironmentalImpact(impact.totalImpact?.carbonSaved || 0, "kg CO₂e")}
+                  {formatEnvironmentalImpact(impact.totalImpact?.carbonSaved || 0, "g")}
                 </h3>
                 <p className="text-xs text-[#08ABAB] mt-1">
                   Equivalent to {Math.round((impact.totalImpact?.treesEquivalent || 0) * 100) / 100} trees planted
@@ -385,7 +385,7 @@ export default function ESGReport() {
               <div>
                 <p className="text-neutral-600 text-sm">Resources Preserved</p>
                 <h3 className="text-2xl font-bold mt-1">
-                  {formatEnvironmentalImpact(impact.totalImpact?.mineralsSaved || 0, "kg")}
+                  {formatEnvironmentalImpact(impact.totalImpact?.mineralsSaved || 0, "g")}
                 </h3>
                 <p className="text-xs text-[#FF9E1C] mt-1">
                   Through remanufactured technology adoption
@@ -526,7 +526,7 @@ export default function ESGReport() {
                         <div className="flex justify-between mb-1">
                           <span className="text-sm">Manufacturing Emissions Avoided</span>
                           <span className="text-sm font-medium">
-                            {formatEnvironmentalImpact((impact.totalImpact?.carbonSaved || 0) * 0.7, "kg CO₂e")}
+                            {formatEnvironmentalImpact((impact.totalImpact?.carbonSaved || 0) * 0.7, "g")}
                           </span>
                         </div>
                         <Progress value={70} className="h-2" />
@@ -535,7 +535,7 @@ export default function ESGReport() {
                         <div className="flex justify-between mb-1">
                           <span className="text-sm">Transport Emissions Reduced</span>
                           <span className="text-sm font-medium">
-                            {formatEnvironmentalImpact((impact.totalImpact?.carbonSaved || 0) * 0.15, "kg CO₂e")}
+                            {formatEnvironmentalImpact((impact.totalImpact?.carbonSaved || 0) * 0.15, "g")}
                           </span>
                         </div>
                         <Progress value={15} className="h-2" />
@@ -544,7 +544,7 @@ export default function ESGReport() {
                         <div className="flex justify-between mb-1">
                           <span className="text-sm">Landfill Avoidance</span>
                           <span className="text-sm font-medium">
-                            {formatEnvironmentalImpact((impact.totalImpact?.carbonSaved || 0) * 0.15, "kg CO₂e")}
+                            {formatEnvironmentalImpact((impact.totalImpact?.carbonSaved || 0) * 0.15, "g")}
                           </span>
                         </div>
                         <Progress value={15} className="h-2" />
@@ -559,7 +559,7 @@ export default function ESGReport() {
                         <div className="flex justify-between mb-1">
                           <span className="text-sm">Metals</span>
                           <span className="text-sm font-medium">
-                            {formatEnvironmentalImpact((impact.totalImpact?.mineralsSaved || 0) * 0.55, "kg")}
+                            {formatEnvironmentalImpact((impact.totalImpact?.mineralsSaved || 0) * 0.55, "g")}
                           </span>
                         </div>
                         <Progress value={55} className="h-2" />
@@ -568,7 +568,7 @@ export default function ESGReport() {
                         <div className="flex justify-between mb-1">
                           <span className="text-sm">Plastics</span>
                           <span className="text-sm font-medium">
-                            {formatEnvironmentalImpact((impact.totalImpact?.mineralsSaved || 0) * 0.30, "kg")}
+                            {formatEnvironmentalImpact((impact.totalImpact?.mineralsSaved || 0) * 0.30, "g")}
                           </span>
                         </div>
                         <Progress value={30} className="h-2" />
@@ -577,7 +577,7 @@ export default function ESGReport() {
                         <div className="flex justify-between mb-1">
                           <span className="text-sm">Rare Earth Elements</span>
                           <span className="text-sm font-medium">
-                            {formatEnvironmentalImpact((impact.totalImpact?.mineralsSaved || 0) * 0.15, "kg")}
+                            {formatEnvironmentalImpact((impact.totalImpact?.mineralsSaved || 0) * 0.15, "g")}
                           </span>
                         </div>
                         <Progress value={15} className="h-2" />
