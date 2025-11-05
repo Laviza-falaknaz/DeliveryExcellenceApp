@@ -9,7 +9,7 @@ import {
   Trophy, Package, ShieldCheck, Target, Award, 
   TrendingUp, Droplet, Leaf, Recycle, Users, 
   ChevronRight, FileText, MessageSquare, Clock,
-  Zap, Star, BarChart3
+  Zap, Star, BarChart3, Brain, Gamepad2, AlertCircle
 } from "lucide-react";
 
 interface User {
@@ -44,6 +44,12 @@ interface RMA {
   rmaNumber: string;
   status: string;
   createdAt: string;
+  email: string;
+}
+
+interface RMAWithItems {
+  rma: RMA;
+  items: any[];
 }
 
 interface Order {
@@ -74,72 +80,73 @@ export default function Dashboard() {
   const { data: orders = [] } = useQuery<Order[]>({
     queryKey: ["/api/orders"],
   });
+
+  const { data: rmas = [] } = useQuery<RMAWithItems[]>({
+    queryKey: ["/api/rma"],
+  });
   
   const { impact } = useImpact();
   
   const recentOrders = orders.slice(0, 3);
+  const activeRmas = rmas.filter(r => !['completed', 'rejected'].includes(r.rma.status)).slice(0, 3);
 
   const tierNames = ['Bronze Partner', 'Silver Partner', 'Gold Partner', 'Platinum Partner', 'Diamond Partner'];
   const tierName = tierNames[Math.min(Math.floor((userProgress?.level || 1) / 2), 4)];
   
-  // Weekly target calculation
-  const weeklyTarget = 50; // kg CO2
+  const weeklyTarget = 50;
   const weeklyProgress = Math.min(((impact?.carbonSaved || 0) % weeklyTarget) / weeklyTarget * 100, 100);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto p-6">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-teal-50">
+      <div className="max-w-7xl mx-auto p-4">
         
         {/* Header */}
-        <div className="mb-6">
-          <h1 className="text-3xl font-semibold text-gray-900">Dashboard</h1>
-          <p className="text-gray-600 mt-1">Welcome back! Here's your sustainability impact overview</p>
+        <div className="mb-4">
+          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+          <p className="text-gray-600 mt-0.5">Welcome back! Here's your sustainability impact overview</p>
         </div>
 
         {/* Tier Banner */}
-        <Card className="mb-6 overflow-hidden shadow-sm border border-gray-200">
-          <div className="bg-teal-600 text-white p-6">
+        <Card className="mb-4 overflow-hidden shadow-lg border-0">
+          <div className="bg-gradient-to-r from-teal-600 via-teal-500 to-emerald-600 text-white p-5">
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
-                  <Star className="h-5 w-5" />
+                  <Star className="h-5 w-5 fill-white" />
                   <span className="text-sm font-medium">Tier {userProgress?.level || 1}</span>
                 </div>
                 <h2 className="text-2xl font-bold mb-1">{tierName}</h2>
-                <div className="flex items-center gap-2 mb-3">
+                <div className="flex items-center gap-2 mb-2">
                   <Trophy className="h-4 w-4" />
                   <span className="text-base">{userProgress?.totalPoints || 0} Credits</span>
                 </div>
-                <p className="text-sm text-white/90 mb-3">Welcome to your sustainability dashboard overview.</p>
+                <p className="text-sm text-white/90 mb-2">Welcome to your sustainability dashboard overview.</p>
                 <div className="flex items-center gap-2 text-sm mb-1">
                   <span>Progress to Gold Partner</span>
                   <span className="font-medium">{((userProgress?.totalPoints || 0) % 1000) / 10}%</span>
                 </div>
                 <div className="w-64">
-                  <Progress value={((userProgress?.totalPoints || 0) % 1000) / 10} className="h-1.5 bg-white/20" />
+                  <Progress value={((userProgress?.totalPoints || 0) % 1000) / 10} className="h-2 bg-white/20" />
                 </div>
               </div>
 
-              <div className="flex gap-6">
-                <div className="text-center px-4">
-                  <div className="text-sm text-white/80 mb-1">Engagement</div>
-                  <div className="text-3xl font-bold mb-1">{userProgress?.currentStreak || 0}</div>
+              <div className="flex gap-4">
+                <div className="text-center px-3 bg-white/10 rounded-lg py-2">
+                  <div className="text-xs text-white/80 mb-0.5">Engagement</div>
+                  <div className="text-2xl font-bold">{userProgress?.currentStreak || 0}</div>
                   <div className="text-xs text-white/80">Days Active</div>
-                  <Badge className="mt-2 bg-white/20 text-white hover:bg-white/30 border-0">
-                    Excellent
-                  </Badge>
                 </div>
 
-                <div className="text-center px-4">
-                  <div className="text-sm text-white/80 mb-1">Environmental Equivalent</div>
-                  <div className="text-3xl font-bold mb-1">{(impact?.carbonSaved || 0).toFixed(0)}</div>
-                  <div className="text-xs text-white/80">Tons CO₂ Saved</div>
+                <div className="text-center px-3 bg-white/10 rounded-lg py-2">
+                  <div className="text-xs text-white/80 mb-0.5">CO₂ Saved</div>
+                  <div className="text-2xl font-bold">{(impact?.carbonSaved || 0).toFixed(0)}</div>
+                  <div className="text-xs text-white/80">Tons Total</div>
                 </div>
 
-                <div className="text-center px-4">
-                  <div className="text-sm text-white/80 mb-1">&nbsp;</div>
-                  <div className="text-3xl font-bold mb-1">8</div>
-                  <div className="text-xs text-white/80">Plants Grown Equiv.</div>
+                <div className="text-center px-3 bg-white/10 rounded-lg py-2">
+                  <div className="text-xs text-white/80 mb-0.5">Impact</div>
+                  <div className="text-2xl font-bold">8</div>
+                  <div className="text-xs text-white/80">Plants Equiv.</div>
                 </div>
               </div>
             </div>
@@ -147,107 +154,59 @@ export default function Dashboard() {
         </Card>
 
         {/* Main Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           
           {/* Left Column - 2/3 width */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-4">
             
-            {/* Weekly Sustainability Target */}
-            <Card className="shadow-sm border border-gray-200">
-              <CardContent className="p-6">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="bg-amber-100 p-2 rounded-lg">
-                    <Target className="h-5 w-5 text-amber-600" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-gray-900">Weekly Sustainability Target</h3>
-                    <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100 mt-1">
-                      In Progress
-                    </Badge>
-                  </div>
-                </div>
-
-                <p className="text-gray-600 mb-4">
-                  Contribute to saving {weeklyTarget}kg of CO₂ through sustainable procurement
-                </p>
-
-                <div className="mb-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-gray-700">
-                      Progress: {((impact?.carbonSaved || 0) % weeklyTarget).toFixed(1)}kg / {weeklyTarget}kg
-                    </span>
-                    <span className="text-sm font-bold text-gray-900">{weeklyProgress.toFixed(0)}%</span>
-                  </div>
-                  <Progress value={weeklyProgress} className="h-3 bg-gray-200" />
-                </div>
-
-                <div className="flex items-center justify-between bg-amber-50 rounded-lg p-3">
-                  <div className="flex items-center gap-2">
-                    <Trophy className="h-4 w-4 text-amber-600" />
-                    <span className="text-sm font-medium text-amber-900">
-                      Reward: Recognition Award & Partnership Credit
-                    </span>
-                  </div>
-                  <Button 
-                    size="sm" 
-                    className="bg-amber-500 hover:bg-amber-600 text-white"
-                    onClick={() => setLocation('/impact')}
-                    data-testid="button-view-progress"
-                  >
-                    View Progress
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-
             {/* Sustainability Metrics */}
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                <TrendingUp className="h-5 w-5" />
+              <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                <TrendingUp className="h-5 w-5 text-teal-600" />
                 Sustainability Metrics
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 
-                <Card className="shadow-sm border border-gray-200">
-                  <CardContent className="p-6">
-                    <div className="bg-green-50 w-12 h-12 rounded-lg flex items-center justify-center mb-3">
-                      <Leaf className="h-6 w-6 text-green-600" />
+                <Card className="shadow-md border-0 bg-gradient-to-br from-green-50 to-emerald-50">
+                  <CardContent className="p-4">
+                    <div className="bg-green-100 w-10 h-10 rounded-lg flex items-center justify-center mb-2">
+                      <Leaf className="h-5 w-5 text-green-700" />
                     </div>
-                    <div className="text-2xl font-bold text-gray-900 mb-1">
+                    <div className="text-2xl font-bold text-gray-900 mb-0.5">
                       {(impact?.carbonSaved || 0).toFixed(0)} kg
                     </div>
-                    <div className="text-sm text-gray-600 mb-2">CO₂ Emissions Prevented</div>
-                    <div className="text-xs text-green-600">
+                    <div className="text-sm text-gray-600 mb-1">CO₂ Prevented</div>
+                    <div className="text-xs text-green-700 font-medium">
                       +{Math.floor((impact?.carbonSaved || 0) * 0.1)}% this month
                     </div>
                   </CardContent>
                 </Card>
 
-                <Card className="shadow-sm border border-gray-200">
-                  <CardContent className="p-6">
-                    <div className="bg-blue-50 w-12 h-12 rounded-lg flex items-center justify-center mb-3">
-                      <Droplet className="h-6 w-6 text-blue-600" />
+                <Card className="shadow-md border-0 bg-gradient-to-br from-blue-50 to-cyan-50">
+                  <CardContent className="p-4">
+                    <div className="bg-blue-100 w-10 h-10 rounded-lg flex items-center justify-center mb-2">
+                      <Droplet className="h-5 w-5 text-blue-700" />
                     </div>
-                    <div className="text-2xl font-bold text-gray-900 mb-1">
+                    <div className="text-2xl font-bold text-gray-900 mb-0.5">
                       {(impact?.waterProvided || 0).toFixed(0)} L
                     </div>
-                    <div className="text-sm text-gray-600 mb-2">Water Resources Saved</div>
-                    <div className="text-xs text-blue-600">
+                    <div className="text-sm text-gray-600 mb-1">Water Saved</div>
+                    <div className="text-xs text-blue-700 font-medium">
                       +{Math.floor((impact?.waterProvided || 0) * 0.08)}% this month
                     </div>
                   </CardContent>
                 </Card>
 
-                <Card className="shadow-sm border border-gray-200">
-                  <CardContent className="p-6">
-                    <div className="bg-yellow-50 w-12 h-12 rounded-lg flex items-center justify-center mb-3">
-                      <Recycle className="h-6 w-6 text-yellow-700" />
+                <Card className="shadow-md border-0 bg-gradient-to-br from-amber-50 to-yellow-50">
+                  <CardContent className="p-4">
+                    <div className="bg-amber-100 w-10 h-10 rounded-lg flex items-center justify-center mb-2">
+                      <Recycle className="h-5 w-5 text-amber-700" />
                     </div>
-                    <div className="text-2xl font-bold text-gray-900 mb-1">
+                    <div className="text-2xl font-bold text-gray-900 mb-0.5">
                       {(impact?.mineralsSaved || 0).toFixed(0)} kg
                     </div>
-                    <div className="text-sm text-gray-600 mb-2">Raw Materials Preserved</div>
-                    <div className="text-xs text-yellow-700">
+                    <div className="text-sm text-gray-600 mb-1">Materials Saved</div>
+                    <div className="text-xs text-amber-700 font-medium">
                       +{Math.floor((impact?.mineralsSaved || 0) * 0.12)}% this month
                     </div>
                   </CardContent>
@@ -255,12 +214,142 @@ export default function Dashboard() {
               </div>
             </div>
 
+            {/* Interactive Challenges Grid */}
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                <Gamepad2 className="h-5 w-5 text-purple-600" />
+                Interactive Challenges
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                
+                {/* Sustainability Quiz */}
+                <Card className="shadow-md border-0 bg-gradient-to-br from-purple-50 via-violet-50 to-purple-100 hover:shadow-lg transition-shadow">
+                  <CardContent className="p-4">
+                    <div className="flex items-start gap-3 mb-3">
+                      <div className="bg-purple-100 p-2 rounded-lg">
+                        <Brain className="h-6 w-6 text-purple-700" />
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-bold text-gray-900 mb-1">Sustainability Quiz</h4>
+                        <p className="text-sm text-gray-600">Test your eco-knowledge!</p>
+                      </div>
+                      <Badge className="bg-purple-600 text-white hover:bg-purple-600">
+                        <Zap className="h-3 w-3 mr-1" />
+                        100 XP
+                      </Badge>
+                    </div>
+                    <div className="bg-white/60 rounded-lg p-3 mb-3">
+                      <div className="text-xs text-gray-600 mb-1">8 Questions • 5 min</div>
+                      <div className="flex items-center gap-2">
+                        <Trophy className="h-4 w-4 text-amber-600" />
+                        <span className="text-xs text-gray-700">Unlock achievements & learn sustainability facts</span>
+                      </div>
+                    </div>
+                    <Button 
+                      className="w-full bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700"
+                      onClick={() => setLocation('/sustainability-quiz')}
+                      data-testid="button-start-quiz"
+                    >
+                      Start Quiz
+                      <ChevronRight className="h-4 w-4 ml-1" />
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                {/* Waste Sorting Game */}
+                <Card className="shadow-md border-0 bg-gradient-to-br from-emerald-50 via-teal-50 to-emerald-100 hover:shadow-lg transition-shadow">
+                  <CardContent className="p-4">
+                    <div className="flex items-start gap-3 mb-3">
+                      <div className="bg-emerald-100 p-2 rounded-lg">
+                        <Recycle className="h-6 w-6 text-emerald-700" />
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-bold text-gray-900 mb-1">Waste Sort Challenge</h4>
+                        <p className="text-sm text-gray-600">Sort items correctly!</p>
+                      </div>
+                      <Badge className="bg-emerald-600 text-white hover:bg-emerald-600">
+                        <Zap className="h-3 w-3 mr-1" />
+                        120 XP
+                      </Badge>
+                    </div>
+                    <div className="bg-white/60 rounded-lg p-3 mb-3">
+                      <div className="text-xs text-gray-600 mb-1">12 Items • 7 min</div>
+                      <div className="flex items-center gap-2">
+                        <Award className="h-4 w-4 text-emerald-600" />
+                        <span className="text-xs text-gray-700">Master e-waste recycling & earn rewards</span>
+                      </div>
+                    </div>
+                    <Button 
+                      className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700"
+                      onClick={() => setLocation('/waste-sorting-game')}
+                      data-testid="button-start-game"
+                    >
+                      Play Now
+                      <ChevronRight className="h-4 w-4 ml-1" />
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+
+            {/* Active RMA Items */}
+            {activeRmas.length > 0 && (
+              <Card className="shadow-md border-0">
+                <CardHeader className="border-b bg-gradient-to-r from-orange-50 to-amber-50 pb-3 pt-3">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-base font-semibold text-gray-900 flex items-center gap-2">
+                      <AlertCircle className="h-5 w-5 text-orange-600" />
+                      Active RMA Requests
+                    </CardTitle>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="text-teal-600 hover:text-teal-700 hover:bg-teal-50"
+                      onClick={() => setLocation('/rma')}
+                      data-testid="button-view-all-rmas"
+                    >
+                      View All
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-0">
+                  <div className="divide-y">
+                    {activeRmas.map(({ rma }) => (
+                      <Link key={rma.id} href={`/rma/${rma.id}`}>
+                        <div 
+                          className="p-3 hover:bg-orange-50/50 transition-colors cursor-pointer"
+                          data-testid={`rma-${rma.id}`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-1">
+                                <span className="font-medium text-gray-900 text-sm">
+                                  {rma.rmaNumber}
+                                </span>
+                                <Badge className="bg-orange-100 text-orange-700 hover:bg-orange-100 text-xs">
+                                  {rma.status}
+                                </Badge>
+                              </div>
+                              <div className="text-xs text-gray-600">
+                                {new Date(rma.createdAt).toLocaleDateString()} • {rma.email}
+                              </div>
+                            </div>
+                            <ChevronRight className="h-4 w-4 text-gray-400" />
+                          </div>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Recent Orders */}
-            <Card className="shadow-sm border border-gray-200">
-              <CardHeader className="border-b bg-gray-50">
+            <Card className="shadow-md border-0">
+              <CardHeader className="border-b bg-gray-50 pb-3 pt-3">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                    <Package className="h-5 w-5" />
+                  <CardTitle className="text-base font-semibold text-gray-900 flex items-center gap-2">
+                    <Package className="h-5 w-5 text-teal-600" />
                     Recent Orders
                   </CardTitle>
                   <Button 
@@ -276,12 +365,12 @@ export default function Dashboard() {
               </CardHeader>
               <CardContent className="p-0">
                 {recentOrders.length === 0 ? (
-                  <div className="p-8 text-center text-gray-500">
-                    <Package className="h-12 w-12 mx-auto mb-3 opacity-20" />
-                    <p>No orders found</p>
+                  <div className="p-6 text-center text-gray-500">
+                    <Package className="h-10 w-10 mx-auto mb-2 opacity-20" />
+                    <p className="text-sm">No orders found</p>
                     <Button 
                       variant="link" 
-                      className="text-teal-600 mt-2"
+                      className="text-teal-600 mt-1 text-sm"
                       onClick={() => setLocation('/orders')}
                       data-testid="link-browse-inventory"
                     >
@@ -293,24 +382,24 @@ export default function Dashboard() {
                     {recentOrders.map((order) => (
                       <Link key={order.id} href={`/orders/${order.id}`}>
                         <div 
-                          className="p-4 hover:bg-gray-50 transition-colors cursor-pointer"
+                          className="p-3 hover:bg-gray-50 transition-colors cursor-pointer"
                           data-testid={`order-${order.id}`}
                         >
                           <div className="flex items-center justify-between">
                             <div className="flex-1">
-                              <div className="flex items-center gap-3 mb-1">
-                                <span className="font-medium text-gray-900">
+                              <div className="flex items-center gap-2 mb-1">
+                                <span className="font-medium text-gray-900 text-sm">
                                   {order.orderNumber}
                                 </span>
-                                <Badge className="bg-teal-100 text-teal-700 hover:bg-teal-100">
+                                <Badge className="bg-teal-100 text-teal-700 hover:bg-teal-100 text-xs">
                                   {order.status}
                                 </Badge>
                               </div>
-                              <div className="text-sm text-gray-600">
+                              <div className="text-xs text-gray-600">
                                 {new Date(order.orderDate).toLocaleDateString()} • {order.currency} {order.totalAmount}
                               </div>
                             </div>
-                            <ChevronRight className="h-5 w-5 text-gray-400" />
+                            <ChevronRight className="h-4 w-4 text-gray-400" />
                           </div>
                         </div>
                       </Link>
@@ -321,52 +410,52 @@ export default function Dashboard() {
             </Card>
 
             {/* Achievements */}
-            <Card className="shadow-sm border border-gray-200">
-              <CardHeader className="border-b bg-gray-50">
-                <CardTitle className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                  <Trophy className="h-5 w-5" />
+            <Card className="shadow-md border-0">
+              <CardHeader className="border-b bg-gray-50 pb-3 pt-3">
+                <CardTitle className="text-base font-semibold text-gray-900 flex items-center gap-2">
+                  <Trophy className="h-5 w-5 text-amber-600" />
                   Achievements
                 </CardTitle>
               </CardHeader>
-              <CardContent className="p-6">
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              <CardContent className="p-4">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   {userAchievements.slice(0, 4).map((ua) => (
                     <div 
                       key={ua.id} 
-                      className="text-center p-4 rounded-lg bg-white hover:bg-gray-50 transition-colors cursor-pointer border border-gray-200"
+                      className="text-center p-3 rounded-lg bg-gradient-to-br from-amber-50 to-yellow-50 hover:from-amber-100 hover:to-yellow-100 transition-all cursor-pointer border border-amber-200"
                       data-testid={`achievement-${ua.achievement.id}`}
                     >
-                      <div className="text-4xl mb-2">{ua.achievement.icon}</div>
-                      <div className="text-sm font-medium text-gray-900 mb-1">
+                      <div className="text-3xl mb-1">{ua.achievement.icon}</div>
+                      <div className="text-xs font-medium text-gray-900 mb-0.5">
                         {ua.achievement.name}
                       </div>
-                      <div className="text-xs text-gray-500">{ua.achievement.pointsAwarded} points</div>
+                      <div className="text-xs text-amber-700 font-medium">+{ua.achievement.pointsAwarded}</div>
                     </div>
                   ))}
                   {userAchievements.length === 0 && (
                     <>
-                      <div className="text-center p-4 rounded-lg bg-gray-50 border border-dashed border-gray-300">
-                        <div className="text-4xl mb-2 opacity-30">🏆</div>
+                      <div className="text-center p-3 rounded-lg bg-gray-50 border border-dashed border-gray-300">
+                        <div className="text-3xl mb-1 opacity-30">🏆</div>
                         <div className="text-xs text-gray-500">First Purchase</div>
                       </div>
-                      <div className="text-center p-4 rounded-lg bg-gray-50 border border-dashed border-gray-300">
-                        <div className="text-4xl mb-2 opacity-30">🌍</div>
-                        <div className="text-xs text-gray-500">Environmental Impact</div>
+                      <div className="text-center p-3 rounded-lg bg-gray-50 border border-dashed border-gray-300">
+                        <div className="text-3xl mb-1 opacity-30">🌍</div>
+                        <div className="text-xs text-gray-500">Impact Hero</div>
                       </div>
-                      <div className="text-center p-4 rounded-lg bg-gray-50 border border-dashed border-gray-300">
-                        <div className="text-4xl mb-2 opacity-30">⭐</div>
-                        <div className="text-xs text-gray-500">Engagement Excellence</div>
+                      <div className="text-center p-3 rounded-lg bg-gray-50 border border-dashed border-gray-300">
+                        <div className="text-3xl mb-1 opacity-30">⭐</div>
+                        <div className="text-xs text-gray-500">Engagement</div>
                       </div>
-                      <div className="text-center p-4 rounded-lg bg-gray-50 border border-dashed border-gray-300">
-                        <div className="text-4xl mb-2 opacity-30">🔥</div>
-                        <div className="text-xs text-gray-500">Water Champion</div>
+                      <div className="text-center p-3 rounded-lg bg-gray-50 border border-dashed border-gray-300">
+                        <div className="text-3xl mb-1 opacity-30">🔥</div>
+                        <div className="text-xs text-gray-500">Streak</div>
                       </div>
                     </>
                   )}
                 </div>
                 <Button 
                   variant="outline" 
-                  className="w-full mt-4 border-gray-300 hover:bg-gray-50"
+                  className="w-full mt-3 border-gray-300 hover:bg-gray-50 text-sm"
                   onClick={() => setLocation('/achievements')}
                   data-testid="button-view-achievements"
                 >
@@ -377,16 +466,54 @@ export default function Dashboard() {
           </div>
 
           {/* Right Column - 1/3 width */}
-          <div className="space-y-6">
+          <div className="space-y-4">
             
+            {/* Weekly Sustainability Target */}
+            <Card className="shadow-md border-0 bg-gradient-to-br from-amber-50 to-orange-50">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="bg-amber-200 p-2 rounded-lg">
+                    <Target className="h-5 w-5 text-amber-800" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-bold text-gray-900 text-sm">Weekly Target</h3>
+                    <Badge className="bg-amber-600 text-white hover:bg-amber-600 mt-0.5 text-xs">
+                      In Progress
+                    </Badge>
+                  </div>
+                </div>
+
+                <p className="text-sm text-gray-700 mb-3">
+                  Save {weeklyTarget}kg CO₂ this week
+                </p>
+
+                <div className="mb-3">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-xs font-medium text-gray-700">
+                      {((impact?.carbonSaved || 0) % weeklyTarget).toFixed(1)}kg / {weeklyTarget}kg
+                    </span>
+                    <span className="text-xs font-bold text-amber-800">{weeklyProgress.toFixed(0)}%</span>
+                  </div>
+                  <Progress value={weeklyProgress} className="h-2 bg-white/50" />
+                </div>
+
+                <div className="bg-white/70 rounded-lg p-2 flex items-center gap-2">
+                  <Trophy className="h-4 w-4 text-amber-700 flex-shrink-0" />
+                  <span className="text-xs text-amber-900 font-medium">
+                    Award + Partnership Credit
+                  </span>
+                </div>
+              </CardContent>
+            </Card>
+
             {/* Quick Actions */}
-            <Card className="shadow-sm border border-gray-200">
-              <CardHeader className="border-b bg-gray-50">
-                <CardTitle className="text-lg font-semibold text-gray-900">Quick Actions</CardTitle>
+            <Card className="shadow-md border-0">
+              <CardHeader className="border-b bg-gray-50 pb-2 pt-2">
+                <CardTitle className="text-base font-semibold text-gray-900">Quick Actions</CardTitle>
               </CardHeader>
-              <CardContent className="p-4 space-y-2">
+              <CardContent className="p-3 space-y-2">
                 <Button 
-                  className="w-full justify-start bg-blue-500 hover:bg-blue-600 text-white"
+                  className="w-full justify-start bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white text-sm h-9"
                   onClick={() => setLocation('/orders')}
                   data-testid="button-track-order"
                 >
@@ -395,7 +522,7 @@ export default function Dashboard() {
                 </Button>
                 
                 <Button 
-                  className="w-full justify-start bg-emerald-500 hover:bg-emerald-600 text-white"
+                  className="w-full justify-start bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white text-sm h-9"
                   onClick={() => setLocation('/impact')}
                   data-testid="button-view-impact"
                 >
@@ -403,11 +530,11 @@ export default function Dashboard() {
                   View Impact
                 </Button>
 
-                <div className="pt-2 border-t mt-4">
-                  <h4 className="text-sm font-medium text-gray-700 mb-2">More Actions</h4>
+                <div className="pt-2 border-t">
+                  <h4 className="text-xs font-medium text-gray-700 mb-2">More Actions</h4>
                   
                   <button 
-                    className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-50 text-sm flex items-center gap-2 transition-colors"
+                    className="w-full text-left px-2 py-1.5 rounded-md hover:bg-gray-100 text-xs flex items-center gap-2 transition-colors"
                     onClick={() => setLocation('/support')}
                     data-testid="link-support-center"
                   >
@@ -416,7 +543,7 @@ export default function Dashboard() {
                   </button>
 
                   <button 
-                    className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-50 text-sm flex items-center gap-2 transition-colors"
+                    className="w-full text-left px-2 py-1.5 rounded-md hover:bg-gray-100 text-xs flex items-center gap-2 transition-colors"
                     onClick={() => setLocation('/warranty')}
                     data-testid="link-documents"
                   >
@@ -425,7 +552,7 @@ export default function Dashboard() {
                   </button>
 
                   <button 
-                    className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-50 text-sm flex items-center gap-2 transition-colors"
+                    className="w-full text-left px-2 py-1.5 rounded-md hover:bg-gray-100 text-xs flex items-center gap-2 transition-colors"
                     onClick={() => setLocation('/support')}
                     data-testid="link-messages"
                   >
@@ -437,53 +564,53 @@ export default function Dashboard() {
             </Card>
 
             {/* Weekly Goal */}
-            <Card className="shadow-sm border border-gray-200">
-              <CardHeader className="border-b bg-gray-50">
-                <CardTitle className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                  <Target className="h-5 w-5 text-amber-600" />
-                  Weekly Goal
+            <Card className="shadow-md border-0">
+              <CardHeader className="border-b bg-gray-50 pb-2 pt-2">
+                <CardTitle className="text-base font-semibold text-gray-900 flex items-center gap-2">
+                  <BarChart3 className="h-4 w-4 text-teal-600" />
+                  Weekly Goals
                 </CardTitle>
               </CardHeader>
-              <CardContent className="p-4">
-                <div className="mb-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm text-gray-600">Actions This Week</span>
-                    <span className="text-2xl font-bold text-teal-600">3/5</span>
+              <CardContent className="p-3">
+                <div className="mb-3">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-xs text-gray-600">Actions This Week</span>
+                    <span className="text-xl font-bold text-teal-600">3/5</span>
                   </div>
                   <Progress value={60} className="h-2 bg-gray-200" />
-                  <p className="text-xs text-gray-500 mt-2">2 days left</p>
+                  <p className="text-xs text-gray-500 mt-1">2 days left</p>
                 </div>
 
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-sm">
-                    <div className="w-5 h-5 rounded-full bg-teal-100 flex items-center justify-center flex-shrink-0">
-                      <div className="w-2 h-2 rounded-full bg-teal-600"></div>
+                <div className="space-y-1.5">
+                  <div className="flex items-center gap-2 text-xs">
+                    <div className="w-4 h-4 rounded-full bg-teal-100 flex items-center justify-center flex-shrink-0">
+                      <div className="w-1.5 h-1.5 rounded-full bg-teal-600"></div>
                     </div>
                     <span className="text-gray-700">Track an order</span>
                   </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <div className="w-5 h-5 rounded-full bg-teal-100 flex items-center justify-center flex-shrink-0">
-                      <div className="w-2 h-2 rounded-full bg-teal-600"></div>
+                  <div className="flex items-center gap-2 text-xs">
+                    <div className="w-4 h-4 rounded-full bg-teal-100 flex items-center justify-center flex-shrink-0">
+                      <div className="w-1.5 h-1.5 rounded-full bg-teal-600"></div>
                     </div>
                     <span className="text-gray-700">View impact report</span>
                   </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <div className="w-5 h-5 rounded-full bg-teal-100 flex items-center justify-center flex-shrink-0">
-                      <div className="w-2 h-2 rounded-full bg-teal-600"></div>
+                  <div className="flex items-center gap-2 text-xs">
+                    <div className="w-4 h-4 rounded-full bg-teal-100 flex items-center justify-center flex-shrink-0">
+                      <div className="w-1.5 h-1.5 rounded-full bg-teal-600"></div>
                     </div>
-                    <span className="text-gray-700">Check sustainability metrics</span>
+                    <span className="text-gray-700">Check metrics</span>
                   </div>
-                  <div className="flex items-center gap-2 text-sm opacity-50">
-                    <div className="w-5 h-5 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
-                      <div className="w-2 h-2 rounded-full bg-gray-400"></div>
+                  <div className="flex items-center gap-2 text-xs opacity-50">
+                    <div className="w-4 h-4 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
+                      <div className="w-1.5 h-1.5 rounded-full bg-gray-400"></div>
                     </div>
                     <span className="text-gray-500">Submit feedback</span>
                   </div>
-                  <div className="flex items-center gap-2 text-sm opacity-50">
-                    <div className="w-5 h-5 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
-                      <div className="w-2 h-2 rounded-full bg-gray-400"></div>
+                  <div className="flex items-center gap-2 text-xs opacity-50">
+                    <div className="w-4 h-4 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
+                      <div className="w-1.5 h-1.5 rounded-full bg-gray-400"></div>
                     </div>
-                    <span className="text-gray-500">Share impact on social</span>
+                    <span className="text-gray-500">Share impact</span>
                   </div>
                 </div>
               </CardContent>
