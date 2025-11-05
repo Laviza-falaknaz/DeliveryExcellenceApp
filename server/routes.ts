@@ -1736,6 +1736,82 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Upsert Order Documents API
+  app.post("/api/data/documents/upsert", requireApiKey, async (req, res) => {
+    try {
+      const { documents: documentsToUpsert } = req.body;
+      
+      if (!Array.isArray(documentsToUpsert)) {
+        return res.status(400).json({ 
+          success: false,
+          error: "Request must include 'documents' array" 
+        });
+      }
+
+      let created = 0;
+      let updated = 0;
+      const errors: any[] = [];
+
+      for (const docData of documentsToUpsert) {
+        try {
+          const { orderNumber, documentType, fileName, fileUrl, fileSize, mimeType } = docData;
+          
+          if (!orderNumber || !documentType || !fileName || !fileUrl) {
+            errors.push({
+              orderNumber: orderNumber || 'unknown',
+              error: 'Missing required fields: orderNumber, documentType, fileName, and fileUrl are required'
+            });
+            continue;
+          }
+
+          // Valid document types
+          const validTypes = ['credit_note', 'packing_list', 'hashcodes', 'invoice'];
+          if (!validTypes.includes(documentType)) {
+            errors.push({
+              orderNumber,
+              error: `Invalid documentType. Must be one of: ${validTypes.join(', ')}`
+            });
+            continue;
+          }
+
+          // Check if document already exists
+          const existing = await storage.getOrderDocumentsByNumber(orderNumber);
+          const existingDoc = existing.find(d => d.documentType === documentType);
+
+          const upsertedDoc = await storage.upsertOrderDocument(orderNumber, documentType, {
+            fileName,
+            fileUrl,
+            fileSize: fileSize || null,
+            mimeType: mimeType || null
+          });
+
+          if (existingDoc) {
+            updated++;
+          } else {
+            created++;
+          }
+        } catch (error: any) {
+          errors.push({
+            orderNumber: docData.orderNumber,
+            error: error.message
+          });
+        }
+      }
+
+      res.json({
+        success: true,
+        created,
+        updated,
+        errors
+      });
+    } catch (error) {
+      res.status(500).json({ 
+        success: false,
+        error: "Internal server error" 
+      });
+    }
+  });
+
   // Upsert RMAs API
   app.post("/api/data/rmas/upsert", requireApiKey, async (req, res) => {
     try {

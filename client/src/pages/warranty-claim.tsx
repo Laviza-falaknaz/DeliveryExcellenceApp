@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { useToast } from "@/hooks/use-toast";
 import { Upload, FileText, X, Camera, QrCode } from "lucide-react";
 import { BrowserMultiFormatReader, NotFoundException } from "@zxing/library";
+import { useQuery } from "@tanstack/react-query";
 
 const warrantyClaimSchema = z.object({
   fullName: z.string().min(2, "Full name must be at least 2 characters"),
@@ -41,6 +42,16 @@ export default function WarrantyClaim() {
   const [isScanning, setIsScanning] = useState(false);
   const [isScannerOpen, setIsScannerOpen] = useState(false);
   const [scannerError, setScannerError] = useState<string | null>(null);
+  
+  // Fetch current user data
+  const { data: currentUser } = useQuery<{
+    name: string;
+    email: string;
+    company: string;
+    phoneNumber?: string;
+  }>({
+    queryKey: ["/api/user"],
+  });
   
   // Parse basket data from URL params
   const [basketData, setBasketData] = useState<any[]>([]);
@@ -77,13 +88,13 @@ export default function WarrantyClaim() {
   const form = useForm<WarrantyClaimFormValues>({
     resolver: zodResolver(warrantyClaimSchema),
     defaultValues: {
-      fullName: "",
-      companyName: "",
-      email: "",
-      phone: "",
+      fullName: currentUser?.name || "",
+      companyName: currentUser?.company || "",
+      email: currentUser?.email || "",
+      phone: currentUser?.phoneNumber || "",
       address: "",
       deliveryAddress: "",
-      recipientContactNumber: "",
+      recipientContactNumber: currentUser?.phoneNumber || "",
       countryOfPurchase: "",
       numberOfProducts: 1,
       productMakeModel: "",
@@ -93,6 +104,17 @@ export default function WarrantyClaim() {
       consent: false,
     },
   });
+  
+  // Update form when user data loads
+  useEffect(() => {
+    if (currentUser) {
+      form.setValue('fullName', currentUser.name || "");
+      form.setValue('companyName', currentUser.company || "");
+      form.setValue('email', currentUser.email || "");
+      form.setValue('phone', currentUser.phoneNumber || "");
+      form.setValue('recipientContactNumber', currentUser.phoneNumber || "");
+    }
+  }, [currentUser, form]);
   
   // Update form when basket data is available
   useEffect(() => {

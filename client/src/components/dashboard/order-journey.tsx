@@ -177,7 +177,7 @@ function SentToWarehouseAnimation({ isActive, isCompleted }: { isActive: boolean
         style={{
           background: isActive || isCompleted
             ? "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)"
-            : "linear-gradient(135deg, #1f2937 0%, #374151 100%)"
+            : "linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%)"
         }}
       >
         {(isActive || isCompleted) && <GlowRing color="#3b82f6" intensity={isActive ? 1.5 : 0.8} />}
@@ -311,7 +311,7 @@ function DispatchedAnimation({ isActive, isCompleted }: { isActive: boolean; isC
         style={{
           background: isActive || isCompleted
             ? "linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)"
-            : "linear-gradient(135deg, #1f2937 0%, #374151 100%)"
+            : "linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%)"
         }}
         animate={isActive ? {
           rotate: [0, 3, -3, 2, -2, 0],
@@ -414,7 +414,7 @@ function InvoiceSentAnimation({ isActive, isCompleted }: { isActive: boolean; is
         style={{
           background: isActive || isCompleted
             ? "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)"
-            : "linear-gradient(135deg, #d1d5db 0%, #9ca3af 100%)"
+            : "linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%)"
         }}
       >
         {(isActive || isCompleted) && <GlowRing color="#f59e0b" intensity={isActive ? 1.5 : 0.8} />}
@@ -507,7 +507,7 @@ function PaymentConfirmedAnimation({ isActive, isCompleted }: { isActive: boolea
         style={{
           background: isActive || isCompleted
             ? "linear-gradient(135deg, #ec4899 0%, #db2777 100%)"
-            : "linear-gradient(135deg, #d1d5db 0%, #9ca3af 100%)"
+            : "linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%)"
         }}
         animate={isActive ? {
           scale: [1, 1.1, 1],
@@ -593,7 +593,7 @@ function FulfilledAnimation({ isActive, isCompleted }: { isActive: boolean; isCo
         style={{
           background: (isActive || isCompleted)
             ? "linear-gradient(135deg, #10b981 0%, #059669 100%)"
-            : "linear-gradient(135deg, #1f2937 0%, #374151 100%)"
+            : "linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%)"
         }}
         initial={{ scale: 0.9 }}
         animate={(isActive || isCompleted) ? {
@@ -803,27 +803,20 @@ export default function OrderJourney({ timeline, environmentalImpact }: OrderJou
   };
 
   return (
-    <div className="relative py-12 px-4 overflow-hidden">
-      {/* Animated Background Gradient - Dark Eco-Luxury Theme */}
-      <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-gray-900 to-neutral-900" />
-      <div className="absolute inset-0 bg-gradient-to-br from-emerald-900/30 via-teal-900/20 to-cyan-900/30" />
-      
-      {/* Particle Flow Background - Neon Accent */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {[...Array(20)].map((_, i) => (
+    <div className="relative py-8 px-4 overflow-hidden bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 rounded-lg">
+      {/* Subtle Particle Flow Background */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-30">
+        {[...Array(15)].map((_, i) => (
           <motion.div
             key={i}
-            className="absolute w-1 h-1 rounded-full"
+            className="absolute w-1 h-1 rounded-full bg-emerald-400"
             style={{
-              background: ["#10b981", "#06b6d4", "#3b82f6"][i % 3],
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
-              opacity: 0.4,
-              boxShadow: "0 0 4px currentColor"
             }}
             animate={{
               y: [0, -100],
-              opacity: [0, 0.4, 0]
+              opacity: [0, 0.6, 0]
             }}
             transition={{
               duration: 3 + Math.random() * 2,
@@ -836,21 +829,20 @@ export default function OrderJourney({ timeline, environmentalImpact }: OrderJou
       </div>
 
       {/* Header */}
-      <div className="relative text-center mb-12">
+      <div className="relative text-center mb-8">
         <motion.h2
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-4xl font-bold bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent mb-3"
-          style={{ textShadow: "0 0 30px rgba(16, 185, 129, 0.3)" }}
+          className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 bg-clip-text text-transparent mb-2"
         >
           Your Sustainable Journey
         </motion.h2>
-        <p className="text-neutral-300 text-lg">Eco-luxury delivery in progress</p>
+        <p className="text-neutral-600 text-sm md:text-base">Eco-luxury delivery in progress</p>
       </div>
 
       {/* Progress Path */}
-      <div className="relative max-w-5xl mx-auto mb-16">
-        <div className="relative h-2 bg-neutral-200/50 backdrop-blur-sm rounded-full overflow-hidden">
+      <div className="relative max-w-5xl mx-auto mb-10">
+        <div className="relative h-2 bg-neutral-200 rounded-full overflow-hidden">
           <motion.div
             className="absolute inset-y-0 left-0 rounded-full"
             style={{
@@ -885,7 +877,7 @@ export default function OrderJourney({ timeline, environmentalImpact }: OrderJou
       </div>
 
       {/* Timeline Stages */}
-      <div className="relative max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8">
+      <div className="relative max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6">
         {stages.map((stage, index) => {
           const isCompleted = stage.date !== null;
           const isCurrent = index === currentStageIndex && !isComplete;
@@ -933,13 +925,13 @@ export default function OrderJourney({ timeline, environmentalImpact }: OrderJou
                 )}
               </div>
 
-              {/* Stage Info - Glassmorphism Card */}
+              {/* Stage Info - Card */}
               <motion.div
                 className={`
-                  relative p-4 rounded-2xl text-center min-h-[140px] w-full
+                  relative p-3 md:p-4 rounded-xl text-center min-h-[120px] md:min-h-[140px] w-full
                   ${isCompleted || isCurrent
-                    ? "bg-neutral-800/70 backdrop-blur-md border-2 border-emerald-500/50 shadow-xl"
-                    : "bg-neutral-900/40 backdrop-blur-sm border-2 border-neutral-700/30"}
+                    ? "bg-white/90 backdrop-blur-sm border-2 border-emerald-400 shadow-lg"
+                    : "bg-white/50 backdrop-blur-sm border-2 border-neutral-200"}
                 `}
                 whileHover={isCompleted || isCurrent ? { y: -4, scale: 1.02 } : {}}
                 transition={{ type: "spring", stiffness: 300 }}
@@ -955,15 +947,15 @@ export default function OrderJourney({ timeline, environmentalImpact }: OrderJou
                 )}
 
                 <h4 className={`
-                  text-sm font-bold mb-2
-                  ${isCompleted || isCurrent ? "text-white" : "text-neutral-500"}
+                  text-xs md:text-sm font-bold mb-1 md:mb-2
+                  ${isCompleted || isCurrent ? "text-neutral-900" : "text-neutral-500"}
                 `}>
                   {stage.label}
                 </h4>
                 
                 <p className={`
-                  text-xs mb-3
-                  ${isCompleted || isCurrent ? "text-neutral-300" : "text-neutral-600"}
+                  text-xs mb-2 md:mb-3
+                  ${isCompleted || isCurrent ? "text-neutral-600" : "text-neutral-400"}
                 `}>
                   {stage.subtitle}
                 </p>

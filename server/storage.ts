@@ -10,6 +10,7 @@ import {
   supportTickets, SupportTicket, InsertSupportTicket,
   caseStudies, CaseStudy, InsertCaseStudy,
   deliveryTimelines, DeliveryTimeline, InsertDeliveryTimeline,
+  orderDocuments, OrderDocument, InsertOrderDocument,
   systemSettings, SystemSetting,
   achievements, Achievement, InsertAchievement,
   userAchievements, UserAchievement, InsertUserAchievement,
@@ -108,6 +109,14 @@ export interface IStorage {
   getDeliveryTimeline(orderId: number): Promise<DeliveryTimeline | undefined>;
   createDeliveryTimeline(timeline: InsertDeliveryTimeline): Promise<DeliveryTimeline>;
   updateDeliveryTimeline(orderId: number, data: Partial<DeliveryTimeline>): Promise<DeliveryTimeline | undefined>;
+
+  // Order document operations
+  getOrderDocuments(orderId: number): Promise<OrderDocument[]>;
+  getOrderDocumentsByNumber(orderNumber: string): Promise<OrderDocument[]>;
+  createOrderDocument(document: InsertOrderDocument): Promise<OrderDocument>;
+  updateOrderDocument(id: number, data: Partial<OrderDocument>): Promise<OrderDocument | undefined>;
+  deleteOrderDocument(id: number): Promise<void>;
+  upsertOrderDocument(orderNumber: string, documentType: string, document: Partial<InsertOrderDocument>): Promise<OrderDocument>;
 
   // Theme settings operations
   getThemeSettings(): Promise<any>;
@@ -489,6 +498,66 @@ export class DatabaseStorage implements IStorage {
       .where(eq(deliveryTimelines.orderId, orderId))
       .returning();
     return updated || undefined;
+  }
+
+  // Order document operations
+  async getOrderDocuments(orderId: number): Promise<OrderDocument[]> {
+    return db.select().from(orderDocuments).where(eq(orderDocuments.orderId, orderId));
+  }
+
+  async getOrderDocumentsByNumber(orderNumber: string): Promise<OrderDocument[]> {
+    return db.select().from(orderDocuments).where(eq(orderDocuments.orderNumber, orderNumber));
+  }
+
+  async createOrderDocument(document: InsertOrderDocument): Promise<OrderDocument> {
+    const [created] = await db.insert(orderDocuments).values(document).returning();
+    return created;
+  }
+
+  async updateOrderDocument(id: number, data: Partial<OrderDocument>): Promise<OrderDocument | undefined> {
+    const [updated] = await db.update(orderDocuments)
+      .set(data)
+      .where(eq(orderDocuments.id, id))
+      .returning();
+    return updated || undefined;
+  }
+
+  async deleteOrderDocument(id: number): Promise<void> {
+    await db.delete(orderDocuments).where(eq(orderDocuments.id, id));
+  }
+
+  async upsertOrderDocument(orderNumber: string, documentType: string, document: Partial<InsertOrderDocument>): Promise<OrderDocument> {
+    // Get order by number to get orderId
+    const order = await this.getOrderByNumber(orderNumber);
+    if (!order) {
+      throw new Error(`Order not found: ${orderNumber}`);
+    }
+
+    // Check if document already exists
+    const existing = await db.select().from(orderDocuments)
+      .where(and(
+        eq(orderDocuments.orderNumber, orderNumber),
+        eq(orderDocuments.documentType, documentType)
+      ))
+      .limit(1);
+
+    if (existing.length > 0) {
+      // Update existing document
+      const [updated] = await db.update(orderDocuments)
+        .set({ ...document, uploadedAt: new Date() })
+        .where(eq(orderDocuments.id, existing[0].id))
+        .returning();
+      return updated;
+    } else {
+      // Create new document
+      const [created] = await db.insert(orderDocuments).values({
+        ...document as InsertOrderDocument,
+        orderId: order.id,
+        orderNumber,
+        documentType
+      }).returning();
+      return created;
+    }
   }
 
   // Admin methods

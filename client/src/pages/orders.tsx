@@ -339,7 +339,7 @@ export default function Orders() {
 
       {/* Order Details Dialog */}
       <Dialog open={isOrderDetailsOpen} onOpenChange={setIsOrderDetailsOpen}>
-        <DialogContent className="max-w-6xl max-h-[90vh] overflow-hidden">
+        <DialogContent className="max-w-[95vw] md:max-w-7xl max-h-[90vh] overflow-hidden">
           <DialogHeader>
             <div className="flex items-center justify-between">
               <div>

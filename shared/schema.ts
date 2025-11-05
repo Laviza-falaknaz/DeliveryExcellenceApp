@@ -257,6 +257,25 @@ export const insertDeliveryTimelineSchema = createInsertSchema(deliveryTimelines
   updatedAt: true,
 });
 
+// Order Documents/Attachments schema
+export const orderDocuments = pgTable("order_documents", {
+  id: serial("id").primaryKey(),
+  orderId: integer("order_id").references(() => orders.id).notNull(),
+  orderNumber: text("order_number").notNull(), // For syncing documents by order number
+  documentType: text("document_type").notNull(), // 'credit_note', 'packing_list', 'hashcodes', 'invoice'
+  fileName: text("file_name").notNull(),
+  fileUrl: text("file_url").notNull(), // URL/path to the document
+  fileSize: integer("file_size"), // File size in bytes
+  mimeType: text("mime_type"), // e.g., 'application/pdf', 'text/csv', 'application/vnd.ms-excel'
+  uploadedAt: timestamp("uploaded_at").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertOrderDocumentSchema = createInsertSchema(orderDocuments).omit({
+  id: true,
+  createdAt: true,
+});
+
 // System Settings schema
 export const systemSettings = pgTable("system_settings", {
   id: serial("id").primaryKey(),
@@ -310,6 +329,9 @@ export type InsertCaseStudy = z.infer<typeof insertCaseStudySchema>;
 
 export type DeliveryTimeline = typeof deliveryTimelines.$inferSelect;
 export type InsertDeliveryTimeline = z.infer<typeof insertDeliveryTimelineSchema>;
+
+export type OrderDocument = typeof orderDocuments.$inferSelect;
+export type InsertOrderDocument = z.infer<typeof insertOrderDocumentSchema>;
 
 export type SystemSetting = typeof systemSettings.$inferSelect;
 export type InsertSystemSetting = z.infer<typeof insertSystemSettingsSchema>;
