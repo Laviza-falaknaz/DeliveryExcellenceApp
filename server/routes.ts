@@ -1908,12 +1908,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
           let processedTimeline: any = null;
           if (timeline && typeof timeline === 'object') {
             processedTimeline = {};
-            // Convert timeline date strings to Date objects
+            // Convert timeline date strings to Date objects, preserve null values
             for (const [key, value] of Object.entries(timeline)) {
-              if (value && typeof value === 'string') {
+              if (value === null || value === undefined) {
+                processedTimeline[key] = null;
+              } else if (typeof value === 'string' && value.trim() !== '') {
                 processedTimeline[key] = new Date(value);
               } else if (value instanceof Date) {
                 processedTimeline[key] = value;
+              } else if (typeof value === 'string' && value.trim() === '') {
+                processedTimeline[key] = null;
               }
             }
           }
