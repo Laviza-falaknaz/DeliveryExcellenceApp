@@ -9,6 +9,7 @@ import SupportResources from "@/components/dashboard/support-resources";
 import NotificationBanner from "@/components/dashboard/notification-banner";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "wouter";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState, useMemo } from "react";
@@ -232,6 +233,55 @@ export default function Dashboard() {
             <p className="text-neutral-500 mt-2">Your environmental impact will appear once you make your first order.</p>
           </div>
         )}
+      </section>
+
+      {/* Sustainability Quiz Game Card */}
+      <section className="mb-8">
+        <Link href="/quiz">
+          <Card className="cursor-pointer hover:shadow-2xl transition-all duration-300 bg-gradient-to-br from-purple-50 via-blue-50 to-cyan-50 border-2 border-purple-200 hover:border-purple-400">
+            <CardContent className="p-6">
+              <div className="flex items-center gap-6">
+                <div className="flex-shrink-0">
+                  <div className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center shadow-lg">
+                    <i className="ri-gamepad-line text-4xl text-white"></i>
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    <h3 className="text-2xl font-bold text-neutral-900">Sustainability Quiz Challenge</h3>
+                    <Badge className="bg-gradient-to-r from-orange-500 to-red-500 text-white border-none">
+                      <i className="ri-fire-line mr-1"></i>
+                      New!
+                    </Badge>
+                  </div>
+                  <p className="text-neutral-600 mb-3">
+                    Test your knowledge about circular economy and e-waste. Earn XP and unlock achievements!
+                  </p>
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2 text-sm">
+                      <i className="ri-question-line text-purple-600"></i>
+                      <span className="text-neutral-700">8 Questions</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <i className="ri-time-line text-purple-600"></i>
+                      <span className="text-neutral-700">~5 minutes</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <Zap className="h-4 w-4 text-orange-500" />
+                      <span className="font-bold text-orange-600">Up to 100 XP</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex-shrink-0">
+                  <Button className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-8">
+                    Play Now
+                    <i className="ri-arrow-right-line ml-2"></i>
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </Link>
       </section>
 
       {/* Achievements Section */}
