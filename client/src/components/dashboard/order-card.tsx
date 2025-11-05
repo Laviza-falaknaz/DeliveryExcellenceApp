@@ -3,9 +3,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatCurrency, formatDate, getOrderStatusColor } from "@/lib/utils";
 import { Link } from "wouter";
-import OrderTracking from "./order-tracking";
+import OrderJourney from "./order-journey";
 import { useState } from "react";
-import { Order, OrderItem } from "@shared/schema";
+import { Order, OrderItem, DeliveryTimeline, EnvironmentalImpact } from "@shared/schema";
 import { useQuery } from "@tanstack/react-query";
 
 interface OrderCardProps {
@@ -24,6 +24,16 @@ export default function OrderCard({ order, isPast = false }: OrderCardProps) {
   const { data: orderUpdates } = useQuery({
     queryKey: [`/api/orders/${order.id}/updates`],
     enabled: expanded && order.status !== "completed" && order.status !== "cancelled",
+  });
+
+  const { data: timeline } = useQuery<DeliveryTimeline>({
+    queryKey: [`/api/orders/${order.id}/timeline`],
+    enabled: expanded && !isPast,
+  });
+
+  const { data: environmentalImpact } = useQuery<EnvironmentalImpact>({
+    queryKey: [`/api/orders/${order.id}/environmental-impact`],
+    enabled: expanded,
   });
 
   const latestUpdate = orderUpdates && orderUpdates.length > 0 ? orderUpdates[0] : null;
@@ -89,7 +99,14 @@ export default function OrderCard({ order, isPast = false }: OrderCardProps) {
 
         {!isPast && order.status !== "completed" && order.status !== "cancelled" && (
           <>
-            <OrderTracking status={order.status} />
+            <OrderJourney 
+              timeline={timeline || null} 
+              environmentalImpact={environmentalImpact ? {
+                carbonSaved: environmentalImpact.carbonSaved || 0,
+                waterProvided: environmentalImpact.waterProvided || 0,
+                mineralsSaved: environmentalImpact.mineralsSaved || 0,
+              } : undefined}
+            />
 
             {latestUpdate && (
               <div className="mt-10 bg-blue-50 rounded-lg p-4 flex">
