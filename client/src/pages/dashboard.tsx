@@ -15,6 +15,7 @@ import {
   Clock, Box, Wrench, ArrowRight, Play, Recycle
 } from "lucide-react";
 import { motion } from "framer-motion";
+import EcoTree from "@/components/dashboard/eco-tree";
 
 interface User {
   id: number;
@@ -88,6 +89,10 @@ export default function Dashboard() {
   
   const activeOrders = orders.filter(o => 
     !['delivered', 'completed', 'cancelled'].includes(o.status)
+  );
+  
+  const completedOrders = orders.filter(o => 
+    ['delivered', 'completed'].includes(o.status)
   );
   
   const activeRMAs = rmas.filter(r => 
@@ -173,32 +178,91 @@ export default function Dashboard() {
           </Card>
         </motion.div>
 
-        {/* XP Progress Bar */}
+        {/* Eco Tree Visualization */}
         <motion.div
-          initial={{ opacity: 0, scaleX: 0.9 }}
-          animate={{ opacity: 1, scaleX: 1 }}
-          transition={{ delay: 0.2 }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="grid grid-cols-1 lg:grid-cols-5 gap-6"
         >
-          <Card className="shadow-sm">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-neutral-700">
-                  Level {userProgress?.level || 1} → Level {(userProgress?.level || 1) + 1}
-                </span>
-                <span className="text-sm font-semibold text-violet-600">
-                  {((userProgress?.totalPoints || 0) - currentLevelXP).toLocaleString()} / {(nextLevelXP - currentLevelXP).toLocaleString()} XP
-                </span>
-              </div>
-              <div className="relative h-3 bg-neutral-100 rounded-full overflow-hidden">
-                <motion.div 
-                  className="absolute inset-y-0 left-0 bg-gradient-to-r from-violet-500 to-purple-600 rounded-full"
-                  initial={{ width: 0 }}
-                  animate={{ width: `${progressToNextLevel}%` }}
-                  transition={{ duration: 1, ease: "easeOut" }}
-                />
-              </div>
-            </CardContent>
-          </Card>
+          {/* Tree Container */}
+          <div className="lg:col-span-2 h-[500px]">
+            <EcoTree 
+              xp={userProgress?.totalPoints || 0}
+              achievements={userAchievements.length}
+              completedOrders={completedOrders.length}
+              familiesHelped={impact?.familiesHelped || 0}
+              currentStreak={userProgress?.currentStreak || 0}
+            />
+          </div>
+          
+          {/* XP Progress & Welcome */}
+          <div className="lg:col-span-3 space-y-4">
+            <Card className="shadow-sm border-2 border-violet-200">
+              <CardContent className="p-6">
+                <div className="mb-4">
+                  <h2 className="text-2xl font-bold text-neutral-900 mb-1">
+                    Welcome back, {user?.name?.split(' ')[0] || 'there'}! 🌿
+                  </h2>
+                  <p className="text-neutral-600">
+                    Your eco-tree is growing! Keep earning XP to watch it flourish.
+                  </p>
+                </div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium text-neutral-700">
+                    Level {userProgress?.level || 1} → Level {(userProgress?.level || 1) + 1}
+                  </span>
+                  <span className="text-sm font-semibold text-violet-600">
+                    {((userProgress?.totalPoints || 0) - currentLevelXP).toLocaleString()} / {(nextLevelXP - currentLevelXP).toLocaleString()} XP
+                  </span>
+                </div>
+                <div className="relative h-4 bg-neutral-100 rounded-full overflow-hidden mb-4">
+                  <motion.div 
+                    className="absolute inset-y-0 left-0 bg-gradient-to-r from-violet-500 to-purple-600 rounded-full"
+                    initial={{ width: 0 }}
+                    animate={{ width: `${progressToNextLevel}%` }}
+                    transition={{ duration: 1, ease: "easeOut" }}
+                  />
+                </div>
+                <div className="grid grid-cols-3 gap-3 text-xs">
+                  <div className="text-center p-2 bg-green-50 rounded-lg">
+                    <div className="text-lg font-bold text-green-600">{(userProgress?.totalPoints || 0) * 2}</div>
+                    <div className="text-neutral-600">🍃 Leaves</div>
+                  </div>
+                  <div className="text-center p-2 bg-pink-50 rounded-lg">
+                    <div className="text-lg font-bold text-pink-600">{userAchievements.length}</div>
+                    <div className="text-neutral-600">🌸 Flowers</div>
+                  </div>
+                  <div className="text-center p-2 bg-blue-50 rounded-lg">
+                    <div className="text-lg font-bold text-blue-600">{impact?.familiesHelped || 0}</div>
+                    <div className="text-neutral-600">💧 Water Drops</div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            {/* Quick Game Actions */}
+            <div className="grid grid-cols-2 gap-3">
+              <Link href="/quiz">
+                <Button className="w-full bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-white h-16" data-testid="button-play-quiz-hero">
+                  <div className="text-left flex-1">
+                    <div className="font-bold">Play Quiz</div>
+                    <div className="text-xs opacity-90">+100 XP</div>
+                  </div>
+                  <Play className="h-5 w-5" />
+                </Button>
+              </Link>
+              <Link href="/sorting-game">
+                <Button className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white h-16" data-testid="button-play-game-hero">
+                  <div className="text-left flex-1">
+                    <div className="font-bold">Sorting Game</div>
+                    <div className="text-xs opacity-90">+120 XP</div>
+                  </div>
+                  <Recycle className="h-5 w-5" />
+                </Button>
+              </Link>
+            </div>
+          </div>
         </motion.div>
 
         {/* Main Grid */}
