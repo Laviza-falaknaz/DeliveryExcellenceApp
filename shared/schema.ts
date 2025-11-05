@@ -51,8 +51,8 @@ export const orders = pgTable("orders", {
   orderNumber: text("order_number").notNull().unique(),
   userId: integer("user_id").notNull().references(() => users.id),
   status: orderStatusEnum("status").notNull().default("placed"),
-  totalAmount: numeric("total_amount", { precision: 10, scale: 2, mode: "number" }).notNull(), // Decimal amount (e.g., 999.99)
-  savedAmount: numeric("saved_amount", { precision: 10, scale: 2, mode: "number" }).notNull(), // Decimal amount (e.g., 100.50)
+  totalAmount: numeric("total_amount", { precision: 10, scale: 2 }).notNull(), // Decimal amount (e.g., 999.99)
+  savedAmount: numeric("saved_amount", { precision: 10, scale: 2 }).notNull(), // Decimal amount (e.g., 100.50)
   currency: text("currency").notNull().default("GBP"), // USD, GBP, EUR, AED, etc.
   orderDate: timestamp("order_date").defaultNow(),
   estimatedDelivery: timestamp("estimated_delivery"),
@@ -79,8 +79,8 @@ export const orderItems = pgTable("order_items", {
   productName: text("product_name").notNull(),
   productDescription: text("product_description").notNull(),
   quantity: integer("quantity").notNull(),
-  unitPrice: numeric("unit_price", { precision: 10, scale: 2, mode: "number" }).notNull(), // Decimal price (e.g., 49.99)
-  totalPrice: numeric("total_price", { precision: 10, scale: 2, mode: "number" }).notNull(), // Decimal total (e.g., 99.98)
+  unitPrice: numeric("unit_price", { precision: 10, scale: 2 }).notNull(), // Decimal price (e.g., 49.99)
+  totalPrice: numeric("total_price", { precision: 10, scale: 2 }).notNull(), // Decimal total (e.g., 99.98)
   imageUrl: text("image_url"),
   createdAt: timestamp("created_at").defaultNow(),
 });
