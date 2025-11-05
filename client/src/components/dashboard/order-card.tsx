@@ -46,26 +46,64 @@ export default function OrderCard({ order, isPast = false }: OrderCardProps) {
   const totalQuantity = orderItems?.reduce((sum, item) => sum + item.quantity, 0) || 0;
   const totalAmount = Number(order.totalAmount) || 0;
 
+  const getCurrentStage = () => {
+    if (!timeline) return null;
+    
+    const stages = [
+      { key: 'orderDate', label: 'Order Confirmed', icon: 'ri-shopping-cart-line' },
+      { key: 'sentToWarehouse', label: 'Processing', icon: 'ri-building-line' },
+      { key: 'dispatchDate', label: 'Dispatched', icon: 'ri-truck-line' },
+      { key: 'invoiceSent', label: 'Invoice Sent', icon: 'ri-file-list-line' },
+      { key: 'paymentConfirmed', label: 'Payment Confirmed', icon: 'ri-check-double-line' },
+      { key: 'fulfilled', label: 'Fulfilled', icon: 'ri-checkbox-circle-line' }
+    ];
+    
+    for (let i = stages.length - 1; i >= 0; i--) {
+      if (timeline[stages[i].key as keyof DeliveryTimeline]) {
+        return { ...stages[i], index: i + 1, total: stages.length };
+      }
+    }
+    return { ...stages[0], index: 1, total: stages.length };
+  };
+  
+  const currentStage = getCurrentStage();
+
   return (
-    <Card className="bg-white overflow-hidden border border-neutral-200 mb-4">
-      <CardHeader className="px-5 py-4 border-b border-neutral-200">
-        <div className="flex flex-wrap items-center justify-between">
-          <div>
-            <h3 className="font-semibold text-neutral-900">
+    <Card className="bg-white overflow-hidden border border-neutral-200 mb-4 hover:shadow-xl transition-all duration-300">
+      <CardHeader className="px-5 py-4 border-b border-neutral-200 bg-gradient-to-r from-emerald-50 to-teal-50">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div className="flex-1">
+            <h3 className="font-bold text-neutral-900 text-lg">
               Order #{order.orderNumber}
             </h3>
-            <p className="text-sm text-neutral-500">
+            <p className="text-sm text-neutral-600 mt-1">
               Ordered on {order.orderDate ? formatDate(order.orderDate) : 'N/A'}
             </p>
           </div>
-          <div className="mt-2 sm:mt-0">
-            <Badge
-              variant="outline"
-              className={`${getOrderStatusColor(order.status)}`}
-            >
-              {getStatusLabel(order.status)}
-            </Badge>
-          </div>
+          
+          {currentStage && !isPast && (
+            <div className="flex items-center gap-3 bg-white px-4 py-2 rounded-lg shadow-sm border border-emerald-200">
+              <div className="flex items-center gap-2">
+                <div className="h-8 w-8 rounded-full bg-emerald-100 flex items-center justify-center">
+                  <i className={`${currentStage.icon} text-emerald-600`}></i>
+                </div>
+                <div>
+                  <p className="text-xs text-neutral-500">Current Stage</p>
+                  <p className="text-sm font-bold text-emerald-700">{currentStage.label}</p>
+                </div>
+              </div>
+              <div className="text-xs text-neutral-500 ml-2">
+                {currentStage.index}/{currentStage.total}
+              </div>
+            </div>
+          )}
+          
+          <Badge
+            variant="outline"
+            className={`${getOrderStatusColor(order.status)}`}
+          >
+            {getStatusLabel(order.status)}
+          </Badge>
         </div>
       </CardHeader>
 

@@ -1,6 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
 import { formatEnvironmentalImpact } from "@/lib/utils";
+import MiniSparkline from "./mini-sparkline";
+import { motion } from "framer-motion";
 
 interface ImpactCardProps {
   title: string;
@@ -13,6 +14,8 @@ interface ImpactCardProps {
   progress: number;
   footnote1: string;
   footnote2?: string;
+  trend?: number[];
+  trendColor?: string;
 }
 
 export default function ImpactCard({
@@ -26,40 +29,50 @@ export default function ImpactCard({
   progress,
   footnote1,
   footnote2,
+  trend,
+  trendColor,
 }: ImpactCardProps) {
   const formattedValue = formatEnvironmentalImpact(value, unit);
 
   return (
-    <Card data-testid="impact-card">
+    <Card data-testid="impact-card" className="hover:shadow-lg transition-all duration-300">
       <CardContent className="p-6" data-testid="impact-card-content">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h3 className="text-sm font-medium text-neutral-500">
+        <div className="flex items-start justify-between mb-3">
+          <div className="flex-1">
+            <h3 className="text-sm font-medium text-neutral-500 mb-2">
               {title}
             </h3>
-            <p className="text-3xl font-bold mt-1" data-testid="impact-card-value">
+            <motion.p 
+              className="text-3xl font-bold text-neutral-900" 
+              data-testid="impact-card-value"
+              initial={{ scale: 0.5, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.5, type: "spring" }}
+            >
               {formattedValue}
-            </p>
+            </motion.p>
           </div>
-          <div className={`h-12 w-12 rounded-full ${iconBgColor} flex items-center justify-center`} data-testid="impact-card-icon">
+          <motion.div 
+            className={`h-12 w-12 rounded-full ${iconBgColor} flex items-center justify-center shadow-sm`} 
+            data-testid="impact-card-icon"
+            whileHover={{ scale: 1.1, rotate: 5 }}
+            transition={{ type: "spring", stiffness: 400 }}
+          >
             {iconImage ? (
               <img src={iconImage} alt={title} className="w-7 h-7" />
             ) : (
-              <i className={`${icon} text-xl`}></i>
+              <i className={`${icon} text-xl ${iconColor}`}></i>
             )}
-          </div>
+          </motion.div>
         </div>
-        <div className="mt-2">
-          <div className="flex justify-between mb-1 text-sm">
-            <span>Impact level</span>
-            <span>{Math.round(progress)}%</span>
+        
+        {trend && trend.length > 0 && trendColor && (
+          <div className="mb-3 h-10">
+            <MiniSparkline data={trend} color={trendColor} height={40} />
           </div>
-          <Progress
-            value={progress}
-            className="h-2"
-          />
-        </div>
-        <div className={`mt-4 text-sm flex items-center ${iconColor}`} data-testid="impact-card-footer">
+        )}
+        
+        <div className={`text-xs flex items-center ${iconColor} font-medium`} data-testid="impact-card-footer">
           <i className="ri-arrow-up-line mr-1"></i>
           <span>{footnote1}</span>
         </div>
