@@ -817,26 +817,33 @@ export default function OrderJourney({ timeline, environmentalImpact }: OrderJou
   };
 
   return (
-    <div className="relative py-8 px-4 overflow-hidden rounded-lg">
-      {/* Subtle Particle Flow Background */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-30">
-        {[...Array(15)].map((_, i) => (
+    <div className="relative py-8 px-4 overflow-hidden rounded-lg bg-gradient-to-br from-white via-emerald-50/20 to-teal-50/20">
+      {/* Enhanced Particle Flow Background */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-40">
+        {[...Array(20)].map((_, i) => (
           <motion.div
             key={i}
-            className="absolute w-1 h-1 rounded-full bg-emerald-400"
+            className="absolute w-2 h-2 rounded-full"
             style={{
+              background: i % 3 === 0 
+                ? 'linear-gradient(135deg, #10b981, #34d399)' 
+                : i % 3 === 1 
+                ? 'linear-gradient(135deg, #0891b2, #22d3ee)'
+                : 'linear-gradient(135deg, #06b6d4, #67e8f9)',
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
             }}
             animate={{
-              y: [0, -100],
-              opacity: [0, 0.6, 0]
+              y: [0, -120],
+              x: [0, (Math.random() - 0.5) * 40],
+              opacity: [0, 0.8, 0],
+              scale: [0.5, 1.2, 0.5]
             }}
             transition={{
-              duration: 3 + Math.random() * 2,
+              duration: 4 + Math.random() * 3,
               repeat: Infinity,
-              delay: Math.random() * 3,
-              ease: "linear"
+              delay: Math.random() * 4,
+              ease: "easeInOut"
             }}
           />
         ))}
@@ -847,44 +854,47 @@ export default function OrderJourney({ timeline, environmentalImpact }: OrderJou
         <motion.h2
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 bg-clip-text text-transparent mb-2"
+          className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 bg-clip-text text-transparent mb-2 drop-shadow-sm"
         >
           Your Sustainable Journey
         </motion.h2>
-        <p className="text-neutral-600 text-sm md:text-base">Eco-luxury delivery in progress</p>
+        <p className="text-neutral-700 text-sm md:text-base font-medium">Eco-luxury delivery in progress</p>
       </div>
 
-      {/* Progress Path */}
+      {/* Enhanced Progress Path */}
       <div className="relative max-w-5xl mx-auto mb-10">
-        <div className="relative h-2 bg-neutral-200 rounded-full overflow-hidden">
+        <div className="relative h-3 bg-neutral-200 rounded-full overflow-hidden shadow-inner">
           <motion.div
             className="absolute inset-y-0 left-0 rounded-full"
             style={{
-              background: "linear-gradient(90deg, #10b981 0%, #06b6d4 50%, #ec4899 100%)"
+              background: "linear-gradient(90deg, #10b981 0%, #14b8a6 35%, #06b6d4 70%, #0891b2 100%)"
             }}
             initial={{ width: 0 }}
             animate={{ width: `${progress}%` }}
             transition={{ duration: 1.5, ease: "easeOut" }}
           >
-            {/* Shimmer Effect */}
+            {/* Enhanced Shimmer Effect */}
             <motion.div
-              className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-40"
+              className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-50"
               animate={{ x: ["-100%", "200%"] }}
               transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
             />
+            {/* Glow Effect */}
+            <div className="absolute inset-0 rounded-full shadow-[0_0_15px_rgba(16,185,129,0.5)]" />
           </motion.div>
         </div>
 
-        {/* Progress Percentage */}
+        {/* Enhanced Progress Percentage */}
         <motion.div
-          className="absolute -top-10 px-4 py-2 rounded-full text-sm font-semibold text-white shadow-lg"
+          className="absolute -top-12 px-5 py-2.5 rounded-full text-sm font-bold text-white shadow-xl border-2 border-white/20"
           style={{
-            background: "linear-gradient(135deg, #10b981 0%, #06b6d4 100%)",
+            background: "linear-gradient(135deg, #10b981 0%, #059669 50%, #06b6d4 100%)",
             left: `${progress}%`,
             transform: "translateX(-50%)"
           }}
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
+          whileHover={{ scale: 1.1 }}
         >
           {Math.round(progress)}% Complete
         </motion.div>
@@ -908,17 +918,21 @@ export default function OrderJourney({ timeline, environmentalImpact }: OrderJou
               }}
               className="relative flex flex-col items-center"
             >
-              {/* Stage Number */}
+              {/* Stage Number with Enhanced Shadow */}
               <motion.div
-                className="absolute -top-6 w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold z-10"
+                className="absolute -top-6 w-12 h-12 rounded-full flex items-center justify-center text-sm font-bold z-10 border-2"
                 style={{
                   background: isCompleted || isCurrent
                     ? "linear-gradient(135deg, #10b981 0%, #059669 100%)"
-                    : "linear-gradient(135deg, #d1d5db 0%, #9ca3af 100%)",
+                    : "linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%)",
+                  borderColor: isCompleted || isCurrent ? "#34d399" : "#9ca3af",
                   color: isCompleted || isCurrent ? "#fff" : "#6b7280",
-                  boxShadow: isCompleted || isCurrent ? "0 4px 12px rgba(16, 185, 129, 0.3)" : "none"
+                  boxShadow: isCompleted || isCurrent 
+                    ? "0 6px 20px rgba(16, 185, 129, 0.4), 0 0 0 3px rgba(16, 185, 129, 0.1)" 
+                    : "0 2px 8px rgba(0, 0, 0, 0.1)"
                 }}
-                whileHover={{ scale: 1.1 }}
+                whileHover={{ scale: 1.15 }}
+                transition={{ type: "spring", stiffness: 400 }}
               >
                 {index + 1}
               </motion.div>
@@ -939,60 +953,63 @@ export default function OrderJourney({ timeline, environmentalImpact }: OrderJou
                 )}
               </div>
 
-              {/* Stage Info - Card */}
+              {/* Stage Info - Enhanced Card */}
               <motion.div
                 className={`
-                  relative p-4 md:p-5 rounded-xl text-center min-h-[160px] w-full
+                  relative p-4 md:p-5 rounded-2xl text-center min-h-[160px] w-full transition-all duration-300
                   ${isCompleted || isCurrent
-                    ? "bg-white/90 backdrop-blur-sm border-2 border-emerald-400 shadow-lg"
-                    : "bg-white/50 backdrop-blur-sm border-2 border-neutral-200"}
+                    ? "bg-gradient-to-br from-white to-emerald-50/30 backdrop-blur-sm border-2 border-emerald-400 shadow-xl"
+                    : "bg-white/70 backdrop-blur-sm border-2 border-neutral-300 shadow-md"}
                 `}
-                whileHover={isCompleted || isCurrent ? { y: -4, scale: 1.02 } : {}}
+                whileHover={isCompleted || isCurrent ? { y: -6, scale: 1.03 } : { y: -2 }}
                 transition={{ type: "spring", stiffness: 300 }}
               >
-                {/* Soft Glow Border */}
+                {/* Enhanced Glow Border */}
                 {(isCompleted || isCurrent) && (
-                  <div
-                    className="absolute inset-0 rounded-2xl opacity-20"
-                    style={{
-                      boxShadow: "inset 0 0 20px #10b981"
-                    }}
-                  />
+                  <>
+                    <div
+                      className="absolute inset-0 rounded-2xl opacity-30"
+                      style={{
+                        boxShadow: "inset 0 0 30px #10b981"
+                      }}
+                    />
+                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-emerald-400/5 to-teal-400/5" />
+                  </>
                 )}
 
                 <h4 className={`
                   text-sm md:text-base font-bold mb-2
-                  ${isCompleted || isCurrent ? "text-neutral-900" : "text-neutral-500"}
+                  ${isCompleted || isCurrent ? "text-neutral-900" : "text-neutral-600"}
                 `}>
                   {stage.label}
                 </h4>
                 
                 <p className={`
                   text-xs md:text-sm mb-3 leading-relaxed
-                  ${isCompleted || isCurrent ? "text-neutral-600" : "text-neutral-400"}
+                  ${isCompleted || isCurrent ? "text-neutral-700" : "text-neutral-500"}
                 `}>
                   {stage.subtitle}
                 </p>
 
-                {/* Date or Status */}
+                {/* Enhanced Date or Status */}
                 {isCompleted && (
-                  <div className="text-xs md:text-sm font-medium text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-full inline-block">
+                  <div className="text-xs md:text-sm font-semibold text-emerald-700 bg-gradient-to-r from-emerald-50 to-emerald-100 px-3 py-1.5 rounded-full inline-block shadow-sm border border-emerald-200">
                     {formatDate(stage.date)}
                   </div>
                 )}
                 
                 {isCurrent && (
                   <motion.div
-                    animate={{ opacity: [0.5, 1, 0.5] }}
+                    animate={{ opacity: [0.6, 1, 0.6] }}
                     transition={{ duration: 2, repeat: Infinity }}
-                    className="text-xs md:text-sm font-semibold text-teal-600 bg-teal-50 px-3 py-1.5 rounded-full inline-block"
+                    className="text-xs md:text-sm font-bold text-teal-700 bg-gradient-to-r from-teal-50 to-cyan-50 px-3 py-1.5 rounded-full inline-block shadow-sm border border-teal-300"
                   >
                     In Progress...
                   </motion.div>
                 )}
 
                 {!isCompleted && !isCurrent && (
-                  <div className="text-xs md:text-sm text-neutral-400 bg-neutral-100 px-3 py-1.5 rounded-full inline-block">
+                  <div className="text-xs md:text-sm font-medium text-neutral-500 bg-neutral-100 px-3 py-1.5 rounded-full inline-block border border-neutral-200">
                     Pending
                   </div>
                 )}
