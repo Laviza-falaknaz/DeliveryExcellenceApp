@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useOrders } from "@/hooks/use-orders";
 import { Button } from "@/components/ui/button";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Order, OrderItem, OrderUpdate, DeliveryTimeline } from "@shared/schema";
@@ -21,14 +21,14 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Eye, Download, FileText, Package, Hash, FileCheck } from "lucide-react";
+import { Eye, Download, FileText, Package, Hash, FileCheck, MapPin } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { formatPrice } from "@/lib/currency";
-import OrderJourney from "@/components/dashboard/order-journey";
 import { EnvironmentalImpact } from "@shared/schema";
 
 export default function Orders() {
   const { orders, isLoadingOrders, getActiveOrders, getPastOrders } = useOrders();
+  const [, setLocation] = useLocation();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
   const [isOrderDialogOpen, setIsOrderDialogOpen] = useState(false);
@@ -127,7 +127,7 @@ export default function Orders() {
 
   // Calculate total paid from order items
   function calculateOrderTotal() {
-    return orderItems.reduce((sum, item) => sum + item.totalPrice, 0);
+    return orderItems.reduce((sum, item) => sum + parseFloat(item.totalPrice || "0"), 0);
   }
 
   // Mock attachments data (in real app, this would come from API)
@@ -512,39 +512,33 @@ export default function Orders() {
                   </CardContent>
                 </Card>
 
-                {/* Gamified Delivery Journey */}
-                {isLoadingTimeline ? (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="text-base">Delivery Journey</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-3">
-                        {Array.from({ length: 4 }).map((_, i) => (
-                          <Skeleton key={i} className="h-32 w-full" />
-                        ))}
-                      </div>
-                    </CardContent>
-                  </Card>
-                ) : deliveryTimeline ? (
-                  <OrderJourney 
-                    timeline={deliveryTimeline} 
-                    environmentalImpact={environmentalImpact ? {
-                      carbonSaved: environmentalImpact.carbonSaved,
-                      waterProvided: environmentalImpact.waterProvided,
-                      mineralsSaved: environmentalImpact.mineralsSaved
-                    } : undefined}
-                  />
-                ) : (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="text-base">Delivery Journey</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-neutral-500 text-center py-4">No timeline data available</p>
-                    </CardContent>
-                  </Card>
-                )}
+                {/* Delivery Journey Link */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base flex items-center gap-2">
+                      <MapPin className="w-5 h-5 text-primary" />
+                      Delivery Journey
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-center py-6 space-y-4">
+                      <p className="text-neutral-600">
+                        Track your order's sustainable journey with our interactive timeline
+                      </p>
+                      <Button
+                        onClick={() => {
+                          setIsOrderDetailsOpen(false);
+                          setLocation(`/orders/${selectedOrder?.id}/journey`);
+                        }}
+                        className="w-full"
+                        data-testid="button-view-journey"
+                      >
+                        <MapPin className="w-4 h-4 mr-2" />
+                        View Full Journey Timeline
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
             </div>
           </ScrollArea>

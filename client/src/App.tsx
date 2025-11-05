@@ -18,6 +18,7 @@ import Remanufactured from "@/pages/remanufactured";
 import ESGReport from "@/pages/esg-report";
 import DeliveryTimeline from "@/pages/delivery-timeline";
 import WarrantyClaim from "@/pages/warranty-claim";
+import OrderJourneyPage from "@/pages/order-journey";
 import { AdminDashboard } from "@/pages/admin-dashboard";
 import { useEffect, useState } from "react";
 import { apiRequest } from "@/lib/queryClient";
@@ -116,6 +117,11 @@ function Router() {
       <Route path="/orders">
         <ProtectedRoute>
           <Orders />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/orders/:id/journey">
+        <ProtectedRoute>
+          <OrderJourneyPage />
         </ProtectedRoute>
       </Route>
       <Route path="/delivery-timeline">
