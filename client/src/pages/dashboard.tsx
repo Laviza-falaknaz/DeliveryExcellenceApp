@@ -247,7 +247,7 @@ export default function Dashboard() {
                     </div>
                     <Button 
                       className="w-full bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700"
-                      onClick={() => setLocation('/sustainability-quiz')}
+                      onClick={() => setLocation('/quiz')}
                       data-testid="button-start-quiz"
                     >
                       Start Quiz
@@ -281,7 +281,7 @@ export default function Dashboard() {
                     </div>
                     <Button 
                       className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700"
-                      onClick={() => setLocation('/waste-sorting-game')}
+                      onClick={() => setLocation('/sorting-game')}
                       data-testid="button-start-game"
                     >
                       Play Now
@@ -315,7 +315,7 @@ export default function Dashboard() {
                 <CardContent className="p-0">
                   <div className="divide-y">
                     {activeRmas.map(({ rma }) => (
-                      <Link key={rma.id} href={`/rma/${rma.id}`}>
+                      <Link key={rma.id} href={`/rma`}>
                         <div 
                           className="p-3 hover:bg-orange-50/50 transition-colors cursor-pointer"
                           data-testid={`rma-${rma.id}`}
@@ -380,7 +380,7 @@ export default function Dashboard() {
                 ) : (
                   <div className="divide-y">
                     {recentOrders.map((order) => (
-                      <Link key={order.id} href={`/orders/${order.id}`}>
+                      <Link key={order.id} href={`/orders`}>
                         <div 
                           className="p-3 hover:bg-gray-50 transition-colors cursor-pointer"
                           data-testid={`order-${order.id}`}
