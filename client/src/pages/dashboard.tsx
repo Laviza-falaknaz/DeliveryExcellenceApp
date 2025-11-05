@@ -145,8 +145,8 @@ export default function Dashboard() {
 
                 <div className="text-center px-3 bg-white/10 rounded-lg py-2">
                   <div className="text-xs text-white/80 mb-0.5">Impact</div>
-                  <div className="text-2xl font-bold">8</div>
-                  <div className="text-xs text-white/80">Plants Equiv.</div>
+                  <div className="text-2xl font-bold">{impact?.treesEquivalent || 0}</div>
+                  <div className="text-xs text-white/80">Trees Equiv.</div>
                 </div>
               </div>
             </div>
