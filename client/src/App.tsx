@@ -21,6 +21,7 @@ import WarrantyClaim from "@/pages/warranty-claim";
 import OrderJourneyPage from "@/pages/order-journey";
 import { AdminDashboard } from "@/pages/admin-dashboard";
 import SustainabilityQuizPage from "@/pages/sustainability-quiz-page";
+import WasteSortingGamePage from "@/pages/waste-sorting-game-page";
 import { useEffect, useState } from "react";
 import { apiRequest } from "@/lib/queryClient";
 import Sidebar from "@/components/layout/sidebar";
@@ -188,6 +189,11 @@ function Router() {
       <Route path="/quiz">
         <ProtectedRoute>
           <SustainabilityQuizPage />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/sorting-game">
+        <ProtectedRoute>
+          <WasteSortingGamePage />
         </ProtectedRoute>
       </Route>
       <Route path="/admin">

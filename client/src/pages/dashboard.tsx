@@ -12,7 +12,7 @@ import {
   Trophy, Zap, Flame, Package, Sparkles, 
   Search, QrCode, Leaf, ShieldCheck, Target, 
   TrendingUp, Award, ChevronRight, AlertCircle, CheckCircle2,
-  Clock, Box, Wrench, ArrowRight, Play
+  Clock, Box, Wrench, ArrowRight, Play, Recycle
 } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -411,6 +411,13 @@ export default function Dashboard() {
                     <Play className="h-4 w-4" />
                     <span className="flex-1 text-left">Play Sustainability Quiz</span>
                     <Badge className="bg-white/20 hover:bg-white/20 text-white border-0">+100 XP</Badge>
+                  </Button>
+                </Link>
+                <Link href="/sorting-game">
+                  <Button className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white justify-start gap-2 h-11" data-testid="button-play-sorting-game">
+                    <Recycle className="h-4 w-4" />
+                    <span className="flex-1 text-left">Waste Sorting Game</span>
+                    <Badge className="bg-white/20 hover:bg-white/20 text-white border-0">+120 XP</Badge>
                   </Button>
                 </Link>
                 <Link href="/warranty">

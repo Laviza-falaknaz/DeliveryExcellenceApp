@@ -15,13 +15,10 @@ export default function SustainabilityQuizPage() {
       const percentage = (score / totalPoints) * 100;
       const pointsEarned = score;
       
-      return await apiRequest("/api/gamification/activity-log", {
-        method: "POST",
-        body: JSON.stringify({
-          activityType: "quiz_completed",
-          description: `Completed Sustainability Quiz with ${Math.round(percentage)}% accuracy`,
-          pointsEarned: pointsEarned
-        })
+      return await apiRequest("POST", "/api/gamification/activity-log", {
+        activityType: "quiz_completed",
+        description: `Completed Sustainability Quiz with ${Math.round(percentage)}% accuracy`,
+        pointsEarned: pointsEarned
       });
     },
     onSuccess: () => {
