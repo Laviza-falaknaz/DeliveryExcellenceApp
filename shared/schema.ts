@@ -478,6 +478,8 @@ export const activityTypeEnum = pgEnum("activity_type", [
   "profile_updated",
   "milestone_reached",
   "achievement_unlocked",
+  "quiz_completed",
+  "game_completed",
 ]);
 
 export const activityLog = pgTable("activity_log", {
