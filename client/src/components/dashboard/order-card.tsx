@@ -42,6 +42,10 @@ export default function OrderCard({ order, isPast = false }: OrderCardProps) {
     return status.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
   }
 
+  // Calculate totals
+  const totalQuantity = orderItems?.reduce((sum, item) => sum + item.quantity, 0) || 0;
+  const totalAmount = Number(order.totalAmount) || 0;
+
   return (
     <Card className="bg-white overflow-hidden border border-neutral-200 mb-4">
       <CardHeader className="px-5 py-4 border-b border-neutral-200">
@@ -66,90 +70,79 @@ export default function OrderCard({ order, isPast = false }: OrderCardProps) {
       </CardHeader>
 
       <CardContent className="p-5">
+        {/* Summary Section */}
+        <div className="grid grid-cols-2 gap-4 mb-6 p-4 bg-gradient-to-br from-emerald-50 to-teal-50 rounded-lg">
+          <div>
+            <p className="text-sm text-neutral-600 font-medium">Total Items</p>
+            <p className="text-2xl font-bold text-neutral-900">{totalQuantity}</p>
+          </div>
+          <div className="text-right">
+            <p className="text-sm text-neutral-600 font-medium">Total Amount</p>
+            <p className="text-2xl font-bold text-emerald-600">{formatCurrency(totalAmount)}</p>
+            {Number(order.savedAmount) > 0 && (
+              <p className="text-xs text-emerald-600 font-medium mt-1">
+                Saved {formatCurrency(Number(order.savedAmount))} vs new
+              </p>
+            )}
+          </div>
+        </div>
+
         {expanded && orderItems && orderItems.map((item) => (
-          <div key={item.id} className="flex flex-col md:flex-row md:items-center mb-4">
+          <div key={item.id} className="flex flex-col md:flex-row md:items-center mb-4 pb-4 border-b border-neutral-100 last:border-0">
             {item.imageUrl ? (
               <img
                 src={item.imageUrl}
                 alt={item.productName}
-                className="w-24 h-24 object-cover rounded-lg"
+                className="w-20 h-20 object-cover rounded-lg"
               />
             ) : (
-              <div className="w-24 h-24 bg-neutral-100 rounded-lg flex items-center justify-center">
-                <i className="ri-laptop-line text-3xl text-neutral-400"></i>
+              <div className="w-20 h-20 bg-neutral-100 rounded-lg flex items-center justify-center">
+                <i className="ri-laptop-line text-2xl text-neutral-400"></i>
               </div>
             )}
-            <div className="mt-4 md:mt-0 md:ml-4">
-              <h4 className="font-medium">{item.productName}</h4>
-              <p className="text-sm text-neutral-600">{item.productDescription}</p>
-              <p className="text-sm text-neutral-500 mt-1">
-                Quantity: {item.quantity} {item.quantity === 1 ? 'unit' : 'units'}
-              </p>
+            <div className="mt-3 md:mt-0 md:ml-4 flex-1">
+              <h4 className="font-medium text-neutral-900">{item.productName}</h4>
+              <p className="text-sm text-neutral-500 mt-1">Qty: {item.quantity}</p>
             </div>
-            <div className="mt-4 md:mt-0 md:ml-auto text-right">
-              <p className="font-semibold">{formatCurrency(Number(item.totalPrice))}</p>
-              {Number(order.savedAmount) > 0 && (
-                <p className="text-sm text-success">
-                  Saved {formatCurrency(Number(order.savedAmount))} vs new
-                </p>
-              )}
+            <div className="mt-3 md:mt-0 text-right">
+              <p className="font-semibold text-neutral-900">{formatCurrency(Number(item.totalPrice))}</p>
             </div>
           </div>
         ))}
 
-        {!isPast && order.status !== "completed" && order.status !== "cancelled" && (
-          <>
-            <OrderJourney 
-              timeline={timeline || null} 
-              environmentalImpact={environmentalImpact ? {
-                carbonSaved: Number(environmentalImpact.carbonSaved) || 0,
-                waterProvided: Number(environmentalImpact.waterProvided) || 0,
-                mineralsSaved: Number(environmentalImpact.mineralsSaved) || 0,
-              } : undefined}
-            />
-
-            {latestUpdate && (
-              <div className="mt-10 bg-blue-50 rounded-lg p-4 flex">
-                <div className="mr-4 text-secondary">
-                  <i className="ri-information-line text-xl"></i>
-                </div>
-                <div>
-                  <h4 className="font-medium text-neutral-800">Latest Update</h4>
-                  <p className="text-sm text-neutral-600">
-                    {latestUpdate.message}
-                  </p>
-                  <p className="text-xs text-neutral-500 mt-2">
-                    {formatDate(latestUpdate.timestamp)} at{" "}
-                    {new Date(latestUpdate.timestamp).toLocaleTimeString("en-US", {
-                      hour: "numeric",
-                      minute: "2-digit",
-                    })}
-                  </p>
-                </div>
-              </div>
-            )}
-          </>
+        {!isPast && order.status !== "completed" && order.status !== "cancelled" && latestUpdate && (
+          <div className="mt-6 bg-blue-50 rounded-lg p-4 flex">
+            <div className="mr-3 text-secondary">
+              <i className="ri-information-line text-xl"></i>
+            </div>
+            <div>
+              <h4 className="font-medium text-neutral-800">Latest Update</h4>
+              <p className="text-sm text-neutral-600">
+                {latestUpdate.message}
+              </p>
+              <p className="text-xs text-neutral-500 mt-2">
+                {formatDate(latestUpdate.timestamp)} at{" "}
+                {new Date(latestUpdate.timestamp).toLocaleTimeString("en-US", {
+                  hour: "numeric",
+                  minute: "2-digit",
+                })}
+              </p>
+            </div>
+          </div>
         )}
 
-        <div className="mt-6 flex flex-wrap justify-end space-x-3">
+        <div className="mt-6 flex flex-wrap gap-3 justify-end">
+          <Button variant="outline" asChild data-testid="button-view-details">
+            <Link href={`/orders/${order.id}`}>View Details</Link>
+          </Button>
           {isPast ? (
-            <>
-              <Button variant="outline" asChild>
-                <Link href={`/orders/${order.id}`}>View Details</Link>
-              </Button>
-              <Button asChild>
-                <Link href={`/orders/reorder/${order.id}`}>Reorder</Link>
-              </Button>
-            </>
+            <Button asChild data-testid="button-reorder">
+              <Link href={`/orders/reorder/${order.id}`}>Reorder</Link>
+            </Button>
           ) : (
-            <>
-              <Button variant="outline" asChild>
-                <a href="https://circularcomputing.com/contact/" target="_blank" rel="noreferrer">Contact Support</a>
-              </Button>
-              <Button asChild>
-                <Link href={`/orders/${order.id}/journey`}>Track Shipment</Link>
-              </Button>
-            </>
+            <Button asChild data-testid="button-track-shipment">
+              <Link href={`/orders/${order.id}/journey`}>Track Shipment</Link>
+            </Button>
           )}
         </div>
       </CardContent>

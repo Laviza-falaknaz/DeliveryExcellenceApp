@@ -112,11 +112,10 @@ function OrderConfirmedAnimation({ isActive, isCompleted }: { isActive: boolean;
         
         {/* Purchase Button */}
         <motion.div
-          className="relative w-16 h-16 rounded-xl flex items-center justify-center border-2"
+          className="relative w-16 h-16 rounded-xl flex items-center justify-center"
           style={{
             background: isActive || isCompleted ? "#fff" : "#f3f4f6",
-            borderColor: isActive || isCompleted ? "#10b981" : "#6b7280",
-            boxShadow: isActive || isCompleted ? "0 8px 20px rgba(16, 185, 129, 0.4)" : "0 2px 8px rgba(0, 0, 0, 0.1)"
+            boxShadow: isActive || isCompleted ? "0 8px 20px rgba(16, 185, 129, 0.3)" : "0 2px 8px rgba(0, 0, 0, 0.08)"
           }}
           animate={isActive ? {
             y: [0, -3, 0],
@@ -126,8 +125,8 @@ function OrderConfirmedAnimation({ isActive, isCompleted }: { isActive: boolean;
           <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
             <path
               d="M6 8L8 4H24L26 8M6 8H26M6 8L8 24H24L26 8M12 12V20M16 12V20M20 12V20"
-              stroke={isActive || isCompleted ? "#10b981" : "#374151"}
-              strokeWidth="3"
+              stroke={isActive || isCompleted ? "#10b981" : "#6b7280"}
+              strokeWidth="2.5"
               strokeLinecap="round"
               strokeLinejoin="round"
             />
@@ -190,8 +189,8 @@ function SentToWarehouseAnimation({ isActive, isCompleted }: { isActive: boolean
             y1="80"
             x2="100"
             y2="80"
-            stroke={isActive || isCompleted ? "#1d4ed8" : "#1f2937"}
-            strokeWidth="4"
+            stroke={isActive || isCompleted ? "#1d4ed8" : "#6b7280"}
+            strokeWidth="3"
             strokeDasharray="8 4"
             animate={isActive ? { strokeDashoffset: [0, -12] } : {}}
             transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
@@ -216,8 +215,8 @@ function SentToWarehouseAnimation({ isActive, isCompleted }: { isActive: boolean
               y1="20"
               x2="60"
               y2="50"
-              stroke="#374151"
-              strokeWidth="5"
+              stroke="#6b7280"
+              strokeWidth="4"
               strokeLinecap="round"
               animate={{ y2: [50, 60, 50] }}
               transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
@@ -227,8 +226,8 @@ function SentToWarehouseAnimation({ isActive, isCompleted }: { isActive: boolean
               y1="50"
               x2="40"
               y2="60"
-              stroke="#6b7280"
-              strokeWidth="5"
+              stroke="#9ca3af"
+              strokeWidth="4"
               strokeLinecap="round"
               animate={{ x2: [40, 30, 40], y2: [60, 70, 60] }}
               transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
@@ -238,8 +237,6 @@ function SentToWarehouseAnimation({ isActive, isCompleted }: { isActive: boolean
               cy="60"
               r="4"
               fill="#3b82f6"
-              stroke="#1d4ed8"
-              strokeWidth="2"
               animate={{ cx: [40, 30, 40], cy: [60, 70, 60] }}
               transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
             />
@@ -268,15 +265,13 @@ function SentToWarehouseAnimation({ isActive, isCompleted }: { isActive: boolean
               width="32"
               height="24"
               rx="2"
-              fill={isActive || isCompleted ? "#10b981" : "#374151"}
-              stroke={isActive || isCompleted ? "#059669" : "#1f2937"}
-              strokeWidth="2"
-              opacity="1"
+              fill={isActive || isCompleted ? "#10b981" : "#9ca3af"}
+              opacity="0.9"
             />
-            <rect x="12" y="16" width="10" height="8" fill={isActive || isCompleted ? "#fff" : "#e5e7eb"} opacity="0.5" />
-            <rect x="26" y="16" width="10" height="8" fill={isActive || isCompleted ? "#fff" : "#e5e7eb"} opacity="0.5" />
-            <path d="M16 12 L24 8 L32 12" stroke={isActive || isCompleted ? "#047857" : "#1f2937"} strokeWidth="3" fill="none" />
-            <circle cx="24" cy="22" r="4" fill="#fbbf24" stroke="#f59e0b" strokeWidth="2" />
+            <rect x="12" y="16" width="10" height="8" fill={isActive || isCompleted ? "#fff" : "#6b7280"} opacity="0.4" />
+            <rect x="26" y="16" width="10" height="8" fill={isActive || isCompleted ? "#fff" : "#6b7280"} opacity="0.4" />
+            <path d="M16 12 L24 8 L32 12" stroke={isActive || isCompleted ? "#047857" : "#4b5563"} strokeWidth="2.5" fill="none" />
+            <circle cx="24" cy="22" r="4" fill="#fbbf24" />
           </svg>
         </motion.div>
 
@@ -343,9 +338,9 @@ function DispatchedAnimation({ isActive, isCompleted }: { isActive: boolean; isC
           } : {}}
         >
           {/* Truck Body */}
-          <rect x="16" y="20" width="32" height="18" rx="2" fill={isActive || isCompleted ? "#10b981" : "#374151"} stroke={isActive || isCompleted ? "#059669" : "#1f2937"} strokeWidth="2" />
-          <rect x="48" y="24" width="10" height="12" rx="1" fill={isActive || isCompleted ? "#059669" : "#1f2937"} stroke="#000" strokeWidth="1" />
-          <rect x="20" y="24" width="24" height="10" fill={isActive || isCompleted ? "#047857" : "#e5e7eb"} opacity="0.5" />
+          <rect x="16" y="20" width="32" height="18" rx="2" fill={isActive || isCompleted ? "#10b981" : "#9ca3af"} />
+          <rect x="48" y="24" width="10" height="12" rx="1" fill={isActive || isCompleted ? "#059669" : "#6b7280"} />
+          <rect x="20" y="24" width="24" height="10" fill={isActive || isCompleted ? "#047857" : "#6b7280"} opacity="0.4" />
           
           {/* Windshield */}
           <path d="M50 25 L54 25 L54 33 L50 33" fill="#a5f3fc" opacity="0.7" />
@@ -454,17 +449,17 @@ function InvoiceSentAnimation({ isActive, isCompleted }: { isActive: boolean; is
             width="40"
             height="28"
             rx="2"
-            fill={isActive || isCompleted ? "#fff" : "#f3f4f6"}
-            stroke={isActive || isCompleted ? "#f59e0b" : "#374151"}
-            strokeWidth="3"
+            fill={isActive || isCompleted ? "#fff" : "#e5e7eb"}
+            stroke={isActive || isCompleted ? "#f59e0b" : "#9ca3af"}
+            strokeWidth="2"
           />
           
           {/* Envelope Flap */}
           <motion.path
             d="M8 16 L28 32 L48 16"
             fill="none"
-            stroke={isActive || isCompleted ? "#f59e0b" : "#1f2937"}
-            strokeWidth="3"
+            stroke={isActive || isCompleted ? "#f59e0b" : "#9ca3af"}
+            strokeWidth="2"
             strokeLinecap="round"
             initial={{ pathLength: 0 }}
             animate={{ pathLength: isActive || isCompleted ? 1 : 0.3 }}
@@ -472,9 +467,9 @@ function InvoiceSentAnimation({ isActive, isCompleted }: { isActive: boolean; is
           />
           
           {/* Document Lines */}
-          <line x1="14" y1="24" x2="42" y2="24" stroke={isActive || isCompleted ? "#d97706" : "#6b7280"} strokeWidth="2.5" opacity="0.8" />
-          <line x1="14" y1="30" x2="42" y2="30" stroke={isActive || isCompleted ? "#d97706" : "#6b7280"} strokeWidth="2.5" opacity="0.8" />
-          <line x1="14" y1="36" x2="35" y2="36" stroke={isActive || isCompleted ? "#d97706" : "#6b7280"} strokeWidth="2.5" opacity="0.8" />
+          <line x1="14" y1="24" x2="42" y2="24" stroke={isActive || isCompleted ? "#d97706" : "#9ca3af"} strokeWidth="2" opacity="0.6" />
+          <line x1="14" y1="30" x2="42" y2="30" stroke={isActive || isCompleted ? "#d97706" : "#9ca3af"} strokeWidth="2" opacity="0.6" />
+          <line x1="14" y1="36" x2="35" y2="36" stroke={isActive || isCompleted ? "#d97706" : "#9ca3af"} strokeWidth="2" opacity="0.6" />
         </motion.svg>
 
         {/* Light Burst on Open */}
@@ -546,13 +541,13 @@ function PaymentConfirmedAnimation({ isActive, isCompleted }: { isActive: boolea
               width="60"
               height="36"
               rx="4"
-              fill={isActive || isCompleted ? "#fff" : "#f3f4f6"}
-              stroke={isActive || isCompleted ? "#ec4899" : "#374151"}
-              strokeWidth="3"
+              fill={isActive || isCompleted ? "#fff" : "#e5e7eb"}
+              stroke={isActive || isCompleted ? "#ec4899" : "#9ca3af"}
+              strokeWidth="2"
             />
-            <rect x="2" y="8" width="60" height="8" fill={isActive || isCompleted ? "#1f2937" : "#374151"} />
-            <rect x="8" y="22" width="16" height="10" rx="2" fill={isActive || isCompleted ? "#fbbf24" : "#6b7280"} stroke={isActive || isCompleted ? "#f59e0b" : "#374151"} strokeWidth="1.5" />
-            <circle cx="52" cy="27" r="6" fill={isActive || isCompleted ? "#ec4899" : "#6b7280"} opacity="0.5" stroke={isActive || isCompleted ? "#db2777" : "#374151"} strokeWidth="2" />
+            <rect x="2" y="8" width="60" height="8" fill={isActive || isCompleted ? "#1f2937" : "#6b7280"} />
+            <rect x="8" y="22" width="16" height="10" rx="2" fill={isActive || isCompleted ? "#fbbf24" : "#9ca3af"} />
+            <circle cx="52" cy="27" r="6" fill={isActive || isCompleted ? "#ec4899" : "#9ca3af"} opacity="0.4" />
           </motion.svg>
         </motion.div>
 
@@ -626,9 +621,9 @@ function FulfilledAnimation({ isActive, isCompleted }: { isActive: boolean; isCo
           {/* Laptop Base */}
           <path
             d="M12 38 L52 38 L52 26 L12 26 Z"
-            fill={isCompleted ? "#a5f3d0" : "#f3f4f6"}
-            stroke={isCompleted ? "#059669" : "#374151"}
-            strokeWidth="3"
+            fill={isCompleted ? "#a5f3d0" : "#e5e7eb"}
+            stroke={isCompleted ? "#059669" : "#9ca3af"}
+            strokeWidth="2"
           />
           
           {/* Screen Glow */}
@@ -639,26 +634,22 @@ function FulfilledAnimation({ isActive, isCompleted }: { isActive: boolean; isCo
               width="32"
               height="8"
               fill="#10b981"
-              opacity="0.7"
+              opacity="0.6"
             />
           )}
           
           {/* Keyboard Base */}
           <path
             d="M8 38 L12 38 L52 38 L56 38 L58 44 L6 44 Z"
-            fill={(isActive || isCompleted) ? "#047857" : "#374151"}
-            stroke={(isActive || isCompleted) ? "#065f46" : "#1f2937"}
-            strokeWidth="2"
+            fill={(isActive || isCompleted) ? "#047857" : "#6b7280"}
           />
           
           {/* Power Button */}
           <motion.circle
             cx="32"
             cy="32"
-            r="4"
+            r="3"
             fill={(isActive || isCompleted) ? "#10b981" : "#6b7280"}
-            stroke={(isActive || isCompleted) ? "#059669" : "#374151"}
-            strokeWidth="2"
             animate={(isActive || isCompleted) ? {
               opacity: [1, 0.5, 1],
             } : {}}
@@ -965,7 +956,7 @@ export default function OrderJourney({ timeline, environmentalImpact }: OrderJou
               {/* Stage Info - Enhanced Card */}
               <motion.div
                 className={`
-                  relative p-4 md:p-5 rounded-2xl text-center min-h-[160px] w-full transition-all duration-300
+                  relative p-4 md:p-5 rounded-2xl text-center min-h-[180px] w-full transition-all duration-300 flex flex-col justify-between
                   ${isCompleted || isCurrent
                     ? "bg-gradient-to-br from-white to-emerald-50/30 backdrop-blur-sm border-2 border-emerald-400 shadow-xl"
                     : "bg-white/70 backdrop-blur-sm border-2 border-neutral-300 shadow-md"}
@@ -986,42 +977,46 @@ export default function OrderJourney({ timeline, environmentalImpact }: OrderJou
                   </>
                 )}
 
-                <h4 className={`
-                  text-sm md:text-base font-bold mb-2
-                  ${isCompleted || isCurrent ? "text-neutral-900" : "text-neutral-600"}
-                `}>
-                  {stage.label}
-                </h4>
-                
-                <p className={`
-                  text-xs md:text-sm mb-3 leading-relaxed
-                  ${isCompleted || isCurrent ? "text-neutral-700" : "text-neutral-500"}
-                `}>
-                  {stage.subtitle}
-                </p>
+                <div className="flex-1 flex flex-col justify-center">
+                  <h4 className={`
+                    text-sm md:text-base font-bold mb-2
+                    ${isCompleted || isCurrent ? "text-neutral-900" : "text-neutral-600"}
+                  `}>
+                    {stage.label}
+                  </h4>
+                  
+                  <p className={`
+                    text-xs md:text-sm mb-3 leading-relaxed
+                    ${isCompleted || isCurrent ? "text-neutral-700" : "text-neutral-500"}
+                  `}>
+                    {stage.subtitle}
+                  </p>
+                </div>
 
                 {/* Enhanced Date or Status */}
-                {isCompleted && (
-                  <div className="text-xs md:text-sm font-semibold text-emerald-700 bg-gradient-to-r from-emerald-50 to-emerald-100 px-3 py-1.5 rounded-full inline-block shadow-sm border border-emerald-200">
-                    {formatDate(stage.date)}
-                  </div>
-                )}
-                
-                {isCurrent && (
-                  <motion.div
-                    animate={{ opacity: [0.6, 1, 0.6] }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                    className="text-xs md:text-sm font-bold text-teal-700 bg-gradient-to-r from-teal-50 to-cyan-50 px-3 py-1.5 rounded-full inline-block shadow-sm border border-teal-300"
-                  >
-                    In Progress...
-                  </motion.div>
-                )}
+                <div className="mt-auto">
+                  {isCompleted && stage.date && (
+                    <div className="text-xs md:text-sm font-semibold text-emerald-700 bg-gradient-to-r from-emerald-50 to-emerald-100 px-3 py-1.5 rounded-full inline-block shadow-sm border border-emerald-200">
+                      {formatDate(stage.date)}
+                    </div>
+                  )}
+                  
+                  {isCurrent && (
+                    <motion.div
+                      animate={{ opacity: [0.6, 1, 0.6] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                      className="text-xs md:text-sm font-bold text-teal-700 bg-gradient-to-r from-teal-50 to-cyan-50 px-3 py-1.5 rounded-full inline-block shadow-sm border border-teal-300"
+                    >
+                      In Progress...
+                    </motion.div>
+                  )}
 
-                {!isCompleted && !isCurrent && (
-                  <div className="text-xs md:text-sm font-medium text-neutral-500 bg-neutral-100 px-3 py-1.5 rounded-full inline-block border border-neutral-200">
-                    Pending
-                  </div>
-                )}
+                  {!isCompleted && !isCurrent && (
+                    <div className="text-xs md:text-sm font-medium text-neutral-500 bg-neutral-100 px-3 py-1.5 rounded-full inline-block border border-neutral-200">
+                      Pending
+                    </div>
+                  )}
+                </div>
               </motion.div>
             </motion.div>
           );
