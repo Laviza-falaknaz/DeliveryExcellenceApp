@@ -307,7 +307,7 @@ function DispatchedAnimation({ isActive, isCompleted }: { isActive: boolean; isC
       {(isActive || isCompleted) && <ParticleBurst color="#06b6d4" density={12} />}
       
       <motion.div
-        className="relative w-full h-full rounded-full flex items-center justify-center overflow-hidden"
+        className="relative w-full h-full rounded-full flex items-center justify-center"
         style={{
           background: isActive || isCompleted
             ? "linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)"
