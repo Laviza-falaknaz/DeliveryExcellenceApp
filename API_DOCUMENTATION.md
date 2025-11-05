@@ -680,6 +680,119 @@ Create or update Return Merchandise Authorization (RMA) requests with multiple s
 
 ---
 
+## 5. Order Documents Upsert API
+
+Attach document files to orders (credit notes, packing lists, hashcodes, invoices). Documents are referenced by URL and automatically linked to orders by order number.
+
+**Endpoint:** `POST /api/data/documents/upsert`
+
+**Request Body:**
+```json
+{
+  "documents": [
+    {
+      "orderNumber": "ORD-2024-12345",
+      "documentType": "invoice",
+      "fileName": "ORD-2024-12345-invoice.pdf",
+      "fileUrl": "https://yourstorage.com/invoices/ORD-2024-12345.pdf",
+      "fileSize": 245680,
+      "mimeType": "application/pdf"
+    },
+    {
+      "orderNumber": "ORD-2024-12345",
+      "documentType": "packing_list",
+      "fileName": "ORD-2024-12345-packing.xlsx",
+      "fileUrl": "https://yourstorage.com/packing/ORD-2024-12345.xlsx",
+      "fileSize": 18432,
+      "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    },
+    {
+      "orderNumber": "ORD-2024-12345",
+      "documentType": "credit_note",
+      "fileName": "ORD-2024-12345-credit.pdf",
+      "fileUrl": "https://yourstorage.com/credits/ORD-2024-12345.pdf",
+      "fileSize": 152340,
+      "mimeType": "application/pdf"
+    },
+    {
+      "orderNumber": "ORD-2024-12345",
+      "documentType": "hashcodes",
+      "fileName": "ORD-2024-12345-hashcodes.csv",
+      "fileUrl": "https://yourstorage.com/hashcodes/ORD-2024-12345.csv",
+      "fileSize": 8192,
+      "mimeType": "text/csv"
+    }
+  ]
+}
+```
+
+**Field Requirements:**
+- `orderNumber` (required): Order number to attach document to (must exist in orders table)
+- `documentType` (required): One of: `credit_note`, `packing_list`, `hashcodes`, `invoice`
+- `fileName` (required): Original filename for display purposes
+- `fileUrl` (required): Public URL where the file is hosted
+- `fileSize` (optional): File size in bytes
+- `mimeType` (optional): MIME type for the file
+
+**Valid Document Types:**
+- `credit_note` - Credit note PDF documents
+- `packing_list` - Packing list Excel/CSV files
+- `hashcodes` - Hash verification CSV files
+- `invoice` - Invoice PDF documents
+
+**Response:**
+```json
+{
+  "success": true,
+  "created": 3,
+  "updated": 1,
+  "errors": []
+}
+```
+
+**Upsert Behavior:**
+- If a document of the same type already exists for an order, it will be **updated** (replaced)
+- If the document type doesn't exist for that order, it will be **created**
+- This allows you to push updated documents without creating duplicates
+
+**Example cURL:**
+```bash
+curl -X POST https://your-portal.replit.app/api/data/documents/upsert \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: YOUR_API_KEY_HERE" \
+  -d '{
+    "documents": [
+      {
+        "orderNumber": "ORD-2024-12345",
+        "documentType": "invoice",
+        "fileName": "ORD-2024-12345-invoice.pdf",
+        "fileUrl": "https://yourstorage.com/invoices/ORD-2024-12345.pdf",
+        "fileSize": 245680,
+        "mimeType": "application/pdf"
+      }
+    ]
+  }'
+```
+
+**Important Notes:**
+- Orders must exist before attaching documents (create orders via Orders Upsert API first)
+- Document files must be hosted on an accessible URL (your own storage, cloud provider, etc.)
+- URLs must be publicly accessible or use signed URLs with appropriate expiration
+- Each order can have one document of each type (invoice, credit note, packing list, hashcodes)
+- Pushing the same document type again will replace the existing document
+- Customers can download these documents from their order details page
+
+**Common Use Case - Power Automate:**
+```
+1. When a new invoice is generated in your ERP system
+2. Upload the PDF to your cloud storage (OneDrive, SharePoint, Azure Blob, etc.)
+3. Get the public/shared URL for the file
+4. Push the document metadata to the portal via this API
+5. Customer sees the invoice in their order details automatically
+```
+
+---
+
 ## Error Handling
 
 All Data Push APIs return detailed error information:
