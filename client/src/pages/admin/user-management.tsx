@@ -20,10 +20,11 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Edit, Trash2 } from "lucide-react";
+import { Plus, Edit, UserCheck, UserX, Shield, ShieldOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
 
 export function UserManagement() {
   const { toast } = useToast();
@@ -68,18 +69,42 @@ export function UserManagement() {
     },
   });
 
-  const deleteMutation = useMutation({
-    mutationFn: async (id: number) => {
+  const toggleActiveMutation = useMutation({
+    mutationFn: async ({ id, isActive }: { id: number; isActive: boolean }) => {
       return apiRequest(`/api/admin/users/${id}`, {
-        method: "DELETE",
+        method: "PATCH",
+        body: JSON.stringify({ isActive }),
       });
     },
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
-      toast({ title: "User deleted successfully" });
+      toast({ 
+        title: variables.isActive ? "User activated" : "User deactivated",
+        description: variables.isActive 
+          ? "User can now access the system"
+          : "User can no longer access the system"
+      });
     },
     onError: () => {
-      toast({ title: "Failed to delete user", variant: "destructive" });
+      toast({ title: "Failed to update user status", variant: "destructive" });
+    },
+  });
+
+  const toggleAdminMutation = useMutation({
+    mutationFn: async ({ id, isAdmin }: { id: number; isAdmin: boolean }) => {
+      return apiRequest(`/api/admin/users/${id}`, {
+        method: "PATCH",
+        body: JSON.stringify({ isAdmin }),
+      });
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
+      toast({ 
+        title: variables.isAdmin ? "Admin privileges granted" : "Admin privileges revoked",
+      });
+    },
+    onError: () => {
+      toast({ title: "Failed to update admin status", variant: "destructive" });
     },
   });
 
@@ -171,7 +196,8 @@ export function UserManagement() {
                 <TableHead>Name</TableHead>
                 <TableHead>Email</TableHead>
                 <TableHead>Company</TableHead>
-                <TableHead>Admin</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Role</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -183,28 +209,46 @@ export function UserManagement() {
                   <TableCell data-testid={`text-name-${user.id}`}>{user.name}</TableCell>
                   <TableCell data-testid={`text-email-${user.id}`}>{user.email}</TableCell>
                   <TableCell data-testid={`text-company-${user.id}`}>{user.company}</TableCell>
-                  <TableCell data-testid={`text-admin-${user.id}`}>{user.isAdmin ? "Yes" : "No"}</TableCell>
+                  <TableCell data-testid={`text-status-${user.id}`}>
+                    <Badge variant={user.isActive ? "default" : "destructive"}>
+                      {user.isActive ? "Active" : "Inactive"}
+                    </Badge>
+                  </TableCell>
+                  <TableCell data-testid={`text-role-${user.id}`}>
+                    <Badge variant={user.isAdmin ? "secondary" : "outline"}>
+                      {user.isAdmin ? "Admin" : "User"}
+                    </Badge>
+                  </TableCell>
                   <TableCell>
-                    <div className="flex gap-2">
+                    <div className="flex gap-1">
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => setEditingUser(user)}
-                        data-testid={`button-edit-${user.id}`}
+                        title={user.isActive ? "Deactivate user" : "Activate user"}
+                        onClick={() => toggleActiveMutation.mutate({ id: user.id, isActive: !user.isActive })}
+                        disabled={toggleActiveMutation.isPending}
+                        data-testid={`button-toggle-active-${user.id}`}
                       >
-                        <Edit className="h-4 w-4" />
+                        {user.isActive ? <UserX className="h-4 w-4 text-red-600" /> : <UserCheck className="h-4 w-4 text-green-600" />}
                       </Button>
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => {
-                          if (confirm("Are you sure you want to delete this user?")) {
-                            deleteMutation.mutate(user.id);
-                          }
-                        }}
-                        data-testid={`button-delete-${user.id}`}
+                        title={user.isAdmin ? "Revoke admin" : "Grant admin"}
+                        onClick={() => toggleAdminMutation.mutate({ id: user.id, isAdmin: !user.isAdmin })}
+                        disabled={toggleAdminMutation.isPending}
+                        data-testid={`button-toggle-admin-${user.id}`}
                       >
-                        <Trash2 className="h-4 w-4" />
+                        {user.isAdmin ? <ShieldOff className="h-4 w-4 text-orange-600" /> : <Shield className="h-4 w-4 text-blue-600" />}
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        title="Edit user"
+                        onClick={() => setEditingUser(user)}
+                        data-testid={`button-edit-${user.id}`}
+                      >
+                        <Edit className="h-4 w-4" />
                       </Button>
                     </div>
                   </TableCell>

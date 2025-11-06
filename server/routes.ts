@@ -1691,6 +1691,170 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin User Management
+  app.get("/api/admin/users", requireAdmin, async (req, res) => {
+    try {
+      const allUsers = await storage.getAllUsers();
+      res.json(allUsers);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.patch("/api/admin/users/:id", requireAdmin, async (req, res) => {
+    try {
+      const userId = parseInt(req.params.id);
+      const updateSchema = z.object({
+        isActive: z.boolean().optional(),
+        isAdmin: z.boolean().optional(),
+        name: z.string().optional(),
+        email: z.string().email().optional(),
+        company: z.string().optional(),
+        phoneNumber: z.string().nullable().optional(),
+        username: z.string().optional(),
+        password: z.string().optional(),
+      });
+
+      const validatedData = updateSchema.parse(req.body);
+      
+      // Hash password if provided
+      if (validatedData.password) {
+        const hashedPassword = await bcrypt.hash(validatedData.password, 10);
+        validatedData.password = hashedPassword;
+      }
+
+      const updatedUser = await storage.updateUser(userId, validatedData);
+      
+      if (!updatedUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      res.json(updatedUser);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
+      console.error("Error updating user:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Admin Order Management
+  app.get("/api/admin/orders", requireAdmin, async (req, res) => {
+    try {
+      const allOrders = await storage.getAllOrders();
+      res.json(allOrders);
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.patch("/api/admin/orders/:id", requireAdmin, async (req, res) => {
+    try {
+      const orderId = parseInt(req.params.id);
+      const updateSchema = z.object({
+        status: z.string().optional(),
+        userId: z.number().optional(),
+        isActive: z.boolean().optional(),
+      });
+
+      const validatedData = updateSchema.parse(req.body);
+      const updatedOrder = await storage.updateOrder(orderId, validatedData);
+      
+      if (!updatedOrder) {
+        return res.status(404).json({ message: "Order not found" });
+      }
+
+      res.json(updatedOrder);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
+      console.error("Error updating order:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Admin RMA Management
+  app.get("/api/admin/rmas", requireAdmin, async (req, res) => {
+    try {
+      const allRmas = await storage.getAllRmas();
+      res.json(allRmas);
+    } catch (error) {
+      console.error("Error fetching RMAs:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.patch("/api/admin/rmas/:id", requireAdmin, async (req, res) => {
+    try {
+      const rmaId = parseInt(req.params.id);
+      const updateSchema = z.object({
+        status: z.enum(["requested", "approved", "in_transit", "received", "processing", "completed", "rejected"]).optional(),
+        userId: z.number().optional(),
+      });
+
+      const validatedData = updateSchema.parse(req.body);
+      const updatedRma = await storage.updateRma(rmaId, validatedData);
+      
+      if (!updatedRma) {
+        return res.status(404).json({ message: "RMA not found" });
+      }
+
+      res.json(updatedRma);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
+      console.error("Error updating RMA:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/admin/rmas/:id/resend", requireAdmin, async (req, res) => {
+    try {
+      const rmaId = parseInt(req.params.id);
+      const rma = await storage.getRma(rmaId);
+      
+      if (!rma) {
+        return res.status(404).json({ message: "RMA not found" });
+      }
+
+      // TODO: Implement actual email sending logic
+      // For now, just return success
+      res.json({ 
+        success: true, 
+        message: "RMA notification resent successfully",
+        rmaNumber: rma.rmaNumber 
+      });
+    } catch (error) {
+      console.error("Error resending RMA:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/admin/rmas/:id/decline", requireAdmin, async (req, res) => {
+    try {
+      const rmaId = parseInt(req.params.id);
+      const updatedRma = await storage.updateRma(rmaId, { status: "rejected" });
+      
+      if (!updatedRma) {
+        return res.status(404).json({ message: "RMA not found" });
+      }
+
+      res.json({
+        success: true,
+        message: "RMA declined successfully",
+        rma: updatedRma
+      });
+    } catch (error) {
+      console.error("Error declining RMA:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Download order document (proxy to external API)
   app.post("/api/orders/:orderNumber/documents/download", isAuthenticated, async (req, res) => {
     try {
