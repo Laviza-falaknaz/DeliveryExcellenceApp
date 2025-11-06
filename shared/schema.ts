@@ -579,3 +579,27 @@ export const insertApiKeySchema = createInsertSchema(apiKeys).omit({
 
 export type ApiKey = typeof apiKeys.$inferSelect;
 export type InsertApiKey = z.infer<typeof insertApiKeySchema>;
+
+// Key Performance Insights schema - admin-controlled metrics for ESG report
+export const keyPerformanceInsights = pgTable("key_performance_insights", {
+  id: serial("id").primaryKey(),
+  metricKey: text("metric_key").notNull().unique(), // e.g., 'remanufactured_units', 'e_waste_diverted', 'carbon_per_device', 'social_impact_score'
+  metricName: text("metric_name").notNull(), // Display name
+  metricValue: text("metric_value").notNull(), // String value to allow flexibility (e.g., "X units", "Y kg")
+  metricUnit: text("metric_unit"), // Optional unit (e.g., 'units', 'kg', 'score')
+  metricCategory: text("metric_category").notNull(), // e.g., 'environmental', 'social', 'governance'
+  displayOrder: integer("display_order").notNull().default(0),
+  isActive: boolean("is_active").notNull().default(true),
+  description: text("description"), // Optional description for tooltip/help text
+  updatedAt: timestamp("updated_at").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertKeyPerformanceInsightSchema = createInsertSchema(keyPerformanceInsights).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type KeyPerformanceInsight = typeof keyPerformanceInsights.$inferSelect;
+export type InsertKeyPerformanceInsight = z.infer<typeof insertKeyPerformanceInsightSchema>;
