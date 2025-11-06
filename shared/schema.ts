@@ -195,6 +195,12 @@ export const rmaRequestLogs = pgTable("rma_request_logs", {
   manufacturerSerialNumber: text("manufacturer_serial_number").notNull(),
   inHouseSerialNumber: text("in_house_serial_number").notNull(),
   faultDescription: text("fault_description").notNull(),
+  products: json("products").$type<Array<{
+    productMakeModel: string;
+    manufacturerSerialNumber: string;
+    inHouseSerialNumber: string;
+    faultDescription: string;
+  }>>(),
   fileAttachment: json("file_attachment").$type<{
     name: string;
     size: number;

@@ -430,25 +430,56 @@ export function RMAManagement() {
                   <Label className="text-sm font-semibold">Delivery Address</Label>
                   <p className="text-sm">{viewingRequest.deliveryAddress}</p>
                 </div>
-                <div>
-                  <Label className="text-sm font-semibold">Product Make/Model</Label>
-                  <p className="text-sm">{viewingRequest.productMakeModel}</p>
-                </div>
-                <div>
-                  <Label className="text-sm font-semibold">Number of Products</Label>
-                  <p className="text-sm">{viewingRequest.numberOfProducts}</p>
-                </div>
-                <div>
-                  <Label className="text-sm font-semibold">Manufacturer Serial</Label>
-                  <p className="text-sm">{viewingRequest.manufacturerSerialNumber}</p>
-                </div>
-                <div>
-                  <Label className="text-sm font-semibold">In-House Serial</Label>
-                  <p className="text-sm">{viewingRequest.inHouseSerialNumber}</p>
-                </div>
                 <div className="col-span-2">
-                  <Label className="text-sm font-semibold">Fault Description</Label>
-                  <p className="text-sm">{viewingRequest.faultDescription}</p>
+                  <Label className="text-sm font-semibold">Products ({viewingRequest.numberOfProducts})</Label>
+                  <div className="mt-2 space-y-3">
+                    {viewingRequest.products && viewingRequest.products.length > 0 ? (
+                      viewingRequest.products.map((product: any, index: number) => (
+                        <div key={index} className="border rounded-lg p-3 bg-neutral-50">
+                          <div className="font-medium text-sm mb-2">Product {index + 1}</div>
+                          <div className="grid grid-cols-2 gap-2 text-sm">
+                            <div>
+                              <span className="text-neutral-600">Make/Model:</span>
+                              <p className="font-medium">{product.productMakeModel}</p>
+                            </div>
+                            <div>
+                              <span className="text-neutral-600">Manufacturer Serial:</span>
+                              <p className="font-medium">{product.manufacturerSerialNumber}</p>
+                            </div>
+                            <div>
+                              <span className="text-neutral-600">In-House Serial:</span>
+                              <p className="font-medium">{product.inHouseSerialNumber}</p>
+                            </div>
+                            <div className="col-span-2">
+                              <span className="text-neutral-600">Fault Description:</span>
+                              <p className="font-medium">{product.faultDescription}</p>
+                            </div>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="border rounded-lg p-3 bg-neutral-50">
+                        <div className="grid grid-cols-2 gap-2 text-sm">
+                          <div>
+                            <span className="text-neutral-600">Make/Model:</span>
+                            <p className="font-medium">{viewingRequest.productMakeModel}</p>
+                          </div>
+                          <div>
+                            <span className="text-neutral-600">Manufacturer Serial:</span>
+                            <p className="font-medium">{viewingRequest.manufacturerSerialNumber}</p>
+                          </div>
+                          <div>
+                            <span className="text-neutral-600">In-House Serial:</span>
+                            <p className="font-medium">{viewingRequest.inHouseSerialNumber}</p>
+                          </div>
+                          <div className="col-span-2">
+                            <span className="text-neutral-600">Fault Description:</span>
+                            <p className="font-medium">{viewingRequest.faultDescription}</p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
                 <div>
                   <Label className="text-sm font-semibold">Status</Label>

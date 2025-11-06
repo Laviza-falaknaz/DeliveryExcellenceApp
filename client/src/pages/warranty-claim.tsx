@@ -11,10 +11,17 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Upload, FileText, X, Camera, QrCode, AlertTriangle } from "lucide-react";
+import { Upload, FileText, X, Camera, QrCode, AlertTriangle, Plus, Trash2 } from "lucide-react";
 import { BrowserMultiFormatReader, NotFoundException } from "@zxing/library";
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
+
+const productSchema = z.object({
+  productMakeModel: z.string().min(1, "Product make and model is required"),
+  manufacturerSerialNumber: z.string().min(1, "Manufacturer serial number is required"),
+  inHouseSerialNumber: z.string().min(1, "In-house serial number is required"),
+  faultDescription: z.string().min(10, "Fault description must be at least 10 characters"),
+});
 
 const warrantyClaimSchema = z.object({
   fullName: z.string().min(2, "Full name must be at least 2 characters"),
@@ -25,11 +32,7 @@ const warrantyClaimSchema = z.object({
   deliveryAddress: z.string().min(10, "Delivery address must be at least 10 characters"),
   recipientContactNumber: z.string().min(10, "Contact number must be at least 10 digits").regex(/^\d+$/, "Contact number should contain only numbers"),
   countryOfPurchase: z.string().min(1, "Country of purchase is required"),
-  numberOfProducts: z.coerce.number().min(1, "Number of products must be at least 1"),
-  productMakeModel: z.string().min(1, "Product make and model is required"),
-  manufacturerSerialNumber: z.string().min(1, "Manufacturer serial number is required"),
-  inHouseSerialNumber: z.string().min(1, "In-house serial number is required"),
-  faultDescription: z.string().min(10, "Fault description must be at least 10 characters"),
+  products: z.array(productSchema).min(1, "At least one product is required"),
   consent: z.boolean().refine((val) => val === true, {
     message: "You must agree to the warranty terms and conditions",
   }),
@@ -103,11 +106,12 @@ export default function WarrantyClaim() {
       deliveryAddress: "",
       recipientContactNumber: currentUser?.phoneNumber || "",
       countryOfPurchase: "",
-      numberOfProducts: 1,
-      productMakeModel: "",
-      manufacturerSerialNumber: "",
-      inHouseSerialNumber: "",
-      faultDescription: "",
+      products: [{
+        productMakeModel: "",
+        manufacturerSerialNumber: "",
+        inHouseSerialNumber: "",
+        faultDescription: "",
+      }],
       consent: false,
     },
   });
@@ -127,34 +131,15 @@ export default function WarrantyClaim() {
   // Update form when basket data is available
   useEffect(() => {
     if (basketData.length > 0) {
-      // Set number of products
-      form.setValue('numberOfProducts', basketData.length);
+      // Map basket data to products array
+      const products = basketData.map(device => ({
+        productMakeModel: device.productName || "",
+        manufacturerSerialNumber: device.serialNumber || "",
+        inHouseSerialNumber: "", // Will need to be filled by user
+        faultDescription: "", // Will need to be filled by user
+      }));
       
-      // Set manufacturer serial number - all serial numbers separated by commas
-      const serialNumbers = basketData
-        .map(device => device.serialNumber)
-        .filter(Boolean)
-        .join(', ');
-      
-      if (serialNumbers) {
-        form.setValue('manufacturerSerialNumber', serialNumbers);
-      }
-      
-      // Set product make/model (first device for now)
-      if (basketData[0]?.productName) {
-        form.setValue('productMakeModel', basketData[0].productName);
-      }
-      
-      // If multiple devices, add them to fault description for reference
-      if (basketData.length > 1) {
-        const deviceList = basketData.map((device, index) => 
-          `Device ${index + 1}: ${device.productName} (SN: ${device.serialNumber})`
-        ).join('\n');
-        
-        form.setValue('faultDescription', 
-          `Multiple devices from RMA basket:\n${deviceList}\n\nFault description: `
-        );
-      }
+      form.setValue('products', products);
     }
   }, [basketData, form]);
   
@@ -168,12 +153,15 @@ export default function WarrantyClaim() {
     };
   }, []);
   
-  const startScanner = async () => {
+  const [currentScanningIndex, setCurrentScanningIndex] = useState<number>(0);
+  
+  const startScanner = async (productIndex: number) => {
     if (!codeReader.current || !videoRef.current) return;
     
     try {
       setIsScanning(true);
       setScannerError(null);
+      setCurrentScanningIndex(productIndex);
       
       const stream = await navigator.mediaDevices.getUserMedia({ 
         video: { 
@@ -217,7 +205,7 @@ export default function WarrantyClaim() {
           
           // Validate serial number format
           if (/^[A-Za-z0-9]{5,}$/.test(serialNumber)) {
-            form.setValue('manufacturerSerialNumber', serialNumber);
+            form.setValue(`products.${productIndex}.manufacturerSerialNumber`, serialNumber);
             stopScanner();
             setIsScannerOpen(false);
             toast({
@@ -520,158 +508,179 @@ export default function WarrantyClaim() {
 
               {/* Product Information */}
               <div className="space-y-4">
-                <h3 className="text-lg font-medium text-neutral-900">Product Information</h3>
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-medium text-neutral-900">Products</h3>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      const currentProducts = form.getValues('products');
+                      form.setValue('products', [...currentProducts, {
+                        productMakeModel: "",
+                        manufacturerSerialNumber: "",
+                        inHouseSerialNumber: "",
+                        faultDescription: "",
+                      }]);
+                    }}
+                    data-testid="button-add-product"
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Product
+                  </Button>
+                </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="numberOfProducts"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Number of Products *</FormLabel>
-                        <FormControl>
-                          <Input type="number" min="1" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                {form.watch('products').map((_, index) => (
+                  <Card key={index} className="p-4">
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <h4 className="text-sm font-semibold text-neutral-700">Product {index + 1}</h4>
+                        {form.watch('products').length > 1 && (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              const currentProducts = form.getValues('products');
+                              form.setValue('products', currentProducts.filter((_, i) => i !== index));
+                            }}
+                            data-testid={`button-remove-product-${index}`}
+                            className="text-red-600 hover:text-red-700"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </div>
 
-                  <FormField
-                    control={form.control}
-                    name="productMakeModel"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Product Make and Model *</FormLabel>
-                        <FormControl>
-                          <Input placeholder="e.g. HP 840 G7" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+                      <FormField
+                        control={form.control}
+                        name={`products.${index}.productMakeModel`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Product Make and Model *</FormLabel>
+                            <FormControl>
+                              <Input placeholder="e.g. HP 840 G7" {...field} data-testid={`input-product-model-${index}`} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="manufacturerSerialNumber"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Manufacturer's Serial Number *</FormLabel>
-                        <div className="flex gap-2">
-                          <FormControl>
-                            <Input placeholder="e.g. SN12345678" {...field} />
-                          </FormControl>
-                          <Dialog open={isScannerOpen} onOpenChange={setIsScannerOpen}>
-                            <DialogTrigger asChild>
-                              <Button
-                                type="button"
-                                variant="outline"
-                                size="icon"
-                                className="shrink-0"
-                              >
-                                <QrCode className="h-4 w-4" />
-                              </Button>
-                            </DialogTrigger>
-                            <DialogContent className="sm:max-w-[500px]">
-                              <DialogHeader>
-                                <DialogTitle>Scan Serial Number</DialogTitle>
-                                <DialogDescription>
-                                  Position the QR code or barcode within the camera view to scan the serial number
-                                </DialogDescription>
-                              </DialogHeader>
-                              
-                              <div className="space-y-4">
-                                {!isScanning ? (
-                                  <div className="text-center py-6">
-                                    <Camera className="h-12 w-12 text-neutral-400 mx-auto mb-4" />
-                                    <p className="text-neutral-600 mb-4">Ready to scan</p>
-                                    <Button onClick={startScanner}>
-                                      Start Scanner
-                                    </Button>
-                                  </div>
-                                ) : (
-                                  <div className="relative">
-                                    <video 
-                                      ref={videoRef}
-                                      className="w-full h-64 bg-black rounded-lg"
-                                      autoPlay
-                                      muted
-                                      playsInline
-                                    />
-                                    <div className="absolute inset-0 border-2 border-teal-500 rounded-lg pointer-events-none">
-                                      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-48 h-32 border-2 border-white rounded-lg"></div>
-                                    </div>
-                                  </div>
-                                )}
-                                
-                                {scannerError && (
-                                  <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-                                    <p className="text-red-700 text-sm">{scannerError}</p>
-                                  </div>
-                                )}
-                                
-                                <div className="flex justify-end gap-2">
-                                  <Button variant="outline" onClick={handleScannerClose}>
-                                    {isScanning ? 'Stop & Close' : 'Close'}
-                                  </Button>
-                                </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <FormField
+                          control={form.control}
+                          name={`products.${index}.manufacturerSerialNumber`}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Manufacturer's Serial Number *</FormLabel>
+                              <div className="flex gap-2">
+                                <FormControl>
+                                  <Input placeholder="e.g. SN12345678" {...field} data-testid={`input-manufacturer-serial-${index}`} />
+                                </FormControl>
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  size="icon"
+                                  className="shrink-0"
+                                  onClick={() => {
+                                    setCurrentScanningIndex(index);
+                                    setIsScannerOpen(true);
+                                  }}
+                                  data-testid={`button-scan-qr-${index}`}
+                                >
+                                  <QrCode className="h-4 w-4" />
+                                </Button>
                               </div>
-                            </DialogContent>
-                          </Dialog>
-                        </div>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="inHouseSerialNumber"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>In-house Serial Number *</FormLabel>
-                        <FormControl>
-                          <Input placeholder="e.g. 5CG041295L" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="inHouseSerialNumber"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>In-house Serial Number *</FormLabel>
-                        <FormControl>
-                          <Input placeholder="e.g. 1HP840G7I516256W11" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                <FormField
-                  control={form.control}
-                  name="faultDescription"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Description of Fault *</FormLabel>
-                      <FormControl>
-                        <Textarea 
-                          placeholder="Please describe the issue you are experiencing with your device in detail..."
-                          className="min-h-[100px]"
-                          {...field} 
+                              <FormMessage />
+                            </FormItem>
+                          )}
                         />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+
+                        <FormField
+                          control={form.control}
+                          name={`products.${index}.inHouseSerialNumber`}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>In-house Serial Number *</FormLabel>
+                              <FormControl>
+                                <Input placeholder="e.g. 1HP840G7I516256W11" {...field} data-testid={`input-inhouse-serial-${index}`} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+
+                      <FormField
+                        control={form.control}
+                        name={`products.${index}.faultDescription`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Description of Fault *</FormLabel>
+                            <FormControl>
+                              <Textarea 
+                                placeholder="Please describe the issue you are experiencing with this device in detail..."
+                                className="min-h-[80px]"
+                                {...field}
+                                data-testid={`textarea-fault-description-${index}`}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </Card>
+                ))}
+
+                {/* QR Scanner Dialog */}
+                <Dialog open={isScannerOpen} onOpenChange={setIsScannerOpen}>
+                  <DialogContent className="sm:max-w-[500px]">
+                    <DialogHeader>
+                      <DialogTitle>Scan Serial Number</DialogTitle>
+                      <DialogDescription>
+                        Position the QR code or barcode within the camera view to scan the serial number
+                      </DialogDescription>
+                    </DialogHeader>
+                    
+                    <div className="space-y-4">
+                      {!isScanning ? (
+                        <div className="text-center py-6">
+                          <Camera className="h-12 w-12 text-neutral-400 mx-auto mb-4" />
+                          <p className="text-neutral-600 mb-4">Ready to scan</p>
+                          <Button onClick={() => startScanner(currentScanningIndex)}>
+                            Start Scanner
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="relative">
+                          <video 
+                            ref={videoRef}
+                            className="w-full h-64 bg-black rounded-lg"
+                            autoPlay
+                            muted
+                            playsInline
+                          />
+                          <div className="absolute inset-0 border-2 border-teal-500 rounded-lg pointer-events-none">
+                            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-48 h-32 border-2 border-white rounded-lg"></div>
+                          </div>
+                        </div>
+                      )}
+                      
+                      {scannerError && (
+                        <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                          <p className="text-red-700 text-sm">{scannerError}</p>
+                        </div>
+                      )}
+                      
+                      <div className="flex justify-end gap-2">
+                        <Button variant="outline" onClick={handleScannerClose}>
+                          {isScanning ? 'Stop & Close' : 'Close'}
+                        </Button>
+                      </div>
+                    </div>
+                  </DialogContent>
+                </Dialog>
               </div>
 
               {/* File Upload */}

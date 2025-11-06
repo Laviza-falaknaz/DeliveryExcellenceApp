@@ -604,11 +604,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         deliveryAddress: z.string(),
         recipientContactNumber: z.string(),
         countryOfPurchase: z.string(),
-        numberOfProducts: z.number(),
-        productMakeModel: z.string(),
-        manufacturerSerialNumber: z.string(),
-        inHouseSerialNumber: z.string(),
-        faultDescription: z.string(),
+        products: z.array(z.object({
+          productMakeModel: z.string(),
+          manufacturerSerialNumber: z.string(),
+          inHouseSerialNumber: z.string(),
+          faultDescription: z.string(),
+        })).min(1),
         consent: z.boolean(),
         userId: z.number().optional(),
         emailChanged: z.boolean().optional(),
@@ -660,6 +661,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Generate request number
       const requestNumber = `REQ-${Math.floor(10000 + Math.random() * 90000)}`;
       
+      // For backward compatibility, use first product for old fields
+      const firstProduct = validatedData.products[0];
+      
       // Create RMA request log (not an actual RMA yet)
       const requestLog = await storage.createRmaRequestLog({
         userId: targetUserId,
@@ -672,11 +676,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         deliveryAddress: validatedData.deliveryAddress,
         recipientContactNumber: validatedData.recipientContactNumber,
         countryOfPurchase: validatedData.countryOfPurchase,
-        numberOfProducts: validatedData.numberOfProducts,
-        productMakeModel: validatedData.productMakeModel,
-        manufacturerSerialNumber: validatedData.manufacturerSerialNumber,
-        inHouseSerialNumber: validatedData.inHouseSerialNumber,
-        faultDescription: validatedData.faultDescription,
+        numberOfProducts: validatedData.products.length,
+        productMakeModel: firstProduct.productMakeModel,
+        manufacturerSerialNumber: firstProduct.manufacturerSerialNumber,
+        inHouseSerialNumber: firstProduct.inHouseSerialNumber,
+        faultDescription: firstProduct.faultDescription,
+        products: validatedData.products,
         fileAttachment: validatedData.fileAttachment || null,
         status: "submitted",
         rmaNumber: null,
@@ -716,15 +721,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
           if (!hasWebhook || !webhookSuccess) {
             // Send RMA request notification
             if (adminSettings?.settingValue?.rmaNotificationEmails) {
+              const firstProduct = validatedData.products[0];
               await sendRmaNotification(
                 adminSettings.settingValue.rmaNotificationEmails,
                 {
                   rmaNumber: requestLog.requestNumber,
                   customerName: validatedData.fullName,
                   customerEmail: validatedData.email,
-                  productDetails: validatedData.productMakeModel,
-                  serialNumber: validatedData.manufacturerSerialNumber,
-                  faultDescription: validatedData.faultDescription,
+                  productDetails: firstProduct.productMakeModel,
+                  serialNumber: firstProduct.manufacturerSerialNumber,
+                  faultDescription: firstProduct.faultDescription,
                 }
               );
             }
@@ -1984,11 +1990,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         deliveryAddress: request.deliveryAddress,
         recipientContactNumber: request.recipientContactNumber,
         countryOfPurchase: request.countryOfPurchase,
-        productMakeModel: request.productMakeModel,
         numberOfProducts: request.numberOfProducts,
-        manufacturerSerialNumber: request.manufacturerSerialNumber,
-        inHouseSerialNumber: request.inHouseSerialNumber,
-        faultDescription: request.faultDescription,
+        products: request.products || [{
+          productMakeModel: request.productMakeModel,
+          manufacturerSerialNumber: request.manufacturerSerialNumber,
+          inHouseSerialNumber: request.inHouseSerialNumber,
+          faultDescription: request.faultDescription,
+        }],
         status: request.status,
         createdAt: request.createdAt,
         timestamp: new Date().toISOString()
