@@ -13,8 +13,9 @@ API keys are required for all Data Push APIs and never expire unless revoked.
 1. [Data Push APIs](#data-push-apis) - **Primary Integration Method** ⭐
 2. [Warranty Lookup API](#warranty-lookup-api) - Public endpoint
 3. [API Key Management](#api-key-management) - Admin only
-4. [Portal APIs](#portal-apis) - Internal use
-5. [Legacy CRUD APIs](#legacy-crud-apis) - Deprecated
+4. [Organizational Metrics API](#organizational-metrics-api) - Admin only, ESG tracking
+5. [Portal APIs](#portal-apis) - Internal use
+6. [Legacy CRUD APIs](#legacy-crud-apis) - Deprecated
 
 ---
 
@@ -980,6 +981,243 @@ Administrators can create and manage API keys through these endpoints (requires 
 ```
 
 **Note:** All API key management endpoints require admin session authentication (login via web portal).
+
+---
+
+# Organizational Metrics API
+
+The Organizational Metrics API allows administrators to update and track company-wide environmental impact statistics. These metrics are displayed in the ESG Report and represent the total impact across all customers.
+
+**Authentication:** Requires admin session authentication (login via web portal)
+
+**Base URL:** `/api/organizational-metrics` and `/api/admin/organizational-metrics`
+
+---
+
+## Get All Organizational Metrics
+
+Retrieve all organizational-level metrics including total units deployed, carbon saved, water saved, and families helped.
+
+**Endpoint:** `GET /api/organizational-metrics`
+
+**Authentication:** Session-based (logged-in users)
+
+**Response:**
+```json
+[
+  {
+    "id": 1,
+    "metricKey": "total_units_deployed",
+    "metricValue": "50000",
+    "lastUpdatedBy": 1,
+    "updatedAt": "2024-11-06T05:23:30.000Z"
+  },
+  {
+    "id": 2,
+    "metricKey": "total_carbon_saved",
+    "metricValue": "15800000000",
+    "lastUpdatedBy": 1,
+    "updatedAt": "2024-11-06T05:23:30.000Z"
+  },
+  {
+    "id": 3,
+    "metricKey": "total_water_saved",
+    "metricValue": "9500000000000",
+    "lastUpdatedBy": 1,
+    "updatedAt": "2024-11-06T05:23:30.000Z"
+  },
+  {
+    "id": 4,
+    "metricKey": "total_families_helped",
+    "metricValue": "50000",
+    "lastUpdatedBy": 1,
+    "updatedAt": "2024-11-06T05:23:30.000Z"
+  }
+]
+```
+
+**Metric Keys:**
+- `total_units_deployed`: Total remanufactured laptops deployed across all customers
+- `total_carbon_saved`: Total CO₂ saved in grams
+- `total_water_saved`: Total water saved in liters
+- `total_families_helped`: Total families provided with clean water access
+
+---
+
+## Update Total Units Deployed (Admin Only)
+
+Update the total number of remanufactured units deployed. This endpoint automatically recalculates all dependent metrics (carbon saved, water saved, families helped) based on sustainability settings.
+
+**Endpoint:** `PUT /api/admin/organizational-metrics/:metricKey`
+
+**Authentication:** Admin session required
+
+**URL Parameters:**
+- `metricKey`: The metric to update (e.g., `total_units_deployed`)
+
+**Request Body:**
+```json
+{
+  "value": 75000
+}
+```
+
+**Example Request:**
+```bash
+curl -X PUT https://your-portal.replit.app/api/admin/organizational-metrics/total_units_deployed \
+  -H "Content-Type: application/json" \
+  -H "Cookie: connect.sid=YOUR_SESSION_COOKIE" \
+  -d '{
+    "value": 75000
+  }'
+```
+
+**Response:**
+```json
+{
+  "id": 1,
+  "metricKey": "total_units_deployed",
+  "metricValue": "75000",
+  "lastUpdatedBy": 1,
+  "updatedAt": "2024-11-06T12:00:00.000Z"
+}
+```
+
+---
+
+## Automatic Recalculation Logic
+
+When you update `total_units_deployed`, the system automatically:
+
+1. **Fetches sustainability settings** from the database (per-laptop metrics)
+2. **Calculates derived metrics:**
+   - Total Carbon Saved = Total Units × Carbon per Laptop (default: 316,000g)
+   - Total Water Saved = Total Units × Water per Laptop (default: 190,000L)
+   - Total Families Helped = Total Units × Families per Laptop (default: 1)
+3. **Updates all dependent metrics** in the database
+4. **Logs the recalculation** for audit purposes
+
+**Example:**
+```
+Admin updates total_units_deployed to 75,000 units
+  ↓
+System fetches sustainability_metrics from system_settings
+  ↓
+Calculates:
+  - Carbon: 75,000 × 316kg = 23,700,000kg CO₂ saved
+  - Water: 75,000 × 190,000L = 14,250,000,000L saved
+  - Families: 75,000 × 1 = 75,000 families helped
+  ↓
+Updates all metrics in organizational_metrics table
+  ↓
+ESG report displays updated values
+```
+
+---
+
+## Configuring Sustainability Settings
+
+The per-laptop sustainability metrics are stored in the `system_settings` table with key `sustainability_metrics`. To update these values:
+
+**Default Values (if not configured):**
+```json
+{
+  "carbonReductionPerLaptop": 316000,  // grams (316kg)
+  "waterSavedPerLaptop": 190000,       // liters
+  "familiesHelpedPerLaptop": 1
+}
+```
+
+**To update sustainability settings**, modify the `system_settings` table through the database or create an admin endpoint:
+```sql
+UPDATE system_settings 
+SET setting_value = '{"carbonReductionPerLaptop": 320000, "waterSavedPerLaptop": 200000, "familiesHelpedPerLaptop": 1}'
+WHERE setting_key = 'sustainability_metrics';
+```
+
+---
+
+## Best Practices
+
+1. **Update Regularly**: Schedule periodic updates to `total_units_deployed` to keep metrics current
+2. **Only Update Total Units**: Don't manually update derived metrics (carbon, water, families) - they recalculate automatically
+3. **Verify Settings**: Ensure sustainability_metrics settings exist before updating total units
+4. **Monitor Logs**: Check server logs for recalculation confirmations
+5. **ESG Report**: View the ESG Report to verify updated metrics are displayed correctly
+
+---
+
+## Error Handling
+
+**Missing Sustainability Settings:**
+If sustainability settings are not found, the recalculation aborts with a warning:
+```
+⚠️ Sustainability metrics settings not found, cannot recalculate organizational metrics
+```
+
+**Solution:** Ensure `sustainability_metrics` exists in `system_settings` table with proper values.
+
+**Unauthorized Access:**
+```json
+{
+  "message": "Unauthorized"
+}
+```
+**Solution:** Login as an admin user before making requests.
+
+---
+
+## Integration Example: Scheduled Update
+
+**Scenario:** Update total units deployed every day at midnight with data from your ERP system.
+
+**Power Automate Flow:**
+```
+1. Scheduled trigger: Daily at 00:00
+2. HTTP Request to your ERP: GET total deployed units
+3. HTTP Request to Portal: PUT /api/admin/organizational-metrics/total_units_deployed
+   - Authentication: Session cookie from admin login
+   - Body: {"value": <ERP_TOTAL>}
+4. Check response status
+5. Send notification on success/failure
+```
+
+**Node.js Script Example:**
+```javascript
+const fetch = require('node-fetch');
+
+async function updateOrganizationalMetrics() {
+  // Login as admin first to get session cookie
+  const loginRes = await fetch('https://your-portal.replit.app/api/auth/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      username: 'admin@company.com',
+      password: 'admin_password'
+    })
+  });
+  
+  const cookies = loginRes.headers.get('set-cookie');
+  
+  // Update total units deployed
+  const updateRes = await fetch(
+    'https://your-portal.replit.app/api/admin/organizational-metrics/total_units_deployed',
+    {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Cookie': cookies
+      },
+      body: JSON.stringify({ value: 75000 })
+    }
+  );
+  
+  const result = await updateRes.json();
+  console.log('✅ Updated organizational metrics:', result);
+}
+
+updateOrganizationalMetrics();
+```
 
 ---
 
