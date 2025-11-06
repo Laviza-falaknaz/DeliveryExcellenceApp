@@ -59,6 +59,17 @@ export default function ESGReport() {
     queryKey: ["/api/key-insights"],
   });
 
+  // Fetch organizational metrics
+  const { data: orgMetrics, isLoading: isOrgMetricsLoading } = useQuery<any[]>({
+    queryKey: ["/api/organizational-metrics"],
+  });
+
+  // Helper function to get organizational metric value
+  const getOrgMetric = (key: string): number => {
+    const metric = orgMetrics?.find(m => m.metricKey === key);
+    return metric ? parseFloat(metric.metricValue) || 0 : 0;
+  };
+
   // Get the current date for the report generation timestamp
   const reportDate = new Date();
   
@@ -545,6 +556,45 @@ export default function ESGReport() {
                             )}
                           </div>
                       ))}
+                    </div>
+                  </div>
+
+                  <Separator className="my-6" />
+
+                  {/* Organizational-Level Metrics */}
+                  <div className="mt-6">
+                    <h3 className="text-lg font-semibold mb-3">Circular Computing Organizational Impact</h3>
+                    <p className="text-sm text-neutral-600 mb-4">
+                      Company-wide environmental impact across all customers
+                    </p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="border rounded-md p-4 bg-gradient-to-br from-teal-50 to-emerald-50">
+                        <p className="text-sm text-neutral-600">Total Units Deployed</p>
+                        <h4 className="text-2xl font-bold mt-1 text-teal-700">
+                          {getOrgMetric('total_units_deployed').toLocaleString()} units
+                        </h4>
+                      </div>
+                      
+                      <div className="border rounded-md p-4 bg-gradient-to-br from-blue-50 to-cyan-50">
+                        <p className="text-sm text-neutral-600">Total Carbon Saved</p>
+                        <h4 className="text-2xl font-bold mt-1 text-blue-700">
+                          {formatEnvironmentalImpact(getOrgMetric('total_carbon_saved'), 'g')}
+                        </h4>
+                      </div>
+                      
+                      <div className="border rounded-md p-4 bg-gradient-to-br from-cyan-50 to-blue-50">
+                        <p className="text-sm text-neutral-600">Total Water Saved</p>
+                        <h4 className="text-2xl font-bold mt-1 text-cyan-700">
+                          {(getOrgMetric('total_water_saved') / 1000000000).toFixed(2)} billion liters
+                        </h4>
+                      </div>
+                      
+                      <div className="border rounded-md p-4 bg-gradient-to-br from-emerald-50 to-teal-50">
+                        <p className="text-sm text-neutral-600">Families Helped with Water Access</p>
+                        <h4 className="text-2xl font-bold mt-1 text-emerald-700">
+                          {getOrgMetric('total_families_helped').toLocaleString()} families
+                        </h4>
+                      </div>
                     </div>
                   </div>
                 </div>

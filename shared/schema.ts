@@ -603,3 +603,24 @@ export const insertKeyPerformanceInsightSchema = createInsertSchema(keyPerforman
 
 export type KeyPerformanceInsight = typeof keyPerformanceInsights.$inferSelect;
 export type InsertKeyPerformanceInsight = z.infer<typeof insertKeyPerformanceInsightSchema>;
+
+// Organizational Metrics schema - company-wide aggregated statistics
+export const organizationalMetrics = pgTable("organizational_metrics", {
+  id: serial("id").primaryKey(),
+  metricKey: text("metric_key").notNull().unique(), // 'total_units_deployed'
+  metricValue: numeric("metric_value", { precision: 15, scale: 2 }).notNull(), // Numeric value
+  metricUnit: text("metric_unit"), // 'units', 'kg', 'liters', etc.
+  description: text("description"),
+  lastUpdatedBy: integer("last_updated_by").references(() => users.id),
+  updatedAt: timestamp("updated_at").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertOrganizationalMetricSchema = createInsertSchema(organizationalMetrics).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type OrganizationalMetric = typeof organizationalMetrics.$inferSelect;
+export type InsertOrganizationalMetric = z.infer<typeof insertOrganizationalMetricSchema>;

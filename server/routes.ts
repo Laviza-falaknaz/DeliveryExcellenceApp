@@ -2333,5 +2333,68 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Organizational Metrics endpoints
+  app.get("/api/organizational-metrics", isAuthenticated, async (req, res) => {
+    try {
+      const metrics = await storage.getAllOrganizationalMetrics();
+      res.json(metrics);
+    } catch (error) {
+      console.error("Error fetching organizational metrics:", error);
+      res.status(500).json({ error: "Failed to fetch organizational metrics" });
+    }
+  });
+
+  app.get("/api/organizational-metrics/:metricKey", isAuthenticated, async (req, res) => {
+    try {
+      const metric = await storage.getOrganizationalMetric(req.params.metricKey);
+      if (!metric) {
+        return res.status(404).json({ error: "Metric not found" });
+      }
+      res.json(metric);
+    } catch (error) {
+      console.error("Error fetching organizational metric:", error);
+      res.status(500).json({ error: "Failed to fetch organizational metric" });
+    }
+  });
+
+  app.put("/api/admin/organizational-metrics/:metricKey", requireAdmin, async (req, res) => {
+    try {
+      const { metricKey } = req.params;
+      const { value } = req.body;
+      
+      if (typeof value !== 'number') {
+        return res.status(400).json({ error: "Value must be a number" });
+      }
+
+      const updated = await storage.updateOrganizationalMetric(metricKey, value, req.user?.id);
+      if (!updated) {
+        return res.status(404).json({ error: "Metric not found" });
+      }
+      
+      res.json(updated);
+    } catch (error) {
+      console.error("Error updating organizational metric:", error);
+      res.status(500).json({ error: "Failed to update organizational metric" });
+    }
+  });
+
+  app.post("/api/admin/organizational-metrics", requireAdmin, async (req, res) => {
+    try {
+      const { metricKey, metricValue, metricUnit, description } = req.body;
+      
+      const metric = await storage.upsertOrganizationalMetric(metricKey, {
+        metricValue: metricValue.toString(),
+        metricUnit,
+        description,
+        lastUpdatedBy: req.user?.id
+      });
+      
+      res.json(metric);
+    } catch (error) {
+      console.error("Error creating/updating organizational metric:", error);
+      res.status(500).json({ error: "Failed to create/update organizational metric" });
+    }
+  });
+
   return httpServer;
 }

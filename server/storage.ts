@@ -20,7 +20,8 @@ import {
   activityLog, ActivityLog, InsertActivityLog,
   warranties, Warranty, InsertWarranty,
   apiKeys, ApiKey,
-  keyPerformanceInsights, KeyPerformanceInsight, InsertKeyPerformanceInsight
+  keyPerformanceInsights, KeyPerformanceInsight, InsertKeyPerformanceInsight,
+  organizationalMetrics, OrganizationalMetric, InsertOrganizationalMetric
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, sum, like, and, sql } from "drizzle-orm";
@@ -191,6 +192,12 @@ export interface IStorage {
   createKeyPerformanceInsight(insight: InsertKeyPerformanceInsight): Promise<KeyPerformanceInsight>;
   updateKeyPerformanceInsight(id: number, data: Partial<KeyPerformanceInsight>): Promise<KeyPerformanceInsight | undefined>;
   deleteKeyPerformanceInsight(id: number): Promise<void>;
+
+  // Organizational Metrics operations
+  getAllOrganizationalMetrics(): Promise<OrganizationalMetric[]>;
+  getOrganizationalMetric(metricKey: string): Promise<OrganizationalMetric | undefined>;
+  upsertOrganizationalMetric(metricKey: string, data: Partial<InsertOrganizationalMetric>): Promise<OrganizationalMetric>;
+  updateOrganizationalMetric(metricKey: string, value: number, updatedBy?: number): Promise<OrganizationalMetric | undefined>;
 }
 
 // Database storage implementation using Drizzle ORM - blueprint:javascript_database
@@ -1323,6 +1330,87 @@ export class DatabaseStorage implements IStorage {
 
   async deleteKeyPerformanceInsight(id: number): Promise<void> {
     await db.delete(keyPerformanceInsights).where(eq(keyPerformanceInsights.id, id));
+  }
+
+  // Organizational Metrics operations
+  async getAllOrganizationalMetrics(): Promise<OrganizationalMetric[]> {
+    return db.select().from(organizationalMetrics);
+  }
+
+  async getOrganizationalMetric(metricKey: string): Promise<OrganizationalMetric | undefined> {
+    const [metric] = await db.select().from(organizationalMetrics).where(eq(organizationalMetrics.metricKey, metricKey));
+    return metric || undefined;
+  }
+
+  async upsertOrganizationalMetric(metricKey: string, data: Partial<InsertOrganizationalMetric>): Promise<OrganizationalMetric> {
+    const existing = await this.getOrganizationalMetric(metricKey);
+    
+    if (existing) {
+      const [updated] = await db.update(organizationalMetrics)
+        .set({ ...data, updatedAt: new Date() })
+        .where(eq(organizationalMetrics.metricKey, metricKey))
+        .returning();
+      return updated;
+    } else {
+      const [created] = await db.insert(organizationalMetrics)
+        .values({ metricKey, ...data } as InsertOrganizationalMetric)
+        .returning();
+      return created;
+    }
+  }
+
+  async updateOrganizationalMetric(metricKey: string, value: number, updatedBy?: number): Promise<OrganizationalMetric | undefined> {
+    const [updated] = await db.update(organizationalMetrics)
+      .set({ metricValue: value.toString(), lastUpdatedBy: updatedBy, updatedAt: new Date() })
+      .where(eq(organizationalMetrics.metricKey, metricKey))
+      .returning();
+    
+    // If total_units_deployed is updated, recalculate dependent metrics
+    if (metricKey === 'total_units_deployed' && updated) {
+      await this.recalculateOrganizationalMetrics(value, updatedBy);
+    }
+    
+    return updated || undefined;
+  }
+
+  async recalculateOrganizationalMetrics(totalUnits: number, updatedBy?: number): Promise<void> {
+    // Get sustainability settings to get per-laptop metrics
+    const settings = await this.getSystemSetting('sustainability_metrics');
+    
+    if (!settings?.settingValue) {
+      console.warn('Sustainability metrics settings not found, cannot recalculate organizational metrics');
+      return;
+    }
+
+    const {
+      carbonReductionPerLaptop = 316000, // grams
+      waterSavedPerLaptop = 190000, // liters
+      familiesHelpedPerLaptop = 1
+    } = settings.settingValue as any;
+
+    // Calculate derived metrics
+    const totalCarbonSaved = totalUnits * carbonReductionPerLaptop;
+    const totalWaterSaved = totalUnits * waterSavedPerLaptop;
+    const totalFamiliesHelped = totalUnits * familiesHelpedPerLaptop;
+
+    // Update all dependent metrics
+    const updates = [
+      { key: 'total_carbon_saved', value: totalCarbonSaved },
+      { key: 'total_water_saved', value: totalWaterSaved },
+      { key: 'total_families_helped', value: totalFamiliesHelped }
+    ];
+
+    for (const { key, value } of updates) {
+      await db.update(organizationalMetrics)
+        .set({ 
+          metricValue: value.toString(), 
+          lastUpdatedBy: updatedBy, 
+          updatedAt: new Date() 
+        })
+        .where(eq(organizationalMetrics.metricKey, key));
+    }
+
+    console.log(`✅ Recalculated organizational metrics based on ${totalUnits} units deployed`);
   }
 }
 

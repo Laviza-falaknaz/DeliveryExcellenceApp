@@ -1,5 +1,5 @@
 import { db } from "./db";
-import { users, waterProjects, systemSettings } from "@shared/schema";
+import { users, waterProjects, systemSettings, organizationalMetrics } from "@shared/schema";
 import bcrypt from "bcryptjs";
 import { eq } from "drizzle-orm";
 import { seedGamificationData } from "./gamification-seed";
@@ -115,6 +115,42 @@ export async function seedDatabase() {
       });
       
       console.log("✅ Sustainability metrics setting created");
+    }
+
+    // Check and seed organizational metrics
+    const existingOrgMetrics = await db.select().from(organizationalMetrics).limit(1);
+    
+    if (existingOrgMetrics.length === 0) {
+      console.log("Creating organizational metrics...");
+      
+      await db.insert(organizationalMetrics).values([
+        {
+          metricKey: 'total_units_deployed',
+          metricValue: '125000', // Total remanufactured units deployed company-wide
+          metricUnit: 'units',
+          description: 'Total number of remanufactured units deployed across all customers'
+        },
+        {
+          metricKey: 'total_carbon_saved',
+          metricValue: '39500000', // 39,500 kg in grams (125000 * 316 kg)
+          metricUnit: 'g',
+          description: 'Total carbon emissions saved through remanufactured devices'
+        },
+        {
+          metricKey: 'total_water_saved',
+          metricValue: '23750000000', // 23.75 billion liters (125000 * 190000)
+          metricUnit: 'liters',
+          description: 'Total water saved through circular economy practices'
+        },
+        {
+          metricKey: 'total_families_helped',
+          metricValue: '125000', // 1 family per laptop
+          metricUnit: 'families',
+          description: 'Total families helped through water access programs'
+        }
+      ]);
+      
+      console.log("✅ Organizational metrics created");
     }
 
     // Seed gamification data
