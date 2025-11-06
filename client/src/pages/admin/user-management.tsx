@@ -37,10 +37,7 @@ export function UserManagement() {
 
   const createMutation = useMutation({
     mutationFn: async (userData: any) => {
-      return apiRequest("/api/admin/users", {
-        method: "POST",
-        body: JSON.stringify(userData),
-      });
+      return apiRequest("POST", "/api/admin/users", userData);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
@@ -54,10 +51,7 @@ export function UserManagement() {
 
   const updateMutation = useMutation({
     mutationFn: async ({ id, data }: { id: number; data: any }) => {
-      return apiRequest(`/api/admin/users/${id}`, {
-        method: "PATCH",
-        body: JSON.stringify(data),
-      });
+      return apiRequest("PATCH", `/api/admin/users/${id}`, data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
@@ -71,10 +65,7 @@ export function UserManagement() {
 
   const toggleActiveMutation = useMutation({
     mutationFn: async ({ id, isActive }: { id: number; isActive: boolean }) => {
-      return apiRequest(`/api/admin/users/${id}`, {
-        method: "PATCH",
-        body: JSON.stringify({ isActive }),
-      });
+      return apiRequest("PATCH", `/api/admin/users/${id}`, { isActive });
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
@@ -92,10 +83,7 @@ export function UserManagement() {
 
   const toggleAdminMutation = useMutation({
     mutationFn: async ({ id, isAdmin }: { id: number; isAdmin: boolean }) => {
-      return apiRequest(`/api/admin/users/${id}`, {
-        method: "PATCH",
-        body: JSON.stringify({ isAdmin }),
-      });
+      return apiRequest("PATCH", `/api/admin/users/${id}`, { isAdmin });
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });

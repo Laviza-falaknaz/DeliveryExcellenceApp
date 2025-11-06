@@ -23,8 +23,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+import { PackageOpen, PackageX, Eye } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Badge } from "@/components/ui/badge";
@@ -32,6 +39,7 @@ import { Badge } from "@/components/ui/badge";
 export function OrderManagement() {
   const { toast } = useToast();
   const [editingOrder, setEditingOrder] = useState<any>(null);
+  const [viewingOrder, setViewingOrder] = useState<any>(null);
 
   const { data: orders, isLoading } = useQuery({
     queryKey: ["/api/admin/orders"],
@@ -43,10 +51,7 @@ export function OrderManagement() {
 
   const updateOrderMutation = useMutation({
     mutationFn: async ({ id, data }: { id: number; data: any }) => {
-      return apiRequest(`/api/admin/orders/${id}`, {
-        method: "PATCH",
-        body: JSON.stringify(data),
-      });
+      return apiRequest("PATCH", `/api/admin/orders/${id}`, data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/orders"] });
@@ -58,12 +63,20 @@ export function OrderManagement() {
     },
   });
 
-  const handleStatusChange = (orderId: number, newStatus: string) => {
-    updateOrderMutation.mutate({
-      id: orderId,
-      data: { status: newStatus },
-    });
-  };
+  const toggleActiveMutation = useMutation({
+    mutationFn: async ({ id, isActive }: { id: number; isActive: boolean }) => {
+      return apiRequest("PATCH", `/api/admin/orders/${id}`, { isActive });
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/orders"] });
+      toast({ 
+        title: variables.isActive ? "Order activated" : "Order deactivated",
+      });
+    },
+    onError: () => {
+      toast({ title: "Failed to update order status", variant: "destructive" });
+    },
+  });
 
   const handleUserChange = (userId: number) => {
     if (!editingOrder) return;
@@ -74,29 +87,11 @@ export function OrderManagement() {
     });
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "delivered":
-      case "completed":
-        return "default";
-      case "shipped":
-        return "secondary";
-      case "processing":
-      case "in_production":
-      case "quality_check":
-        return "outline";
-      case "cancelled":
-      case "returned":
-        return "destructive";
-      default:
-        return "outline";
-    }
-  };
-
   return (
     <Card>
       <CardHeader>
         <CardTitle>Order Management</CardTitle>
+        <CardDescription>View and manage all customer orders</CardDescription>
       </CardHeader>
       <CardContent>
         {isLoading ? (
@@ -111,6 +106,7 @@ export function OrderManagement() {
                 <TableHead>Amount</TableHead>
                 <TableHead>Currency</TableHead>
                 <TableHead>Order Date</TableHead>
+                <TableHead>Active</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -126,7 +122,7 @@ export function OrderManagement() {
                       {orderUser?.name || `User #${order.userId}`}
                     </TableCell>
                     <TableCell data-testid={`text-status-${order.id}`}>
-                      <Badge variant={getStatusColor(order.status)}>
+                      <Badge variant="outline">
                         {order.status.replace(/_/g, " ").toUpperCase()}
                       </Badge>
                     </TableCell>
@@ -139,27 +135,35 @@ export function OrderManagement() {
                     <TableCell data-testid={`text-date-${order.id}`}>
                       {new Date(order.orderDate).toLocaleDateString()}
                     </TableCell>
+                    <TableCell data-testid={`text-active-${order.id}`}>
+                      <Badge variant={order.isActive ? "default" : "destructive"}>
+                        {order.isActive ? "Active" : "Inactive"}
+                      </Badge>
+                    </TableCell>
                     <TableCell>
-                      <div className="flex gap-2">
-                        <Select
-                          value={order.status}
-                          onValueChange={(value) => handleStatusChange(order.id, value)}
+                      <div className="flex gap-1">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          title="View order details"
+                          onClick={() => setViewingOrder(order)}
+                          data-testid={`button-view-${order.id}`}
                         >
-                          <SelectTrigger className="w-[160px]" data-testid={`select-status-${order.id}`}>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="placed">Placed</SelectItem>
-                            <SelectItem value="processing">Processing</SelectItem>
-                            <SelectItem value="in_production">In Production</SelectItem>
-                            <SelectItem value="quality_check">Quality Check</SelectItem>
-                            <SelectItem value="shipped">Shipped</SelectItem>
-                            <SelectItem value="delivered">Delivered</SelectItem>
-                            <SelectItem value="completed">Completed</SelectItem>
-                            <SelectItem value="cancelled">Cancelled</SelectItem>
-                            <SelectItem value="returned">Returned</SelectItem>
-                          </SelectContent>
-                        </Select>
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          title={order.isActive ? "Deactivate order" : "Activate order"}
+                          onClick={() => toggleActiveMutation.mutate({ id: order.id, isActive: !order.isActive })}
+                          disabled={toggleActiveMutation.isPending}
+                          data-testid={`button-toggle-active-${order.id}`}
+                        >
+                          {order.isActive ? 
+                            <PackageX className="h-4 w-4 text-red-600" /> : 
+                            <PackageOpen className="h-4 w-4 text-green-600" />
+                          }
+                        </Button>
                         <Button
                           variant="outline"
                           size="sm"
@@ -208,6 +212,59 @@ export function OrderManagement() {
                   </SelectContent>
                 </Select>
               </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {viewingOrder && (
+        <Dialog open={!!viewingOrder} onOpenChange={() => setViewingOrder(null)}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Order Details - {viewingOrder.orderNumber}</DialogTitle>
+              <DialogDescription>
+                Complete order information
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-sm font-semibold">User</Label>
+                  <p className="text-sm">
+                    {users?.find((u: any) => u.id === viewingOrder.userId)?.name || `User #${viewingOrder.userId}`}
+                  </p>
+                </div>
+                <div>
+                  <Label className="text-sm font-semibold">Status</Label>
+                  <p className="text-sm">{viewingOrder.status.replace(/_/g, " ").toUpperCase()}</p>
+                </div>
+                <div>
+                  <Label className="text-sm font-semibold">Total Amount</Label>
+                  <p className="text-sm">{viewingOrder.currency} {viewingOrder.totalAmount}</p>
+                </div>
+                <div>
+                  <Label className="text-sm font-semibold">Order Date</Label>
+                  <p className="text-sm">{new Date(viewingOrder.orderDate).toLocaleDateString()}</p>
+                </div>
+                <div>
+                  <Label className="text-sm font-semibold">Tracking Number</Label>
+                  <p className="text-sm">{viewingOrder.trackingNumber || "N/A"}</p>
+                </div>
+                <div>
+                  <Label className="text-sm font-semibold">Active Status</Label>
+                  <p className="text-sm">{viewingOrder.isActive ? "Active" : "Inactive"}</p>
+                </div>
+              </div>
+              {viewingOrder.shippingAddress && (
+                <div>
+                  <Label className="text-sm font-semibold">Shipping Address</Label>
+                  <p className="text-sm">
+                    {viewingOrder.shippingAddress.street}, {viewingOrder.shippingAddress.city}, 
+                    {viewingOrder.shippingAddress.state} {viewingOrder.shippingAddress.zipCode}, 
+                    {viewingOrder.shippingAddress.country}
+                  </p>
+                </div>
+              )}
             </div>
           </DialogContent>
         </Dialog>

@@ -64,6 +64,7 @@ export const orders = pgTable("orders", {
     zipCode: string;
     country: string;
   }>(),
+  isActive: boolean("is_active").notNull().default(true),
   createdAt: timestamp("created_at").defaultNow(),
 });
 

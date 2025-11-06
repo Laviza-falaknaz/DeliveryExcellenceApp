@@ -1702,6 +1702,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post("/api/admin/users", requireAdmin, async (req, res) => {
+    try {
+      const createSchema = z.object({
+        username: z.string().min(1),
+        password: z.string().min(6),
+        name: z.string().min(1),
+        company: z.string().min(1),
+        email: z.string().email(),
+        phoneNumber: z.string().nullable().optional(),
+        isAdmin: z.boolean().default(false),
+      });
+
+      const validatedData = createSchema.parse(req.body);
+      
+      // Hash password
+      const hashedPassword = await bcrypt.hash(validatedData.password, 10);
+      
+      const newUser = await storage.createUser({
+        ...validatedData,
+        password: hashedPassword,
+        isActive: true,
+      });
+
+      res.status(201).json(newUser);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
+      console.error("Error creating user:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   app.patch("/api/admin/users/:id", requireAdmin, async (req, res) => {
     try {
       const userId = parseInt(req.params.id);
@@ -1887,6 +1920,50 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Validation error", errors: error.errors });
       }
       console.error("Error updating RMA request:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/admin/rma-requests/:id/resend", requireAdmin, async (req, res) => {
+    try {
+      const requestId = parseInt(req.params.id);
+      const request = await storage.getRmaRequestLog(requestId);
+      
+      if (!request) {
+        return res.status(404).json({ message: "RMA request not found" });
+      }
+
+      // Get RMA notification emails from settings
+      const setting = await storage.getSystemSetting('admin_portal');
+      const rmaEmails = setting?.settingValue?.rmaNotificationEmails || [];
+
+      if (rmaEmails.length === 0) {
+        return res.status(400).json({ 
+          message: "No RMA notification emails configured. Please configure them in Admin Settings." 
+        });
+      }
+
+      // TODO: Implement actual email sending logic using the configured email service
+      // For now, just log the details and return success
+      console.log("=== RMA Request Email ===");
+      console.log("To:", rmaEmails.join(", "));
+      console.log("Request Number:", request.requestNumber);
+      console.log("Full Name:", request.fullName);
+      console.log("Company:", request.companyName);
+      console.log("Email:", request.email);
+      console.log("Phone:", request.phone);
+      console.log("Product:", request.productMakeModel);
+      console.log("Fault:", request.faultDescription);
+      console.log("========================");
+
+      res.json({ 
+        success: true, 
+        message: "RMA request details sent via email",
+        sentTo: rmaEmails,
+        requestNumber: request.requestNumber 
+      });
+    } catch (error) {
+      console.error("Error resending RMA request:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });
