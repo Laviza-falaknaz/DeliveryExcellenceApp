@@ -514,59 +514,97 @@ export default function ESGReport() {
                   <p className="text-neutral-700 mb-4">
                     By extending the lifecycle of IT equipment through remanufacturing, {user?.company} has contributed to the circular economy, reduced carbon emissions, conserved natural resources, and supported clean water initiatives in communities facing water scarcity.
                   </p>
-                  
-                  <div className="mt-6">
-                    <h3 className="text-lg font-semibold mb-3">Key Performance Highlights</h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      {/* Display user's actual product count */}
-                      <div className="border rounded-md p-4">
-                        <p className="text-sm text-neutral-600">Remanufactured Units Deployed</p>
-                        <h4 className="text-xl font-semibold mt-1">{impact?.productCount || 0} units</h4>
+                </div>
+                
+                <div>
+                  <h3 className="text-lg font-semibold mb-3">UN SDG Alignment</h3>
+                  <div className="border rounded-md p-4 space-y-3">
+                    <div>
+                      <div className="flex items-center">
+                        <img src="https://sdgs.un.org/sites/default/files/goals/E_SDG_Icons-12.jpg" alt="SDG 12" className="h-10 w-10 mr-2" />
+                        <h4 className="font-semibold">SDG 12</h4>
                       </div>
-                      
-                      {/* Display user's actual calculated e-waste diversion */}
-                      <div className="border rounded-md p-4">
-                        <p className="text-sm text-neutral-600">E-Waste Diverted</p>
-                        <h4 className="text-xl font-semibold mt-1">{Math.round(((impact?.productCount || 0) * 2.5) * 10) / 10} kg</h4>
+                      <p className="text-sm text-neutral-700 mt-1">Responsible Consumption and Production</p>
+                    </div>
+                    <div>
+                      <div className="flex items-center">
+                        <img src="https://sdgs.un.org/sites/default/files/goals/E_SDG_Icons-13.jpg" alt="SDG 13" className="h-10 w-10 mr-2" />
+                        <h4 className="font-semibold">SDG 13</h4>
                       </div>
-                      
-                      {/* Display user's actual calculated average carbon per device */}
-                      <div className="border rounded-md p-4">
-                        <p className="text-sm text-neutral-600">Average Carbon Footprint Reduction</p>
-                        <h4 className="text-xl font-semibold mt-1">
-                          {impact?.productCount ? Math.round(((impact.totalImpact?.carbonSaved || 0) / 1000) / impact.productCount) : 0} kg CO₂e per device
-                        </h4>
+                      <p className="text-sm text-neutral-700 mt-1">Climate Action</p>
+                    </div>
+                    <div>
+                      <div className="flex items-center">
+                        <img src="https://sdgs.un.org/sites/default/files/goals/E_SDG_Icons-06.jpg" alt="SDG 6" className="h-10 w-10 mr-2" />
+                        <h4 className="font-semibold">SDG 6</h4>
                       </div>
-                      
-                      {/* Display user's social impact calculated from families helped */}
-                      <div className="border rounded-md p-4">
-                        <p className="text-sm text-neutral-600">Families Helped with Clean Water</p>
-                        <h4 className="text-xl font-semibold mt-1">
-                          {impact?.totalImpact?.familiesHelped || 0} families
-                        </h4>
-                      </div>
-                      
-                      {/* Display admin-configured key insights */}
-                      {keyInsights && keyInsights.length > 0 && keyInsights
-                        .filter((insight: any) => insight.isActive)
-                        .slice(0, 4)
-                        .map((insight: any) => (
-                          <div key={insight.id} className="border rounded-md p-4 bg-gradient-to-br from-teal-50 to-cyan-50">
-                            <p className="text-sm text-neutral-600">{insight.metricName}</p>
-                            <h4 className="text-xl font-semibold mt-1 text-teal-700">
-                              {insight.metricValue} {insight.metricUnit || ""}
-                            </h4>
-                            {insight.description && (
-                              <p className="text-xs text-neutral-500 mt-1">{insight.description}</p>
-                            )}
-                          </div>
-                      ))}
+                      <p className="text-sm text-neutral-700 mt-1">Clean Water and Sanitation</p>
                     </div>
                   </div>
+                  
+                  <div className="mt-4 border rounded-md p-4">
+                    <h4 className="font-semibold mb-2">TCO Certified</h4>
+                    <p className="text-sm text-neutral-700">
+                      All deployed Circular Computing products meet TCO Certified criteria for social and environmental responsibility.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              <Separator />
+              
+              <div>
+                <h3 className="text-lg font-semibold mb-3">Key Performance Highlights</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {/* Display user's actual product count */}
+                  <div className="border rounded-md p-4">
+                    <p className="text-sm text-neutral-600">Remanufactured Units Deployed</p>
+                    <h4 className="text-xl font-semibold mt-1">{impact?.productCount || 0} units</h4>
+                  </div>
+                  
+                  {/* Display user's actual calculated e-waste diversion */}
+                  <div className="border rounded-md p-4">
+                    <p className="text-sm text-neutral-600">E-Waste Diverted</p>
+                    <h4 className="text-xl font-semibold mt-1">{Math.round(((impact?.productCount || 0) * 2.5) * 10) / 10} kg</h4>
+                  </div>
+                  
+                  {/* Display user's actual calculated average carbon per device */}
+                  <div className="border rounded-md p-4">
+                    <p className="text-sm text-neutral-600">Average Carbon Footprint Reduction</p>
+                    <h4 className="text-xl font-semibold mt-1">
+                      {impact?.productCount ? Math.round(((impact.totalImpact?.carbonSaved || 0) / 1000) / impact.productCount) : 0} kg CO₂e per device
+                    </h4>
+                  </div>
+                  
+                  {/* Display user's social impact calculated from families helped */}
+                  <div className="border rounded-md p-4">
+                    <p className="text-sm text-neutral-600">Families Helped with Clean Water</p>
+                    <h4 className="text-xl font-semibold mt-1">
+                      {impact?.totalImpact?.familiesHelped || 0} families
+                    </h4>
+                  </div>
+                  
+                  {/* Display admin-configured key insights */}
+                  {keyInsights && keyInsights.length > 0 && keyInsights
+                    .filter((insight: any) => insight.isActive)
+                    .slice(0, 4)
+                    .map((insight: any) => (
+                      <div key={insight.id} className="border rounded-md p-4 bg-gradient-to-br from-teal-50 to-cyan-50">
+                        <p className="text-sm text-neutral-600">{insight.metricName}</p>
+                        <h4 className="text-xl font-semibold mt-1 text-teal-700">
+                          {insight.metricValue} {insight.metricUnit || ""}
+                        </h4>
+                        {insight.description && (
+                          <p className="text-xs text-neutral-500 mt-1">{insight.description}</p>
+                        )}
+                      </div>
+                  ))}
+                </div>
+              </div>
+              
+              <Separator />
 
-                  <Separator className="my-6" />
-
-                  {/* Organizational-Level Metrics */}
+              {/* Organizational-Level Metrics */}
                   <div className="mt-6">
                     <h3 className="text-lg font-semibold mb-3">Circular Computing Organizational Impact</h3>
                     <p className="text-sm text-neutral-600 mb-4">
