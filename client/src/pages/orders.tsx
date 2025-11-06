@@ -25,16 +25,20 @@ import { Eye, Download, FileText, Package, Hash, FileCheck, MapPin } from "lucid
 import { useQuery } from "@tanstack/react-query";
 import { formatPrice } from "@/lib/currency";
 import { EnvironmentalImpact } from "@shared/schema";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Orders() {
   const { orders, isLoadingOrders, getActiveOrders, getPastOrders } = useOrders();
   const [, setLocation] = useLocation();
+  const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
   const [isOrderDialogOpen, setIsOrderDialogOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [isOrderDetailsOpen, setIsOrderDetailsOpen] = useState(false);
   const [attachmentFilter, setAttachmentFilter] = useState<string>("all");
+  const [downloadingDoc, setDownloadingDoc] = useState<string | null>(null);
 
   const activeOrders = getActiveOrders();
   const pastOrders = getPastOrders();
@@ -130,12 +134,80 @@ export default function Orders() {
     return orderItems.reduce((sum, item) => sum + parseFloat(item.totalPrice || "0"), 0);
   }
 
-  // Mock attachments data (in real app, this would come from API)
+  // Handle document download
+  async function handleDownloadDocument(documentType: string, documentName: string) {
+    if (!selectedOrder) return;
+    
+    setDownloadingDoc(documentType);
+    
+    try {
+      const response = await fetch(`/api/orders/${selectedOrder.orderNumber}/documents/download`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ documentType }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        
+        if (response.status === 404 || response.status === 503) {
+          toast({
+            title: "Document Not Available",
+            description: errorData.message || "This document is not available yet. Please check back later or contact support.",
+            variant: "destructive",
+          });
+        } else {
+          throw new Error(errorData.message || "Failed to download document");
+        }
+        return;
+      }
+
+      // Get the filename from content-disposition header or use default
+      const contentDisposition = response.headers.get('Content-Disposition');
+      let filename = documentName;
+      if (contentDisposition) {
+        const matches = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/.exec(contentDisposition);
+        if (matches && matches[1]) {
+          filename = matches[1].replace(/['"]/g, '');
+        }
+      }
+
+      // Download the file
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+
+      toast({
+        title: "Download Complete",
+        description: `${documentName} has been downloaded successfully.`,
+      });
+    } catch (error) {
+      console.error("Download error:", error);
+      toast({
+        title: "Download Failed",
+        description: error instanceof Error ? error.message : "Failed to download document. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setDownloadingDoc(null);
+    }
+  }
+
+  // Available documents for download
   const attachments = [
-    { id: 1, type: "invoice", name: "Invoice.pdf", url: "#" },
-    { id: 2, type: "packing_list", name: "Packing List.pdf", url: "#" },
-    { id: 3, type: "hashcodes", name: "Hashcodes.txt", url: "#" },
-    { id: 4, type: "credit_note", name: "Credit Note.pdf", url: "#" },
+    { id: 1, type: "invoice", name: "Invoice.pdf" },
+    { id: 2, type: "packing_list", name: "Packing List.xlsx" },
+    { id: 3, type: "hashcodes", name: "Hashcodes.csv" },
+    { id: 4, type: "credit_note", name: "Credit Note.pdf" },
   ];
 
   const filteredAttachments = attachmentFilter === "all" 
@@ -436,9 +508,11 @@ export default function Orders() {
                             size="sm"
                             variant="ghost"
                             className="h-8 w-8 p-0"
-                            onClick={() => window.open(attachment.url, '_blank')}
+                            onClick={() => handleDownloadDocument(attachment.type, attachment.name)}
+                            disabled={downloadingDoc === attachment.type}
+                            data-testid={`button-download-${attachment.type}`}
                           >
-                            <Download className="h-4 w-4" />
+                            <Download className={`h-4 w-4 ${downloadingDoc === attachment.type ? 'animate-pulse' : ''}`} />
                           </Button>
                         </div>
                       ))}

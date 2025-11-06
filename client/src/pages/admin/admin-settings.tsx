@@ -125,11 +125,33 @@ export function AdminSettings() {
   };
 
   const handleSave = () => {
+    // Validate document download API URL if provided
+    if (documentApiUrl && documentApiUrl.trim() !== "") {
+      try {
+        const url = new URL(documentApiUrl);
+        if (url.protocol !== 'https:') {
+          toast({
+            title: "Invalid URL",
+            description: "Document download API URL must use HTTPS protocol for security.",
+            variant: "destructive",
+          });
+          return;
+        }
+      } catch (error) {
+        toast({
+          title: "Invalid URL",
+          description: "Please enter a valid URL for the document download API (e.g., https://your-api.com/documents).",
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+
     saveMutation.mutate({
       visibleTabs,
       rmaNotificationEmails: rmaEmails,
       newUserAlertEmails: userEmails,
-      documentDownloadApiUrl: documentApiUrl || undefined,
+      documentDownloadApiUrl: documentApiUrl && documentApiUrl.trim() !== "" ? documentApiUrl : undefined,
     });
   };
 
