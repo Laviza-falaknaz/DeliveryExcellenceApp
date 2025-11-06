@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Users, ShoppingCart, Wrench, HelpCircle, Droplets, FileText, Palette, Database, Trophy, Key, Settings, Leaf } from "lucide-react";
+import { Users, ShoppingCart, Wrench, HelpCircle, Droplets, FileText, Palette, Database, Trophy, Key, Settings, Leaf, BarChart3 } from "lucide-react";
 import { UserManagement } from "./admin/user-management";
 import { OrderManagement } from "./admin/order-management";
 import { RMAManagement } from "./admin/rma-management";
@@ -14,6 +14,7 @@ import GamificationManagement from "./admin/gamification-management";
 import { ApiKeyManagement } from "./admin/api-key-management";
 import { AdminSettings } from "./admin/admin-settings";
 import { SustainabilitySettings } from "./admin/sustainability-settings";
+import { KeyPerformanceInsightsManagement } from "./admin/key-performance-insights";
 
 interface AdminSettingsData {
   visibleTabs: string[];
@@ -31,6 +32,7 @@ const ALL_TABS = [
   { id: "gamification", label: "Gamification", icon: Trophy, component: GamificationManagement },
   { id: "api-keys", label: "API Keys", icon: Key, component: ApiKeyManagement },
   { id: "sustainability", label: "Sustainability", icon: Leaf, component: SustainabilitySettings },
+  { id: "key-insights", label: "Key Insights", icon: BarChart3, component: KeyPerformanceInsightsManagement },
   { id: "theme", label: "Theme", icon: Palette, component: ThemeSettings },
   { id: "connection", label: "Connection", icon: Database, component: ConnectionSettings },
 ];
