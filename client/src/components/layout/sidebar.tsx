@@ -140,16 +140,6 @@ export default function Sidebar() {
           </NavItem>
         </NavSection>
 
-        <NavSection title="Gamification">
-          <NavItem
-            href="/quiz"
-            icon="ri-gamepad-line"
-            active={location === "/quiz"}
-          >
-            Sustainability Quiz
-          </NavItem>
-        </NavSection>
-
         <NavSection title="Account">
           <NavItem
             href="/profile"
