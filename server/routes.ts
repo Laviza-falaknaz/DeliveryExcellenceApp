@@ -684,9 +684,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         processedAt: null,
       });
       
-      // Send email notifications asynchronously (don't block response)
+      // Send notifications asynchronously (don't block response)
       (async () => {
         try {
+          // Send webhook notification for new RMA request
+          await sendRmaWebhookNotification(requestLog);
+          
           const { sendRmaNotification, sendNewUserNotification } = await import('./email-service.js');
           
           // Get admin settings for notification emails
@@ -719,9 +722,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
               }
             );
           }
-        } catch (emailError) {
-          console.error('Failed to send email notifications:', emailError);
-          // Don't fail the request if email sending fails
+        } catch (notificationError) {
+          console.error('Failed to send notifications:', notificationError);
+          // Don't fail the request if notification sending fails
         }
       })();
       
@@ -1924,37 +1927,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/admin/rma-requests/:id/resend", requireAdmin, async (req, res) => {
+  // Helper function to send RMA webhook notifications
+  async function sendRmaWebhookNotification(request: any): Promise<{ success: boolean; error?: string }> {
     try {
-      const requestId = parseInt(req.params.id);
-      const request = await storage.getRmaRequestLog(requestId);
-      
-      if (!request) {
-        return res.status(404).json({ message: "RMA request not found" });
-      }
-
       // Get RMA webhook URL from settings
       const setting = await storage.getSystemSetting('admin_portal');
       const webhookUrl = setting?.settingValue?.rmaWebhookUrl;
 
       if (!webhookUrl) {
-        return res.status(400).json({ 
-          message: "No RMA webhook URL configured. Please configure it in Admin Settings." 
-        });
+        console.log("No RMA webhook URL configured, skipping webhook notification");
+        return { success: false, error: "No webhook URL configured" };
       }
 
       // Validate webhook URL is HTTPS
       try {
         const url = new URL(webhookUrl);
         if (url.protocol !== 'https:') {
-          return res.status(400).json({
-            message: "RMA webhook URL must use HTTPS protocol for security."
-          });
+          console.error("RMA webhook URL must use HTTPS protocol");
+          return { success: false, error: "Webhook URL must use HTTPS" };
         }
       } catch (error) {
-        return res.status(400).json({
-          message: "Invalid RMA webhook URL configured."
-        });
+        console.error("Invalid RMA webhook URL configured");
+        return { success: false, error: "Invalid webhook URL" };
       }
 
       // Prepare the webhook payload with complete RMA request details
@@ -1967,6 +1961,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         phone: request.phone,
         address: request.address,
         deliveryAddress: request.deliveryAddress,
+        recipientContactNumber: request.recipientContactNumber,
+        countryOfPurchase: request.countryOfPurchase,
         productMakeModel: request.productMakeModel,
         numberOfProducts: request.numberOfProducts,
         manufacturerSerialNumber: request.manufacturerSerialNumber,
@@ -1989,19 +1985,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       if (!webhookResponse.ok) {
         console.error("Webhook request failed:", webhookResponse.status, webhookResponse.statusText);
-        return res.status(500).json({ 
-          message: `Webhook request failed with status ${webhookResponse.status}`,
-          details: webhookResponse.statusText
-        });
+        return { 
+          success: false, 
+          error: `Webhook failed with status ${webhookResponse.status}`
+        };
       }
 
-      console.log("RMA request notification sent to webhook:", webhookUrl);
-      console.log("Request Number:", request.requestNumber);
+      console.log("✅ RMA request notification sent to webhook:", webhookUrl);
+      console.log("   Request Number:", request.requestNumber);
+      return { success: true };
+    } catch (error) {
+      console.error("Error sending RMA webhook notification:", error);
+      return { 
+        success: false, 
+        error: error instanceof Error ? error.message : "Unknown error"
+      };
+    }
+  }
+
+  app.post("/api/admin/rma-requests/:id/resend", requireAdmin, async (req, res) => {
+    try {
+      const requestId = parseInt(req.params.id);
+      const request = await storage.getRmaRequestLog(requestId);
+      
+      if (!request) {
+        return res.status(404).json({ message: "RMA request not found" });
+      }
+
+      // Send webhook notification
+      const result = await sendRmaWebhookNotification(request);
+
+      if (!result.success) {
+        return res.status(400).json({ 
+          message: result.error || "Failed to send webhook notification"
+        });
+      }
 
       res.json({ 
         success: true, 
         message: "RMA request details sent to webhook",
-        webhookUrl: webhookUrl,
         requestNumber: request.requestNumber 
       });
     } catch (error) {
