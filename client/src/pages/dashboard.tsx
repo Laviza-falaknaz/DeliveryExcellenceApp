@@ -9,7 +9,7 @@ import {
   Trophy, Package, ShieldCheck, Target, Award, 
   TrendingUp, Droplet, Leaf, Recycle, Users, 
   ChevronRight, FileText, MessageSquare, Clock,
-  Zap, Star, BarChart3, Brain, Gamepad2, AlertCircle
+  Zap, Star, BarChart3, Brain, Gamepad2, AlertCircle, Truck
 } from "lucide-react";
 
 interface User {
@@ -380,29 +380,40 @@ export default function Dashboard() {
                 ) : (
                   <div className="divide-y">
                     {recentOrders.map((order) => (
-                      <Link key={order.id} href={`/orders`}>
-                        <div 
-                          className="p-3 hover:bg-gray-50 transition-colors cursor-pointer"
-                          data-testid={`order-${order.id}`}
-                        >
-                          <div className="flex items-center justify-between">
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2 mb-1">
-                                <span className="font-medium text-gray-900 text-sm">
-                                  {order.orderNumber}
-                                </span>
-                                <Badge className="bg-teal-100 text-teal-700 hover:bg-teal-100 text-xs">
-                                  {order.status}
-                                </Badge>
-                              </div>
-                              <div className="text-xs text-gray-600">
-                                {new Date(order.orderDate).toLocaleDateString()} • {order.currency} {order.totalAmount}
-                              </div>
+                      <div 
+                        key={order.id}
+                        className="p-3 hover:bg-gray-50 transition-colors"
+                        data-testid={`order-${order.id}`}
+                      >
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex-1 cursor-pointer" onClick={() => setLocation('/orders')}>
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="font-medium text-gray-900 text-sm">
+                                {order.orderNumber}
+                              </span>
+                              <Badge className="bg-teal-100 text-teal-700 hover:bg-teal-100 text-xs">
+                                {order.status}
+                              </Badge>
                             </div>
-                            <ChevronRight className="h-4 w-4 text-gray-400" />
+                            <div className="text-xs text-gray-600">
+                              {new Date(order.orderDate).toLocaleDateString()} • {order.currency} {order.totalAmount}
+                            </div>
                           </div>
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="text-teal-600 hover:text-teal-700 hover:bg-teal-50 border-teal-200 text-xs h-7"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setLocation('/delivery-timeline');
+                            }}
+                            data-testid={`button-track-order-${order.id}`}
+                          >
+                            <Truck className="h-3 w-3 mr-1" />
+                            Track
+                          </Button>
                         </div>
-                      </Link>
+                      </div>
                     ))}
                   </div>
                 )}
