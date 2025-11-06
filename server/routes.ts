@@ -1855,6 +1855,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin RMA Request Logs Management
+  app.get("/api/admin/rma-requests", requireAdmin, async (req, res) => {
+    try {
+      const allRequests = await storage.getAllRmaRequestLogs();
+      res.json(allRequests);
+    } catch (error) {
+      console.error("Error fetching RMA requests:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.patch("/api/admin/rma-requests/:id", requireAdmin, async (req, res) => {
+    try {
+      const requestId = parseInt(req.params.id);
+      const updateSchema = z.object({
+        status: z.enum(["submitted", "approved", "declined"]).optional(),
+        declineReason: z.string().optional(),
+      });
+
+      const validatedData = updateSchema.parse(req.body);
+      const updatedRequest = await storage.updateRmaRequestLog(requestId, validatedData);
+      
+      if (!updatedRequest) {
+        return res.status(404).json({ message: "RMA request not found" });
+      }
+
+      res.json(updatedRequest);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
+      console.error("Error updating RMA request:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Download order document (proxy to external API)
   app.post("/api/orders/:orderNumber/documents/download", isAuthenticated, async (req, res) => {
     try {

@@ -24,8 +24,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
-import { Send, XCircle } from "lucide-react";
+import { Send, XCircle, CheckCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Badge } from "@/components/ui/badge";
@@ -34,8 +35,12 @@ export function RMAManagement() {
   const { toast } = useToast();
   const [editingRma, setEditingRma] = useState<any>(null);
 
-  const { data: rmas, isLoading } = useQuery({
+  const { data: rmas, isLoading: isLoadingRmas } = useQuery({
     queryKey: ["/api/admin/rmas"],
+  });
+
+  const { data: rmaRequests, isLoading: isLoadingRequests } = useQuery({
+    queryKey: ["/api/admin/rma-requests"],
   });
 
   const { data: users } = useQuery({
@@ -56,6 +61,22 @@ export function RMAManagement() {
     },
     onError: () => {
       toast({ title: "Failed to update RMA", variant: "destructive" });
+    },
+  });
+
+  const updateRequestMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: number; data: any }) => {
+      return apiRequest(`/api/admin/rma-requests/${id}`, {
+        method: "PATCH",
+        body: JSON.stringify(data),
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/rma-requests"] });
+      toast({ title: "RMA request updated successfully" });
+    },
+    onError: () => {
+      toast({ title: "Failed to update RMA request", variant: "destructive" });
     },
   });
 
@@ -94,9 +115,16 @@ export function RMAManagement() {
     },
   });
 
-  const handleStatusChange = (rmaId: number, newStatus: string) => {
+  const handleRmaStatusChange = (rmaId: number, newStatus: string) => {
     updateRmaMutation.mutate({
       id: rmaId,
+      data: { status: newStatus },
+    });
+  };
+
+  const handleRequestStatusChange = (requestId: number, newStatus: string) => {
+    updateRequestMutation.mutate({
+      id: requestId,
       data: { status: newStatus },
     });
   };
@@ -122,7 +150,7 @@ export function RMAManagement() {
     }
   };
 
-  const getStatusColor = (status: string) => {
+  const getRmaStatusColor = (status: string) => {
     switch (status) {
       case "completed":
         return "default";
@@ -140,107 +168,218 @@ export function RMAManagement() {
     }
   };
 
+  const getRequestStatusColor = (status: string) => {
+    switch (status) {
+      case "approved":
+        return "default";
+      case "submitted":
+        return "outline";
+      case "declined":
+        return "destructive";
+      default:
+        return "outline";
+    }
+  };
+
   return (
     <Card>
       <CardHeader>
         <CardTitle>RMA Management</CardTitle>
       </CardHeader>
       <CardContent>
-        {isLoading ? (
-          <p>Loading RMAs...</p>
-        ) : rmas && rmas.length > 0 ? (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>RMA Number</TableHead>
-                <TableHead>User</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Request Date</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {rmas.map((rma: any) => {
-                const rmaUser = users?.find((u: any) => u.id === rma.userId);
-                return (
-                  <TableRow key={rma.id} data-testid={`row-rma-${rma.id}`}>
-                    <TableCell data-testid={`text-rma-number-${rma.id}`}>
-                      {rma.rmaNumber}
-                    </TableCell>
-                    <TableCell data-testid={`text-user-${rma.id}`}>
-                      {rmaUser?.name || `User #${rma.userId}`}
-                    </TableCell>
-                    <TableCell data-testid={`text-email-${rma.id}`}>
-                      {rma.email}
-                    </TableCell>
-                    <TableCell data-testid={`text-status-${rma.id}`}>
-                      <Badge variant={getStatusColor(rma.status)}>
-                        {rma.status.toUpperCase()}
-                      </Badge>
-                    </TableCell>
-                    <TableCell data-testid={`text-date-${rma.id}`}>
-                      {new Date(rma.createdAt).toLocaleDateString()}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex gap-1 flex-wrap">
-                        <Select
-                          value={rma.status}
-                          onValueChange={(value) => handleStatusChange(rma.id, value)}
-                        >
-                          <SelectTrigger className="w-[140px]" data-testid={`select-status-${rma.id}`}>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="requested">Requested</SelectItem>
-                            <SelectItem value="approved">Approved</SelectItem>
-                            <SelectItem value="in_transit">In Transit</SelectItem>
-                            <SelectItem value="received">Received</SelectItem>
-                            <SelectItem value="processing">Processing</SelectItem>
-                            <SelectItem value="completed">Completed</SelectItem>
-                            <SelectItem value="rejected">Rejected</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setEditingRma(rma)}
-                          data-testid={`button-switch-user-${rma.id}`}
-                        >
-                          Switch User
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          title="Resend RMA notification"
-                          onClick={() => handleResend(rma.id)}
-                          disabled={resendRmaMutation.isPending}
-                          data-testid={`button-resend-${rma.id}`}
-                        >
-                          <Send className="h-4 w-4 text-blue-600" />
-                        </Button>
-                        {rma.status !== "rejected" && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            title="Decline RMA request"
-                            onClick={() => handleDecline(rma.id)}
-                            disabled={declineRmaMutation.isPending}
-                            data-testid={`button-decline-${rma.id}`}
-                          >
-                            <XCircle className="h-4 w-4 text-red-600" />
-                          </Button>
-                        )}
-                      </div>
-                    </TableCell>
+        <Tabs defaultValue="active-rmas" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="active-rmas" data-testid="tab-active-rmas">
+              Active RMAs ({rmas?.length || 0})
+            </TabsTrigger>
+            <TabsTrigger value="pending-requests" data-testid="tab-pending-requests">
+              Pending Requests ({rmaRequests?.filter((r: any) => r.status === 'submitted').length || 0})
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="active-rmas" className="mt-4">
+            {isLoadingRmas ? (
+              <p>Loading RMAs...</p>
+            ) : rmas && rmas.length > 0 ? (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>RMA Number</TableHead>
+                    <TableHead>User</TableHead>
+                    <TableHead>Email</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Request Date</TableHead>
+                    <TableHead>Actions</TableHead>
                   </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        ) : (
-          <p className="text-center text-gray-500">No RMAs found</p>
-        )}
+                </TableHeader>
+                <TableBody>
+                  {rmas.map((rma: any) => {
+                    const rmaUser = users?.find((u: any) => u.id === rma.userId);
+                    return (
+                      <TableRow key={rma.id} data-testid={`row-rma-${rma.id}`}>
+                        <TableCell data-testid={`text-rma-number-${rma.id}`}>
+                          {rma.rmaNumber}
+                        </TableCell>
+                        <TableCell data-testid={`text-user-${rma.id}`}>
+                          {rmaUser?.name || `User #${rma.userId}`}
+                        </TableCell>
+                        <TableCell data-testid={`text-email-${rma.id}`}>
+                          {rma.email}
+                        </TableCell>
+                        <TableCell data-testid={`text-status-${rma.id}`}>
+                          <Badge variant={getRmaStatusColor(rma.status)}>
+                            {rma.status.toUpperCase()}
+                          </Badge>
+                        </TableCell>
+                        <TableCell data-testid={`text-date-${rma.id}`}>
+                          {new Date(rma.createdAt).toLocaleDateString()}
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex gap-1 flex-wrap">
+                            <Select
+                              value={rma.status}
+                              onValueChange={(value) => handleRmaStatusChange(rma.id, value)}
+                            >
+                              <SelectTrigger className="w-[140px]" data-testid={`select-status-${rma.id}`}>
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="requested">Requested</SelectItem>
+                                <SelectItem value="approved">Approved</SelectItem>
+                                <SelectItem value="in_transit">In Transit</SelectItem>
+                                <SelectItem value="received">Received</SelectItem>
+                                <SelectItem value="processing">Processing</SelectItem>
+                                <SelectItem value="completed">Completed</SelectItem>
+                                <SelectItem value="rejected">Rejected</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setEditingRma(rma)}
+                              data-testid={`button-switch-user-${rma.id}`}
+                            >
+                              Switch User
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              title="Resend RMA notification"
+                              onClick={() => handleResend(rma.id)}
+                              disabled={resendRmaMutation.isPending}
+                              data-testid={`button-resend-${rma.id}`}
+                            >
+                              <Send className="h-4 w-4 text-blue-600" />
+                            </Button>
+                            {rma.status !== "rejected" && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                title="Decline RMA request"
+                                onClick={() => handleDecline(rma.id)}
+                                disabled={declineRmaMutation.isPending}
+                                data-testid={`button-decline-${rma.id}`}
+                              >
+                                <XCircle className="h-4 w-4 text-red-600" />
+                              </Button>
+                            )}
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            ) : (
+              <p className="text-center text-gray-500 py-8">No active RMAs found</p>
+            )}
+          </TabsContent>
+
+          <TabsContent value="pending-requests" className="mt-4">
+            {isLoadingRequests ? (
+              <p>Loading RMA requests...</p>
+            ) : rmaRequests && rmaRequests.length > 0 ? (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Request Number</TableHead>
+                    <TableHead>Full Name</TableHead>
+                    <TableHead>Company</TableHead>
+                    <TableHead>Email</TableHead>
+                    <TableHead>Product</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Submitted</TableHead>
+                    <TableHead>Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {rmaRequests.map((request: any) => (
+                    <TableRow key={request.id} data-testid={`row-request-${request.id}`}>
+                      <TableCell data-testid={`text-request-number-${request.id}`}>
+                        {request.requestNumber}
+                      </TableCell>
+                      <TableCell data-testid={`text-name-${request.id}`}>
+                        {request.fullName}
+                      </TableCell>
+                      <TableCell data-testid={`text-company-${request.id}`}>
+                        {request.companyName}
+                      </TableCell>
+                      <TableCell data-testid={`text-email-${request.id}`}>
+                        {request.email}
+                      </TableCell>
+                      <TableCell data-testid={`text-product-${request.id}`}>
+                        {request.productMakeModel}
+                      </TableCell>
+                      <TableCell data-testid={`text-status-${request.id}`}>
+                        <Badge variant={getRequestStatusColor(request.status)}>
+                          {request.status.toUpperCase()}
+                        </Badge>
+                      </TableCell>
+                      <TableCell data-testid={`text-date-${request.id}`}>
+                        {new Date(request.createdAt).toLocaleDateString()}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex gap-1">
+                          {request.status === "submitted" && (
+                            <>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                title="Approve request"
+                                onClick={() => handleRequestStatusChange(request.id, "approved")}
+                                disabled={updateRequestMutation.isPending}
+                                data-testid={`button-approve-${request.id}`}
+                              >
+                                <CheckCircle className="h-4 w-4 text-green-600" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                title="Decline request"
+                                onClick={() => handleRequestStatusChange(request.id, "declined")}
+                                disabled={updateRequestMutation.isPending}
+                                data-testid={`button-decline-request-${request.id}`}
+                              >
+                                <XCircle className="h-4 w-4 text-red-600" />
+                              </Button>
+                            </>
+                          )}
+                          {request.status !== "submitted" && (
+                            <span className="text-sm text-gray-500">
+                              {request.status === "approved" ? "Approved" : "Declined"}
+                            </span>
+                          )}
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            ) : (
+              <p className="text-center text-gray-500 py-8">No RMA requests found</p>
+            )}
+          </TabsContent>
+        </Tabs>
       </CardContent>
 
       {editingRma && (
