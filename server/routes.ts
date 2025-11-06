@@ -2509,5 +2509,304 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Gamification: User-facing endpoints
+  app.get("/api/gamification/score", isAuthenticated, async (req, res) => {
+    try {
+      const userId = (req.user as User).id;
+      const { scoringService } = await import("./scoring-service");
+      const scoreResult = await scoringService.calculateUserESGScore(userId);
+      res.json(scoreResult);
+    } catch (error) {
+      console.error("Error calculating ESG score:", error);
+      res.status(500).json({ error: "Failed to calculate ESG score" });
+    }
+  });
+
+  app.post("/api/gamification/calculate-score", isAuthenticated, async (req, res) => {
+    try {
+      const userId = (req.user as User).id;
+      const { scoringService } = await import("./scoring-service");
+      await scoringService.updateUserESGScore(userId);
+      const scoreResult = await scoringService.calculateUserESGScore(userId);
+      res.json(scoreResult);
+    } catch (error) {
+      console.error("Error updating ESG score:", error);
+      res.status(500).json({ error: "Failed to update ESG score" });
+    }
+  });
+
+  app.get("/api/gamification/achievements", isAuthenticated, async (req, res) => {
+    try {
+      const userId = (req.user as User).id;
+      const achievements = await storage.getUserAchievementProgressWithDetails(userId);
+      res.json(achievements);
+    } catch (error) {
+      console.error("Error fetching user achievements:", error);
+      res.status(500).json({ error: "Failed to fetch achievements" });
+    }
+  });
+
+  app.get("/api/gamification/milestones", isAuthenticated, async (req, res) => {
+    try {
+      const userId = (req.user as User).id;
+      const milestones = await storage.getUserMilestoneEventsWithDetails(userId);
+      res.json(milestones);
+    } catch (error) {
+      console.error("Error fetching user milestones:", error);
+      res.status(500).json({ error: "Failed to fetch milestones" });
+    }
+  });
+
+  app.get("/api/gamification/all-milestones", isAuthenticated, async (req, res) => {
+    try {
+      const milestones = await storage.getActiveGamificationMilestones();
+      res.json(milestones);
+    } catch (error) {
+      console.error("Error fetching all milestones:", error);
+      res.status(500).json({ error: "Failed to fetch milestones" });
+    }
+  });
+
+  app.get("/api/gamification/leaderboard", isAuthenticated, async (req, res) => {
+    try {
+      const limit = parseInt(req.query.limit as string) || 10;
+      const period = (req.query.period as string) || 'current';
+      const { scoringService } = await import("./scoring-service");
+      const leaderboard = await scoringService.getLeaderboard(limit, period);
+      res.json(leaderboard);
+    } catch (error) {
+      console.error("Error fetching leaderboard:", error);
+      res.status(500).json({ error: "Failed to fetch leaderboard" });
+    }
+  });
+
+  app.get("/api/gamification/benchmark", isAuthenticated, async (req, res) => {
+    try {
+      const userId = (req.user as User).id;
+      const { scoringService } = await import("./scoring-service");
+      const benchmark = await scoringService.getBenchmarkComparison(userId);
+      res.json(benchmark);
+    } catch (error) {
+      console.error("Error fetching benchmark:", error);
+      res.status(500).json({ error: "Failed to fetch benchmark" });
+    }
+  });
+
+  app.get("/api/gamification/tiers", isAuthenticated, async (req, res) => {
+    try {
+      const tiers = await storage.getActiveTiers();
+      res.json(tiers);
+    } catch (error) {
+      console.error("Error fetching tiers:", error);
+      res.status(500).json({ error: "Failed to fetch tiers" });
+    }
+  });
+
+  // Gamification: Admin endpoints - Tiers
+  app.get("/api/admin/gamification/tiers", requireAdmin, async (req, res) => {
+    try {
+      const tiers = await storage.getGamificationTiers();
+      res.json(tiers);
+    } catch (error) {
+      console.error("Error fetching all tiers:", error);
+      res.status(500).json({ error: "Failed to fetch tiers" });
+    }
+  });
+
+  app.get("/api/admin/gamification/tiers/:id", requireAdmin, async (req, res) => {
+    try {
+      const tier = await storage.getGamificationTier(parseInt(req.params.id));
+      if (!tier) {
+        return res.status(404).json({ error: "Tier not found" });
+      }
+      res.json(tier);
+    } catch (error) {
+      console.error("Error fetching tier:", error);
+      res.status(500).json({ error: "Failed to fetch tier" });
+    }
+  });
+
+  app.post("/api/admin/gamification/tiers", requireAdmin, async (req, res) => {
+    try {
+      const tier = await storage.createGamificationTier(req.body);
+      res.json(tier);
+    } catch (error) {
+      console.error("Error creating tier:", error);
+      res.status(500).json({ error: "Failed to create tier" });
+    }
+  });
+
+  app.put("/api/admin/gamification/tiers/:id", requireAdmin, async (req, res) => {
+    try {
+      const updated = await storage.updateGamificationTier(parseInt(req.params.id), req.body);
+      if (!updated) {
+        return res.status(404).json({ error: "Tier not found" });
+      }
+      res.json(updated);
+    } catch (error) {
+      console.error("Error updating tier:", error);
+      res.status(500).json({ error: "Failed to update tier" });
+    }
+  });
+
+  app.delete("/api/admin/gamification/tiers/:id", requireAdmin, async (req, res) => {
+    try {
+      await storage.deleteGamificationTier(parseInt(req.params.id));
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting tier:", error);
+      res.status(500).json({ error: "Failed to delete tier" });
+    }
+  });
+
+  // Gamification: Admin endpoints - Achievements
+  app.get("/api/admin/gamification/achievements", requireAdmin, async (req, res) => {
+    try {
+      const achievements = await storage.getGamificationAchievements();
+      res.json(achievements);
+    } catch (error) {
+      console.error("Error fetching all achievements:", error);
+      res.status(500).json({ error: "Failed to fetch achievements" });
+    }
+  });
+
+  app.get("/api/admin/gamification/achievements/:id", requireAdmin, async (req, res) => {
+    try {
+      const achievement = await storage.getGamificationAchievement(parseInt(req.params.id));
+      if (!achievement) {
+        return res.status(404).json({ error: "Achievement not found" });
+      }
+      res.json(achievement);
+    } catch (error) {
+      console.error("Error fetching achievement:", error);
+      res.status(500).json({ error: "Failed to fetch achievement" });
+    }
+  });
+
+  app.post("/api/admin/gamification/achievements", requireAdmin, async (req, res) => {
+    try {
+      const achievement = await storage.createGamificationAchievement(req.body);
+      res.json(achievement);
+    } catch (error) {
+      console.error("Error creating achievement:", error);
+      res.status(500).json({ error: "Failed to create achievement" });
+    }
+  });
+
+  app.put("/api/admin/gamification/achievements/:id", requireAdmin, async (req, res) => {
+    try {
+      const updated = await storage.updateGamificationAchievement(parseInt(req.params.id), req.body);
+      if (!updated) {
+        return res.status(404).json({ error: "Achievement not found" });
+      }
+      res.json(updated);
+    } catch (error) {
+      console.error("Error updating achievement:", error);
+      res.status(500).json({ error: "Failed to update achievement" });
+    }
+  });
+
+  app.delete("/api/admin/gamification/achievements/:id", requireAdmin, async (req, res) => {
+    try {
+      await storage.deleteGamificationAchievement(parseInt(req.params.id));
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting achievement:", error);
+      res.status(500).json({ error: "Failed to delete achievement" });
+    }
+  });
+
+  // Gamification: Admin endpoints - Milestones
+  app.get("/api/admin/gamification/milestones", requireAdmin, async (req, res) => {
+    try {
+      const milestones = await storage.getGamificationMilestones();
+      res.json(milestones);
+    } catch (error) {
+      console.error("Error fetching all milestones:", error);
+      res.status(500).json({ error: "Failed to fetch milestones" });
+    }
+  });
+
+  app.get("/api/admin/gamification/milestones/:id", requireAdmin, async (req, res) => {
+    try {
+      const milestone = await storage.getGamificationMilestone(parseInt(req.params.id));
+      if (!milestone) {
+        return res.status(404).json({ error: "Milestone not found" });
+      }
+      res.json(milestone);
+    } catch (error) {
+      console.error("Error fetching milestone:", error);
+      res.status(500).json({ error: "Failed to fetch milestone" });
+    }
+  });
+
+  app.post("/api/admin/gamification/milestones", requireAdmin, async (req, res) => {
+    try {
+      const milestone = await storage.createGamificationMilestone(req.body);
+      res.json(milestone);
+    } catch (error) {
+      console.error("Error creating milestone:", error);
+      res.status(500).json({ error: "Failed to create milestone" });
+    }
+  });
+
+  app.put("/api/admin/gamification/milestones/:id", requireAdmin, async (req, res) => {
+    try {
+      const updated = await storage.updateGamificationMilestone(parseInt(req.params.id), req.body);
+      if (!updated) {
+        return res.status(404).json({ error: "Milestone not found" });
+      }
+      res.json(updated);
+    } catch (error) {
+      console.error("Error updating milestone:", error);
+      res.status(500).json({ error: "Failed to update milestone" });
+    }
+  });
+
+  app.delete("/api/admin/gamification/milestones/:id", requireAdmin, async (req, res) => {
+    try {
+      await storage.deleteGamificationMilestone(parseInt(req.params.id));
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting milestone:", error);
+      res.status(500).json({ error: "Failed to delete milestone" });
+    }
+  });
+
+  // Gamification: Admin endpoints - Settings
+  app.get("/api/admin/gamification/settings", requireAdmin, async (req, res) => {
+    try {
+      const settings = await storage.getGamificationSettings();
+      res.json(settings);
+    } catch (error) {
+      console.error("Error fetching gamification settings:", error);
+      res.status(500).json({ error: "Failed to fetch gamification settings" });
+    }
+  });
+
+  app.get("/api/admin/gamification/settings/:key", requireAdmin, async (req, res) => {
+    try {
+      const setting = await storage.getGamificationSetting(req.params.key);
+      if (!setting) {
+        return res.status(404).json({ error: "Setting not found" });
+      }
+      res.json(setting);
+    } catch (error) {
+      console.error("Error fetching gamification setting:", error);
+      res.status(500).json({ error: "Failed to fetch gamification setting" });
+    }
+  });
+
+  app.put("/api/admin/gamification/settings/:key", requireAdmin, async (req, res) => {
+    try {
+      const { value, description } = req.body;
+      const setting = await storage.setGamificationSetting(req.params.key, value, description);
+      res.json(setting);
+    } catch (error) {
+      console.error("Error updating gamification setting:", error);
+      res.status(500).json({ error: "Failed to update gamification setting" });
+    }
+  });
+
   return httpServer;
 }
