@@ -1,1047 +1,721 @@
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Separator } from "@/components/ui/separator";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { Separator } from "@/components/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
-  Share, 
-  Download, 
-  X, 
-  Linkedin, 
-  Facebook, 
-  Instagram,
-  Mail,
-  Copy,
-  CheckCircle,
-  BarChart4,
+  Trophy, 
+  Award, 
+  TrendingUp, 
+  Users, 
+  Zap, 
+  Target,
+  Droplets,
   Leaf,
-  Users,
-  Droplets
+  Recycle,
+  Heart,
+  ChevronRight,
+  Crown,
+  Sparkles,
+  Star,
+  Lock
 } from "lucide-react";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { formatDate, formatEnvironmentalImpact } from "@/lib/utils";
-import carbonIcon from "@assets/Carbon Icon CC_1757609663969.png";
-import waterIcon from "@assets/CC_Icons_Weight increased-152_1759311752403.png";
-import waterDropletsIcon from "@assets/Minerals Saved Icon CC _1759311880681.png";
-import resourceIcon from "@assets/Resource Pres Icon CC_1757609742523.png";
+import { cn } from "@/lib/utils";
+
+interface ESGScoreData {
+  totalScore: number;
+  breakdown: {
+    carbon: number;
+    water: number;
+    resources: number;
+    social: number;
+  };
+  tierId: number | null;
+  tierName: string;
+  previousScore?: number;
+  scoreChange?: number;
+}
+
+interface TierData {
+  id: number;
+  name: string;
+  minScore: number;
+  maxScore: number | null;
+  colorAccent: string;
+  icon: string | null;
+  benefits: string[];
+  displayOrder: number;
+  isActive: boolean;
+}
+
+interface AchievementProgress {
+  id: number;
+  userId: number;
+  achievementId: number;
+  currentValue: string;
+  progressPercent: number;
+  isUnlocked: boolean;
+  unlockedAt: Date | null;
+  achievement: {
+    id: number;
+    code: string;
+    name: string;
+    description: string;
+    icon: string | null;
+    category: string;
+    thresholdType: string;
+    thresholdValue: string;
+    rewardPoints: number;
+  };
+}
+
+interface MilestoneData {
+  id: number;
+  tierId: number | null;
+  title: string;
+  description: string;
+  icon: string | null;
+  requiredScore: number | null;
+  orderIndex: number;
+  isActive: boolean;
+}
+
+interface UserMilestoneEvent {
+  id: number;
+  userId: number;
+  milestoneId: number;
+  reachedAt: Date;
+  milestone: MilestoneData;
+}
+
+interface ESGTarget {
+  id: number;
+  category: string;
+  title: string;
+  targetValue: string;
+  currentValue: string;
+  unit: string;
+  description?: string;
+  displayOrder: number;
+  isActive: boolean;
+}
+
+interface LeaderboardEntry {
+  rank: number;
+  userId: number;
+  name: string;
+  company?: string;
+  totalScore: number;
+  tier: string;
+  tierColor: string;
+  breakdown: {
+    carbon: number;
+    water: number;
+    resources: number;
+    social: number;
+  };
+}
+
+interface BenchmarkData {
+  userScore: number;
+  averageScore: number;
+  percentile: number;
+  rank: number;
+  totalUsers: number;
+}
+
+interface ImpactData {
+  carbonSaved: number;
+  waterProvided: number;
+  mineralsSaved: number;
+  familiesHelped: number;
+  treesEquivalent: number;
+}
+
+interface UserData {
+  id: number;
+  name: string;
+  email: string;
+}
 
 export default function ESGReport() {
   const { toast } = useToast();
-  const [shareDialogOpen, setShareDialogOpen] = useState(false);
-  const [activeShareOption, setActiveShareOption] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState("overview");
-  
-  // Fetch user impact data
-  const { data: impact, isLoading: isImpactLoading } = useQuery({
-    queryKey: ["/api/impact"],
-  });
 
-  // Fetch user data
-  const { data: user, isLoading: isUserLoading } = useQuery({
+  const { data: user } = useQuery<UserData>({
     queryKey: ["/api/auth/me"],
   });
 
-  // Fetch key performance insights (admin-configured)
-  const { data: keyInsights, isLoading: isKeyInsightsLoading } = useQuery({
-    queryKey: ["/api/key-insights"],
+  const { data: scoreData, isLoading: isScoreLoading } = useQuery<ESGScoreData>({
+    queryKey: ["/api/gamification/score"],
   });
 
-  // Fetch organizational metrics
-  const { data: orgMetrics, isLoading: isOrgMetricsLoading } = useQuery<any[]>({
-    queryKey: ["/api/organizational-metrics"],
+  const { data: tiers } = useQuery<TierData[]>({
+    queryKey: ["/api/gamification/tiers"],
   });
 
-  // Fetch ESG targets (admin-configured goals)
-  const { data: esgTargets, isLoading: isEsgTargetsLoading } = useQuery<any[]>({
+  const { data: achievements } = useQuery<AchievementProgress[]>({
+    queryKey: ["/api/gamification/achievements"],
+  });
+
+  const { data: milestones } = useQuery<MilestoneData[]>({
+    queryKey: ["/api/gamification/all-milestones"],
+  });
+
+  const { data: userMilestones } = useQuery<UserMilestoneEvent[]>({
+    queryKey: ["/api/gamification/milestones"],
+  });
+
+  const { data: leaderboardData } = useQuery<LeaderboardEntry[]>({
+    queryKey: ["/api/gamification/leaderboard"],
+  });
+
+  const { data: benchmarkData } = useQuery<BenchmarkData>({
+    queryKey: ["/api/gamification/benchmark"],
+  });
+
+  const { data: esgTargets } = useQuery<ESGTarget[]>({
     queryKey: ["/api/esg-targets"],
   });
 
-  // Helper function to get organizational metric value
-  const getOrgMetric = (key: string): number => {
-    const metric = orgMetrics?.find(m => m.metricKey === key);
-    return metric ? parseFloat(metric.metricValue) || 0 : 0;
-  };
+  const { data: impact } = useQuery<ImpactData>({
+    queryKey: ["/api/impact"],
+  });
 
-  // Get the current date for the report generation timestamp
-  const reportDate = new Date();
-  
-  // Generate time periods for historical view
-  const currentYear = reportDate.getFullYear();
-  const currentMonth = reportDate.getMonth();
-  const periods = [
-    { label: "Current Quarter", startDate: new Date(currentYear, Math.floor(currentMonth / 3) * 3, 1) },
-    { label: "Year to Date", startDate: new Date(currentYear, 0, 1) },
-    { label: "Last 12 Months", startDate: new Date(currentYear, currentMonth - 11, 1) },
-    { label: "All Time", startDate: new Date(currentYear - 5, 0, 1) }
-  ];
-
-  // Handle share link copy
-  const handleCopyLink = () => {
-    const shareUrl = `${window.location.origin}/share/impact?company=${encodeURIComponent(user?.company || '')}&id=${user?.id}`;
-    navigator.clipboard.writeText(shareUrl);
-    setActiveShareOption("copy");
-    toast({
-      title: "Link Copied!",
-      description: "Share link has been copied to your clipboard",
-    });
-    
-    // Reset the active state after 2 seconds
-    setTimeout(() => {
-      setActiveShareOption(null);
-    }, 2000);
-  };
-
-  // Handle social media sharing
-  const handleShare = (platform: string) => {
-    const shareUrl = `${window.location.origin}/share/impact?company=${encodeURIComponent(user?.company || '')}&id=${user?.id}`;
-    const shareTitle = `${user?.company}'s Environmental Impact with Circular Computing`;
-    const shareText = `Check out how ${user?.company} is making a positive impact on the environment through sustainable IT practices with Circular Computing.`;
-    
-    let shareLink = '';
-    
-    switch (platform) {
-      case 'twitter':
-        shareLink = `https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`;
-        break;
-      case 'linkedin':
-        shareLink = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}&title=${encodeURIComponent(shareTitle)}&summary=${encodeURIComponent(shareText)}`;
-        break;
-      case 'facebook':
-        shareLink = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(shareText)}`;
-        break;
-      case 'email':
-        shareLink = `mailto:?subject=${encodeURIComponent(shareTitle)}&body=${encodeURIComponent(shareText + '\n\n' + shareUrl)}`;
-        break;
-    }
-    
-    setActiveShareOption(platform);
-    
-    // Open the share link in a new window
-    if (shareLink) {
-      window.open(shareLink, '_blank');
-    }
-    
-    // Reset the active state after 2 seconds
-    setTimeout(() => {
-      setActiveShareOption(null);
-    }, 2000);
-  };
-
-  // Calculate ESG goals based on actual user data and targets
-  const esgGoals = [
-    { 
-      category: "Environmental", 
-      goals: [
-        { 
-          id: 1, 
-          title: "Carbon Emissions Reduction", 
-          target: `${Math.round((impact?.productCount || 0) * 1.5)} units target`, 
-          progress: Math.min(100, Math.round(((impact?.productCount || 0) / ((impact?.productCount || 1) * 1.5)) * 100)), 
-          description: `Currently deployed ${impact?.productCount || 0} remanufactured units, reducing ${formatEnvironmentalImpact(impact?.totalImpact?.carbonSaved || 0, "g")} of carbon emissions`
-        },
-        { 
-          id: 2, 
-          title: "E-waste Diversion", 
-          target: `${Math.round((impact?.productCount || 0) * 2.5)} kg target`, 
-          progress: Math.min(100, Math.round((((impact?.productCount || 0) * 2.5) / (((impact?.productCount || 1) * 2.5) * 1.3)) * 100)), 
-          description: `Diverted ${Math.round(((impact?.productCount || 0) * 2.5) * 10) / 10} kg of e-waste from landfills through circular economy practices`
-        },
-        { 
-          id: 3, 
-          title: "Water Conservation Impact", 
-          target: `${Math.round((impact?.totalImpact?.familiesHelped || 0) * 1.4)} families target`, 
-          progress: Math.min(100, Math.round(((impact?.totalImpact?.familiesHelped || 0) / ((impact?.totalImpact?.familiesHelped || 1) * 1.4)) * 100)), 
-          description: `Providing clean water access to ${impact?.totalImpact?.familiesHelped || 0} families through sustainable IT purchases`
-        }
-      ]
+  const calculateScoreMutation = useMutation({
+    mutationFn: async () => {
+      const res = await fetch("/api/gamification/calculate-score", {
+        method: "POST",
+        credentials: "include"
+      });
+      if (!res.ok) throw new Error("Failed to calculate score");
+      return res.json();
     },
-    { 
-      category: "Social", 
-      goals: [
-        { 
-          id: 4, 
-          title: "Technology Access", 
-          target: `Support ${Math.round((impact?.productCount || 0) * 0.2)} people`, 
-          progress: Math.min(100, Math.round((((impact?.productCount || 0) * 0.2) / (((impact?.productCount || 1) * 0.2) * 1.5)) * 100)), 
-          description: `Extending technology lifecycle benefits ${Math.round((impact?.productCount || 0) * 0.2)} individuals through remanufactured devices`
-        },
-        { 
-          id: 5, 
-          title: "Ethical Supply Chain", 
-          target: "100% TCO Certified products", 
-          progress: 100, 
-          description: "All Circular Computing products meet TCO Certified criteria for social and environmental responsibility"
-        }
-      ]
-    },
-    { 
-      category: "Governance", 
-      goals: [
-        { 
-          id: 6, 
-          title: "Sustainability Reporting", 
-          target: "Regular ESG impact tracking", 
-          progress: 100, 
-          description: "Continuous monitoring and transparent reporting on environmental and social impact metrics"
-        },
-        { 
-          id: 7, 
-          title: "Sustainable Procurement", 
-          target: `${impact?.productCount || 0}+ sustainable devices`, 
-          progress: 100, 
-          description: `Achieved ${impact?.productCount || 0} remanufactured device deployments, prioritizing circular economy vendors`
-        }
-      ]
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/gamification/score"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/gamification/achievements"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/gamification/milestones"] });
+      toast({
+        title: "Score Updated",
+        description: "Your ESG score has been recalculated successfully."
+      });
     }
-  ];
-  
-  // Shareable impact cards based on user's impact data
-  const getShareableCards = () => {
-    if (!impact || isImpactLoading) return [];
-    
-    return [
-      {
-        id: "carbon",
-        title: "Total Carbon Saved",
-        value: impact.totalImpact?.carbonSaved || 0,
-        unit: "kg CO₂e",
-        icon: <img src={carbonIcon} alt="Carbon Icon" className="w-6 h-6" />,
-        color: "text-[#08ABAB]",
-        bgColor: "bg-[#08ABAB]/10"
-      },
-      {
-        id: "water",
-        title: "Clean Water Provided",
-        value: impact.totalImpact?.familiesHelped || 0,
-        unit: "families",
-        icon: <img src={waterIcon} alt="Water Icon" className="w-6 h-6" />,
-        color: "text-[#305269]",
-        bgColor: "bg-[#305269]/10"
-      },
-      {
-        id: "minerals",
-        title: "Resources Preserved",
-        value: impact.totalImpact?.mineralsSaved || 0,
-        unit: "kg",
-        icon: <img src={resourceIcon} alt="Resource Icon" className="w-6 h-6" />,
-        color: "text-[#FF9E1C]",
-        bgColor: "bg-[#FF9E1C]/10"
-      },
-      {
-        id: "waterSaved",
-        title: "Litres of Water Saved",
-        value: impact.totalImpact?.waterSaved || 0,
-        unit: "litres",
-        icon: <img src={waterDropletsIcon} alt="Water Icon" className="w-6 h-6" />,
-        color: "text-[#08ABAB]",
-        bgColor: "bg-[#08ABAB]/10"
-      }
-    ];
-  };
+  });
 
-  const shareableCards = getShareableCards();
+  const currentTier = tiers?.find((t: any) => t.name === scoreData?.tierName);
+  const nextTier = tiers?.find((t: any) => 
+    t.minScore > (scoreData?.totalScore || 0)
+  );
 
-  // If still loading data
-  if (isImpactLoading || isUserLoading) {
+  const progressToNextTier = nextTier 
+    ? Math.round(((scoreData?.totalScore || 0) / nextTier.minScore) * 100)
+    : 100;
+
+  const unlockedAchievements = achievements?.filter((a: any) => a.isUnlocked) || [];
+  const lockedAchievements = achievements?.filter((a: any) => !a.isUnlocked) || [];
+
+  const reachedMilestoneIds = userMilestones?.map((m: any) => m.milestoneId) || [];
+  const sortedMilestones = milestones?.sort((a: any, b: any) => a.orderIndex - b.orderIndex) || [];
+
+  if (isScoreLoading) {
     return (
-      <div className="py-6 px-4 md:px-8 max-w-7xl mx-auto">
-        <div className="flex flex-col gap-2 mb-6">
-          <div className="h-8 w-64 bg-neutral-200 rounded animate-pulse" />
-          <div className="h-5 w-96 bg-neutral-200 rounded animate-pulse" />
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading your impact journey...</p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="h-48 bg-neutral-200 rounded animate-pulse" />
-          ))}
-        </div>
-        <div className="h-96 bg-neutral-200 rounded animate-pulse" />
       </div>
     );
   }
 
   return (
-    <div className="py-6 px-4 md:px-8 max-w-7xl mx-auto">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-bold font-poppins text-neutral-900">Sustainability ESG Report</h1>
-          <p className="text-neutral-600">
-            Track your organization's environmental and social governance metrics
-          </p>
-        </div>
-        <div className="mt-4 md:mt-0 flex gap-2">
-          <Button variant="outline" className="flex items-center gap-2">
-            <Download className="h-4 w-4" />
-            <span>Download Report</span>
-          </Button>
-          <Dialog open={shareDialogOpen} onOpenChange={setShareDialogOpen}>
-            <DialogTrigger asChild>
-              <Button variant="outline" className="flex items-center gap-2">
-                <Share className="h-4 w-4" />
-                <span>Share Report</span>
+    <div className="container mx-auto py-8 px-4 max-w-7xl">
+      {/* Hero Section - Tier Badge & Score */}
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary/10 via-primary/5 to-background border border-primary/20 p-8 md:p-12 mb-8">
+        <div className="absolute inset-0 bg-grid-white/5 [mask-image:linear-gradient(0deg,transparent,black)]"></div>
+        
+        <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+          <div className="flex-1 text-center md:text-left">
+            <div className="flex items-center gap-3 mb-4 justify-center md:justify-start">
+              <Badge 
+                className="text-lg px-4 py-2 font-semibold"
+                style={{ 
+                  backgroundColor: currentTier?.colorAccent || '#08ABAB',
+                  borderColor: currentTier?.colorAccent || '#08ABAB'
+                }}
+                data-testid="tier-badge"
+              >
+                <Crown className="w-5 h-5 mr-2" />
+                {scoreData?.tierName || 'Explorer'}
+              </Badge>
+              {scoreData?.scoreChange && scoreData.scoreChange > 0 && (
+                <Badge variant="secondary" className="gap-1" data-testid="score-change">
+                  <TrendingUp className="w-4 h-4" />
+                  +{scoreData.scoreChange}
+                </Badge>
+              )}
+            </div>
+            
+            <h1 className="text-4xl md:text-5xl font-bold mb-2" data-testid="user-name">
+              Welcome back, {user?.name?.split(' ')[0] || 'Champion'}!
+            </h1>
+            <p className="text-xl text-muted-foreground mb-6">
+              Your environmental impact is making a real difference
+            </p>
+
+            <div className="flex flex-wrap gap-4 justify-center md:justify-start">
+              <Button 
+                onClick={() => calculateScoreMutation.mutate()}
+                disabled={calculateScoreMutation.isPending}
+                data-testid="button-refresh-score"
+              >
+                <Sparkles className="w-4 h-4 mr-2" />
+                {calculateScoreMutation.isPending ? "Calculating..." : "Refresh Score"}
               </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Share Your Impact</DialogTitle>
-                <DialogDescription>
-                  Showcase your organization's sustainability achievements with your team and network
-                </DialogDescription>
-              </DialogHeader>
-              
-              <div className="py-4">
-                <h3 className="text-sm font-medium mb-3">Choose what to share:</h3>
-                <div className="grid grid-cols-1 gap-3">
-                  {shareableCards.map(card => (
-                    <div key={card.id} className="flex items-center p-3 border rounded-lg">
-                      <div className={`h-10 w-10 rounded-full ${card.bgColor} flex items-center justify-center ${card.color} mr-3`}>
-                        {card.icon}
+            </div>
+          </div>
+
+          {/* Score Dial */}
+          <div className="relative">
+            <div className="relative w-48 h-48 md:w-56 md:h-56">
+              <svg className="w-full h-full transform -rotate-90">
+                <circle
+                  cx="50%"
+                  cy="50%"
+                  r="45%"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="8"
+                  className="text-muted/20"
+                />
+                <circle
+                  cx="50%"
+                  cy="50%"
+                  r="45%"
+                  fill="none"
+                  stroke={currentTier?.colorAccent || '#08ABAB'}
+                  strokeWidth="8"
+                  strokeDasharray={`${progressToNextTier * 2.83} 283`}
+                  strokeLinecap="round"
+                  className="transition-all duration-1000 ease-out"
+                  style={{
+                    filter: `drop-shadow(0 0 8px ${currentTier?.colorAccent || '#08ABAB'}40)`
+                  }}
+                />
+              </svg>
+              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <p className="text-5xl font-bold" data-testid="total-score">{scoreData?.totalScore || 0}</p>
+                <p className="text-sm text-muted-foreground">ESG Score</p>
+              </div>
+            </div>
+            {nextTier && (
+              <p className="text-center mt-4 text-sm text-muted-foreground">
+                {nextTier.minScore - (scoreData?.totalScore || 0)} points to {nextTier.name}
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <Tabs defaultValue="impact" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-4 lg:w-auto lg:inline-grid" data-testid="tabs-navigation">
+          <TabsTrigger value="impact" data-testid="tab-impact">
+            <Target className="w-4 h-4 mr-2" />
+            Impact
+          </TabsTrigger>
+          <TabsTrigger value="achievements" data-testid="tab-achievements">
+            <Trophy className="w-4 h-4 mr-2" />
+            Achievements
+          </TabsTrigger>
+          <TabsTrigger value="journey" data-testid="tab-journey">
+            <Award className="w-4 h-4 mr-2" />
+            Journey
+          </TabsTrigger>
+          <TabsTrigger value="leaderboard" data-testid="tab-leaderboard">
+            <Users className="w-4 h-4 mr-2" />
+            Leaderboard
+          </TabsTrigger>
+        </TabsList>
+
+        {/* Impact Pillars Tab */}
+        <TabsContent value="impact" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Target className="w-5 h-5" />
+                Your Environmental Impact
+              </CardTitle>
+              <CardDescription>
+                Track your progress across key sustainability pillars
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Carbon Pillar */}
+                <div className="space-y-3" data-testid="pillar-carbon">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 rounded-lg bg-green-500/10">
+                        <Leaf className="w-5 h-5 text-green-600" />
                       </div>
-                      <div className="flex-1">
-                        <h4 className="font-medium">{card.title}</h4>
-                        <p className="text-sm text-neutral-600">
-                          {formatEnvironmentalImpact(card.value, card.unit)}
+                      <div>
+                        <h3 className="font-semibold">Carbon Saved</h3>
+                        <p className="text-2xl font-bold" data-testid="value-carbon">
+                          {((impact?.carbonSaved ?? 0) / 1000).toFixed(2)} kg
                         </p>
                       </div>
-                      <input type="checkbox" className="h-4 w-4" defaultChecked />
                     </div>
-                  ))}
-                </div>
-                
-                <Separator className="my-4" />
-                
-                <h3 className="text-sm font-medium mb-3">Share via:</h3>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                  <Button 
-                    variant="outline" 
-                    className="flex flex-col items-center justify-center h-20 gap-2"
-                    onClick={() => handleShare('twitter')}
-                  >
-                    <X className={`h-5 w-5 ${activeShareOption === 'twitter' ? 'text-primary' : 'text-neutral-600'}`} />
-                    <span className="text-xs">X</span>
-                  </Button>
-                  
-                  <Button 
-                    variant="outline" 
-                    className="flex flex-col items-center justify-center h-20 gap-2"
-                    onClick={() => handleShare('linkedin')}
-                  >
-                    <Linkedin className={`h-5 w-5 ${activeShareOption === 'linkedin' ? 'text-primary' : 'text-neutral-600'}`} />
-                    <span className="text-xs">LinkedIn</span>
-                  </Button>
-                  
-                  <Button 
-                    variant="outline" 
-                    className="flex flex-col items-center justify-center h-20 gap-2"
-                    onClick={() => handleShare('facebook')}
-                  >
-                    <Facebook className={`h-5 w-5 ${activeShareOption === 'facebook' ? 'text-primary' : 'text-neutral-600'}`} />
-                    <span className="text-xs">Facebook</span>
-                  </Button>
-                  
-                  <Button 
-                    variant="outline" 
-                    className="flex flex-col items-center justify-center h-20 gap-2"
-                    onClick={() => handleShare('instagram')}
-                  >
-                    <Instagram className={`h-5 w-5 ${activeShareOption === 'instagram' ? 'text-primary' : 'text-neutral-600'}`} />
-                    <span className="text-xs">Instagram</span>
-                  </Button>
-                  
-                  <Button 
-                    variant="outline" 
-                    className="flex flex-col items-center justify-center h-20 gap-2"
-                    onClick={() => handleShare('email')}
-                  >
-                    <Mail className={`h-5 w-5 ${activeShareOption === 'email' ? 'text-primary' : 'text-neutral-600'}`} />
-                    <span className="text-xs">Email</span>
-                  </Button>
-                </div>
-                
-                <Separator className="my-4" />
-                
-                <div className="flex items-center justify-between rounded-lg border p-3">
-                  <div className="truncate flex-1 text-sm">
-                    {`${window.location.origin}/share/impact?company=${encodeURIComponent(user?.company || '')}&id=${user?.id}`}
+                    <div className="text-right">
+                      <p className="text-sm text-muted-foreground">Score</p>
+                      <p className="text-lg font-semibold text-green-600" data-testid="score-carbon">
+                        {scoreData?.breakdown?.carbon || 0}
+                      </p>
+                    </div>
                   </div>
-                  <Button 
-                    variant="ghost" 
-                    size="sm"
-                    onClick={handleCopyLink}
-                    className="ml-2"
-                  >
-                    {activeShareOption === 'copy' ? (
-                      <CheckCircle className="h-4 w-4 text-green-600" />
-                    ) : (
-                      <Copy className="h-4 w-4" />
-                    )}
-                  </Button>
+                  {esgTargets?.find((t: any) => t.category === 'environmental' && t.title.toLowerCase().includes('carbon')) && (
+                    <Progress 
+                      value={Math.min(((impact?.carbonSaved ?? 0) / parseFloat(esgTargets.find((t: any) => t.category === 'environmental' && t.title.toLowerCase().includes('carbon'))?.targetValue || '1')) * 100, 100)} 
+                      className="h-2"
+                    />
+                  )}
+                </div>
+
+                {/* Water Pillar */}
+                <div className="space-y-3" data-testid="pillar-water">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 rounded-lg bg-blue-500/10">
+                        <Droplets className="w-5 h-5 text-blue-600" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold">Families Helped</h3>
+                        <p className="text-2xl font-bold" data-testid="value-families">
+                          {impact?.familiesHelped ?? 0}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm text-muted-foreground">Score</p>
+                      <p className="text-lg font-semibold text-blue-600" data-testid="score-water">
+                        {scoreData?.breakdown?.water || 0}
+                      </p>
+                    </div>
+                  </div>
+                  {esgTargets?.find((t: any) => t.category === 'social') && (
+                    <Progress 
+                      value={Math.min(((impact?.familiesHelped ?? 0) / parseFloat(esgTargets.find((t: any) => t.category === 'social')?.targetValue || '1')) * 100, 100)} 
+                      className="h-2"
+                    />
+                  )}
+                </div>
+
+                {/* Resources Pillar */}
+                <div className="space-y-3" data-testid="pillar-resources">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 rounded-lg bg-purple-500/10">
+                        <Recycle className="w-5 h-5 text-purple-600" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold">Minerals Saved</h3>
+                        <p className="text-2xl font-bold" data-testid="value-minerals">
+                          {((impact?.mineralsSaved ?? 0) / 1000).toFixed(2)} kg
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm text-muted-foreground">Score</p>
+                      <p className="text-lg font-semibold text-purple-600" data-testid="score-resources">
+                        {scoreData?.breakdown?.resources || 0}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Social Pillar */}
+                <div className="space-y-3" data-testid="pillar-social">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 rounded-lg bg-pink-500/10">
+                        <Heart className="w-5 h-5 text-pink-600" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold">Social Impact</h3>
+                        <p className="text-2xl font-bold" data-testid="value-water-provided">
+                          {(impact?.waterProvided ?? 0).toLocaleString()} L
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm text-muted-foreground">Score</p>
+                      <p className="text-lg font-semibold text-pink-600" data-testid="score-social">
+                        {scoreData?.breakdown?.social || 0}
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
-              
-              <DialogFooter>
-                <Button onClick={() => setShareDialogOpen(false)}>Done</Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-        </div>
-      </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
-      {/* Report Header with key metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <Card className="bg-white">
-          <CardContent className="p-4">
-            <div className="flex items-start">
-              <div className="h-12 w-12 rounded-full bg-[#08ABAB]/10 flex items-center justify-center text-[#08ABAB] mr-3">
-                <img src={carbonIcon} alt="Carbon Icon" className="w-6 h-6" />
-              </div>
-              <div>
-                <p className="text-neutral-600 text-sm">Total Carbon Saved</p>
-                <h3 className="text-2xl font-bold mt-1">
-                  {formatEnvironmentalImpact(impact.totalImpact?.carbonSaved || 0, "g")}
-                </h3>
-                <p className="text-xs text-[#08ABAB] mt-1">
-                  Equivalent to {Math.round((impact.totalImpact?.treesEquivalent || 0) * 100) / 100} trees planted
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-white">
-          <CardContent className="p-4">
-            <div className="flex items-start">
-              <div className="h-12 w-12 rounded-full bg-[#305269]/10 flex items-center justify-center text-[#305269] mr-3">
-                <img src={waterIcon} alt="Water Icon" className="w-6 h-6" />
-              </div>
-              <div>
-                <p className="text-neutral-600 text-sm">Clean Water Provided</p>
-                <h3 className="text-2xl font-bold mt-1">
-                  {formatEnvironmentalImpact(impact.totalImpact?.waterProvided || 0, "litres")}
-                </h3>
-                <p className="text-xs text-[#305269] mt-1">
-                  Figure for 1 week supply per family
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-white">
-          <CardContent className="p-4">
-            <div className="flex items-start">
-              <div className="h-12 w-12 rounded-full bg-[#FF9E1C]/10 flex items-center justify-center text-[#FF9E1C] mr-3">
-                <img src={resourceIcon} alt="Resource Icon" className="w-6 h-6" />
-              </div>
-              <div>
-                <p className="text-neutral-600 text-sm">Resources Preserved</p>
-                <h3 className="text-2xl font-bold mt-1">
-                  {formatEnvironmentalImpact(impact.totalImpact?.mineralsSaved || 0, "g")}
-                </h3>
-                <p className="text-xs text-[#FF9E1C] mt-1">
-                  Through remanufactured technology adoption
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-white">
-          <CardContent className="p-4">
-            <div className="flex items-start">
-              <div className="h-12 w-12 rounded-full bg-[#08ABAB]/10 flex items-center justify-center text-[#08ABAB] mr-3">
-                <img src={waterDropletsIcon} alt="Water Icon" className="w-6 h-6" />
-              </div>
-              <div>
-                <p className="text-neutral-600 text-sm">Litres of Water Saved</p>
-                <h3 className="text-2xl font-bold mt-1">
-                  {formatEnvironmentalImpact(impact.totalImpact?.waterSaved || 0, "litres")}
-                </h3>
-                <p className="text-xs text-[#08ABAB] mt-1">
-                  Water conservation through reuse
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Report Content Tabs */}
-      <Card className="mb-6">
-        <CardHeader className="pb-2">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-            <div>
-              <CardTitle>ESG Performance Report</CardTitle>
+        {/* Achievements Tab */}
+        <TabsContent value="achievements" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Trophy className="w-5 h-5" />
+                Achievement Showcase
+              </CardTitle>
               <CardDescription>
-                {user?.company} • Generated on {formatDate(reportDate)}
+                {unlockedAchievements.length} of {achievements?.length || 0} achievements unlocked
               </CardDescription>
-            </div>
-            <Badge variant="outline" className="mt-2 md:mt-0">
-              Report ID: ESG-{user?.id}-{reportDate.getFullYear()}{(reportDate.getMonth() + 1).toString().padStart(2, '0')}
-            </Badge>
-          </div>
-        </CardHeader>
-
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <CardContent className="pb-0">
-            <TabsList className="grid grid-cols-3 w-full">
-              <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="goals">ESG Goals</TabsTrigger>
-              <TabsTrigger value="history">Historical View</TabsTrigger>
-            </TabsList>
-          </CardContent>
-
-          <TabsContent value="overview" className="p-6">
-            <div className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="md:col-span-2">
-                  <h3 className="text-lg font-semibold mb-3">Executive Summary</h3>
-                  <p className="text-neutral-700 mb-4">
-                    {user?.company} has demonstrated a significant commitment to environmental sustainability through the adoption of remanufactured technology solutions from Circular Computing. This report outlines the quantifiable environmental benefits achieved, as well as social and governance initiatives.
-                  </p>
-                  <p className="text-neutral-700 mb-4">
-                    By extending the lifecycle of IT equipment through remanufacturing, {user?.company} has contributed to the circular economy, reduced carbon emissions, conserved natural resources, and supported clean water initiatives in communities facing water scarcity.
-                  </p>
+            </CardHeader>
+            <CardContent>
+              {/* Unlocked Achievements */}
+              {unlockedAchievements.length > 0 && (
+                <div className="mb-8">
+                  <h3 className="font-semibold mb-4 flex items-center gap-2">
+                    <Star className="w-4 h-4 text-yellow-500" />
+                    Unlocked
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {unlockedAchievements.map((achievement: any) => (
+                      <Card 
+                        key={achievement.id} 
+                        className="border-primary/50 bg-gradient-to-br from-primary/5 to-background"
+                        data-testid={`achievement-unlocked-${achievement.achievement.code}`}
+                      >
+                        <CardContent className="pt-6">
+                          <div className="flex items-start gap-3">
+                            <div className="p-2 rounded-lg bg-primary/10">
+                              <Award className="w-6 h-6 text-primary" />
+                            </div>
+                            <div className="flex-1">
+                              <h4 className="font-semibold mb-1">{achievement.achievement.name}</h4>
+                              <p className="text-sm text-muted-foreground mb-2">
+                                {achievement.achievement.description}
+                              </p>
+                              <Badge variant="secondary" className="text-xs">
+                                +{achievement.achievement.rewardPoints} points
+                              </Badge>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
                 </div>
-                
+              )}
+
+              {/* Locked Achievements */}
+              {lockedAchievements.length > 0 && (
                 <div>
-                  <h3 className="text-lg font-semibold mb-3">UN SDG Alignment</h3>
-                  <div className="border rounded-md p-4 space-y-3">
-                    <div>
-                      <div className="flex items-center">
-                        <img src="https://sdgs.un.org/sites/default/files/goals/E_SDG_Icons-12.jpg" alt="SDG 12" className="h-10 w-10 mr-2" />
-                        <h4 className="font-semibold">SDG 12</h4>
-                      </div>
-                      <p className="text-sm text-neutral-700 mt-1">Responsible Consumption and Production</p>
-                    </div>
-                    <div>
-                      <div className="flex items-center">
-                        <img src="https://sdgs.un.org/sites/default/files/goals/E_SDG_Icons-13.jpg" alt="SDG 13" className="h-10 w-10 mr-2" />
-                        <h4 className="font-semibold">SDG 13</h4>
-                      </div>
-                      <p className="text-sm text-neutral-700 mt-1">Climate Action</p>
-                    </div>
-                    <div>
-                      <div className="flex items-center">
-                        <img src="https://sdgs.un.org/sites/default/files/goals/E_SDG_Icons-06.jpg" alt="SDG 6" className="h-10 w-10 mr-2" />
-                        <h4 className="font-semibold">SDG 6</h4>
-                      </div>
-                      <p className="text-sm text-neutral-700 mt-1">Clean Water and Sanitation</p>
-                    </div>
-                  </div>
-                  
-                  <div className="mt-4 border rounded-md p-4">
-                    <h4 className="font-semibold mb-2">TCO Certified</h4>
-                    <p className="text-sm text-neutral-700">
-                      All deployed Circular Computing products meet TCO Certified criteria for social and environmental responsibility.
-                    </p>
+                  <h3 className="font-semibold mb-4 flex items-center gap-2">
+                    <Lock className="w-4 h-4" />
+                    In Progress
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {lockedAchievements.slice(0, 6).map((achievement: any) => (
+                      <Card 
+                        key={achievement.id} 
+                        className="opacity-75"
+                        data-testid={`achievement-locked-${achievement.achievement.code}`}
+                      >
+                        <CardContent className="pt-6">
+                          <div className="flex items-start gap-3">
+                            <div className="p-2 rounded-lg bg-muted">
+                              <Lock className="w-6 h-6 text-muted-foreground" />
+                            </div>
+                            <div className="flex-1">
+                              <h4 className="font-semibold mb-1">{achievement.achievement.name}</h4>
+                              <p className="text-sm text-muted-foreground mb-3">
+                                {achievement.achievement.description}
+                              </p>
+                              <Progress value={achievement.progressPercent} className="h-2 mb-2" />
+                              <p className="text-xs text-muted-foreground">
+                                {achievement.progressPercent}% complete
+                              </p>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
                   </div>
                 </div>
-              </div>
-              
-              <Separator />
-              
-              <div>
-                <h3 className="text-lg font-semibold mb-3">Key Performance Highlights</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {/* Display user's actual product count */}
-                  <div className="border rounded-md p-4">
-                    <p className="text-sm text-neutral-600">Remanufactured Units Deployed</p>
-                    <h4 className="text-xl font-semibold mt-1">{impact?.productCount || 0} units</h4>
-                  </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Journey/Milestones Tab */}
+        <TabsContent value="journey" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Award className="w-5 h-5" />
+                Your Sustainability Journey
+              </CardTitle>
+              <CardDescription>
+                Track your progress through key milestones
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="relative space-y-8">
+                {sortedMilestones.map((milestone: any, index: number) => {
+                  const isReached = reachedMilestoneIds.includes(milestone.id);
+                  const isNext = !isReached && !sortedMilestones.slice(0, index).some((m: any) => !reachedMilestoneIds.includes(m.id));
                   
-                  {/* Display user's actual calculated e-waste diversion */}
-                  <div className="border rounded-md p-4">
-                    <p className="text-sm text-neutral-600">E-Waste Diverted</p>
-                    <h4 className="text-xl font-semibold mt-1">{Math.round(((impact?.productCount || 0) * 2.5) * 10) / 10} kg</h4>
-                  </div>
-                  
-                  {/* Display user's actual calculated average carbon per device */}
-                  <div className="border rounded-md p-4">
-                    <p className="text-sm text-neutral-600">Average Carbon Footprint Reduction</p>
-                    <h4 className="text-xl font-semibold mt-1">
-                      {impact?.productCount ? Math.round(((impact.totalImpact?.carbonSaved || 0) / 1000) / impact.productCount) : 0} kg CO₂e per device
-                    </h4>
-                  </div>
-                  
-                  {/* Display user's social impact calculated from families helped */}
-                  <div className="border rounded-md p-4">
-                    <p className="text-sm text-neutral-600">Families Helped with Clean Water</p>
-                    <h4 className="text-xl font-semibold mt-1">
-                      {impact?.totalImpact?.familiesHelped || 0} families
-                    </h4>
-                  </div>
-                  
-                  {/* Display admin-configured key insights */}
-                  {keyInsights && keyInsights.length > 0 && keyInsights
-                    .filter((insight: any) => insight.isActive)
-                    .slice(0, 4)
-                    .map((insight: any) => (
-                      <div key={insight.id} className="border rounded-md p-4 bg-gradient-to-br from-teal-50 to-cyan-50">
-                        <p className="text-sm text-neutral-600">{insight.metricName}</p>
-                        <h4 className="text-xl font-semibold mt-1 text-teal-700">
-                          {insight.metricValue} {insight.metricUnit || ""}
-                        </h4>
-                        {insight.description && (
-                          <p className="text-xs text-neutral-500 mt-1">{insight.description}</p>
+                  return (
+                    <div 
+                      key={milestone.id} 
+                      className="flex gap-4 relative"
+                      data-testid={`milestone-${milestone.id}`}
+                    >
+                      {index < sortedMilestones.length - 1 && (
+                        <div className="absolute left-5 top-12 bottom-0 w-0.5 bg-border" />
+                      )}
+                      
+                      <div className={cn(
+                        "relative z-10 flex h-10 w-10 items-center justify-center rounded-full border-2 shrink-0",
+                        isReached 
+                          ? "bg-primary border-primary text-primary-foreground" 
+                          : isNext 
+                          ? "bg-background border-primary text-primary animate-pulse"
+                          : "bg-muted border-muted-foreground/30 text-muted-foreground"
+                      )}>
+                        {isReached ? (
+                          <Zap className="w-5 h-5" />
+                        ) : (
+                          <span className="text-xs font-semibold">{index + 1}</span>
                         )}
                       </div>
-                  ))}
-                </div>
-              </div>
-              
-              <Separator />
-
-              <div>
-                <h3 className="text-lg font-semibold mb-3">Circular Computing Organizational Impact</h3>
-                <p className="text-sm text-neutral-600 mb-4">
-                  Company-wide environmental impact across all customers
-                </p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="border rounded-md p-4 bg-gradient-to-br from-teal-50 to-emerald-50">
-                    <p className="text-sm text-neutral-600">Total Units Deployed</p>
-                    <h4 className="text-2xl font-bold mt-1 text-teal-700">
-                      {getOrgMetric('total_units_deployed').toLocaleString()} units
-                    </h4>
-                  </div>
-                  
-                  <div className="border rounded-md p-4 bg-gradient-to-br from-blue-50 to-cyan-50">
-                    <p className="text-sm text-neutral-600">Total Carbon Saved</p>
-                    <h4 className="text-2xl font-bold mt-1 text-blue-700">
-                      {formatEnvironmentalImpact(getOrgMetric('total_carbon_saved'), 'g')}
-                    </h4>
-                  </div>
-                  
-                  <div className="border rounded-md p-4 bg-gradient-to-br from-cyan-50 to-blue-50">
-                    <p className="text-sm text-neutral-600">Total Water Saved</p>
-                    <h4 className="text-2xl font-bold mt-1 text-cyan-700">
-                      {(getOrgMetric('total_water_saved') / 1000000000).toFixed(2)} billion liters
-                    </h4>
-                  </div>
-                  
-                  <div className="border rounded-md p-4 bg-gradient-to-br from-emerald-50 to-teal-50">
-                    <p className="text-sm text-neutral-600">Families Helped with Water Access</p>
-                    <h4 className="text-2xl font-bold mt-1 text-emerald-700">
-                      {getOrgMetric('total_families_helped').toLocaleString()} families
-                    </h4>
-                  </div>
-                </div>
-              </div>
-              
-              <Separator />
-              
-              <div>
-                <h3 className="text-lg font-semibold mb-3">Environmental Impact Breakdown</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <h4 className="font-medium mb-3">Total Carbon Saved</h4>
-                    <div className="space-y-3">
-                      <div>
-                        <div className="flex justify-between mb-1">
-                          <span className="text-sm">Manufacturing Emissions Avoided</span>
-                          <span className="text-sm font-medium">
-                            {formatEnvironmentalImpact((impact.totalImpact?.carbonSaved || 0) * 0.7, "g")}
-                          </span>
-                        </div>
-                        <Progress value={70} className="h-2" />
-                      </div>
-                      <div>
-                        <div className="flex justify-between mb-1">
-                          <span className="text-sm">Transport Emissions Reduced</span>
-                          <span className="text-sm font-medium">
-                            {formatEnvironmentalImpact((impact.totalImpact?.carbonSaved || 0) * 0.15, "g")}
-                          </span>
-                        </div>
-                        <Progress value={15} className="h-2" />
-                      </div>
-                      <div>
-                        <div className="flex justify-between mb-1">
-                          <span className="text-sm">Landfill Avoidance</span>
-                          <span className="text-sm font-medium">
-                            {formatEnvironmentalImpact((impact.totalImpact?.carbonSaved || 0) * 0.15, "g")}
-                          </span>
-                        </div>
-                        <Progress value={15} className="h-2" />
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <h4 className="font-medium mb-3">Resource Conservation</h4>
-                    <div className="space-y-3">
-                      <div>
-                        <div className="flex justify-between mb-1">
-                          <span className="text-sm">Metals</span>
-                          <span className="text-sm font-medium">
-                            {formatEnvironmentalImpact((impact.totalImpact?.mineralsSaved || 0) * 0.55, "g")}
-                          </span>
-                        </div>
-                        <Progress value={55} className="h-2" />
-                      </div>
-                      <div>
-                        <div className="flex justify-between mb-1">
-                          <span className="text-sm">Plastics</span>
-                          <span className="text-sm font-medium">
-                            {formatEnvironmentalImpact((impact.totalImpact?.mineralsSaved || 0) * 0.30, "g")}
-                          </span>
-                        </div>
-                        <Progress value={30} className="h-2" />
-                      </div>
-                      <div>
-                        <div className="flex justify-between mb-1">
-                          <span className="text-sm">Rare Earth Elements</span>
-                          <span className="text-sm font-medium">
-                            {formatEnvironmentalImpact((impact.totalImpact?.mineralsSaved || 0) * 0.15, "g")}
-                          </span>
-                        </div>
-                        <Progress value={15} className="h-2" />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              <Separator />
-              
-              <div>
-                <h3 className="text-lg font-semibold mb-3">Social Impact Achievements</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="border rounded-md p-4">
-                    <div className="flex items-start">
-                      <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mr-3">
-                        <Users className="h-5 w-5" />
-                      </div>
-                      <div>
-                        <h4 className="font-medium">Clean Water Access</h4>
-                        <p className="text-sm text-neutral-700 mt-1">
-                          Through partnership with charity: water, your organization provides clean water to {impact.totalImpact?.familiesHelped || 0} families in water-stressed regions (Figure is for 1 week supply per family).
+                      
+                      <div className="flex-1 pb-8">
+                        <h4 className={cn(
+                          "font-semibold mb-1",
+                          isReached && "text-primary"
+                        )}>
+                          {milestone.title}
+                        </h4>
+                        <p className="text-sm text-muted-foreground mb-2">
+                          {milestone.description}
                         </p>
+                        {milestone.requiredScore && (
+                          <Badge variant={isReached ? "default" : "secondary"} className="text-xs">
+                            {isReached ? "Completed" : `${milestone.requiredScore} points required`}
+                          </Badge>
+                        )}
                       </div>
                     </div>
-                  </div>
-                  
-                  <div className="border rounded-md p-4">
-                    <div className="flex items-start">
-                      <div className="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 mr-3">
-                        <i className="ri-building-4-line text-xl"></i>
-                      </div>
-                      <div>
-                        <h4 className="font-medium">Ethical Supply Chain</h4>
-                        <p className="text-sm text-neutral-700 mt-1">
-                          By choosing Circular Computing, you've supported a supply chain with fair labor practices, ethical sourcing, and verified working conditions.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                  );
+                })}
               </div>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="goals" className="p-6">
-            <div className="space-y-6">
-              <div>
-                <h3 className="text-lg font-semibold mb-4">Environmental, Social & Governance Goals</h3>
-                <p className="text-neutral-700 mb-6">
-                  Track progress towards your organization's sustainability objectives. These goals reflect industry best practices and align with global sustainability frameworks.
-                </p>
-                
-                {esgGoals.map((category) => (
-                  <div key={category.category} className="mb-8">
-                    <h4 className="text-md font-semibold mb-4">{category.category} Goals</h4>
-                    <div className="space-y-5">
-                      {category.goals.map((goal) => (
-                        <div key={goal.id} className="border rounded-lg p-4">
-                          <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-3">
-                            <div>
-                              <h5 className="font-medium">{goal.title}</h5>
-                              <p className="text-sm text-neutral-600">Target: {goal.target}</p>
-                            </div>
-                            <Badge className="mt-2 md:mt-0" variant={goal.progress >= 75 ? "default" : "outline"}>
-                              {goal.progress}% Complete
-                            </Badge>
-                          </div>
-                          
-                          <Progress value={goal.progress} className="h-2 mb-3" />
-                          
-                          <p className="text-sm text-neutral-700">
-                            {goal.description}
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-              
-              <Separator />
-              
-              <div>
-                <h3 className="text-lg font-semibold mb-4">Sustainability Roadmap</h3>
-                <div className="relative pl-6 border-l-2 border-dashed border-neutral-200 space-y-8">
-                  <div className="relative">
-                    <div className="absolute -left-[25px] h-10 w-10 rounded-full bg-green-600 text-white flex items-center justify-center">
-                      <CheckCircle className="h-5 w-5" />
-                    </div>
-                    <div className="ml-4">
-                      <h4 className="font-medium">Phase 1: Baseline & Assessment</h4>
-                      <p className="text-neutral-600 text-sm mt-1">
-                        Complete initial environmental impact assessment and establish baseline metrics
-                      </p>
-                      <Badge variant="outline" className="mt-2">Completed</Badge>
-                    </div>
-                  </div>
-                  
-                  <div className="relative">
-                    <div className="absolute -left-[25px] h-10 w-10 rounded-full bg-primary text-white flex items-center justify-center">
-                      <i className="ri-arrow-right-line text-xl"></i>
-                    </div>
-                    <div className="ml-4">
-                      <h4 className="font-medium">Phase 2: Implementation & Optimization</h4>
-                      <p className="text-neutral-600 text-sm mt-1">
-                        Deploy sustainable IT policy across organization and optimize resource usage
-                      </p>
-                      <Badge variant="outline" className="mt-2">In Progress - 65%</Badge>
-                    </div>
-                  </div>
-                  
-                  <div className="relative">
-                    <div className="absolute -left-[25px] h-10 w-10 rounded-full bg-neutral-200 text-neutral-600 flex items-center justify-center">
-                      <i className="ri-bar-chart-line text-xl"></i>
-                    </div>
-                    <div className="ml-4">
-                      <h4 className="font-medium">Phase 3: Advanced Reporting & Integration</h4>
-                      <p className="text-neutral-600 text-sm mt-1">
-                        Integrate ESG metrics into corporate reporting and stakeholder communications
-                      </p>
-                      <Badge variant="outline" className="mt-2">Upcoming - Q3 2025</Badge>
-                    </div>
-                  </div>
-                  
-                  <div className="relative">
-                    <div className="absolute -left-[25px] h-10 w-10 rounded-full bg-neutral-200 text-neutral-600 flex items-center justify-center">
-                      <i className="ri-global-line text-xl"></i>
-                    </div>
-                    <div className="ml-4">
-                      <h4 className="font-medium">Phase 4: Leadership & Advocacy</h4>
-                      <p className="text-neutral-600 text-sm mt-1">
-                        Establish position as industry sustainability leader and advocate for circular economy principles
-                      </p>
-                      <Badge variant="outline" className="mt-2">Planned - 2026</Badge>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="history" className="p-6">
-            <div className="space-y-6">
-              <div>
-                <h3 className="text-lg font-semibold mb-3">Historical Performance</h3>
-                <p className="text-neutral-700 mb-4">
-                  Track your organization's sustainability progress over time across key environmental metrics.
-                </p>
-                
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {periods.map((period) => (
-                    <Badge key={period.label} variant="outline" className="cursor-pointer">
-                      {period.label}
-                    </Badge>
-                  ))}
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <Card>
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-base">Carbon Footprint Reduction</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="h-64 bg-neutral-100 rounded-md flex items-center justify-center">
-                        <p className="text-neutral-500">Carbon reduction trend chart</p>
-                      </div>
-                    </CardContent>
-                  </Card>
-                  
-                  <Card>
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-base">Water Impact</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="h-64 bg-neutral-100 rounded-md flex items-center justify-center">
-                        <p className="text-neutral-500">Water impact trend chart</p>
-                      </div>
-                    </CardContent>
-                  </Card>
-                  
-                  <Card>
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-base">E-Waste Diversion</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="h-64 bg-neutral-100 rounded-md flex items-center justify-center">
-                        <p className="text-neutral-500">E-waste diversion trend chart</p>
-                      </div>
-                    </CardContent>
-                  </Card>
-                  
-                  <Card>
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-base">Total Environmental Score</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="h-64 bg-neutral-100 rounded-md flex items-center justify-center">
-                        <p className="text-neutral-500">Environmental score trend chart</p>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-              </div>
-              
-              <Separator />
-              
-              <div>
-                <h3 className="text-lg font-semibold mb-3">Impact Timeline</h3>
-                <div className="border rounded-lg overflow-hidden">
-                  <ScrollArea className="h-80">
-                    <div className="p-4">
-                      <div className="relative pl-6 border-l-2 border-dashed border-neutral-200 space-y-6">
-                        <div className="relative">
-                          <div className="absolute -left-[25px] h-10 w-10 rounded-full bg-green-100 text-green-600 flex items-center justify-center">
-                            <i className="ri-truck-line text-xl"></i>
-                          </div>
-                          <div className="ml-4">
-                            <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-                              <h4 className="font-medium">First Circular Computing Order</h4>
-                              <span className="text-sm text-neutral-500">Jan 15, 2024</span>
-                            </div>
-                            <p className="text-neutral-600 text-sm mt-1">
-                              Deployed 25 remanufactured laptops, reducing carbon footprint by 3,750 kg CO₂e
-                            </p>
-                          </div>
-                        </div>
-                        
-                        <div className="relative">
-                          <div className="absolute -left-[25px] h-10 w-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center">
-                            <i className="ri-water-flash-line text-xl"></i>
-                          </div>
-                          <div className="ml-4">
-                            <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-                              <h4 className="font-medium">First Water Project Contribution</h4>
-                              <span className="text-sm text-neutral-500">Feb 28, 2024</span>
-                            </div>
-                            <p className="text-neutral-600 text-sm mt-1">
-                              Clean water provided to 50 people in Tanzania through charity: water
-                            </p>
-                          </div>
-                        </div>
-                        
-                        <div className="relative">
-                          <div className="absolute -left-[25px] h-10 w-10 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center">
-                            <i className="ri-file-paper-line text-xl"></i>
-                          </div>
-                          <div className="ml-4">
-                            <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-                              <h4 className="font-medium">First Quarterly ESG Report</h4>
-                              <span className="text-sm text-neutral-500">Mar 31, 2024</span>
-                            </div>
-                            <p className="text-neutral-600 text-sm mt-1">
-                              Established environmental baseline and sustainability goals
-                            </p>
-                          </div>
-                        </div>
-                        
-                        <div className="relative">
-                          <div className="absolute -left-[25px] h-10 w-10 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center">
-                            <i className="ri-recycle-line text-xl"></i>
-                          </div>
-                          <div className="ml-4">
-                            <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-                              <h4 className="font-medium">IT Asset Disposition Programme Launch</h4>
-                              <span className="text-sm text-neutral-500">Apr 15, 2024</span>
-                            </div>
-                            <p className="text-neutral-600 text-sm mt-1">
-                              Initiated sustainable IT lifecycle management programme
-                            </p>
-                          </div>
-                        </div>
-                        
-                        <div className="relative">
-                          <div className="absolute -left-[25px] h-10 w-10 rounded-full bg-green-100 text-green-600 flex items-center justify-center">
-                            <i className="ri-truck-line text-xl"></i>
-                          </div>
-                          <div className="ml-4">
-                            <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-                              <h4 className="font-medium">Major Deployment Expansion</h4>
-                              <span className="text-sm text-neutral-500">May 10, 2024</span>
-                            </div>
-                            <p className="text-neutral-600 text-sm mt-1">
-                              Expanded remanufactured laptop deployment, doubling environmental impact
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </ScrollArea>
-                </div>
-              </div>
-            </div>
-          </TabsContent>
-        </Tabs>
-      </Card>
-
-      {/* Shareable Social Impact Cards */}
-      <h2 className="text-xl font-semibold mb-4">Shareable Impact Cards</h2>
-      <p className="text-neutral-600 mb-4">
-        Celebrate and share your sustainability achievements with these ready-to-post social media cards
-      </p>
-      
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {shareableCards.map(card => (
-          <Card key={card.id} className="overflow-hidden">
-            <div className="h-40 bg-gradient-to-br from-primary/20 to-primary/5 flex flex-col items-center justify-center text-center p-4">
-              <div className={`h-16 w-16 rounded-full ${card.bgColor} flex items-center justify-center ${card.color} mb-2`}>
-                {card.icon}
-              </div>
-              <h3 className="text-xl font-bold">
-                {formatEnvironmentalImpact(card.value, card.unit)}
-              </h3>
-              <p className="text-neutral-700">{card.title}</p>
-            </div>
-            <CardFooter className="flex justify-between p-4">
-              <p className="text-xs text-neutral-500">
-                {user?.company} • Circular Computing
-              </p>
-              <div className="flex space-x-1">
-                <Button variant="ghost" size="icon" className="h-8 w-8">
-                  <Facebook className="h-4 w-4" />
-                </Button>
-                <Button variant="ghost" size="icon" className="h-8 w-8">
-                  <X className="h-4 w-4" />
-                </Button>
-                <Button variant="ghost" size="icon" className="h-8 w-8">
-                  <Instagram className="h-4 w-4" />
-                </Button>
-                <Button variant="ghost" size="icon" className="h-8 w-8">
-                  <Linkedin className="h-4 w-4" />
-                </Button>
-              </div>
-            </CardFooter>
+            </CardContent>
           </Card>
-        ))}
-      </div>
+        </TabsContent>
+
+        {/* Leaderboard Tab */}
+        <TabsContent value="leaderboard" className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Benchmark Card */}
+            <Card className="lg:col-span-1">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <TrendingUp className="w-5 h-5" />
+                  Your Ranking
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="text-center p-6 bg-primary/5 rounded-lg">
+                  <p className="text-5xl font-bold text-primary" data-testid="user-rank">
+                    #{benchmarkData?.rank || 0}
+                  </p>
+                  <p className="text-sm text-muted-foreground mt-2">
+                    out of {benchmarkData?.totalUsers || 0} users
+                  </p>
+                </div>
+                
+                <Separator />
+                
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-muted-foreground">Your Score</span>
+                    <span className="font-semibold" data-testid="benchmark-user-score">
+                      {benchmarkData?.userScore || 0}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-muted-foreground">Average Score</span>
+                    <span className="font-semibold" data-testid="benchmark-average">
+                      {benchmarkData?.averageScore || 0}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-muted-foreground">Percentile</span>
+                    <Badge variant="secondary" data-testid="benchmark-percentile">
+                      Top {100 - (benchmarkData?.percentile || 0)}%
+                    </Badge>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Leaderboard Card */}
+            <Card className="lg:col-span-2">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Users className="w-5 h-5" />
+                  Global Leaderboard
+                </CardTitle>
+                <CardDescription>
+                  Top sustainability champions
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {leaderboardData?.map((entry: any, index: number) => (
+                    <div 
+                      key={entry.userId}
+                      className={cn(
+                        "flex items-center gap-4 p-4 rounded-lg border",
+                        entry.userId === user?.id && "bg-primary/5 border-primary/50"
+                      )}
+                      data-testid={`leaderboard-rank-${entry.rank}`}
+                    >
+                      <div className="flex items-center justify-center w-8 h-8 rounded-full bg-muted font-bold text-sm">
+                        {index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : entry.rank}
+                      </div>
+                      
+                      <div className="flex-1">
+                        <p className="font-semibold">{entry.name}</p>
+                        <Badge 
+                          variant="secondary" 
+                          className="text-xs mt-1"
+                          style={{ 
+                            backgroundColor: `${entry.tierColor}20`,
+                            borderColor: entry.tierColor
+                          }}
+                        >
+                          {entry.tier}
+                        </Badge>
+                      </div>
+                      
+                      <div className="text-right">
+                        <p className="font-bold text-lg">{entry.totalScore}</p>
+                        <p className="text-xs text-muted-foreground">points</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

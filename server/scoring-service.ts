@@ -78,9 +78,9 @@ export class ScoringService {
     );
 
     const waterScore = this.calculatePillarScore(
-      totalImpact.familiesHelped,
+      totalImpact.waterProvided,
       multipliers.waterMultiplier,
-      1
+      multipliers.baseUnit
     );
 
     const resourcesScore = this.calculatePillarScore(
