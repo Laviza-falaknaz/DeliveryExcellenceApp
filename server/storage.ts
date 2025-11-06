@@ -22,7 +22,14 @@ import {
   apiKeys, ApiKey,
   keyPerformanceInsights, KeyPerformanceInsight, InsertKeyPerformanceInsight,
   organizationalMetrics, OrganizationalMetric, InsertOrganizationalMetric,
-  esgTargets, EsgTarget, InsertEsgTarget
+  esgTargets, EsgTarget, InsertEsgTarget,
+  gamificationTiers, GamificationTier, InsertGamificationTier,
+  gamificationAchievements, GamificationAchievement, InsertGamificationAchievement,
+  userAchievementProgress, UserAchievementProgress, InsertUserAchievementProgress,
+  gamificationMilestones, GamificationMilestone, InsertGamificationMilestone,
+  userMilestoneEvents, UserMilestoneEvent, InsertUserMilestoneEvent,
+  esgScores, EsgScore, InsertEsgScore,
+  gamificationSettings, GamificationSetting, InsertGamificationSetting
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, sum, like, and, sql } from "drizzle-orm";
@@ -207,6 +214,61 @@ export interface IStorage {
   createEsgTarget(target: InsertEsgTarget): Promise<EsgTarget>;
   updateEsgTarget(id: number, data: Partial<EsgTarget>): Promise<EsgTarget | undefined>;
   deleteEsgTarget(id: number): Promise<void>;
+
+  // New Gamification: Tier operations
+  getGamificationTiers(): Promise<GamificationTier[]>;
+  getActiveTiers(): Promise<GamificationTier[]>;
+  getGamificationTier(id: number): Promise<GamificationTier | undefined>;
+  getTierByScore(score: number): Promise<GamificationTier | undefined>;
+  createGamificationTier(tier: InsertGamificationTier): Promise<GamificationTier>;
+  updateGamificationTier(id: number, data: Partial<GamificationTier>): Promise<GamificationTier | undefined>;
+  deleteGamificationTier(id: number): Promise<void>;
+
+  // New Gamification: Achievement operations
+  getGamificationAchievements(): Promise<GamificationAchievement[]>;
+  getActiveGamificationAchievements(): Promise<GamificationAchievement[]>;
+  getGamificationAchievement(id: number): Promise<GamificationAchievement | undefined>;
+  getGamificationAchievementByCode(code: string): Promise<GamificationAchievement | undefined>;
+  createGamificationAchievement(achievement: InsertGamificationAchievement): Promise<GamificationAchievement>;
+  updateGamificationAchievement(id: number, data: Partial<GamificationAchievement>): Promise<GamificationAchievement | undefined>;
+  deleteGamificationAchievement(id: number): Promise<void>;
+
+  // New Gamification: User Achievement Progress operations
+  getUserAchievementProgress(userId: number): Promise<UserAchievementProgress[]>;
+  getUserAchievementProgressWithDetails(userId: number): Promise<(UserAchievementProgress & { achievement: GamificationAchievement })[]>;
+  getUserAchievementProgressForAchievement(userId: number, achievementId: number): Promise<UserAchievementProgress | undefined>;
+  createUserAchievementProgress(progress: InsertUserAchievementProgress): Promise<UserAchievementProgress>;
+  updateUserAchievementProgress(id: number, data: Partial<UserAchievementProgress>): Promise<UserAchievementProgress | undefined>;
+  unlockGamificationAchievement(userId: number, achievementId: number): Promise<UserAchievementProgress | undefined>;
+
+  // New Gamification: Milestone operations
+  getGamificationMilestones(): Promise<GamificationMilestone[]>;
+  getActiveGamificationMilestones(): Promise<GamificationMilestone[]>;
+  getGamificationMilestone(id: number): Promise<GamificationMilestone | undefined>;
+  getMilestonesByTier(tierId: number): Promise<GamificationMilestone[]>;
+  createGamificationMilestone(milestone: InsertGamificationMilestone): Promise<GamificationMilestone>;
+  updateGamificationMilestone(id: number, data: Partial<GamificationMilestone>): Promise<GamificationMilestone | undefined>;
+  deleteGamificationMilestone(id: number): Promise<void>;
+
+  // New Gamification: User Milestone Events operations
+  getUserMilestoneEvents(userId: number): Promise<UserMilestoneEvent[]>;
+  getUserMilestoneEventsWithDetails(userId: number): Promise<(UserMilestoneEvent & { milestone: GamificationMilestone })[]>;
+  createUserMilestoneEvent(event: InsertUserMilestoneEvent): Promise<UserMilestoneEvent>;
+  hasReachedMilestone(userId: number, milestoneId: number): Promise<boolean>;
+
+  // New Gamification: ESG Score operations
+  getUserEsgScores(userId: number): Promise<EsgScore[]>;
+  getCurrentUserEsgScore(userId: number): Promise<EsgScore | undefined>;
+  getUserEsgScoreByPeriod(userId: number, period: string): Promise<EsgScore | undefined>;
+  createEsgScore(score: InsertEsgScore): Promise<EsgScore>;
+  updateEsgScore(id: number, data: Partial<EsgScore>): Promise<EsgScore | undefined>;
+  getTopEsgScores(limit: number, period?: string): Promise<EsgScore[]>;
+
+  // New Gamification: Settings operations
+  getGamificationSettings(): Promise<GamificationSetting[]>;
+  getGamificationSetting(key: string): Promise<GamificationSetting | undefined>;
+  setGamificationSetting(key: string, value: any, description?: string): Promise<GamificationSetting>;
+  updateGamificationSetting(id: number, data: Partial<GamificationSetting>): Promise<GamificationSetting | undefined>;
 }
 
 // Database storage implementation using Drizzle ORM - blueprint:javascript_database
@@ -1453,6 +1515,315 @@ export class DatabaseStorage implements IStorage {
 
   async deleteEsgTarget(id: number): Promise<void> {
     await db.delete(esgTargets).where(eq(esgTargets.id, id));
+  }
+
+  // New Gamification: Tier operations
+  async getGamificationTiers(): Promise<GamificationTier[]> {
+    return db.select().from(gamificationTiers).orderBy(gamificationTiers.displayOrder);
+  }
+
+  async getActiveTiers(): Promise<GamificationTier[]> {
+    return db.select().from(gamificationTiers)
+      .where(eq(gamificationTiers.isActive, true))
+      .orderBy(gamificationTiers.displayOrder);
+  }
+
+  async getGamificationTier(id: number): Promise<GamificationTier | undefined> {
+    const [tier] = await db.select().from(gamificationTiers).where(eq(gamificationTiers.id, id));
+    return tier || undefined;
+  }
+
+  async getTierByScore(score: number): Promise<GamificationTier | undefined> {
+    const tiers = await db.select().from(gamificationTiers)
+      .where(eq(gamificationTiers.isActive, true))
+      .orderBy(gamificationTiers.minScore);
+    
+    for (const tier of tiers.reverse()) {
+      if (score >= tier.minScore) {
+        if (tier.maxScore === null || score <= tier.maxScore) {
+          return tier;
+        }
+      }
+    }
+    return tiers[0] || undefined;
+  }
+
+  async createGamificationTier(tier: InsertGamificationTier): Promise<GamificationTier> {
+    const [created] = await db.insert(gamificationTiers).values(tier).returning();
+    return created;
+  }
+
+  async updateGamificationTier(id: number, data: Partial<GamificationTier>): Promise<GamificationTier | undefined> {
+    const [updated] = await db.update(gamificationTiers)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(gamificationTiers.id, id))
+      .returning();
+    return updated || undefined;
+  }
+
+  async deleteGamificationTier(id: number): Promise<void> {
+    await db.delete(gamificationTiers).where(eq(gamificationTiers.id, id));
+  }
+
+  // New Gamification: Achievement operations
+  async getGamificationAchievements(): Promise<GamificationAchievement[]> {
+    return db.select().from(gamificationAchievements).orderBy(gamificationAchievements.displayOrder);
+  }
+
+  async getActiveGamificationAchievements(): Promise<GamificationAchievement[]> {
+    return db.select().from(gamificationAchievements)
+      .where(eq(gamificationAchievements.isActive, true))
+      .orderBy(gamificationAchievements.displayOrder);
+  }
+
+  async getGamificationAchievement(id: number): Promise<GamificationAchievement | undefined> {
+    const [achievement] = await db.select().from(gamificationAchievements).where(eq(gamificationAchievements.id, id));
+    return achievement || undefined;
+  }
+
+  async getGamificationAchievementByCode(code: string): Promise<GamificationAchievement | undefined> {
+    const [achievement] = await db.select().from(gamificationAchievements).where(eq(gamificationAchievements.code, code));
+    return achievement || undefined;
+  }
+
+  async createGamificationAchievement(achievement: InsertGamificationAchievement): Promise<GamificationAchievement> {
+    const [created] = await db.insert(gamificationAchievements).values(achievement).returning();
+    return created;
+  }
+
+  async updateGamificationAchievement(id: number, data: Partial<GamificationAchievement>): Promise<GamificationAchievement | undefined> {
+    const [updated] = await db.update(gamificationAchievements)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(gamificationAchievements.id, id))
+      .returning();
+    return updated || undefined;
+  }
+
+  async deleteGamificationAchievement(id: number): Promise<void> {
+    await db.delete(gamificationAchievements).where(eq(gamificationAchievements.id, id));
+  }
+
+  // New Gamification: User Achievement Progress operations
+  async getUserAchievementProgress(userId: number): Promise<UserAchievementProgress[]> {
+    return db.select().from(userAchievementProgress)
+      .where(eq(userAchievementProgress.userId, userId));
+  }
+
+  async getUserAchievementProgressWithDetails(userId: number): Promise<(UserAchievementProgress & { achievement: GamificationAchievement })[]> {
+    const results = await db.select()
+      .from(userAchievementProgress)
+      .leftJoin(gamificationAchievements, eq(userAchievementProgress.achievementId, gamificationAchievements.id))
+      .where(eq(userAchievementProgress.userId, userId));
+    
+    return results.map(row => ({
+      ...row.user_achievement_progress,
+      achievement: row.gamification_achievements!
+    }));
+  }
+
+  async getUserAchievementProgressForAchievement(userId: number, achievementId: number): Promise<UserAchievementProgress | undefined> {
+    const [progress] = await db.select().from(userAchievementProgress)
+      .where(
+        and(
+          eq(userAchievementProgress.userId, userId),
+          eq(userAchievementProgress.achievementId, achievementId)
+        )
+      );
+    return progress || undefined;
+  }
+
+  async createUserAchievementProgress(progress: InsertUserAchievementProgress): Promise<UserAchievementProgress> {
+    const [created] = await db.insert(userAchievementProgress).values(progress).returning();
+    return created;
+  }
+
+  async updateUserAchievementProgress(id: number, data: Partial<UserAchievementProgress>): Promise<UserAchievementProgress | undefined> {
+    const [updated] = await db.update(userAchievementProgress)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(userAchievementProgress.id, id))
+      .returning();
+    return updated || undefined;
+  }
+
+  async unlockGamificationAchievement(userId: number, achievementId: number): Promise<UserAchievementProgress | undefined> {
+    const existing = await this.getUserAchievementProgressForAchievement(userId, achievementId);
+    
+    if (existing && !existing.isUnlocked) {
+      return this.updateUserAchievementProgress(existing.id, {
+        isUnlocked: true,
+        unlockedAt: new Date(),
+        progressPercent: 100
+      });
+    } else if (!existing) {
+      return this.createUserAchievementProgress({
+        userId,
+        achievementId,
+        currentValue: "0",
+        progressPercent: 100,
+        isUnlocked: true,
+        unlockedAt: new Date()
+      });
+    }
+    return existing;
+  }
+
+  // New Gamification: Milestone operations
+  async getGamificationMilestones(): Promise<GamificationMilestone[]> {
+    return db.select().from(gamificationMilestones).orderBy(gamificationMilestones.orderIndex);
+  }
+
+  async getActiveGamificationMilestones(): Promise<GamificationMilestone[]> {
+    return db.select().from(gamificationMilestones)
+      .where(eq(gamificationMilestones.isActive, true))
+      .orderBy(gamificationMilestones.orderIndex);
+  }
+
+  async getGamificationMilestone(id: number): Promise<GamificationMilestone | undefined> {
+    const [milestone] = await db.select().from(gamificationMilestones).where(eq(gamificationMilestones.id, id));
+    return milestone || undefined;
+  }
+
+  async getMilestonesByTier(tierId: number): Promise<GamificationMilestone[]> {
+    return db.select().from(gamificationMilestones)
+      .where(eq(gamificationMilestones.tierId, tierId))
+      .orderBy(gamificationMilestones.orderIndex);
+  }
+
+  async createGamificationMilestone(milestone: InsertGamificationMilestone): Promise<GamificationMilestone> {
+    const [created] = await db.insert(gamificationMilestones).values(milestone).returning();
+    return created;
+  }
+
+  async updateGamificationMilestone(id: number, data: Partial<GamificationMilestone>): Promise<GamificationMilestone | undefined> {
+    const [updated] = await db.update(gamificationMilestones)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(gamificationMilestones.id, id))
+      .returning();
+    return updated || undefined;
+  }
+
+  async deleteGamificationMilestone(id: number): Promise<void> {
+    await db.delete(gamificationMilestones).where(eq(gamificationMilestones.id, id));
+  }
+
+  // New Gamification: User Milestone Events operations
+  async getUserMilestoneEvents(userId: number): Promise<UserMilestoneEvent[]> {
+    return db.select().from(userMilestoneEvents)
+      .where(eq(userMilestoneEvents.userId, userId))
+      .orderBy(userMilestoneEvents.reachedAt);
+  }
+
+  async getUserMilestoneEventsWithDetails(userId: number): Promise<(UserMilestoneEvent & { milestone: GamificationMilestone })[]> {
+    const results = await db.select()
+      .from(userMilestoneEvents)
+      .leftJoin(gamificationMilestones, eq(userMilestoneEvents.milestoneId, gamificationMilestones.id))
+      .where(eq(userMilestoneEvents.userId, userId))
+      .orderBy(userMilestoneEvents.reachedAt);
+    
+    return results.map(row => ({
+      ...row.user_milestone_events,
+      milestone: row.gamification_milestones!
+    }));
+  }
+
+  async createUserMilestoneEvent(event: InsertUserMilestoneEvent): Promise<UserMilestoneEvent> {
+    const [created] = await db.insert(userMilestoneEvents).values(event).returning();
+    return created;
+  }
+
+  async hasReachedMilestone(userId: number, milestoneId: number): Promise<boolean> {
+    const [event] = await db.select().from(userMilestoneEvents)
+      .where(
+        and(
+          eq(userMilestoneEvents.userId, userId),
+          eq(userMilestoneEvents.milestoneId, milestoneId)
+        )
+      );
+    return !!event;
+  }
+
+  // New Gamification: ESG Score operations
+  async getUserEsgScores(userId: number): Promise<EsgScore[]> {
+    return db.select().from(esgScores)
+      .where(eq(esgScores.userId, userId))
+      .orderBy(esgScores.calculatedAt);
+  }
+
+  async getCurrentUserEsgScore(userId: number): Promise<EsgScore | undefined> {
+    const [score] = await db.select().from(esgScores)
+      .where(
+        and(
+          eq(esgScores.userId, userId),
+          eq(esgScores.period, 'current')
+        )
+      );
+    return score || undefined;
+  }
+
+  async getUserEsgScoreByPeriod(userId: number, period: string): Promise<EsgScore | undefined> {
+    const [score] = await db.select().from(esgScores)
+      .where(
+        and(
+          eq(esgScores.userId, userId),
+          eq(esgScores.period, period)
+        )
+      );
+    return score || undefined;
+  }
+
+  async createEsgScore(score: InsertEsgScore): Promise<EsgScore> {
+    const [created] = await db.insert(esgScores).values(score).returning();
+    return created;
+  }
+
+  async updateEsgScore(id: number, data: Partial<EsgScore>): Promise<EsgScore | undefined> {
+    const [updated] = await db.update(esgScores)
+      .set(data)
+      .where(eq(esgScores.id, id))
+      .returning();
+    return updated || undefined;
+  }
+
+  async getTopEsgScores(limit: number, period: string = 'current'): Promise<EsgScore[]> {
+    return db.select().from(esgScores)
+      .where(eq(esgScores.period, period))
+      .orderBy(sql`${esgScores.totalScore} DESC`)
+      .limit(limit);
+  }
+
+  // New Gamification: Settings operations
+  async getGamificationSettings(): Promise<GamificationSetting[]> {
+    return db.select().from(gamificationSettings);
+  }
+
+  async getGamificationSetting(key: string): Promise<GamificationSetting | undefined> {
+    const [setting] = await db.select().from(gamificationSettings).where(eq(gamificationSettings.settingKey, key));
+    return setting || undefined;
+  }
+
+  async setGamificationSetting(key: string, value: any, description?: string): Promise<GamificationSetting> {
+    const existing = await this.getGamificationSetting(key);
+    
+    if (existing) {
+      const [updated] = await db.update(gamificationSettings)
+        .set({ settingValue: value, description: description || existing.description, updatedAt: new Date() })
+        .where(eq(gamificationSettings.settingKey, key))
+        .returning();
+      return updated;
+    } else {
+      const [created] = await db.insert(gamificationSettings)
+        .values({ settingKey: key, settingValue: value, description })
+        .returning();
+      return created;
+    }
+  }
+
+  async updateGamificationSetting(id: number, data: Partial<GamificationSetting>): Promise<GamificationSetting | undefined> {
+    const [updated] = await db.update(gamificationSettings)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(gamificationSettings.id, id))
+      .returning();
+    return updated || undefined;
   }
 }
 
