@@ -2509,6 +2509,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update ESG target progress (simplified endpoint for automated updates)
+  app.patch("/api/admin/esg-targets/:id/progress", requireAdmin, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const { currentValue } = req.body;
+      
+      if (currentValue === undefined) {
+        return res.status(400).json({ error: "currentValue is required" });
+      }
+
+      const target = await storage.getEsgTarget(id);
+      if (!target) {
+        return res.status(404).json({ error: "ESG target not found" });
+      }
+
+      const updated = await storage.updateEsgTarget(id, { currentValue: currentValue.toString() });
+      res.json(updated);
+    } catch (error) {
+      console.error("Error updating ESG target progress:", error);
+      res.status(500).json({ error: "Failed to update progress" });
+    }
+  });
+
   // Gamification: User-facing endpoints
   app.get("/api/gamification/score", isAuthenticated, async (req, res) => {
     try {

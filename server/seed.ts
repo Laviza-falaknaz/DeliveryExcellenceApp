@@ -3,6 +3,7 @@ import { users, waterProjects, systemSettings, organizationalMetrics } from "@sh
 import bcrypt from "bcryptjs";
 import { eq } from "drizzle-orm";
 import { seedGamificationData } from "./gamification-seed";
+import { seedEsgTargets } from "./esg-targets-seed";
 
 export async function seedDatabase() {
   console.log("🌱 Starting database seeding...");
@@ -155,6 +156,9 @@ export async function seedDatabase() {
 
     // Seed gamification data
     await seedGamificationData();
+
+    // Seed ESG targets
+    await seedEsgTargets();
 
     console.log("✅ Database seeding completed successfully");
   } catch (error) {
