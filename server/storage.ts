@@ -21,7 +21,8 @@ import {
   warranties, Warranty, InsertWarranty,
   apiKeys, ApiKey,
   keyPerformanceInsights, KeyPerformanceInsight, InsertKeyPerformanceInsight,
-  organizationalMetrics, OrganizationalMetric, InsertOrganizationalMetric
+  organizationalMetrics, OrganizationalMetric, InsertOrganizationalMetric,
+  esgTargets, EsgTarget, InsertEsgTarget
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, sum, like, and, sql } from "drizzle-orm";
@@ -198,6 +199,14 @@ export interface IStorage {
   getOrganizationalMetric(metricKey: string): Promise<OrganizationalMetric | undefined>;
   upsertOrganizationalMetric(metricKey: string, data: Partial<InsertOrganizationalMetric>): Promise<OrganizationalMetric>;
   updateOrganizationalMetric(metricKey: string, value: number, updatedBy?: number): Promise<OrganizationalMetric | undefined>;
+
+  // ESG Target operations
+  getEsgTargets(): Promise<EsgTarget[]>;
+  getActiveEsgTargets(): Promise<EsgTarget[]>;
+  getEsgTarget(id: number): Promise<EsgTarget | undefined>;
+  createEsgTarget(target: InsertEsgTarget): Promise<EsgTarget>;
+  updateEsgTarget(id: number, data: Partial<EsgTarget>): Promise<EsgTarget | undefined>;
+  deleteEsgTarget(id: number): Promise<void>;
 }
 
 // Database storage implementation using Drizzle ORM - blueprint:javascript_database
@@ -1411,6 +1420,39 @@ export class DatabaseStorage implements IStorage {
     }
 
     console.log(`✅ Recalculated organizational metrics based on ${totalUnits} units deployed`);
+  }
+
+  // ESG Target operations
+  async getEsgTargets(): Promise<EsgTarget[]> {
+    return db.select().from(esgTargets).orderBy(esgTargets.displayOrder, esgTargets.createdAt);
+  }
+
+  async getActiveEsgTargets(): Promise<EsgTarget[]> {
+    return db.select().from(esgTargets)
+      .where(eq(esgTargets.isActive, true))
+      .orderBy(esgTargets.displayOrder, esgTargets.createdAt);
+  }
+
+  async getEsgTarget(id: number): Promise<EsgTarget | undefined> {
+    const [target] = await db.select().from(esgTargets).where(eq(esgTargets.id, id));
+    return target || undefined;
+  }
+
+  async createEsgTarget(target: InsertEsgTarget): Promise<EsgTarget> {
+    const [created] = await db.insert(esgTargets).values(target).returning();
+    return created;
+  }
+
+  async updateEsgTarget(id: number, data: Partial<EsgTarget>): Promise<EsgTarget | undefined> {
+    const [updated] = await db.update(esgTargets)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(esgTargets.id, id))
+      .returning();
+    return updated || undefined;
+  }
+
+  async deleteEsgTarget(id: number): Promise<void> {
+    await db.delete(esgTargets).where(eq(esgTargets.id, id));
   }
 }
 

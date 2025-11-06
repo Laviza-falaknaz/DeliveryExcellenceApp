@@ -64,6 +64,11 @@ export default function ESGReport() {
     queryKey: ["/api/organizational-metrics"],
   });
 
+  // Fetch ESG targets (admin-configured goals)
+  const { data: esgTargets, isLoading: isEsgTargetsLoading } = useQuery<any[]>({
+    queryKey: ["/api/esg-targets"],
+  });
+
   // Helper function to get organizational metric value
   const getOrgMetric = (key: string): number => {
     const metric = orgMetrics?.find(m => m.metricKey === key);

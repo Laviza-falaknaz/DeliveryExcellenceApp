@@ -2442,5 +2442,72 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ESG Targets endpoints
+  app.get("/api/esg-targets", isAuthenticated, async (req, res) => {
+    try {
+      const targets = await storage.getActiveEsgTargets();
+      res.json(targets);
+    } catch (error) {
+      console.error("Error fetching ESG targets:", error);
+      res.status(500).json({ error: "Failed to fetch ESG targets" });
+    }
+  });
+
+  app.get("/api/admin/esg-targets", requireAdmin, async (req, res) => {
+    try {
+      const targets = await storage.getEsgTargets();
+      res.json(targets);
+    } catch (error) {
+      console.error("Error fetching all ESG targets:", error);
+      res.status(500).json({ error: "Failed to fetch ESG targets" });
+    }
+  });
+
+  app.get("/api/admin/esg-targets/:id", requireAdmin, async (req, res) => {
+    try {
+      const target = await storage.getEsgTarget(parseInt(req.params.id));
+      if (!target) {
+        return res.status(404).json({ error: "ESG target not found" });
+      }
+      res.json(target);
+    } catch (error) {
+      console.error("Error fetching ESG target:", error);
+      res.status(500).json({ error: "Failed to fetch ESG target" });
+    }
+  });
+
+  app.post("/api/admin/esg-targets", requireAdmin, async (req, res) => {
+    try {
+      const target = await storage.createEsgTarget(req.body);
+      res.json(target);
+    } catch (error) {
+      console.error("Error creating ESG target:", error);
+      res.status(500).json({ error: "Failed to create ESG target" });
+    }
+  });
+
+  app.put("/api/admin/esg-targets/:id", requireAdmin, async (req, res) => {
+    try {
+      const updated = await storage.updateEsgTarget(parseInt(req.params.id), req.body);
+      if (!updated) {
+        return res.status(404).json({ error: "ESG target not found" });
+      }
+      res.json(updated);
+    } catch (error) {
+      console.error("Error updating ESG target:", error);
+      res.status(500).json({ error: "Failed to update ESG target" });
+    }
+  });
+
+  app.delete("/api/admin/esg-targets/:id", requireAdmin, async (req, res) => {
+    try {
+      await storage.deleteEsgTarget(parseInt(req.params.id));
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting ESG target:", error);
+      res.status(500).json({ error: "Failed to delete ESG target" });
+    }
+  });
+
   return httpServer;
 }
