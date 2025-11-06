@@ -1039,16 +1039,18 @@ Retrieve all organizational-level metrics including total units deployed, carbon
 ```
 
 **Metric Keys:**
-- `total_units_deployed`: Total remanufactured laptops deployed across all customers
-- `total_carbon_saved`: Total CO₂ saved in grams
-- `total_water_saved`: Total water saved in liters
-- `total_families_helped`: Total families provided with clean water access
+- `total_units_deployed`: Total remanufactured laptops deployed across all customers (triggers auto-recalculation)
+- `total_carbon_saved`: Total CO₂ saved in grams (auto-calculated when total_units_deployed changes)
+- `total_water_saved`: Total water saved in liters (auto-calculated when total_units_deployed changes)
+- `total_families_helped`: Total families provided with clean water access (auto-calculated when total_units_deployed changes)
+
+**Note:** When you update `total_units_deployed`, the system automatically recalculates `total_carbon_saved`, `total_water_saved`, and `total_families_helped` based on per-laptop sustainability settings. You typically only need to update `total_units_deployed`.
 
 ---
 
-## Update Total Units Deployed
+## Update Organizational Metrics
 
-Update the total number of remanufactured units deployed. This endpoint automatically recalculates all dependent metrics (carbon saved, water saved, families helped) based on sustainability settings.
+Update organizational-level metrics. The recommended approach is to update `total_units_deployed` which automatically recalculates all dependent metrics.
 
 **Endpoint:** `PUT /api/admin/organizational-metrics/:metricKey`
 
@@ -1083,6 +1085,46 @@ curl -X PUT https://your-portal.replit.app/api/admin/organizational-metrics/tota
     "value": 75000
   }'
 ```
+
+---
+
+### All Updatable Metrics
+
+**1. Total Units Deployed (Recommended - Auto-calculates others)**
+```bash
+curl -X PUT https://your-portal.replit.app/api/admin/organizational-metrics/total_units_deployed \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: YOUR_API_KEY" \
+  -d '{"value": 75000}'
+```
+When updated, automatically recalculates: `total_carbon_saved`, `total_water_saved`, `total_families_helped`
+
+**2. Total Carbon Saved (grams) - Auto-calculated**
+```bash
+curl -X PUT https://your-portal.replit.app/api/admin/organizational-metrics/total_carbon_saved \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: YOUR_API_KEY" \
+  -d '{"value": 23700000000}'
+```
+⚠️ Manually updating this metric is not recommended - it will be overwritten when `total_units_deployed` is updated.
+
+**3. Total Water Saved (liters) - Auto-calculated**
+```bash
+curl -X PUT https://your-portal.replit.app/api/admin/organizational-metrics/total_water_saved \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: YOUR_API_KEY" \
+  -d '{"value": 14250000000}'
+```
+⚠️ Manually updating this metric is not recommended - it will be overwritten when `total_units_deployed` is updated.
+
+**4. Total Families Helped - Auto-calculated**
+```bash
+curl -X PUT https://your-portal.replit.app/api/admin/organizational-metrics/total_families_helped \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: YOUR_API_KEY" \
+  -d '{"value": 75000}'
+```
+⚠️ Manually updating this metric is not recommended - it will be overwritten when `total_units_deployed` is updated.
 
 **Response:**
 ```json
