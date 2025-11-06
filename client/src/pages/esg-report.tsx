@@ -54,6 +54,11 @@ export default function ESGReport() {
     queryKey: ["/api/auth/me"],
   });
 
+  // Fetch key performance insights (admin-configured)
+  const { data: keyInsights, isLoading: isKeyInsightsLoading } = useQuery({
+    queryKey: ["/api/key-insights"],
+  });
+
   // Get the current date for the report generation timestamp
   const reportDate = new Date();
   
@@ -455,26 +460,49 @@ export default function ESGReport() {
                   <div className="mt-6">
                     <h3 className="text-lg font-semibold mb-3">Key Performance Highlights</h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {/* Display user's actual product count */}
                       <div className="border rounded-md p-4">
                         <p className="text-sm text-neutral-600">Remanufactured Units Deployed</p>
-                        <h4 className="text-xl font-semibold mt-1">{impact.productCount || 0} units</h4>
+                        <h4 className="text-xl font-semibold mt-1">{impact?.productCount || 0} units</h4>
                       </div>
+                      
+                      {/* Display user's actual calculated e-waste diversion */}
                       <div className="border rounded-md p-4">
                         <p className="text-sm text-neutral-600">E-Waste Diverted</p>
-                        <h4 className="text-xl font-semibold mt-1">{Math.round(((impact.productCount || 0) * 2.5) * 10) / 10} kg</h4>
+                        <h4 className="text-xl font-semibold mt-1">{Math.round(((impact?.productCount || 0) * 2.5) * 10) / 10} kg</h4>
                       </div>
+                      
+                      {/* Display user's actual calculated average carbon per device */}
                       <div className="border rounded-md p-4">
                         <p className="text-sm text-neutral-600">Average Carbon Footprint Reduction</p>
                         <h4 className="text-xl font-semibold mt-1">
-                          {impact.productCount ? Math.round((impact.totalImpact?.carbonSaved || 0) / impact.productCount) : 0} kg CO₂e per device
+                          {impact?.productCount ? Math.round(((impact.totalImpact?.carbonSaved || 0) / 1000) / impact.productCount) : 0} kg CO₂e per device
                         </h4>
                       </div>
+                      
+                      {/* Display user's social impact calculated from families helped */}
                       <div className="border rounded-md p-4">
-                        <p className="text-sm text-neutral-600">Social Impact Score</p>
+                        <p className="text-sm text-neutral-600">Families Helped with Clean Water</p>
                         <h4 className="text-xl font-semibold mt-1">
-                          {Math.round((impact.totalImpact?.familiesHelped || 0) / 10) * 10 + 20}/100
+                          {impact?.totalImpact?.familiesHelped || 0} families
                         </h4>
                       </div>
+                      
+                      {/* Display admin-configured key insights */}
+                      {keyInsights && keyInsights.length > 0 && keyInsights
+                        .filter((insight: any) => insight.isActive)
+                        .slice(0, 4)
+                        .map((insight: any) => (
+                          <div key={insight.id} className="border rounded-md p-4 bg-gradient-to-br from-teal-50 to-cyan-50">
+                            <p className="text-sm text-neutral-600">{insight.metricName}</p>
+                            <h4 className="text-xl font-semibold mt-1 text-teal-700">
+                              {insight.metricValue} {insight.metricUnit || ""}
+                            </h4>
+                            {insight.description && (
+                              <p className="text-xs text-neutral-500 mt-1">{insight.description}</p>
+                            )}
+                          </div>
+                      ))}
                     </div>
                   </div>
                 </div>
