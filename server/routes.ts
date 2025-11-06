@@ -18,6 +18,7 @@ import {
   insertUserProgressSchema,
   insertActivityLogSchema,
   insertWarrantySchema,
+  insertKeyPerformanceInsightSchema,
   User
 } from "@shared/schema";
 import session from "express-session";
@@ -2267,6 +2268,68 @@ export async function registerRoutes(app: Express): Promise<Server> {
         success: false,
         error: "Internal server error" 
       });
+    }
+  });
+
+  // Key Performance Insights API (Admin only)
+  app.get("/api/admin/key-insights", requireAdmin, async (req, res) => {
+    try {
+      const insights = await storage.getAllKeyPerformanceInsights();
+      res.json(insights);
+    } catch (error) {
+      console.error("Error fetching key insights:", error);
+      res.status(500).json({ error: "Failed to fetch key insights" });
+    }
+  });
+
+  app.get("/api/key-insights", isAuthenticated, async (req, res) => {
+    try {
+      const insights = await storage.getAllKeyPerformanceInsights();
+      const activeInsights = insights.filter(i => i.isActive);
+      res.json(activeInsights);
+    } catch (error) {
+      console.error("Error fetching key insights:", error);
+      res.status(500).json({ error: "Failed to fetch key insights" });
+    }
+  });
+
+  app.post("/api/admin/key-insights", requireAdmin, async (req, res) => {
+    try {
+      const validatedData = insertKeyPerformanceInsightSchema.parse(req.body);
+      const insight = await storage.createKeyPerformanceInsight(validatedData);
+      res.json(insight);
+    } catch (error: any) {
+      console.error("Error creating key insight:", error);
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ error: error.errors });
+      } else {
+        res.status(500).json({ error: "Failed to create key insight" });
+      }
+    }
+  });
+
+  app.put("/api/admin/key-insights/:id", requireAdmin, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const updated = await storage.updateKeyPerformanceInsight(id, req.body);
+      if (!updated) {
+        return res.status(404).json({ error: "Key insight not found" });
+      }
+      res.json(updated);
+    } catch (error) {
+      console.error("Error updating key insight:", error);
+      res.status(500).json({ error: "Failed to update key insight" });
+    }
+  });
+
+  app.delete("/api/admin/key-insights/:id", requireAdmin, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      await storage.deleteKeyPerformanceInsight(id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting key insight:", error);
+      res.status(500).json({ error: "Failed to delete key insight" });
     }
   });
 

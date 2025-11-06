@@ -19,7 +19,8 @@ import {
   userProgress, UserProgress, InsertUserProgress,
   activityLog, ActivityLog, InsertActivityLog,
   warranties, Warranty, InsertWarranty,
-  apiKeys, ApiKey
+  apiKeys, ApiKey,
+  keyPerformanceInsights, KeyPerformanceInsight, InsertKeyPerformanceInsight
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, sum, like, and, sql } from "drizzle-orm";
@@ -182,6 +183,14 @@ export interface IStorage {
   upsertOrder(orderNumber: string, email: string, order: Omit<InsertOrder, 'userId'>, items?: Omit<InsertOrderItem, 'orderId'>[]): Promise<Order>;
   upsertRma(rmaNumber: string, email: string, rma: Omit<InsertRma, 'userId'>): Promise<Rma>;
   upsertRmaItems(rmaId: number, items: Omit<InsertRmaItem, 'rmaId'>[]): Promise<RmaItem[]>;
+
+  // Key Performance Insights operations
+  getAllKeyPerformanceInsights(): Promise<KeyPerformanceInsight[]>;
+  getKeyPerformanceInsight(id: number): Promise<KeyPerformanceInsight | undefined>;
+  getKeyPerformanceInsightByKey(metricKey: string): Promise<KeyPerformanceInsight | undefined>;
+  createKeyPerformanceInsight(insight: InsertKeyPerformanceInsight): Promise<KeyPerformanceInsight>;
+  updateKeyPerformanceInsight(id: number, data: Partial<KeyPerformanceInsight>): Promise<KeyPerformanceInsight | undefined>;
+  deleteKeyPerformanceInsight(id: number): Promise<void>;
 }
 
 // Database storage implementation using Drizzle ORM - blueprint:javascript_database
@@ -1282,6 +1291,38 @@ export class DatabaseStorage implements IStorage {
 
   async deleteApiKey(id: number): Promise<void> {
     await db.delete(apiKeys).where(eq(apiKeys.id, id));
+  }
+
+  // Key Performance Insights operations
+  async getAllKeyPerformanceInsights(): Promise<KeyPerformanceInsight[]> {
+    return db.select().from(keyPerformanceInsights).orderBy(keyPerformanceInsights.displayOrder);
+  }
+
+  async getKeyPerformanceInsight(id: number): Promise<KeyPerformanceInsight | undefined> {
+    const [insight] = await db.select().from(keyPerformanceInsights).where(eq(keyPerformanceInsights.id, id));
+    return insight || undefined;
+  }
+
+  async getKeyPerformanceInsightByKey(metricKey: string): Promise<KeyPerformanceInsight | undefined> {
+    const [insight] = await db.select().from(keyPerformanceInsights).where(eq(keyPerformanceInsights.metricKey, metricKey));
+    return insight || undefined;
+  }
+
+  async createKeyPerformanceInsight(insight: InsertKeyPerformanceInsight): Promise<KeyPerformanceInsight> {
+    const [newInsight] = await db.insert(keyPerformanceInsights).values(insight).returning();
+    return newInsight;
+  }
+
+  async updateKeyPerformanceInsight(id: number, data: Partial<KeyPerformanceInsight>): Promise<KeyPerformanceInsight | undefined> {
+    const [updated] = await db.update(keyPerformanceInsights)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(keyPerformanceInsights.id, id))
+      .returning();
+    return updated || undefined;
+  }
+
+  async deleteKeyPerformanceInsight(id: number): Promise<void> {
+    await db.delete(keyPerformanceInsights).where(eq(keyPerformanceInsights.id, id));
   }
 }
 
