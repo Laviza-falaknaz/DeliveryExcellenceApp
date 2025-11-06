@@ -1,6 +1,6 @@
-import { db } from '../db';
-import { esgTargets } from '../db/schema';
-import { eq, and } from 'drizzle-orm';
+import { db } from './db';
+import { esgTargets } from '@shared/schema';
+import { eq } from 'drizzle-orm';
 
 export async function seedEsgTargets() {
   console.log("Seeding ESG targets...");
