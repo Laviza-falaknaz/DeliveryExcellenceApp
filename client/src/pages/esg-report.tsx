@@ -142,6 +142,18 @@ interface UserData {
   email: string;
 }
 
+interface KeyPerformanceInsight {
+  id: number;
+  metricKey: string;
+  metricName: string;
+  metricValue: string;
+  metricUnit: string | null;
+  metricCategory: string;
+  displayOrder: number;
+  isActive: boolean;
+  description: string | null;
+}
+
 export default function ESGReport() {
   const { toast } = useToast();
 
@@ -183,6 +195,10 @@ export default function ESGReport() {
 
   const { data: impact } = useQuery<ImpactData>({
     queryKey: ["/api/impact"],
+  });
+
+  const { data: keyInsights } = useQuery<KeyPerformanceInsight[]>({
+    queryKey: ["/api/key-insights"],
   });
 
   const calculateScoreMutation = useMutation({
@@ -231,15 +247,31 @@ export default function ESGReport() {
     );
   }
 
+  // Group insights by category
+  const environmentalInsights = keyInsights?.filter(i => i.metricCategory === 'environmental') || [];
+  const socialInsights = keyInsights?.filter(i => i.metricCategory === 'social') || [];
+  const governanceInsights = keyInsights?.filter(i => i.metricCategory === 'governance') || [];
+
+  // Group targets by category
+  const environmentalTargets = esgTargets?.filter(t => t.category === 'environmental') || [];
+  const socialTargets = esgTargets?.filter(t => t.category === 'social') || [];
+  const governanceTargets = esgTargets?.filter(t => t.category === 'governance') || [];
+
   return (
     <div className="container mx-auto py-8 px-4 max-w-7xl">
-      {/* Hero Section - Tier Badge & Score */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary/10 via-primary/5 to-background border border-primary/20 p-8 md:p-12 mb-8">
-        <div className="absolute inset-0 bg-grid-white/5 [mask-image:linear-gradient(0deg,transparent,black)]"></div>
-        
-        <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
-          <div className="flex-1 text-center md:text-left">
-            <div className="flex items-center gap-3 mb-4 justify-center md:justify-start">
+      {/* ESG Report Header */}
+      <div className="mb-8">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h1 className="text-4xl font-bold mb-2" data-testid="page-title">
+              ESG Performance Report
+            </h1>
+            <p className="text-muted-foreground text-lg">
+              Environmental, Social & Governance Impact Dashboard
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            {scoreData && (
               <Badge 
                 className="text-lg px-4 py-2 font-semibold"
                 style={{ 
@@ -249,90 +281,260 @@ export default function ESGReport() {
                 data-testid="tier-badge"
               >
                 <Crown className="w-5 h-5 mr-2" />
-                {scoreData?.tierName || 'Explorer'}
+                {scoreData.tierName} Tier
               </Badge>
-              {scoreData?.scoreChange && scoreData.scoreChange > 0 && (
-                <Badge variant="secondary" className="gap-1" data-testid="score-change">
-                  <TrendingUp className="w-4 h-4" />
-                  +{scoreData.scoreChange}
-                </Badge>
-              )}
-            </div>
-            
-            <h1 className="text-4xl md:text-5xl font-bold mb-2" data-testid="user-name">
-              Welcome back, {user?.name?.split(' ')[0] || 'Champion'}!
-            </h1>
-            <p className="text-xl text-muted-foreground mb-6">
-              Your environmental impact is making a real difference
-            </p>
-
-            <div className="flex flex-wrap gap-4 justify-center md:justify-start">
-              <Button 
-                onClick={() => calculateScoreMutation.mutate()}
-                disabled={calculateScoreMutation.isPending}
-                data-testid="button-refresh-score"
-              >
-                <Sparkles className="w-4 h-4 mr-2" />
-                {calculateScoreMutation.isPending ? "Calculating..." : "Refresh Score"}
-              </Button>
-            </div>
-          </div>
-
-          {/* Score Dial */}
-          <div className="relative">
-            <div className="relative w-48 h-48 md:w-56 md:h-56">
-              <svg className="w-full h-full transform -rotate-90">
-                <circle
-                  cx="50%"
-                  cy="50%"
-                  r="45%"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="8"
-                  className="text-muted/20"
-                />
-                <circle
-                  cx="50%"
-                  cy="50%"
-                  r="45%"
-                  fill="none"
-                  stroke={currentTier?.colorAccent || '#08ABAB'}
-                  strokeWidth="8"
-                  strokeDasharray={`${progressToNextTier * 2.83} 283`}
-                  strokeLinecap="round"
-                  className="transition-all duration-1000 ease-out"
-                  style={{
-                    filter: `drop-shadow(0 0 8px ${currentTier?.colorAccent || '#08ABAB'}40)`
-                  }}
-                />
-              </svg>
-              <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <p className="text-5xl font-bold" data-testid="total-score">{scoreData?.totalScore || 0}</p>
-                <p className="text-sm text-muted-foreground">ESG Score</p>
-              </div>
-            </div>
-            {nextTier && (
-              <p className="text-center mt-4 text-sm text-muted-foreground">
-                {nextTier.minScore - (scoreData?.totalScore || 0)} points to {nextTier.name}
-              </p>
             )}
           </div>
         </div>
       </div>
 
-      <Tabs defaultValue="impact" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4 lg:w-auto lg:inline-grid" data-testid="tabs-navigation">
+      {/* ESG Goals & Targets Section */}
+      <Card className="mb-8">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Target className="w-6 h-6" />
+            ESG Goals & Targets
+          </CardTitle>
+          <CardDescription>
+            Track progress towards organizational sustainability objectives
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Tabs defaultValue="environmental" className="w-full">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="environmental" data-testid="tab-environmental-goals">
+                <Leaf className="w-4 h-4 mr-2" />
+                Environmental
+              </TabsTrigger>
+              <TabsTrigger value="social" data-testid="tab-social-goals">
+                <Users className="w-4 h-4 mr-2" />
+                Social
+              </TabsTrigger>
+              <TabsTrigger value="governance" data-testid="tab-governance-goals">
+                <Award className="w-4 h-4 mr-2" />
+                Governance
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="environmental" className="space-y-4 mt-6">
+              {environmentalTargets.length > 0 ? (
+                environmentalTargets.map((target) => {
+                  const currentValue = parseFloat(target.currentValue);
+                  const targetValue = parseFloat(target.targetValue);
+                  const progress = Math.min((currentValue / targetValue) * 100, 100);
+                  
+                  return (
+                    <div key={target.id} className="space-y-2" data-testid={`goal-environmental-${target.id}`}>
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1">
+                          <h4 className="font-semibold">{target.title}</h4>
+                          {target.description && (
+                            <p className="text-sm text-muted-foreground">{target.description}</p>
+                          )}
+                        </div>
+                        <div className="text-right ml-4">
+                          <p className="font-bold text-lg">
+                            {currentValue.toLocaleString()} / {targetValue.toLocaleString()} {target.unit}
+                          </p>
+                          <p className="text-sm text-muted-foreground">{progress.toFixed(1)}% achieved</p>
+                        </div>
+                      </div>
+                      <Progress value={progress} className="h-3" />
+                    </div>
+                  );
+                })
+              ) : (
+                <p className="text-muted-foreground text-center py-8">No environmental targets set</p>
+              )}
+            </TabsContent>
+
+            <TabsContent value="social" className="space-y-4 mt-6">
+              {socialTargets.length > 0 ? (
+                socialTargets.map((target) => {
+                  const currentValue = parseFloat(target.currentValue);
+                  const targetValue = parseFloat(target.targetValue);
+                  const progress = Math.min((currentValue / targetValue) * 100, 100);
+                  
+                  return (
+                    <div key={target.id} className="space-y-2" data-testid={`goal-social-${target.id}`}>
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1">
+                          <h4 className="font-semibold">{target.title}</h4>
+                          {target.description && (
+                            <p className="text-sm text-muted-foreground">{target.description}</p>
+                          )}
+                        </div>
+                        <div className="text-right ml-4">
+                          <p className="font-bold text-lg">
+                            {currentValue.toLocaleString()} / {targetValue.toLocaleString()} {target.unit}
+                          </p>
+                          <p className="text-sm text-muted-foreground">{progress.toFixed(1)}% achieved</p>
+                        </div>
+                      </div>
+                      <Progress value={progress} className="h-3" />
+                    </div>
+                  );
+                })
+              ) : (
+                <p className="text-muted-foreground text-center py-8">No social targets set</p>
+              )}
+            </TabsContent>
+
+            <TabsContent value="governance" className="space-y-4 mt-6">
+              {governanceTargets.length > 0 ? (
+                governanceTargets.map((target) => {
+                  const currentValue = parseFloat(target.currentValue);
+                  const targetValue = parseFloat(target.targetValue);
+                  const progress = Math.min((currentValue / targetValue) * 100, 100);
+                  
+                  return (
+                    <div key={target.id} className="space-y-2" data-testid={`goal-governance-${target.id}`}>
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1">
+                          <h4 className="font-semibold">{target.title}</h4>
+                          {target.description && (
+                            <p className="text-sm text-muted-foreground">{target.description}</p>
+                          )}
+                        </div>
+                        <div className="text-right ml-4">
+                          <p className="font-bold text-lg">
+                            {currentValue.toLocaleString()} / {targetValue.toLocaleString()} {target.unit}
+                          </p>
+                          <p className="text-sm text-muted-foreground">{progress.toFixed(1)}% achieved</p>
+                        </div>
+                      </div>
+                      <Progress value={progress} className="h-3" />
+                    </div>
+                  );
+                })
+              ) : (
+                <p className="text-muted-foreground text-center py-8">No governance targets set</p>
+              )}
+            </TabsContent>
+          </Tabs>
+        </CardContent>
+      </Card>
+
+      {/* Key Performance Metrics Section */}
+      <Card className="mb-8">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Zap className="w-6 h-6" />
+            Key Performance Indicators
+          </CardTitle>
+          <CardDescription>
+            Critical metrics tracking organizational ESG performance
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Environmental KPIs */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="p-2 rounded-lg bg-green-500/10">
+                  <Leaf className="w-5 h-5 text-green-600" />
+                </div>
+                <h3 className="font-semibold text-lg">Environmental</h3>
+              </div>
+              {environmentalInsights.length > 0 ? (
+                environmentalInsights.map((insight) => (
+                  <div 
+                    key={insight.id} 
+                    className="p-4 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
+                    data-testid={`kpi-environmental-${insight.metricKey}`}
+                  >
+                    <p className="text-sm text-muted-foreground mb-1">{insight.metricName}</p>
+                    <p className="text-2xl font-bold">
+                      {insight.metricValue}
+                      {insight.metricUnit && <span className="text-lg ml-1">{insight.metricUnit}</span>}
+                    </p>
+                    {insight.description && (
+                      <p className="text-xs text-muted-foreground mt-1">{insight.description}</p>
+                    )}
+                  </div>
+                ))
+              ) : (
+                <p className="text-sm text-muted-foreground">No environmental metrics available</p>
+              )}
+            </div>
+
+            {/* Social KPIs */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="p-2 rounded-lg bg-blue-500/10">
+                  <Users className="w-5 h-5 text-blue-600" />
+                </div>
+                <h3 className="font-semibold text-lg">Social</h3>
+              </div>
+              {socialInsights.length > 0 ? (
+                socialInsights.map((insight) => (
+                  <div 
+                    key={insight.id} 
+                    className="p-4 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
+                    data-testid={`kpi-social-${insight.metricKey}`}
+                  >
+                    <p className="text-sm text-muted-foreground mb-1">{insight.metricName}</p>
+                    <p className="text-2xl font-bold">
+                      {insight.metricValue}
+                      {insight.metricUnit && <span className="text-lg ml-1">{insight.metricUnit}</span>}
+                    </p>
+                    {insight.description && (
+                      <p className="text-xs text-muted-foreground mt-1">{insight.description}</p>
+                    )}
+                  </div>
+                ))
+              ) : (
+                <p className="text-sm text-muted-foreground">No social metrics available</p>
+              )}
+            </div>
+
+            {/* Governance KPIs */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="p-2 rounded-lg bg-purple-500/10">
+                  <Award className="w-5 h-5 text-purple-600" />
+                </div>
+                <h3 className="font-semibold text-lg">Governance</h3>
+              </div>
+              {governanceInsights.length > 0 ? (
+                governanceInsights.map((insight) => (
+                  <div 
+                    key={insight.id} 
+                    className="p-4 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
+                    data-testid={`kpi-governance-${insight.metricKey}`}
+                  >
+                    <p className="text-sm text-muted-foreground mb-1">{insight.metricName}</p>
+                    <p className="text-2xl font-bold">
+                      {insight.metricValue}
+                      {insight.metricUnit && <span className="text-lg ml-1">{insight.metricUnit}</span>}
+                    </p>
+                    {insight.description && (
+                      <p className="text-xs text-muted-foreground mt-1">{insight.description}</p>
+                    )}
+                  </div>
+                ))
+              ) : (
+                <p className="text-sm text-muted-foreground">No governance metrics available</p>
+              )}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Detailed Impact & Gamification Tabs */}
+      <Tabs defaultValue="impact" className="w-full">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="impact" data-testid="tab-impact">
-            <Target className="w-4 h-4 mr-2" />
-            Impact
+            <Leaf className="w-4 h-4 mr-2" />
+            Impact Breakdown
           </TabsTrigger>
           <TabsTrigger value="achievements" data-testid="tab-achievements">
             <Trophy className="w-4 h-4 mr-2" />
             Achievements
           </TabsTrigger>
-          <TabsTrigger value="journey" data-testid="tab-journey">
-            <Award className="w-4 h-4 mr-2" />
-            Journey
+          <TabsTrigger value="milestones" data-testid="tab-milestones">
+            <Target className="w-4 h-4 mr-2" />
+            Milestones
           </TabsTrigger>
           <TabsTrigger value="leaderboard" data-testid="tab-leaderboard">
             <Users className="w-4 h-4 mr-2" />
@@ -340,121 +542,114 @@ export default function ESGReport() {
           </TabsTrigger>
         </TabsList>
 
-        {/* Impact Pillars Tab */}
-        <TabsContent value="impact" className="space-y-6">
+        {/* Impact Breakdown Tab */}
+        <TabsContent value="impact" className="space-y-6 mt-6">
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Target className="w-5 h-5" />
-                Your Environmental Impact
-              </CardTitle>
-              <CardDescription>
-                Track your progress across key sustainability pillars
-              </CardDescription>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle>Environmental & Social Impact Score</CardTitle>
+                  <CardDescription>
+                    Detailed breakdown of sustainability contributions across four key pillars
+                  </CardDescription>
+                </div>
+                <Button 
+                  onClick={() => calculateScoreMutation.mutate()}
+                  disabled={calculateScoreMutation.isPending}
+                  data-testid="button-refresh-score"
+                  variant="outline"
+                >
+                  <Sparkles className="w-4 h-4 mr-2" />
+                  {calculateScoreMutation.isPending ? "Calculating..." : "Refresh Score"}
+                </Button>
+              </div>
             </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Carbon Pillar */}
-                <div className="space-y-3" data-testid="pillar-carbon">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 rounded-lg bg-green-500/10">
-                        <Leaf className="w-5 h-5 text-green-600" />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold">Carbon Saved</h3>
-                        <p className="text-2xl font-bold" data-testid="value-carbon">
-                          {((impact?.carbonSaved ?? 0) / 1000).toFixed(2)} kg
-                        </p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-sm text-muted-foreground">Score</p>
-                      <p className="text-lg font-semibold text-green-600" data-testid="score-carbon">
-                        {scoreData?.breakdown?.carbon || 0}
-                      </p>
+            <CardContent className="pt-0">
+              {/* Score Dial */}
+              <div className="flex flex-col md:flex-row gap-8 items-center mb-8">
+                <div className="relative">
+                  <div className="relative w-48 h-48 md:w-56 md:h-56">
+                    <svg className="w-full h-full transform -rotate-90">
+                      <circle
+                        cx="50%"
+                        cy="50%"
+                        r="45%"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="8"
+                        className="text-muted/20"
+                      />
+                      <circle
+                        cx="50%"
+                        cy="50%"
+                        r="45%"
+                        fill="none"
+                        stroke={currentTier?.colorAccent || '#08ABAB'}
+                        strokeWidth="8"
+                        strokeDasharray={`${progressToNextTier * 2.83} 283`}
+                        strokeLinecap="round"
+                        className="transition-all duration-1000 ease-out"
+                        style={{
+                          filter: `drop-shadow(0 0 8px ${currentTier?.colorAccent || '#08ABAB'}40)`
+                        }}
+                      />
+                    </svg>
+                    <div className="absolute inset-0 flex flex-col items-center justify-center">
+                      <p className="text-5xl font-bold" data-testid="total-score">{scoreData?.totalScore || 0}</p>
+                      <p className="text-sm text-muted-foreground">ESG Score</p>
                     </div>
                   </div>
-                  {esgTargets?.find((t: any) => t.category === 'environmental' && t.title.toLowerCase().includes('carbon')) && (
-                    <Progress 
-                      value={Math.min(((impact?.carbonSaved ?? 0) / parseFloat(esgTargets.find((t: any) => t.category === 'environmental' && t.title.toLowerCase().includes('carbon'))?.targetValue || '1')) * 100, 100)} 
-                      className="h-2"
-                    />
+                  {nextTier && (
+                    <p className="text-center mt-4 text-sm text-muted-foreground">
+                      {nextTier.minScore - (scoreData?.totalScore || 0)} points to {nextTier.name}
+                    </p>
                   )}
                 </div>
 
-                {/* Water Pillar */}
-                <div className="space-y-3" data-testid="pillar-water">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 rounded-lg bg-blue-500/10">
-                        <Droplets className="w-5 h-5 text-blue-600" />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold">Families Helped</h3>
-                        <p className="text-2xl font-bold" data-testid="value-families">
-                          {impact?.familiesHelped ?? 0}
-                        </p>
-                      </div>
+                {/* Score Breakdown Cards */}
+                <div className="flex-1 grid grid-cols-2 gap-4 w-full">
+                  <div className="p-4 rounded-lg bg-green-500/10 border border-green-500/20">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Leaf className="w-5 h-5 text-green-600" />
+                      <h4 className="font-semibold">Carbon</h4>
                     </div>
-                    <div className="text-right">
-                      <p className="text-sm text-muted-foreground">Score</p>
-                      <p className="text-lg font-semibold text-blue-600" data-testid="score-water">
-                        {scoreData?.breakdown?.water || 0}
-                      </p>
-                    </div>
+                    <p className="text-3xl font-bold">{scoreData?.breakdown?.carbon || 0}</p>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      {((impact?.carbonSaved ?? 0) / 1000).toFixed(2)} kg saved
+                    </p>
                   </div>
-                  {esgTargets?.find((t: any) => t.category === 'social') && (
-                    <Progress 
-                      value={Math.min(((impact?.familiesHelped ?? 0) / parseFloat(esgTargets.find((t: any) => t.category === 'social')?.targetValue || '1')) * 100, 100)} 
-                      className="h-2"
-                    />
-                  )}
-                </div>
 
-                {/* Resources Pillar */}
-                <div className="space-y-3" data-testid="pillar-resources">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 rounded-lg bg-purple-500/10">
-                        <Recycle className="w-5 h-5 text-purple-600" />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold">Minerals Saved</h3>
-                        <p className="text-2xl font-bold" data-testid="value-minerals">
-                          {((impact?.mineralsSaved ?? 0) / 1000).toFixed(2)} kg
-                        </p>
-                      </div>
+                  <div className="p-4 rounded-lg bg-blue-500/10 border border-blue-500/20">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Droplets className="w-5 h-5 text-blue-600" />
+                      <h4 className="font-semibold">Water</h4>
                     </div>
-                    <div className="text-right">
-                      <p className="text-sm text-muted-foreground">Score</p>
-                      <p className="text-lg font-semibold text-purple-600" data-testid="score-resources">
-                        {scoreData?.breakdown?.resources || 0}
-                      </p>
-                    </div>
+                    <p className="text-3xl font-bold">{scoreData?.breakdown?.water || 0}</p>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      {(impact?.waterProvided ?? 0).toLocaleString()} L provided
+                    </p>
                   </div>
-                </div>
 
-                {/* Social Pillar */}
-                <div className="space-y-3" data-testid="pillar-social">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 rounded-lg bg-pink-500/10">
-                        <Heart className="w-5 h-5 text-pink-600" />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold">Social Impact</h3>
-                        <p className="text-2xl font-bold" data-testid="value-water-provided">
-                          {(impact?.waterProvided ?? 0).toLocaleString()} L
-                        </p>
-                      </div>
+                  <div className="p-4 rounded-lg bg-purple-500/10 border border-purple-500/20">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Recycle className="w-5 h-5 text-purple-600" />
+                      <h4 className="font-semibold">Resources</h4>
                     </div>
-                    <div className="text-right">
-                      <p className="text-sm text-muted-foreground">Score</p>
-                      <p className="text-lg font-semibold text-pink-600" data-testid="score-social">
-                        {scoreData?.breakdown?.social || 0}
-                      </p>
+                    <p className="text-3xl font-bold">{scoreData?.breakdown?.resources || 0}</p>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      {((impact?.mineralsSaved ?? 0) / 1000).toFixed(2)} kg minerals
+                    </p>
+                  </div>
+
+                  <div className="p-4 rounded-lg bg-pink-500/10 border border-pink-500/20">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Heart className="w-5 h-5 text-pink-600" />
+                      <h4 className="font-semibold">Social</h4>
                     </div>
+                    <p className="text-3xl font-bold">{scoreData?.breakdown?.social || 0}</p>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      {impact?.familiesHelped ?? 0} families helped
+                    </p>
                   </div>
                 </div>
               </div>
