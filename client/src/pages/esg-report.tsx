@@ -483,30 +483,34 @@ export default function ESGReport() {
                     Unlocked
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {unlockedAchievements.map((achievement: any) => (
-                      <Card 
-                        key={achievement.id} 
-                        className="border-primary/50 bg-gradient-to-br from-primary/5 to-background"
-                        data-testid={`achievement-unlocked-${achievement.achievement.code}`}
-                      >
-                        <CardContent className="pt-6">
-                          <div className="flex items-start gap-3">
-                            <div className="p-2 rounded-lg bg-primary/10">
-                              <Award className="w-6 h-6 text-primary" />
+                    {unlockedAchievements.map((achievement: any) => {
+                      const achData = achievement?.achievement;
+                      if (!achData) return null;
+                      return (
+                        <Card 
+                          key={achievement.id} 
+                          className="border-primary/50 bg-gradient-to-br from-primary/5 to-background"
+                          data-testid={`achievement-unlocked-${achData.code}`}
+                        >
+                          <CardContent className="pt-6">
+                            <div className="flex items-start gap-3">
+                              <div className="p-2 rounded-lg bg-primary/10">
+                                <Award className="w-6 h-6 text-primary" />
+                              </div>
+                              <div className="flex-1">
+                                <h4 className="font-semibold mb-1">{achData.name}</h4>
+                                <p className="text-sm text-muted-foreground mb-2">
+                                  {achData.description}
+                                </p>
+                                <Badge variant="secondary" className="text-xs">
+                                  +{achData.rewardPoints} points
+                                </Badge>
+                              </div>
                             </div>
-                            <div className="flex-1">
-                              <h4 className="font-semibold mb-1">{achievement.achievement.name}</h4>
-                              <p className="text-sm text-muted-foreground mb-2">
-                                {achievement.achievement.description}
-                              </p>
-                              <Badge variant="secondary" className="text-xs">
-                                +{achievement.achievement.rewardPoints} points
-                              </Badge>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
+                          </CardContent>
+                        </Card>
+                      );
+                    })}
                   </div>
                 </div>
               )}
@@ -519,31 +523,35 @@ export default function ESGReport() {
                     In Progress
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {lockedAchievements.slice(0, 6).map((achievement: any) => (
-                      <Card 
-                        key={achievement.id} 
-                        className="opacity-75"
-                        data-testid={`achievement-locked-${achievement.achievement.code}`}
-                      >
-                        <CardContent className="pt-6">
-                          <div className="flex items-start gap-3">
-                            <div className="p-2 rounded-lg bg-muted">
-                              <Lock className="w-6 h-6 text-muted-foreground" />
+                    {lockedAchievements.slice(0, 6).map((achievement: any) => {
+                      const achData = achievement?.achievement;
+                      if (!achData) return null;
+                      return (
+                        <Card 
+                          key={achievement.id} 
+                          className="opacity-75"
+                          data-testid={`achievement-locked-${achData.code}`}
+                        >
+                          <CardContent className="pt-6">
+                            <div className="flex items-start gap-3">
+                              <div className="p-2 rounded-lg bg-muted">
+                                <Lock className="w-6 h-6 text-muted-foreground" />
+                              </div>
+                              <div className="flex-1">
+                                <h4 className="font-semibold mb-1">{achData.name}</h4>
+                                <p className="text-sm text-muted-foreground mb-3">
+                                  {achData.description}
+                                </p>
+                                <Progress value={achievement.progressPercent ?? 0} className="h-2 mb-2" />
+                                <p className="text-xs text-muted-foreground">
+                                  {achievement.progressPercent ?? 0}% complete
+                                </p>
+                              </div>
                             </div>
-                            <div className="flex-1">
-                              <h4 className="font-semibold mb-1">{achievement.achievement.name}</h4>
-                              <p className="text-sm text-muted-foreground mb-3">
-                                {achievement.achievement.description}
-                              </p>
-                              <Progress value={achievement.progressPercent} className="h-2 mb-2" />
-                              <p className="text-xs text-muted-foreground">
-                                {achievement.progressPercent}% complete
-                              </p>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
+                          </CardContent>
+                        </Card>
+                      );
+                    })}
                   </div>
                 </div>
               )}
