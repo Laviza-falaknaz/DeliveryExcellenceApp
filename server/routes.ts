@@ -1668,6 +1668,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         visibleTabs: z.array(z.string()),
         rmaNotificationEmails: z.array(z.string().email()),
         newUserAlertEmails: z.array(z.string().email()),
+        documentDownloadApiUrl: z.string().url().optional(),
       });
 
       const validatedSettings = settingsSchema.parse(req.body);
@@ -1687,6 +1688,75 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Download order document (proxy to external API)
+  app.post("/api/orders/:orderNumber/documents/download", isAuthenticated, async (req, res) => {
+    try {
+      const { orderNumber } = req.params;
+      const { documentType } = req.body;
+
+      // Validate document type
+      const validDocumentTypes = ['invoice', 'packing_list', 'hashcodes', 'credit_note'];
+      if (!documentType || !validDocumentTypes.includes(documentType)) {
+        return res.status(400).json({ error: "Invalid document type" });
+      }
+
+      // Get the configured API URL from settings
+      const setting = await storage.getSystemSetting('admin_portal');
+      const apiUrl = setting?.settingValue?.documentDownloadApiUrl;
+
+      if (!apiUrl) {
+        return res.status(503).json({ 
+          error: "Document download service not configured",
+          message: "Please contact your administrator to configure the document download API."
+        });
+      }
+
+      // Make request to external API
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          orderNumber,
+          documentType,
+        }),
+      });
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          return res.status(404).json({ 
+            error: "Document not available",
+            message: "This document is not available yet. Please check back later or contact support."
+          });
+        }
+        throw new Error(`External API returned ${response.status}`);
+      }
+
+      // Get the file content and headers
+      const contentType = response.headers.get('content-type');
+      const contentDisposition = response.headers.get('content-disposition');
+      const fileBuffer = await response.arrayBuffer();
+
+      // Set appropriate headers
+      if (contentType) {
+        res.setHeader('Content-Type', contentType);
+      }
+      if (contentDisposition) {
+        res.setHeader('Content-Disposition', contentDisposition);
+      }
+
+      // Send the file
+      res.send(Buffer.from(fileBuffer));
+    } catch (error) {
+      console.error("Error downloading document:", error);
+      res.status(500).json({ 
+        error: "Failed to download document",
+        message: "An error occurred while downloading the document. Please try again later."
+      });
     }
   });
 

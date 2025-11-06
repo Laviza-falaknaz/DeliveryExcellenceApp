@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { Settings, Save, X, Plus, Mail } from "lucide-react";
+import { Settings, Save, X, Plus, Mail, FileDown } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 
 const AVAILABLE_TABS = [
@@ -28,6 +28,7 @@ interface AdminSettingsData {
   visibleTabs: string[];
   rmaNotificationEmails: string[];
   newUserAlertEmails: string[];
+  documentDownloadApiUrl?: string;
 }
 
 export function AdminSettings() {
@@ -42,6 +43,7 @@ export function AdminSettings() {
   const [visibleTabs, setVisibleTabs] = useState<string[]>([]);
   const [rmaEmails, setRmaEmails] = useState<string[]>([]);
   const [userEmails, setUserEmails] = useState<string[]>([]);
+  const [documentApiUrl, setDocumentApiUrl] = useState("");
 
   // Synchronize local state when settings load
   useEffect(() => {
@@ -49,6 +51,7 @@ export function AdminSettings() {
       setVisibleTabs(settings.visibleTabs || AVAILABLE_TABS.map(t => t.id));
       setRmaEmails(settings.rmaNotificationEmails || []);
       setUserEmails(settings.newUserAlertEmails || []);
+      setDocumentApiUrl(settings.documentDownloadApiUrl || "");
     }
   }, [settings]);
 
@@ -126,6 +129,7 @@ export function AdminSettings() {
       visibleTabs,
       rmaNotificationEmails: rmaEmails,
       newUserAlertEmails: userEmails,
+      documentDownloadApiUrl: documentApiUrl || undefined,
     });
   };
 
@@ -311,6 +315,36 @@ export function AdminSettings() {
                   ))
                 )}
               </div>
+            </div>
+          </div>
+
+          <Separator />
+
+          {/* Document Download API URL Section */}
+          <div className="space-y-4">
+            <div>
+              <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
+                <FileDown className="w-5 h-5" />
+                Document Download API Configuration
+              </h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                Configure the external API endpoint for downloading order documents (invoices, packing lists, hashcodes, credit notes)
+              </p>
+            </div>
+
+            <div className="space-y-3">
+              <Label htmlFor="document-api-url">API Endpoint URL</Label>
+              <Input
+                id="document-api-url"
+                type="url"
+                placeholder="https://your-api.com/documents/download"
+                value={documentApiUrl}
+                onChange={(e) => setDocumentApiUrl(e.target.value)}
+                data-testid="input-document-api-url"
+              />
+              <p className="text-xs text-muted-foreground">
+                The API will receive a POST request with orderNumber and documentType. It should return the requested file.
+              </p>
             </div>
           </div>
 
