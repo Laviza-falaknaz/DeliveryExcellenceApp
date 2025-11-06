@@ -400,9 +400,8 @@ export default function Dashboard() {
                             </div>
                           </div>
                           <Button 
-                            variant="outline" 
                             size="sm" 
-                            className="text-teal-600 hover:text-teal-700 hover:bg-teal-50 border-teal-200 text-xs h-7"
+                            className="bg-teal-600 hover:bg-teal-700 text-white text-xs h-7"
                             onClick={(e) => {
                               e.stopPropagation();
                               setLocation(`/orders/${order.id}/journey`);
