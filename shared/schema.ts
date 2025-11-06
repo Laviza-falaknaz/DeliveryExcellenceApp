@@ -650,3 +650,163 @@ export const insertEsgTargetSchema = createInsertSchema(esgTargets).omit({
 
 export type EsgTarget = typeof esgTargets.$inferSelect;
 export type InsertEsgTarget = z.infer<typeof insertEsgTargetSchema>;
+
+// Gamification Tiers schema - defines achievement levels (Explorer, Innovator, Vanguard, etc.)
+export const gamificationTiers = pgTable("gamification_tiers", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull().unique(), // e.g., 'Explorer', 'Innovator', 'Vanguard'
+  minScore: integer("min_score").notNull(), // Minimum score to reach this tier
+  maxScore: integer("max_score"), // Maximum score for this tier (null for highest tier)
+  colorAccent: text("color_accent").notNull().default('#08ABAB'), // Hex color for tier branding
+  icon: text("icon"), // Icon identifier or URL
+  benefits: json("benefits").$type<string[]>().default([]), // List of benefits for reaching this tier
+  displayOrder: integer("display_order").notNull().default(0),
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertGamificationTierSchema = createInsertSchema(gamificationTiers).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type GamificationTier = typeof gamificationTiers.$inferSelect;
+export type InsertGamificationTier = z.infer<typeof insertGamificationTierSchema>;
+
+// Gamification Achievements schema - badges and achievements users can unlock
+export const gamificationAchievements = pgTable("gamification_achievements", {
+  id: serial("id").primaryKey(),
+  code: text("code").notNull().unique(), // Unique identifier like 'carbon_champion_100'
+  name: text("name").notNull(), // Display name: "Carbon Champion"
+  description: text("description").notNull(), // What the achievement is for
+  icon: text("icon"), // Icon identifier or URL
+  category: text("category").notNull(), // 'environmental', 'social', 'governance', 'engagement'
+  thresholdType: text("threshold_type").notNull(), // 'carbon_saved', 'water_provided', 'orders_completed', etc.
+  thresholdValue: numeric("threshold_value", { precision: 15, scale: 2 }).notNull(), // Target value to unlock
+  rewardPoints: integer("reward_points").notNull().default(0), // Points awarded when unlocked
+  tierRequired: integer("tier_required").references(() => gamificationTiers.id), // Optional: required tier to see/unlock
+  shareCopy: text("share_copy"), // Pre-written text for social sharing
+  displayOrder: integer("display_order").notNull().default(0),
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertGamificationAchievementSchema = createInsertSchema(gamificationAchievements).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type GamificationAchievement = typeof gamificationAchievements.$inferSelect;
+export type InsertGamificationAchievement = z.infer<typeof insertGamificationAchievementSchema>;
+
+// User Achievement Progress schema - tracks user progress toward achievements
+export const userAchievementProgress = pgTable("user_achievement_progress", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id),
+  achievementId: integer("achievement_id").notNull().references(() => gamificationAchievements.id),
+  currentValue: numeric("current_value", { precision: 15, scale: 2 }).notNull().default('0'), // Current progress
+  progressPercent: integer("progress_percent").notNull().default(0), // 0-100%
+  isUnlocked: boolean("is_unlocked").notNull().default(false),
+  unlockedAt: timestamp("unlocked_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertUserAchievementProgressSchema = createInsertSchema(userAchievementProgress).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type UserAchievementProgress = typeof userAchievementProgress.$inferSelect;
+export type InsertUserAchievementProgress = z.infer<typeof insertUserAchievementProgressSchema>;
+
+// Gamification Milestones schema - journey milestones tied to tiers
+export const gamificationMilestones = pgTable("gamification_milestones", {
+  id: serial("id").primaryKey(),
+  tierId: integer("tier_id").references(() => gamificationTiers.id), // Optional: link to tier
+  title: text("title").notNull(), // e.g., "First Carbon Offset"
+  description: text("description").notNull(),
+  icon: text("icon"),
+  requiredScore: integer("required_score"), // Score needed to reach this milestone
+  orderIndex: integer("order_index").notNull().default(0), // Order in timeline
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertGamificationMilestoneSchema = createInsertSchema(gamificationMilestones).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type GamificationMilestone = typeof gamificationMilestones.$inferSelect;
+export type InsertGamificationMilestone = z.infer<typeof insertGamificationMilestoneSchema>;
+
+// User Milestone Events schema - tracks when users reach milestones
+export const userMilestoneEvents = pgTable("user_milestone_events", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id),
+  milestoneId: integer("milestone_id").notNull().references(() => gamificationMilestones.id),
+  reachedAt: timestamp("reached_at").defaultNow(),
+  metadata: json("metadata").$type<Record<string, any>>(), // Additional context data
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertUserMilestoneEventSchema = createInsertSchema(userMilestoneEvents).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type UserMilestoneEvent = typeof userMilestoneEvents.$inferSelect;
+export type InsertUserMilestoneEvent = z.infer<typeof insertUserMilestoneEventSchema>;
+
+// ESG Scores schema - calculated scores for users over time
+export const esgScores = pgTable("esg_scores", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id),
+  period: text("period").notNull(), // e.g., '2025-01', 'all-time', 'current'
+  totalScore: integer("total_score").notNull().default(0),
+  tierId: integer("tier_id").references(() => gamificationTiers.id),
+  breakdown: json("breakdown").$type<{
+    carbon: number;
+    water: number;
+    resources: number;
+    social: number;
+  }>(), // Score breakdown by pillar
+  metadata: json("metadata").$type<Record<string, any>>(), // Additional scoring data
+  calculatedAt: timestamp("calculated_at").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertEsgScoreSchema = createInsertSchema(esgScores).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type EsgScore = typeof esgScores.$inferSelect;
+export type InsertEsgScore = z.infer<typeof insertEsgScoreSchema>;
+
+// Gamification Settings schema - configurable system settings for scoring and features
+export const gamificationSettings = pgTable("gamification_settings", {
+  id: serial("id").primaryKey(),
+  settingKey: text("setting_key").notNull().unique(), // e.g., 'scoring_weights', 'features_enabled'
+  settingValue: json("setting_value").$type<any>().notNull(), // JSON value for flexibility
+  description: text("description"),
+  updatedAt: timestamp("updated_at").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertGamificationSettingSchema = createInsertSchema(gamificationSettings).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type GamificationSetting = typeof gamificationSettings.$inferSelect;
+export type InsertGamificationSetting = z.infer<typeof insertGamificationSettingSchema>;
