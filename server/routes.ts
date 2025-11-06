@@ -1933,38 +1933,83 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "RMA request not found" });
       }
 
-      // Get RMA notification emails from settings
+      // Get RMA webhook URL from settings
       const setting = await storage.getSystemSetting('admin_portal');
-      const rmaEmails = setting?.settingValue?.rmaNotificationEmails || [];
+      const webhookUrl = setting?.settingValue?.rmaWebhookUrl;
 
-      if (rmaEmails.length === 0) {
+      if (!webhookUrl) {
         return res.status(400).json({ 
-          message: "No RMA notification emails configured. Please configure them in Admin Settings." 
+          message: "No RMA webhook URL configured. Please configure it in Admin Settings." 
         });
       }
 
-      // TODO: Implement actual email sending logic using the configured email service
-      // For now, just log the details and return success
-      console.log("=== RMA Request Email ===");
-      console.log("To:", rmaEmails.join(", "));
+      // Validate webhook URL is HTTPS
+      try {
+        const url = new URL(webhookUrl);
+        if (url.protocol !== 'https:') {
+          return res.status(400).json({
+            message: "RMA webhook URL must use HTTPS protocol for security."
+          });
+        }
+      } catch (error) {
+        return res.status(400).json({
+          message: "Invalid RMA webhook URL configured."
+        });
+      }
+
+      // Prepare the webhook payload with complete RMA request details
+      const webhookPayload = {
+        requestId: request.id,
+        requestNumber: request.requestNumber,
+        fullName: request.fullName,
+        companyName: request.companyName,
+        email: request.email,
+        phone: request.phone,
+        address: request.address,
+        deliveryAddress: request.deliveryAddress,
+        productMakeModel: request.productMakeModel,
+        numberOfProducts: request.numberOfProducts,
+        manufacturerSerialNumber: request.manufacturerSerialNumber,
+        inHouseSerialNumber: request.inHouseSerialNumber,
+        faultDescription: request.faultDescription,
+        status: request.status,
+        createdAt: request.createdAt,
+        timestamp: new Date().toISOString()
+      };
+
+      // Send HTTP POST request to webhook
+      const webhookResponse = await fetch(webhookUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'User-Agent': 'Circular-Computing-Portal/1.0'
+        },
+        body: JSON.stringify(webhookPayload)
+      });
+
+      if (!webhookResponse.ok) {
+        console.error("Webhook request failed:", webhookResponse.status, webhookResponse.statusText);
+        return res.status(500).json({ 
+          message: `Webhook request failed with status ${webhookResponse.status}`,
+          details: webhookResponse.statusText
+        });
+      }
+
+      console.log("RMA request notification sent to webhook:", webhookUrl);
       console.log("Request Number:", request.requestNumber);
-      console.log("Full Name:", request.fullName);
-      console.log("Company:", request.companyName);
-      console.log("Email:", request.email);
-      console.log("Phone:", request.phone);
-      console.log("Product:", request.productMakeModel);
-      console.log("Fault:", request.faultDescription);
-      console.log("========================");
 
       res.json({ 
         success: true, 
-        message: "RMA request details sent via email",
-        sentTo: rmaEmails,
+        message: "RMA request details sent to webhook",
+        webhookUrl: webhookUrl,
         requestNumber: request.requestNumber 
       });
     } catch (error) {
       console.error("Error resending RMA request:", error);
-      res.status(500).json({ message: "Internal server error" });
+      res.status(500).json({ 
+        message: "Failed to send webhook notification",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
     }
   });
 
