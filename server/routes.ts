@@ -2080,21 +2080,102 @@ export async function registerRoutes(app: Express): Promise<Server> {
         throw new Error(`External API returned ${response.status}`);
       }
 
-      // Get the file content and headers
       const contentType = response.headers.get('content-type');
-      const contentDisposition = response.headers.get('content-disposition');
-      const fileBuffer = await response.arrayBuffer();
 
-      // Set appropriate headers
-      if (contentType) {
-        res.setHeader('Content-Type', contentType);
-      }
-      if (contentDisposition) {
-        res.setHeader('Content-Disposition', contentDisposition);
-      }
+      // Check if response is JSON (array of files) or a single file
+      if (contentType && contentType.includes('application/json')) {
+        // Response is JSON - expect array of file URLs or file data
+        const jsonData = await response.json();
+        
+        // Handle array of files - create ZIP
+        if (Array.isArray(jsonData) && jsonData.length > 0) {
+          const archiver = (await import('archiver')).default;
+          const archive = archiver('zip', { zlib: { level: 9 } });
 
-      // Send the file
-      res.send(Buffer.from(fileBuffer));
+          // Set response headers for ZIP download
+          const zipFileName = `${orderNumber}_${documentType}_${Date.now()}.zip`;
+          res.setHeader('Content-Type', 'application/zip');
+          res.setHeader('Content-Disposition', `attachment; filename="${zipFileName}"`);
+
+          // Pipe archive to response
+          archive.pipe(res);
+
+          // Add each file to the archive
+          for (let i = 0; i < jsonData.length; i++) {
+            const fileData = jsonData[i];
+            
+            try {
+              let fileBuffer: Buffer;
+              let fileName: string;
+
+              // Handle different response formats
+              if (typeof fileData === 'string') {
+                // File URL - fetch it
+                const fileResponse = await fetch(fileData);
+                if (!fileResponse.ok) {
+                  console.error(`Failed to fetch file from ${fileData}`);
+                  continue;
+                }
+                fileBuffer = Buffer.from(await fileResponse.arrayBuffer());
+                fileName = `${documentType}_${i + 1}.pdf`;
+              } else if (fileData.url) {
+                // Object with URL
+                const fileResponse = await fetch(fileData.url);
+                if (!fileResponse.ok) {
+                  console.error(`Failed to fetch file from ${fileData.url}`);
+                  continue;
+                }
+                fileBuffer = Buffer.from(await fileResponse.arrayBuffer());
+                fileName = fileData.fileName || fileData.name || `${documentType}_${i + 1}.pdf`;
+              } else if (fileData.data) {
+                // Object with base64 data
+                fileBuffer = Buffer.from(fileData.data, 'base64');
+                fileName = fileData.fileName || fileData.name || `${documentType}_${i + 1}.pdf`;
+              } else {
+                console.error('Unknown file format in array:', fileData);
+                continue;
+              }
+
+              // Add file to archive
+              archive.append(fileBuffer, { name: fileName });
+            } catch (fileError) {
+              console.error(`Error processing file ${i}:`, fileError);
+              // Continue with other files
+            }
+          }
+
+          // Finalize the archive
+          await archive.finalize();
+          return;
+        } else if (jsonData.url) {
+          // Single file with URL
+          const fileResponse = await fetch(jsonData.url);
+          if (!fileResponse.ok) {
+            throw new Error('Failed to fetch file from provided URL');
+          }
+          const fileBuffer = await fileResponse.arrayBuffer();
+          const fileName = jsonData.fileName || jsonData.name || `${orderNumber}_${documentType}.pdf`;
+          
+          res.setHeader('Content-Type', 'application/pdf');
+          res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
+          return res.send(Buffer.from(fileBuffer));
+        } else {
+          throw new Error('Invalid JSON response format from API');
+        }
+      } else {
+        // Response is a single file - return it directly
+        const contentDisposition = response.headers.get('content-disposition');
+        const fileBuffer = await response.arrayBuffer();
+
+        if (contentType) {
+          res.setHeader('Content-Type', contentType);
+        }
+        if (contentDisposition) {
+          res.setHeader('Content-Disposition', contentDisposition);
+        }
+
+        return res.send(Buffer.from(fileBuffer));
+      }
     } catch (error) {
       console.error("Error downloading document:", error);
       res.status(500).json({ 
