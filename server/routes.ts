@@ -2118,6 +2118,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 }
                 fileBuffer = Buffer.from(await fileResponse.arrayBuffer());
                 fileName = `${documentType}_${i + 1}.pdf`;
+              } else if (fileData['$content']) {
+                // Object with $content (base64) and $content-type format
+                fileBuffer = Buffer.from(fileData['$content'], 'base64');
+                fileName = fileData.fileName || fileData.name || `${documentType}_${i + 1}.pdf`;
               } else if (fileData.url) {
                 // Object with URL
                 const fileResponse = await fetch(fileData.url);
