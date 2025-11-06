@@ -27,6 +27,8 @@ import { apiRequest } from "@/lib/queryClient";
 import Sidebar from "@/components/layout/sidebar";
 import MobileNav from "@/components/layout/mobile-nav";
 import { FloatingChat } from "@/components/ui/floating-chat";
+import { LaunchAnimation } from "@/components/ui/launch-animation";
+import { AnimatePresence } from "framer-motion";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
@@ -207,13 +209,32 @@ function Router() {
 }
 
 function App() {
+  const [showLaunchAnimation, setShowLaunchAnimation] = useState(() => {
+    const hasSeenAnimation = sessionStorage.getItem('hasSeenLaunchAnimation');
+    return !hasSeenAnimation;
+  });
+
+  const handleAnimationComplete = () => {
+    sessionStorage.setItem('hasSeenLaunchAnimation', 'true');
+    setShowLaunchAnimation(false);
+  };
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Toaster />
-        <AppLayout>
-          <Router />
-        </AppLayout>
+        <AnimatePresence mode="wait">
+          {showLaunchAnimation ? (
+            <LaunchAnimation
+              key="launch"
+              onComplete={handleAnimationComplete}
+            />
+          ) : (
+            <AppLayout key="app">
+              <Router />
+            </AppLayout>
+          )}
+        </AnimatePresence>
       </TooltipProvider>
     </QueryClientProvider>
   );
