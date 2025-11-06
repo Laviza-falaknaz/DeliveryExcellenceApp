@@ -29,6 +29,7 @@ interface AdminSettingsData {
   rmaNotificationEmails: string[];
   newUserAlertEmails: string[];
   documentDownloadApiUrl?: string;
+  rmaWebhookUrl?: string;
 }
 
 export function AdminSettings() {
@@ -44,6 +45,7 @@ export function AdminSettings() {
   const [rmaEmails, setRmaEmails] = useState<string[]>([]);
   const [userEmails, setUserEmails] = useState<string[]>([]);
   const [documentApiUrl, setDocumentApiUrl] = useState("");
+  const [rmaWebhookUrl, setRmaWebhookUrl] = useState("");
 
   // Synchronize local state when settings load
   useEffect(() => {
@@ -52,6 +54,7 @@ export function AdminSettings() {
       setRmaEmails(settings.rmaNotificationEmails || []);
       setUserEmails(settings.newUserAlertEmails || []);
       setDocumentApiUrl(settings.documentDownloadApiUrl || "");
+      setRmaWebhookUrl(settings.rmaWebhookUrl || "");
     }
   }, [settings]);
 
@@ -147,11 +150,34 @@ export function AdminSettings() {
       }
     }
 
+    // Validate RMA webhook URL if provided
+    if (rmaWebhookUrl && rmaWebhookUrl.trim() !== "") {
+      try {
+        const url = new URL(rmaWebhookUrl);
+        if (url.protocol !== 'https:') {
+          toast({
+            title: "Invalid URL",
+            description: "RMA webhook URL must use HTTPS protocol for security.",
+            variant: "destructive",
+          });
+          return;
+        }
+      } catch (error) {
+        toast({
+          title: "Invalid URL",
+          description: "Please enter a valid URL for the RMA webhook (e.g., https://your-webhook.com/rma).",
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+
     saveMutation.mutate({
       visibleTabs,
       rmaNotificationEmails: rmaEmails,
       newUserAlertEmails: userEmails,
       documentDownloadApiUrl: documentApiUrl && documentApiUrl.trim() !== "" ? documentApiUrl : undefined,
+      rmaWebhookUrl: rmaWebhookUrl && rmaWebhookUrl.trim() !== "" ? rmaWebhookUrl : undefined,
     });
   };
 
@@ -275,6 +301,36 @@ export function AdminSettings() {
                   ))
                 )}
               </div>
+            </div>
+          </div>
+
+          <Separator />
+
+          {/* RMA Webhook URL Section */}
+          <div className="space-y-4">
+            <div>
+              <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
+                <FileDown className="w-5 h-5" />
+                RMA Notification Webhook
+              </h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                Configure a webhook URL to receive RMA request notifications as JSON data
+              </p>
+            </div>
+
+            <div className="space-y-3">
+              <Label htmlFor="rma-webhook-url">Webhook URL</Label>
+              <Input
+                id="rma-webhook-url"
+                type="url"
+                placeholder="https://your-webhook.com/rma-notifications"
+                value={rmaWebhookUrl}
+                onChange={(e) => setRmaWebhookUrl(e.target.value)}
+                data-testid="input-rma-webhook-url"
+              />
+              <p className="text-xs text-muted-foreground">
+                When an RMA request is resent, a POST request with complete request details will be sent to this URL as JSON.
+              </p>
             </div>
           </div>
 
