@@ -405,7 +405,7 @@ export default function Dashboard() {
                             className="text-teal-600 hover:text-teal-700 hover:bg-teal-50 border-teal-200 text-xs h-7"
                             onClick={(e) => {
                               e.stopPropagation();
-                              setLocation('/delivery-timeline');
+                              setLocation(`/orders/${order.id}/journey`);
                             }}
                             data-testid={`button-track-order-${order.id}`}
                           >
