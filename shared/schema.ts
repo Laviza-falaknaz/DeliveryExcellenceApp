@@ -624,3 +624,29 @@ export const insertOrganizationalMetricSchema = createInsertSchema(organizationa
 
 export type OrganizationalMetric = typeof organizationalMetrics.$inferSelect;
 export type InsertOrganizationalMetric = z.infer<typeof insertOrganizationalMetricSchema>;
+
+// ESG Targets schema - configurable sustainability goals and targets
+export const esgTargets = pgTable("esg_targets", {
+  id: serial("id").primaryKey(),
+  category: text("category").notNull(), // 'environmental', 'social', 'governance'
+  title: text("title").notNull(),
+  targetValue: numeric("target_value", { precision: 15, scale: 2 }).notNull(),
+  currentValue: numeric("current_value", { precision: 15, scale: 2 }).notNull().default('0'),
+  unit: text("unit").notNull(), // 'units', 'kg', 'families', '%', etc.
+  description: text("description"),
+  displayOrder: integer("display_order").notNull().default(0),
+  isActive: boolean("is_active").notNull().default(true),
+  startDate: timestamp("start_date").defaultNow(),
+  targetDate: timestamp("target_date"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertEsgTargetSchema = createInsertSchema(esgTargets).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type EsgTarget = typeof esgTargets.$inferSelect;
+export type InsertEsgTarget = z.infer<typeof insertEsgTargetSchema>;
