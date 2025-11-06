@@ -144,6 +144,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   };
 
+  // API Key OR Admin Session authentication middleware
+  const requireApiKeyOrAdmin = async (req: Request, res: Response, next: Function) => {
+    // Check if user is authenticated via session and is admin
+    if (req.isAuthenticated() && req.user && (req.user as User).isAdmin) {
+      console.log(`[Auth] Admin session authenticated: ${(req.user as User).username}`);
+      return next();
+    }
+
+    // Otherwise, check for API key
+    try {
+      const apiKey = req.headers['x-api-key'] as string || 
+                     (req.headers.authorization?.startsWith('Bearer ') ? 
+                      req.headers.authorization.substring(7) : null);
+      
+      if (!apiKey) {
+        console.log(`[Auth] No API key or admin session for ${req.method} ${req.path}`);
+        return res.status(401).json({ 
+          success: false,
+          error: "Admin session or API key required. Provide API key in X-API-Key header or Authorization: Bearer <key>" 
+        });
+      }
+
+      const keyPrefix = apiKey.substring(0, 11);
+      console.log(`[API Key Auth] Validating key with prefix: ${keyPrefix} for ${req.method} ${req.path}`);
+
+      const validKey = await storage.validateApiKey(apiKey);
+      
+      if (!validKey) {
+        console.log(`[API Key Auth] FAILED - Invalid or expired key with prefix: ${keyPrefix}`);
+        return res.status(401).json({ 
+          success: false,
+          error: "Invalid or expired API key" 
+        });
+      }
+
+      console.log(`[API Key Auth] SUCCESS - Valid key: ${validKey.name} (ID: ${validKey.id})`);
+      next();
+    } catch (error) {
+      console.error('[Auth] Exception:', error);
+      res.status(500).json({ 
+        success: false,
+        error: "Internal server error" 
+      });
+    }
+  };
+
   // Auth routes
   // Registration is disabled - users are created by administrators
   app.post("/api/auth/register", async (req, res) => {
@@ -2357,7 +2403,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/admin/organizational-metrics/:metricKey", requireAdmin, async (req, res) => {
+  app.put("/api/admin/organizational-metrics/:metricKey", requireApiKeyOrAdmin, async (req, res) => {
     try {
       const { metricKey } = req.params;
       const { value } = req.body;
@@ -2366,7 +2412,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Value must be a number" });
       }
 
-      const updated = await storage.updateOrganizationalMetric(metricKey, value, req.user?.id);
+      const updated = await storage.updateOrganizationalMetric(metricKey, value, (req.user as User)?.id);
       if (!updated) {
         return res.status(404).json({ error: "Metric not found" });
       }
@@ -2378,7 +2424,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/admin/organizational-metrics", requireAdmin, async (req, res) => {
+  app.post("/api/admin/organizational-metrics", requireApiKeyOrAdmin, async (req, res) => {
     try {
       const { metricKey, metricValue, metricUnit, description } = req.body;
       
@@ -2386,7 +2432,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         metricValue: metricValue.toString(),
         metricUnit,
         description,
-        lastUpdatedBy: req.user?.id
+        lastUpdatedBy: (req.user as User)?.id
       });
       
       res.json(metric);

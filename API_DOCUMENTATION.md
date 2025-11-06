@@ -988,9 +988,11 @@ Administrators can create and manage API keys through these endpoints (requires 
 
 The Organizational Metrics API allows administrators to update and track company-wide environmental impact statistics. These metrics are displayed in the ESG Report and represent the total impact across all customers.
 
-**Authentication:** Requires admin session authentication (login via web portal)
+**Authentication:** Admin session OR API key authentication (both supported for write operations)
 
 **Base URL:** `/api/organizational-metrics` and `/api/admin/organizational-metrics`
+
+**Recommended for Automation:** Use API key authentication for automated updates from external systems like Power Automate, Zapier, or scheduled scripts.
 
 ---
 
@@ -1044,13 +1046,13 @@ Retrieve all organizational-level metrics including total units deployed, carbon
 
 ---
 
-## Update Total Units Deployed (Admin Only)
+## Update Total Units Deployed
 
 Update the total number of remanufactured units deployed. This endpoint automatically recalculates all dependent metrics (carbon saved, water saved, families helped) based on sustainability settings.
 
 **Endpoint:** `PUT /api/admin/organizational-metrics/:metricKey`
 
-**Authentication:** Admin session required
+**Authentication:** Admin session OR API key (both supported)
 
 **URL Parameters:**
 - `metricKey`: The metric to update (e.g., `total_units_deployed`)
@@ -1062,7 +1064,17 @@ Update the total number of remanufactured units deployed. This endpoint automati
 }
 ```
 
-**Example Request:**
+**Example Request (API Key - Recommended for automation):**
+```bash
+curl -X PUT https://your-portal.replit.app/api/admin/organizational-metrics/total_units_deployed \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: YOUR_API_KEY_HERE" \
+  -d '{
+    "value": 75000
+  }'
+```
+
+**Example Request (Admin Session):**
 ```bash
 curl -X PUT https://your-portal.replit.app/api/admin/organizational-metrics/total_units_deployed \
   -H "Content-Type: application/json" \
@@ -1176,47 +1188,93 @@ If sustainability settings are not found, the recalculation aborts with a warnin
 1. Scheduled trigger: Daily at 00:00
 2. HTTP Request to your ERP: GET total deployed units
 3. HTTP Request to Portal: PUT /api/admin/organizational-metrics/total_units_deployed
-   - Authentication: Session cookie from admin login
+   - Method: PUT
+   - Headers:
+     - Content-Type: application/json
+     - X-API-Key: YOUR_API_KEY_HERE
    - Body: {"value": <ERP_TOTAL>}
 4. Check response status
 5. Send notification on success/failure
+```
+
+**Power Automate HTTP Action Configuration:**
+```json
+{
+  "method": "PUT",
+  "uri": "https://your-portal.replit.app/api/admin/organizational-metrics/total_units_deployed",
+  "headers": {
+    "Content-Type": "application/json",
+    "X-API-Key": "YOUR_API_KEY_HERE"
+  },
+  "body": {
+    "value": 75000
+  }
+}
 ```
 
 **Node.js Script Example:**
 ```javascript
 const fetch = require('node-fetch');
 
-async function updateOrganizationalMetrics() {
-  // Login as admin first to get session cookie
-  const loginRes = await fetch('https://your-portal.replit.app/api/auth/login', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      username: 'admin@company.com',
-      password: 'admin_password'
-    })
-  });
-  
-  const cookies = loginRes.headers.get('set-cookie');
-  
-  // Update total units deployed
+async function updateOrganizationalMetrics(totalUnits) {
+  // Update total units deployed using API key
   const updateRes = await fetch(
     'https://your-portal.replit.app/api/admin/organizational-metrics/total_units_deployed',
     {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        'Cookie': cookies
+        'X-API-Key': process.env.PORTAL_API_KEY // Store API key in environment variable
       },
-      body: JSON.stringify({ value: 75000 })
+      body: JSON.stringify({ value: totalUnits })
     }
   );
   
+  if (!updateRes.ok) {
+    throw new Error(`Failed to update metrics: ${updateRes.statusText}`);
+  }
+  
   const result = await updateRes.json();
   console.log('✅ Updated organizational metrics:', result);
+  console.log(`📊 Total units deployed: ${result.metricValue}`);
+  
+  return result;
 }
 
-updateOrganizationalMetrics();
+// Example usage
+updateOrganizationalMetrics(75000)
+  .then(() => console.log('Update complete'))
+  .catch(error => console.error('Update failed:', error));
+```
+
+**Python Script Example:**
+```python
+import requests
+import os
+
+def update_organizational_metrics(total_units):
+    """Update total units deployed using API key"""
+    
+    url = 'https://your-portal.replit.app/api/admin/organizational-metrics/total_units_deployed'
+    headers = {
+        'Content-Type': 'application/json',
+        'X-API-Key': os.environ.get('PORTAL_API_KEY')  # Store API key in environment variable
+    }
+    payload = {'value': total_units}
+    
+    response = requests.put(url, headers=headers, json=payload)
+    response.raise_for_status()
+    
+    result = response.json()
+    print(f"✅ Updated organizational metrics: {result}")
+    print(f"📊 Total units deployed: {result['metricValue']}")
+    
+    return result
+
+# Example usage
+if __name__ == '__main__':
+    update_organizational_metrics(75000)
+    print('Update complete')
 ```
 
 ---
