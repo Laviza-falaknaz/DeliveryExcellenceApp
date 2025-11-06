@@ -1672,6 +1672,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         rmaNotificationEmails: z.array(z.string().email()),
         newUserAlertEmails: z.array(z.string().email()),
         documentDownloadApiUrl: z.string().url().regex(/^https:\/\//, "URL must use HTTPS protocol").optional(),
+        rmaWebhookUrl: z.string().url().regex(/^https:\/\//, "URL must use HTTPS protocol").optional(),
       });
 
       const validatedSettings = settingsSchema.parse(req.body);
