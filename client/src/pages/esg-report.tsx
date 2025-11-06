@@ -604,75 +604,38 @@ export default function ESGReport() {
               
               <Separator />
 
-              {/* Organizational-Level Metrics */}
-                  <div className="mt-6">
-                    <h3 className="text-lg font-semibold mb-3">Circular Computing Organizational Impact</h3>
-                    <p className="text-sm text-neutral-600 mb-4">
-                      Company-wide environmental impact across all customers
-                    </p>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div className="border rounded-md p-4 bg-gradient-to-br from-teal-50 to-emerald-50">
-                        <p className="text-sm text-neutral-600">Total Units Deployed</p>
-                        <h4 className="text-2xl font-bold mt-1 text-teal-700">
-                          {getOrgMetric('total_units_deployed').toLocaleString()} units
-                        </h4>
-                      </div>
-                      
-                      <div className="border rounded-md p-4 bg-gradient-to-br from-blue-50 to-cyan-50">
-                        <p className="text-sm text-neutral-600">Total Carbon Saved</p>
-                        <h4 className="text-2xl font-bold mt-1 text-blue-700">
-                          {formatEnvironmentalImpact(getOrgMetric('total_carbon_saved'), 'g')}
-                        </h4>
-                      </div>
-                      
-                      <div className="border rounded-md p-4 bg-gradient-to-br from-cyan-50 to-blue-50">
-                        <p className="text-sm text-neutral-600">Total Water Saved</p>
-                        <h4 className="text-2xl font-bold mt-1 text-cyan-700">
-                          {(getOrgMetric('total_water_saved') / 1000000000).toFixed(2)} billion liters
-                        </h4>
-                      </div>
-                      
-                      <div className="border rounded-md p-4 bg-gradient-to-br from-emerald-50 to-teal-50">
-                        <p className="text-sm text-neutral-600">Families Helped with Water Access</p>
-                        <h4 className="text-2xl font-bold mt-1 text-emerald-700">
-                          {getOrgMetric('total_families_helped').toLocaleString()} families
-                        </h4>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                
-                <div>
-                  <h3 className="text-lg font-semibold mb-3">UN SDG Alignment</h3>
-                  <div className="border rounded-md p-4 space-y-3">
-                    <div>
-                      <div className="flex items-center">
-                        <img src="https://sdgs.un.org/sites/default/files/goals/E_SDG_Icons-12.jpg" alt="SDG 12" className="h-10 w-10 mr-2" />
-                        <h4 className="font-semibold">SDG 12</h4>
-                      </div>
-                      <p className="text-sm text-neutral-700 mt-1">Responsible Consumption and Production</p>
-                    </div>
-                    <div>
-                      <div className="flex items-center">
-                        <img src="https://sdgs.un.org/sites/default/files/goals/E_SDG_Icons-13.jpg" alt="SDG 13" className="h-10 w-10 mr-2" />
-                        <h4 className="font-semibold">SDG 13</h4>
-                      </div>
-                      <p className="text-sm text-neutral-700 mt-1">Climate Action</p>
-                    </div>
-                    <div>
-                      <div className="flex items-center">
-                        <img src="https://sdgs.un.org/sites/default/files/goals/E_SDG_Icons-06.jpg" alt="SDG 6" className="h-10 w-10 mr-2" />
-                        <h4 className="font-semibold">SDG 6</h4>
-                      </div>
-                      <p className="text-sm text-neutral-700 mt-1">Clean Water and Sanitation</p>
-                    </div>
+              <div>
+                <h3 className="text-lg font-semibold mb-3">Circular Computing Organizational Impact</h3>
+                <p className="text-sm text-neutral-600 mb-4">
+                  Company-wide environmental impact across all customers
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="border rounded-md p-4 bg-gradient-to-br from-teal-50 to-emerald-50">
+                    <p className="text-sm text-neutral-600">Total Units Deployed</p>
+                    <h4 className="text-2xl font-bold mt-1 text-teal-700">
+                      {getOrgMetric('total_units_deployed').toLocaleString()} units
+                    </h4>
                   </div>
                   
-                  <div className="mt-4 border rounded-md p-4">
-                    <h4 className="font-semibold mb-2">TCO Certified</h4>
-                    <p className="text-sm text-neutral-700">
-                      All deployed Circular Computing products meet TCO Certified criteria for social and environmental responsibility.
-                    </p>
+                  <div className="border rounded-md p-4 bg-gradient-to-br from-blue-50 to-cyan-50">
+                    <p className="text-sm text-neutral-600">Total Carbon Saved</p>
+                    <h4 className="text-2xl font-bold mt-1 text-blue-700">
+                      {formatEnvironmentalImpact(getOrgMetric('total_carbon_saved'), 'g')}
+                    </h4>
+                  </div>
+                  
+                  <div className="border rounded-md p-4 bg-gradient-to-br from-cyan-50 to-blue-50">
+                    <p className="text-sm text-neutral-600">Total Water Saved</p>
+                    <h4 className="text-2xl font-bold mt-1 text-cyan-700">
+                      {(getOrgMetric('total_water_saved') / 1000000000).toFixed(2)} billion liters
+                    </h4>
+                  </div>
+                  
+                  <div className="border rounded-md p-4 bg-gradient-to-br from-emerald-50 to-teal-50">
+                    <p className="text-sm text-neutral-600">Families Helped with Water Access</p>
+                    <h4 className="text-2xl font-bold mt-1 text-emerald-700">
+                      {getOrgMetric('total_families_helped').toLocaleString()} families
+                    </h4>
                   </div>
                 </div>
               </div>
