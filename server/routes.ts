@@ -2513,10 +2513,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch("/api/admin/esg-targets/:id/progress", requireAdmin, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      const { currentValue } = req.body;
       
-      if (currentValue === undefined) {
-        return res.status(400).json({ error: "currentValue is required" });
+      // Validate input with Zod schema
+      const progressSchema = z.object({
+        currentValue: z.union([
+          z.string().regex(/^\d+(\.\d+)?$/, "Must be a valid number"),
+          z.number().nonnegative("Must be non-negative")
+        ]).transform(val => String(val))
+      });
+
+      const validation = progressSchema.safeParse(req.body);
+      if (!validation.success) {
+        return res.status(400).json({ 
+          error: "Invalid input", 
+          details: validation.error.errors 
+        });
       }
 
       const target = await storage.getEsgTarget(id);
@@ -2524,10 +2535,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "ESG target not found" });
       }
 
-      const updated = await storage.updateEsgTarget(id, { currentValue: currentValue.toString() });
+      const updated = await storage.updateEsgTarget(id, { currentValue: validation.data.currentValue });
       res.json(updated);
     } catch (error) {
-      console.error("Error updating ESG target progress:", error);
+      console.error(`Error updating ESG target progress (ID: ${req.params.id}):`, error);
       res.status(500).json({ error: "Failed to update progress" });
     }
   });
