@@ -102,17 +102,16 @@ export function RMAManagement() {
 
   const resendRequestMutation = useMutation({
     mutationFn: async (id: number) => {
-      // TODO: Implement actual email sending
       return apiRequest("POST", `/api/admin/rma-requests/${id}/resend`, {});
     },
     onSuccess: () => {
       toast({ 
-        title: "Email Sent",
-        description: "RMA request details have been emailed to the configured addresses"
+        title: "Notification Sent",
+        description: "RMA request details have been sent successfully"
       });
     },
     onError: () => {
-      toast({ title: "Failed to send email", variant: "destructive" });
+      toast({ title: "Failed to send notification", variant: "destructive" });
     },
   });
 
@@ -132,7 +131,7 @@ export function RMAManagement() {
   };
 
   const handleResendRequest = (requestId: number) => {
-    if (confirm("Send RMA request details to configured notification emails?")) {
+    if (confirm("Send RMA request notification? This will use the configured webhook or email notifications.")) {
       resendRequestMutation.mutate(requestId);
     }
   };
@@ -302,7 +301,7 @@ export function RMAManagement() {
                           <Button
                             variant="ghost"
                             size="sm"
-                            title="Resend via email"
+                            title="Resend notification"
                             onClick={() => handleResendRequest(request.id)}
                             disabled={resendRequestMutation.isPending}
                             data-testid={`button-resend-${request.id}`}

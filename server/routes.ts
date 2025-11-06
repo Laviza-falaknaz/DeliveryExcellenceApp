@@ -687,40 +687,60 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Send notifications asynchronously (don't block response)
       (async () => {
         try {
-          // Send webhook notification for new RMA request
-          await sendRmaWebhookNotification(requestLog);
+          // Get admin settings to check for webhook configuration
+          const adminSettings = await storage.getSystemSetting('admin_portal');
+          const hasWebhook = !!adminSettings?.settingValue?.rmaWebhookUrl;
           
+          // Import email helpers in case we need them (for fallback or when no webhook)
           const { sendRmaNotification, sendNewUserNotification } = await import('./email-service.js');
           
-          // Get admin settings for notification emails
-          const adminSettings = await storage.getSystemSetting('admin_portal');
+          let webhookSuccess = false;
           
-          // Send RMA request notification
-          if (adminSettings?.settingValue?.rmaNotificationEmails) {
-            await sendRmaNotification(
-              adminSettings.settingValue.rmaNotificationEmails,
-              {
-                rmaNumber: requestLog.requestNumber,
-                customerName: validatedData.fullName,
-                customerEmail: validatedData.email,
-                productDetails: validatedData.productMakeModel,
-                serialNumber: validatedData.manufacturerSerialNumber,
-                faultDescription: validatedData.faultDescription,
+          if (hasWebhook) {
+            // Try webhook first
+            try {
+              const webhookResult = await sendRmaWebhookNotification(requestLog);
+              webhookSuccess = webhookResult.success;
+              
+              if (!webhookSuccess) {
+                console.error('Webhook notification failed, falling back to email');
               }
-            );
+            } catch (webhookError) {
+              console.error('Webhook notification error, falling back to email:', webhookError);
+            }
           }
           
-          // Send new user notification if applicable
-          if (newUserCreated && adminSettings?.settingValue?.newUserAlertEmails) {
-            await sendNewUserNotification(
-              adminSettings.settingValue.newUserAlertEmails,
-              {
-                userName: validatedData.fullName,
-                userEmail: validatedData.email,
-                userCompany: validatedData.companyName,
-                rmaNumber: requestLog.requestNumber,
-              }
-            );
+          // Send email notifications if:
+          // 1. No webhook configured, OR
+          // 2. Webhook failed
+          if (!hasWebhook || !webhookSuccess) {
+            // Send RMA request notification
+            if (adminSettings?.settingValue?.rmaNotificationEmails) {
+              await sendRmaNotification(
+                adminSettings.settingValue.rmaNotificationEmails,
+                {
+                  rmaNumber: requestLog.requestNumber,
+                  customerName: validatedData.fullName,
+                  customerEmail: validatedData.email,
+                  productDetails: validatedData.productMakeModel,
+                  serialNumber: validatedData.manufacturerSerialNumber,
+                  faultDescription: validatedData.faultDescription,
+                }
+              );
+            }
+            
+            // Send new user notification if applicable
+            if (newUserCreated && adminSettings?.settingValue?.newUserAlertEmails) {
+              await sendNewUserNotification(
+                adminSettings.settingValue.newUserAlertEmails,
+                {
+                  userName: validatedData.fullName,
+                  userEmail: validatedData.email,
+                  userCompany: validatedData.companyName,
+                  rmaNumber: requestLog.requestNumber,
+                }
+              );
+            }
           }
         } catch (notificationError) {
           console.error('Failed to send notifications:', notificationError);
