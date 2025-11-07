@@ -310,10 +310,18 @@ export class ScoringService {
       
       if (!shippingBonuses.includes(orderId)) {
         shippingBonuses.push(orderId);
+        const newTotalScore = newScore.totalScore + 1000;
+        const tier = await storage.getTierByScore(newTotalScore);
+        
         await storage.updateEsgScore(newScore.id, {
-          totalScore: newScore.totalScore + 1000,
-          metadata: { ...metadata, shippingBonuses }
+          totalScore: newTotalScore,
+          tierId: tier?.id || newScore.tierId,
+          metadata: { ...metadata, shippingBonuses },
+          calculatedAt: new Date()
         });
+
+        await this.checkAndUnlockAchievements(userId);
+        await this.checkAndReachMilestones(userId, newTotalScore);
       }
       return;
     }
