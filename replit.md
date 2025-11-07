@@ -36,8 +36,18 @@ The platform includes a comprehensive gamification system with configurable achi
 Achievements are **automatically unlocked** when users meet the criteria. The system triggers ESG score recalculation and achievement checking after:
 - Order creation (user-facing and admin routes)
 - Order item addition (user-facing and admin routes)
+- Order shipping (when status changes to "shipped")
 
 Each achievement check is error-isolated (wrapped in try/catch) to ensure order creation never fails due to gamification scoring issues. The implementation uses the `scoringService.updateUserESGScore()` function which calculates total environmental impact and unlocks any newly-earned achievements.
+
+#### Shipping Bonus XP
+Users automatically receive **+1000 XP** when their order status changes to "shipped". This shipping bonus:
+- Is awarded only once per order (tracked in ESG score metadata)
+- Updates the user's tier if they reach a new threshold
+- Triggers achievement and milestone checks automatically
+- Never causes order updates to fail (error-isolated with try/catch)
+
+The shipping bonus is implemented in the `scoringService.awardShippingBonus()` method and is called by both admin order update routes (`/api/crud/orders/:id` and `/api/admin/orders/:id`).
 
 #### Admin Management
 All achievements, milestones, and gamification settings are fully configurable via the Admin Panel at `/admin/gamification-management`. Admins can create, edit, and delete achievements, adjusting thresholds, reward points, icons, and active status. The seeding system is idempotent, allowing safe redeployment without data duplication.
