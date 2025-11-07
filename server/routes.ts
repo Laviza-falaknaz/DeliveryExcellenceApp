@@ -417,6 +417,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
       
       const order = await storage.createOrder(orderData);
+      
+      // Automatically update ESG score and check achievements
+      try {
+        const { scoringService } = await import("./scoring-service");
+        await scoringService.updateUserESGScore(user.id);
+      } catch (achievementError) {
+        console.error("Error updating achievements after order creation:", achievementError);
+        // Don't fail the order creation if achievement update fails
+      }
+      
       res.status(201).json(order);
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -468,6 +478,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
       
       const item = await storage.createOrderItem(itemData);
+      
+      // Automatically update ESG score and check achievements
+      try {
+        const { scoringService } = await import("./scoring-service");
+        await scoringService.updateUserESGScore(user.id);
+      } catch (achievementError) {
+        console.error("Error updating achievements after order item creation:", achievementError);
+        // Don't fail the order item creation if achievement update fails
+      }
+      
       res.status(201).json(item);
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -1492,6 +1512,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const validated = insertOrderSchema.parse(req.body);
       const order = await storage.createOrder(validated);
+      
+      // Automatically update ESG score and check achievements for the order's user
+      if (validated.userId) {
+        try {
+          const { scoringService } = await import("./scoring-service");
+          await scoringService.updateUserESGScore(validated.userId);
+        } catch (achievementError) {
+          console.error("Error updating achievements after admin order creation:", achievementError);
+          // Don't fail the order creation if achievement update fails
+        }
+      }
+      
       res.status(201).json(order);
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -1542,6 +1574,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const validated = insertOrderItemSchema.parse(req.body);
       const item = await storage.createOrderItem(validated);
+      
+      // Automatically update ESG score and check achievements for the order's user
+      const order = await storage.getOrder(validated.orderId);
+      if (order && order.userId) {
+        try {
+          const { scoringService } = await import("./scoring-service");
+          await scoringService.updateUserESGScore(order.userId);
+        } catch (achievementError) {
+          console.error("Error updating achievements after admin order item creation:", achievementError);
+          // Don't fail the order item creation if achievement update fails
+        }
+      }
+      
       res.status(201).json(item);
     } catch (error) {
       if (error instanceof z.ZodError) {
