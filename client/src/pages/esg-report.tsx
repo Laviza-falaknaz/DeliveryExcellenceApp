@@ -1,5 +1,6 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -21,7 +22,9 @@ import {
   Crown,
   Sparkles,
   Star,
-  Lock
+  Lock,
+  Footprints,
+  User
 } from "lucide-react";
 import { queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -237,9 +240,16 @@ export default function ESGReport() {
   const reachedMilestoneIds = userMilestones?.map((m: any) => m.milestoneId) || [];
   const sortedMilestones = milestones?.sort((a: any, b: any) => a.orderIndex - b.orderIndex) || [];
 
-  // Auto-trigger score calculation when achievements are empty (initializes progress tracking)
+  // Auto-trigger score calculation once when achievements are empty (initializes progress tracking)
+  const hasTriggeredCalculation = useRef(false);
   useEffect(() => {
-    if (!calculateScoreMutation.isPending && achievements !== undefined && achievements.length === 0) {
+    if (
+      !hasTriggeredCalculation.current &&
+      !calculateScoreMutation.isPending && 
+      achievements !== undefined && 
+      achievements.length === 0
+    ) {
+      hasTriggeredCalculation.current = true;
       calculateScoreMutation.mutate();
     }
   }, [achievements, calculateScoreMutation]);
@@ -661,163 +671,351 @@ export default function ESGReport() {
           </Card>
         </TabsContent>
 
-        {/* Achievements Tab */}
+        {/* Achievements Tab - Enhanced with Framer Motion */}
         <TabsContent value="achievements" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Trophy className="w-5 h-5" />
-                Achievement Showcase
-              </CardTitle>
-              <CardDescription>
-                {unlockedAchievements.length} of {achievements?.length || 0} achievements unlocked
-              </CardDescription>
+              <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+              >
+                <CardTitle className="flex items-center gap-2">
+                  <Trophy className="w-5 h-5 text-primary" />
+                  Achievement Showcase
+                </CardTitle>
+                <CardDescription>
+                  {unlockedAchievements.length} of {achievements?.length || 0} achievements unlocked
+                </CardDescription>
+              </motion.div>
             </CardHeader>
             <CardContent>
               {/* Unlocked Achievements */}
               {unlockedAchievements.length > 0 && (
-                <div className="mb-8">
+                <motion.div 
+                  className="mb-8"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.2 }}
+                >
                   <h3 className="font-semibold mb-4 flex items-center gap-2">
-                    <Star className="w-4 h-4 text-yellow-500" />
-                    Unlocked
+                    <motion.div
+                      animate={{ rotate: [0, 10, -10, 0] }}
+                      transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
+                    >
+                      <Star className="w-4 h-4 text-yellow-500" />
+                    </motion.div>
+                    Unlocked Achievements
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {unlockedAchievements.map((achievement: any) => {
+                    {unlockedAchievements.map((achievement: any, index: number) => {
                       const achData = achievement?.achievement;
                       if (!achData) return null;
                       return (
-                        <Card 
-                          key={achievement.id} 
-                          className="border-primary/50 bg-gradient-to-br from-primary/5 to-background"
+                        <motion.div
+                          key={achievement.id}
+                          initial={{ opacity: 0, scale: 0.8, y: 20 }}
+                          animate={{ opacity: 1, scale: 1, y: 0 }}
+                          transition={{ delay: index * 0.1, duration: 0.4 }}
+                          whileHover={{ scale: 1.05, y: -5 }}
                           data-testid={`achievement-unlocked-${achData.code}`}
                         >
-                          <CardContent className="pt-6">
-                            <div className="flex items-start gap-3">
-                              <div className="p-2 rounded-lg bg-primary/10">
-                                <Award className="w-6 h-6 text-primary" />
+                          <Card className="border-primary/50 bg-gradient-to-br from-primary/10 to-background relative overflow-hidden cursor-pointer">
+                            {/* Sparkle Effect */}
+                            <motion.div
+                              className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/20 to-transparent"
+                              initial={{ x: '-100%' }}
+                              animate={{ x: '200%' }}
+                              transition={{ duration: 2, repeat: Infinity, repeatDelay: 5 }}
+                            />
+                            <CardContent className="pt-6 relative z-10">
+                              <div className="flex items-start gap-3">
+                                <motion.div 
+                                  className="p-2 rounded-lg bg-primary/20"
+                                  animate={{ rotate: [0, 5, -5, 0] }}
+                                  transition={{ duration: 3, repeat: Infinity }}
+                                >
+                                  <Award className="w-6 h-6 text-primary" />
+                                </motion.div>
+                                <div className="flex-1">
+                                  <h4 className="font-semibold mb-1 text-primary">{achData.name}</h4>
+                                  <p className="text-sm text-muted-foreground mb-2">
+                                    {achData.description}
+                                  </p>
+                                  <Badge variant="default" className="text-xs">
+                                    <Sparkles className="w-3 h-3 mr-1" />
+                                    +{achData.rewardPoints} points
+                                  </Badge>
+                                </div>
                               </div>
-                              <div className="flex-1">
-                                <h4 className="font-semibold mb-1">{achData.name}</h4>
-                                <p className="text-sm text-muted-foreground mb-2">
-                                  {achData.description}
-                                </p>
-                                <Badge variant="secondary" className="text-xs">
-                                  +{achData.rewardPoints} points
-                                </Badge>
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
+                            </CardContent>
+                          </Card>
+                        </motion.div>
                       );
                     })}
                   </div>
-                </div>
+                </motion.div>
               )}
 
               {/* Locked Achievements */}
               {lockedAchievements.length > 0 && (
-                <div>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.4 }}
+                >
                   <h3 className="font-semibold mb-4 flex items-center gap-2">
-                    <Lock className="w-4 h-4" />
+                    <Lock className="w-4 h-4 text-muted-foreground" />
                     In Progress
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {lockedAchievements.slice(0, 6).map((achievement: any) => {
+                    {lockedAchievements.slice(0, 6).map((achievement: any, index: number) => {
                       const achData = achievement?.achievement;
                       if (!achData) return null;
+                      const progress = achievement.progressPercent ?? 0;
                       return (
-                        <Card 
-                          key={achievement.id} 
-                          className="opacity-75"
+                        <motion.div
+                          key={achievement.id}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: index * 0.1, duration: 0.4 }}
+                          whileHover={{ scale: 1.03, boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }}
                           data-testid={`achievement-locked-${achData.code}`}
                         >
-                          <CardContent className="pt-6">
-                            <div className="flex items-start gap-3">
-                              <div className="p-2 rounded-lg bg-muted">
-                                <Lock className="w-6 h-6 text-muted-foreground" />
+                          <Card className="opacity-80 hover:opacity-100 transition-opacity cursor-pointer">
+                            <CardContent className="pt-6">
+                              <div className="flex items-start gap-3">
+                                <motion.div 
+                                  className="p-2 rounded-lg bg-muted"
+                                  animate={progress > 50 ? { scale: [1, 1.1, 1] } : {}}
+                                  transition={{ duration: 2, repeat: Infinity }}
+                                >
+                                  <Lock className="w-6 h-6 text-muted-foreground" />
+                                </motion.div>
+                                <div className="flex-1">
+                                  <h4 className="font-semibold mb-1">{achData.name}</h4>
+                                  <p className="text-sm text-muted-foreground mb-3">
+                                    {achData.description}
+                                  </p>
+                                  <motion.div
+                                    initial={{ width: 0 }}
+                                    animate={{ width: "100%" }}
+                                    transition={{ delay: index * 0.1 + 0.5, duration: 0.8 }}
+                                  >
+                                    <Progress value={progress} className="h-2 mb-2" />
+                                  </motion.div>
+                                  <p className="text-xs text-muted-foreground flex items-center gap-1">
+                                    <Target className="w-3 h-3" />
+                                    {progress}% complete
+                                  </p>
+                                </div>
                               </div>
-                              <div className="flex-1">
-                                <h4 className="font-semibold mb-1">{achData.name}</h4>
-                                <p className="text-sm text-muted-foreground mb-3">
-                                  {achData.description}
-                                </p>
-                                <Progress value={achievement.progressPercent ?? 0} className="h-2 mb-2" />
-                                <p className="text-xs text-muted-foreground">
-                                  {achievement.progressPercent ?? 0}% complete
-                                </p>
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
+                            </CardContent>
+                          </Card>
+                        </motion.div>
                       );
                     })}
                   </div>
-                </div>
+                </motion.div>
+              )}
+
+              {/* Empty State */}
+              {achievements && achievements.length === 0 && (
+                <motion.div
+                  className="text-center py-12"
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <Trophy className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">Your Journey Begins!</h3>
+                  <p className="text-muted-foreground">
+                    Start making sustainable choices to unlock achievements and earn rewards.
+                  </p>
+                </motion.div>
               )}
             </CardContent>
           </Card>
         </TabsContent>
 
-        {/* Journey/Milestones Tab */}
+        {/* Journey/Milestones Tab - Gamified Curvy Road */}
         <TabsContent value="milestones" className="space-y-6">
-          <Card>
+          <Card className="overflow-hidden">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Award className="w-5 h-5" />
+                <Footprints className="w-5 h-5" />
                 Your Sustainability Journey
               </CardTitle>
               <CardDescription>
-                Track your progress through key milestones
+                Follow the winding path to sustainability excellence
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="relative space-y-8">
+            <CardContent className="p-6">
+              <div className="relative w-full" style={{ minHeight: '600px' }}>
+                {/* SVG Curvy Road */}
+                <svg 
+                  className="w-full h-full absolute inset-0" 
+                  viewBox="0 0 800 600" 
+                  preserveAspectRatio="xMidYMid meet"
+                  style={{ overflow: 'visible' }}
+                >
+                  {/* Background decorative elements */}
+                  <defs>
+                    <linearGradient id="pathGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                      <stop offset="0%" stopColor="#08ABAB" stopOpacity="0.3" />
+                      <stop offset="100%" stopColor="#08ABAB" stopOpacity="0.1" />
+                    </linearGradient>
+                  </defs>
+
+                  {/* Curvy Road Path */}
+                  <motion.path
+                    d="M 100 550 Q 150 480, 200 450 T 350 380 Q 450 320, 500 280 T 650 150 Q 700 100, 750 50"
+                    stroke="url(#pathGradient)"
+                    strokeWidth="40"
+                    fill="none"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    initial={{ pathLength: 0 }}
+                    animate={{ pathLength: 1 }}
+                    transition={{ duration: 2, ease: "easeInOut" }}
+                  />
+
+                  {/* Road Border */}
+                  <motion.path
+                    d="M 100 550 Q 150 480, 200 450 T 350 380 Q 450 320, 500 280 T 650 150 Q 700 100, 750 50"
+                    stroke="#08ABAB"
+                    strokeWidth="2"
+                    fill="none"
+                    strokeDasharray="10,5"
+                    initial={{ pathLength: 0 }}
+                    animate={{ pathLength: 1 }}
+                    transition={{ duration: 2, ease: "easeInOut", delay: 0.5 }}
+                  />
+                </svg>
+
+                {/* Milestone Markers positioned along the curvy path */}
                 {sortedMilestones.map((milestone: any, index: number) => {
                   const isReached = reachedMilestoneIds.includes(milestone.id);
                   const isNext = !isReached && !sortedMilestones.slice(0, index).some((m: any) => !reachedMilestoneIds.includes(m.id));
                   
+                  // Position milestones along the curve using approximated coordinates
+                  const positions = [
+                    { x: 100, y: 550 },  // Start
+                    { x: 200, y: 450 },
+                    { x: 350, y: 380 },
+                    { x: 500, y: 280 },
+                    { x: 600, y: 200 },
+                    { x: 700, y: 120 },
+                    { x: 750, y: 50 },   // End
+                  ];
+                  
+                  const pos = positions[index] || positions[positions.length - 1];
+                  const lastReachedIndex = sortedMilestones.findIndex((m: any, i: number) => 
+                    i > 0 && !reachedMilestoneIds.includes(m.id)
+                  ) - 1;
+                  const isCurrentPosition = index === Math.max(0, lastReachedIndex);
+                  
                   return (
-                    <div 
-                      key={milestone.id} 
-                      className="flex gap-4 relative"
+                    <motion.g
+                      key={milestone.id}
+                      initial={{ opacity: 0, scale: 0 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: index * 0.2, duration: 0.5 }}
                       data-testid={`milestone-${milestone.id}`}
                     >
-                      {index < sortedMilestones.length - 1 && (
-                        <div className="absolute left-5 top-12 bottom-0 w-0.5 bg-border" />
+                      {/* Footprint/Marker */}
+                      <motion.circle
+                        cx={pos.x}
+                        cy={pos.y}
+                        r="20"
+                        className={cn(
+                          "cursor-pointer",
+                          isReached ? "fill-primary" : isNext ? "fill-primary/50" : "fill-muted"
+                        )}
+                        stroke={isReached ? "#08ABAB" : "#888"}
+                        strokeWidth="3"
+                        whileHover={{ scale: 1.2 }}
+                        whileTap={{ scale: 0.9 }}
+                      />
+                      
+                      {/* Milestone number/icon */}
+                      <text
+                        x={pos.x}
+                        y={pos.y + 5}
+                        textAnchor="middle"
+                        className="font-bold text-sm pointer-events-none"
+                        fill={isReached ? "white" : "#666"}
+                      >
+                        {isReached ? "✓" : index + 1}
+                      </text>
+
+                      {/* Character at current position */}
+                      {isCurrentPosition && (
+                        <motion.g
+                          initial={{ y: -20, opacity: 0 }}
+                          animate={{ y: 0, opacity: 1 }}
+                          transition={{ delay: 1, duration: 0.5 }}
+                        >
+                          <motion.circle
+                            cx={pos.x}
+                            cy={pos.y - 60}
+                            r="25"
+                            fill="#FFD700"
+                            stroke="#FFA500"
+                            strokeWidth="3"
+                            animate={{ 
+                              y: [0, -5, 0],
+                            }}
+                            transition={{ 
+                              repeat: Infinity, 
+                              duration: 1.5,
+                              ease: "easeInOut"
+                            }}
+                          />
+                          <text
+                            x={pos.x}
+                            y={pos.y - 52}
+                            textAnchor="middle"
+                            className="text-2xl pointer-events-none"
+                          >
+                            🏃
+                          </text>
+                        </motion.g>
                       )}
-                      
-                      <div className={cn(
-                        "relative z-10 flex h-10 w-10 items-center justify-center rounded-full border-2 shrink-0",
-                        isReached 
-                          ? "bg-primary border-primary text-primary-foreground" 
-                          : isNext 
-                          ? "bg-background border-primary text-primary animate-pulse"
-                          : "bg-muted border-muted-foreground/30 text-muted-foreground"
-                      )}>
-                        {isReached ? (
-                          <Zap className="w-5 h-5" />
-                        ) : (
-                          <span className="text-xs font-semibold">{index + 1}</span>
-                        )}
-                      </div>
-                      
-                      <div className="flex-1 pb-8">
-                        <h4 className={cn(
-                          "font-semibold mb-1",
-                          isReached && "text-primary"
-                        )}>
-                          {milestone.title}
-                        </h4>
-                        <p className="text-sm text-muted-foreground mb-2">
-                          {milestone.description}
-                        </p>
-                        {milestone.requiredScore && (
-                          <Badge variant={isReached ? "default" : "secondary"} className="text-xs">
-                            {isReached ? "Completed" : `${milestone.requiredScore} points required`}
-                          </Badge>
-                        )}
-                      </div>
-                    </div>
+
+                      {/* Milestone info card (on hover or always visible) */}
+                      {(isReached || isNext) && (
+                        <foreignObject
+                          x={pos.x + 30}
+                          y={pos.y - 40}
+                          width="200"
+                          height="100"
+                          className="pointer-events-none"
+                        >
+                          <motion.div
+                            className="bg-card border border-border rounded-lg p-3 shadow-lg"
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: index * 0.2 + 0.3 }}
+                          >
+                            <h4 className="font-semibold text-sm mb-1 text-foreground">
+                              {milestone.title}
+                            </h4>
+                            <p className="text-xs text-muted-foreground mb-2">
+                              {milestone.description}
+                            </p>
+                            {milestone.requiredScore !== null && (
+                              <Badge 
+                                variant={isReached ? "default" : "secondary"} 
+                                className="text-xs"
+                              >
+                                {isReached ? "✓ Completed" : `${milestone.requiredScore} pts`}
+                              </Badge>
+                            )}
+                          </motion.div>
+                        </foreignObject>
+                      )}
+                    </motion.g>
                   );
                 })}
               </div>
