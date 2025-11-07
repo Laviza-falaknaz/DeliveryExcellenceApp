@@ -1,5 +1,5 @@
 import { db } from "./db";
-import { users, waterProjects, systemSettings, organizationalMetrics, impactEquivalencySettings, esgMeasurementParameters } from "@shared/schema";
+import { users, waterProjects, systemSettings, organizationalMetrics, impactEquivalencySettings, esgMeasurementParameters, keyPerformanceInsights } from "@shared/schema";
 import bcrypt from "bcryptjs";
 import { eq } from "drizzle-orm";
 import { seedGamificationData } from "./gamification-seed";
@@ -296,6 +296,98 @@ export async function seedDatabase() {
       ]);
       
       console.log("✅ ESG measurement parameters created");
+    }
+
+    // Seed Key Performance Insights
+    const existingKpiInsights = await db.select().from(keyPerformanceInsights).limit(1);
+    
+    if (existingKpiInsights.length === 0) {
+      console.log("Creating key performance insights...");
+      
+      await db.insert(keyPerformanceInsights).values([
+        {
+          metricKey: 'remanufactured_units_deployed',
+          metricName: 'Remanufactured Units Deployed',
+          metricValue: '15,234',
+          metricUnit: 'units',
+          metricCategory: 'environmental',
+          description: 'Total number of remanufactured laptops deployed to customers',
+          displayOrder: 1,
+          isActive: true,
+        },
+        {
+          metricKey: 'total_carbon_offset',
+          metricName: 'Total Carbon Offset',
+          metricValue: '4,814',
+          metricUnit: 'tonnes CO₂e',
+          metricCategory: 'environmental',
+          description: 'Total carbon emissions prevented through remanufacturing',
+          displayOrder: 2,
+          isActive: true,
+        },
+        {
+          metricKey: 'e_waste_diverted',
+          metricName: 'E-Waste Diverted from Landfills',
+          metricValue: '18,281',
+          metricUnit: 'kg',
+          metricCategory: 'environmental',
+          description: 'Electronic waste prevented from entering landfills',
+          displayOrder: 3,
+          isActive: true,
+        },
+        {
+          metricKey: 'water_conservation',
+          metricName: 'Water Conservation',
+          metricValue: '2.9',
+          metricUnit: 'million litres',
+          metricCategory: 'environmental',
+          description: 'Water saved in manufacturing through remanufacturing process',
+          displayOrder: 4,
+          isActive: true,
+        },
+        {
+          metricKey: 'communities_supported',
+          metricName: 'Communities Supported',
+          metricValue: '28',
+          metricUnit: 'communities',
+          metricCategory: 'social',
+          description: 'Number of communities receiving clean water through charity partnerships',
+          displayOrder: 5,
+          isActive: true,
+        },
+        {
+          metricKey: 'families_with_clean_water',
+          metricName: 'Families with Clean Water Access',
+          metricValue: '3,420',
+          metricUnit: 'families',
+          metricCategory: 'social',
+          description: 'Families provided with clean drinking water through our partnerships',
+          displayOrder: 6,
+          isActive: true,
+        },
+        {
+          metricKey: 'circular_economy_rate',
+          metricName: 'Circular Economy Rate',
+          metricValue: '94',
+          metricUnit: '%',
+          metricCategory: 'governance',
+          description: 'Percentage of materials recovered and reused in circular economy',
+          displayOrder: 7,
+          isActive: true,
+        },
+        {
+          metricKey: 'warranty_fulfillment',
+          metricName: 'Warranty Fulfillment Rate',
+          metricValue: '98.5',
+          metricUnit: '%',
+          metricCategory: 'governance',
+          description: 'Percentage of warranty claims successfully fulfilled',
+          displayOrder: 8,
+          isActive: true,
+        },
+      ]);
+      
+      console.log("✅ Key performance insights created");
     }
 
     // Seed gamification data
