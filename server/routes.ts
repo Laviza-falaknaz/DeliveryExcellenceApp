@@ -1535,10 +1535,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.patch("/api/crud/orders/:id", requireAdmin, async (req, res) => {
     try {
-      const order = await storage.updateOrder(parseInt(req.params.id), req.body);
+      const orderId = parseInt(req.params.id);
+      const previousOrder = await storage.getOrder(orderId);
+      const order = await storage.updateOrder(orderId, req.body);
       if (!order) {
         return res.status(404).json({ message: "Order not found" });
       }
+
+      // Award shipping bonus if status changed to shipped
+      if (previousOrder && previousOrder.status !== 'shipped' && order.status === 'shipped') {
+        try {
+          const { scoringService } = await import("./scoring-service");
+          await scoringService.awardShippingBonus(order.userId, order.id);
+        } catch (bonusError) {
+          console.error("Error awarding shipping bonus:", bonusError);
+          // Don't fail the order update if bonus award fails
+        }
+      }
+
       res.json(order);
     } catch (error) {
       res.status(500).json({ message: "Internal server error" });
@@ -2249,10 +2263,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
 
       const validatedData = updateSchema.parse(req.body);
+      const previousOrder = await storage.getOrder(orderId);
       const updatedOrder = await storage.updateOrder(orderId, validatedData);
       
       if (!updatedOrder) {
         return res.status(404).json({ message: "Order not found" });
+      }
+
+      // Award shipping bonus if status changed to shipped
+      if (previousOrder && previousOrder.status !== 'shipped' && updatedOrder.status === 'shipped') {
+        try {
+          const { scoringService } = await import("./scoring-service");
+          await scoringService.awardShippingBonus(updatedOrder.userId, updatedOrder.id);
+        } catch (bonusError) {
+          console.error("Error awarding shipping bonus:", bonusError);
+          // Don't fail the order update if bonus award fails
+        }
       }
 
       res.json(updatedOrder);
