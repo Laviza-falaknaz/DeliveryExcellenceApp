@@ -745,8 +745,9 @@ export default function ESGReport() {
                           transition={{ delay: index * 0.1, duration: 0.4 }}
                           whileHover={{ scale: 1.05, y: -5 }}
                           data-testid={`achievement-unlocked-${achData.code}`}
+                          className="h-full"
                         >
-                          <Card className="border-primary/50 bg-gradient-to-br from-primary/10 to-background relative overflow-hidden cursor-pointer">
+                          <Card className="border-primary/50 bg-gradient-to-br from-primary/10 to-background relative overflow-hidden cursor-pointer h-full">
                             {/* Sparkle Effect */}
                             <motion.div
                               className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/20 to-transparent"
@@ -754,21 +755,21 @@ export default function ESGReport() {
                               animate={{ x: '200%' }}
                               transition={{ duration: 2, repeat: Infinity, repeatDelay: 5 }}
                             />
-                            <CardContent className="pt-6 relative z-10">
-                              <div className="flex items-start gap-3">
+                            <CardContent className="pt-6 pb-6 relative z-10 h-full flex flex-col">
+                              <div className="flex items-start gap-3 flex-1">
                                 <motion.div 
-                                  className="text-4xl"
+                                  className="text-4xl flex-shrink-0"
                                   animate={{ rotate: [0, 5, -5, 0], scale: [1, 1.1, 1] }}
                                   transition={{ duration: 3, repeat: Infinity }}
                                 >
                                   {getAchievementEmoji(achData.icon)}
                                 </motion.div>
-                                <div className="flex-1">
-                                  <h4 className="font-semibold mb-1 text-primary">{achData.name}</h4>
-                                  <p className="text-sm text-muted-foreground mb-2">
+                                <div className="flex-1 flex flex-col min-h-[120px]">
+                                  <h4 className="font-semibold mb-1 text-primary line-clamp-1">{achData.name}</h4>
+                                  <p className="text-sm text-muted-foreground mb-2 flex-1 line-clamp-2">
                                     {achData.description}
                                   </p>
-                                  <Badge variant="default" className="text-xs">
+                                  <Badge variant="default" className="text-xs w-fit mt-auto">
                                     <Sparkles className="w-3 h-3 mr-1" />
                                     +{achData.points} points
                                   </Badge>
@@ -807,11 +808,12 @@ export default function ESGReport() {
                           transition={{ delay: index * 0.1, duration: 0.4 }}
                           whileHover={{ scale: 1.03, boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }}
                           data-testid={`achievement-locked-${achData.code}`}
+                          className="h-full"
                         >
-                          <Card className="opacity-80 hover:opacity-100 transition-opacity cursor-pointer">
-                            <CardContent className="pt-6">
-                              <div className="flex items-start gap-3">
-                                <div className="relative">
+                          <Card className="opacity-80 hover:opacity-100 transition-opacity cursor-pointer h-full">
+                            <CardContent className="pt-6 pb-6 h-full flex flex-col">
+                              <div className="flex items-start gap-3 flex-1">
+                                <div className="relative flex-shrink-0">
                                   <motion.div 
                                     className="text-4xl grayscale opacity-40"
                                     animate={progress > 50 ? { scale: [1, 1.1, 1] } : {}}
@@ -823,22 +825,24 @@ export default function ESGReport() {
                                     <Lock className="w-5 h-5 text-muted-foreground" />
                                   </div>
                                 </div>
-                                <div className="flex-1">
-                                  <h4 className="font-semibold mb-1">{achData.name}</h4>
-                                  <p className="text-sm text-muted-foreground mb-3">
+                                <div className="flex-1 flex flex-col min-h-[120px]">
+                                  <h4 className="font-semibold mb-1 line-clamp-1">{achData.name}</h4>
+                                  <p className="text-sm text-muted-foreground mb-3 flex-1 line-clamp-2">
                                     {achData.description}
                                   </p>
-                                  <motion.div
-                                    initial={{ width: 0 }}
-                                    animate={{ width: "100%" }}
-                                    transition={{ delay: index * 0.1 + 0.5, duration: 0.8 }}
-                                  >
-                                    <Progress value={progress} className="h-2 mb-2" />
-                                  </motion.div>
-                                  <p className="text-xs text-muted-foreground flex items-center gap-1">
-                                    <Target className="w-3 h-3" />
-                                    {progress}% complete
-                                  </p>
+                                  <div className="mt-auto">
+                                    <motion.div
+                                      initial={{ width: 0 }}
+                                      animate={{ width: "100%" }}
+                                      transition={{ delay: index * 0.1 + 0.5, duration: 0.8 }}
+                                    >
+                                      <Progress value={progress} className="h-2 mb-2" />
+                                    </motion.div>
+                                    <p className="text-xs text-muted-foreground flex items-center gap-1">
+                                      <Target className="w-3 h-3" />
+                                      {progress}% complete
+                                    </p>
+                                  </div>
                                 </div>
                               </div>
                             </CardContent>
