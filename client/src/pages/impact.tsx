@@ -845,161 +845,225 @@ Learn more about sustainable IT solutions: circularcomputing.com
 
       {/* Share My Success Section */}
       <section className="mb-8">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Share2 className="h-5 w-5 text-teal-600" />
-              Share My Success
-            </CardTitle>
-            <p className="text-neutral-600">
-              Showcase your sustainability achievements and inspire others to make environmentally conscious IT choices.
-            </p>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {/* LinkedIn */}
-            <div className="border rounded-lg p-4">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-8 h-8 bg-[#0077B5] rounded flex items-center justify-center">
-                  <i className="ri-linkedin-fill text-white text-lg"></i>
-                </div>
-                <h4 className="font-semibold">LinkedIn</h4>
-              </div>
-              <div className="bg-neutral-50 rounded p-3 mb-3 max-h-32 overflow-y-auto">
-                <p className="text-sm text-neutral-700 whitespace-pre-wrap">
-                  {generateSocialContent('linkedin')}
-                </p>
-              </div>
-              <div className="flex gap-2">
-                <Button
-                  size="sm"
-                  onClick={() => shareContent('linkedin', generateSocialContent('linkedin'))}
-                  className="bg-[#0077B5] hover:bg-[#005885] text-white"
-                >
-                  Share on LinkedIn
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => copyToClipboard(generateSocialContent('linkedin'))}
-                >
-                  <Copy className="h-4 w-4 mr-1" />
-                  Copy
-                </Button>
-              </div>
-            </div>
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold flex items-center gap-2 mb-2">
+            <Share2 className="h-6 w-6 text-teal-600" />
+            Share Your Sustainability Impact
+          </h2>
+          <p className="text-neutral-600">
+            Inspire others by showcasing your environmental achievements on social media
+          </p>
+        </div>
 
-            {/* X (Twitter) */}
-            <div className="border rounded-lg p-4">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-8 h-8 bg-black rounded flex items-center justify-center">
-                  <i className="ri-twitter-x-line text-white text-lg"></i>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* LinkedIn Post Preview */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            whileHover={{ scale: 1.02 }}
+          >
+            <Card className="overflow-hidden border-2 border-[#0077B5]/20 hover:border-[#0077B5]/40 transition-all bg-gradient-to-br from-[#0077B5]/5 to-white">
+              <div className="bg-[#0077B5] p-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center">
+                    <i className="ri-linkedin-fill text-[#0077B5] text-2xl"></i>
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-bold text-white text-lg">LinkedIn</h3>
+                    <p className="text-white/80 text-sm">Professional Network</p>
+                  </div>
                 </div>
-                <h4 className="font-semibold">X (Twitter)</h4>
               </div>
-              <div className="bg-neutral-50 rounded p-3 mb-3 max-h-32 overflow-y-auto">
-                <p className="text-sm text-neutral-700 whitespace-pre-wrap">
-                  {generateSocialContent('x')}
-                </p>
-              </div>
-              <div className="flex gap-2">
-                <Button
-                  size="sm"
-                  onClick={() => shareContent('x', generateSocialContent('x'))}
-                  className="bg-black hover:bg-neutral-800 text-white"
-                >
-                  Share on X
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => copyToClipboard(generateSocialContent('x'))}
-                >
-                  <Copy className="h-4 w-4 mr-1" />
-                  Copy
-                </Button>
-              </div>
-            </div>
-
-            {/* Instagram */}
-            <div className="border rounded-lg p-4">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-8 h-8 bg-gradient-to-br from-[#833AB4] via-[#FD1D1D] to-[#F77737] rounded flex items-center justify-center">
-                  <i className="ri-instagram-line text-white text-lg"></i>
-                </div>
-                <h4 className="font-semibold">Instagram</h4>
-              </div>
-              <div className="bg-neutral-50 rounded p-3 mb-3 max-h-32 overflow-y-auto">
-                <p className="text-sm text-neutral-700 whitespace-pre-wrap">
-                  {generateSocialContent('instagram')}
-                </p>
-              </div>
-              <div className="flex gap-2">
-                <Button
-                  size="sm"
-                  onClick={() => shareContent('instagram', generateSocialContent('instagram'))}
-                  className="bg-gradient-to-r from-[#833AB4] via-[#FD1D1D] to-[#F77737] hover:opacity-90 text-white"
-                >
-                  Copy for Instagram
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => copyToClipboard(generateSocialContent('instagram'))}
-                >
-                  <Copy className="h-4 w-4 mr-1" />
-                  Copy
-                </Button>
-              </div>
-            </div>
-
-            {/* Facebook */}
-            <div className="border rounded-lg p-4">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-8 h-8 bg-[#1877F2] rounded flex items-center justify-center">
-                  <i className="ri-facebook-fill text-white text-lg"></i>
-                </div>
-                <h4 className="font-semibold">Facebook</h4>
-              </div>
-              <div className="bg-neutral-50 rounded p-3 mb-3 max-h-32 overflow-y-auto">
-                <p className="text-sm text-neutral-700 whitespace-pre-wrap">
-                  {generateSocialContent('facebook')}
-                </p>
-              </div>
-              <div className="flex gap-2">
-                <Button
-                  size="sm"
-                  onClick={() => shareContent('facebook', generateSocialContent('facebook'))}
-                  className="bg-[#1877F2] hover:bg-[#166FE5] text-white"
-                >
-                  Share on Facebook
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => copyToClipboard(generateSocialContent('facebook'))}
-                >
-                  <Copy className="h-4 w-4 mr-1" />
-                  Copy
-                </Button>
-              </div>
-            </div>
-
-            <div className="bg-teal-50 border border-teal-200 rounded-lg p-4 mt-6">
-              <div className="flex items-start gap-3">
-                <div className="w-8 h-8 bg-teal-600 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                  <img src="/attached_assets/CC_Logo_Teal.png" alt="Circular Computing" className="w-6 h-6" />
-                </div>
-                <div>
-                  <h4 className="font-semibold text-teal-900 mb-1">Circular Computing Branding</h4>
-                  <p className="text-sm text-teal-800">
-                    All social content includes Circular Computing branding and mentions to help spread awareness about sustainable IT solutions. 
-                    Feel free to customize the content while keeping our partnership attribution.
+              <CardContent className="p-5">
+                <div className="bg-white border rounded-lg p-4 mb-4 max-h-48 overflow-y-auto shadow-sm">
+                  <p className="text-sm text-neutral-800 whitespace-pre-wrap leading-relaxed">
+                    {generateSocialContent('linkedin')}
                   </p>
                 </div>
+                <div className="flex gap-2">
+                  <Button
+                    onClick={() => shareContent('linkedin', generateSocialContent('linkedin'))}
+                    className="flex-1 bg-[#0077B5] hover:bg-[#005885] text-white"
+                    data-testid="button-share-linkedin"
+                  >
+                    <i className="ri-linkedin-fill mr-2"></i>
+                    Share on LinkedIn
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => copyToClipboard(generateSocialContent('linkedin'))}
+                    className="border-[#0077B5] text-[#0077B5] hover:bg-[#0077B5]/10"
+                    data-testid="button-copy-linkedin"
+                  >
+                    <Copy className="h-4 w-4" />
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          {/* X (Twitter) Post Preview */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            whileHover={{ scale: 1.02 }}
+          >
+            <Card className="overflow-hidden border-2 border-black/20 hover:border-black/40 transition-all bg-gradient-to-br from-neutral-100 to-white">
+              <div className="bg-black p-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center">
+                    <i className="ri-twitter-x-line text-black text-2xl"></i>
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-bold text-white text-lg">X (Twitter)</h3>
+                    <p className="text-white/80 text-sm">Global Conversation</p>
+                  </div>
+                </div>
               </div>
+              <CardContent className="p-5">
+                <div className="bg-white border rounded-lg p-4 mb-4 max-h-48 overflow-y-auto shadow-sm">
+                  <p className="text-sm text-neutral-800 whitespace-pre-wrap leading-relaxed">
+                    {generateSocialContent('x')}
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    onClick={() => shareContent('x', generateSocialContent('x'))}
+                    className="flex-1 bg-black hover:bg-neutral-800 text-white"
+                    data-testid="button-share-x"
+                  >
+                    <i className="ri-twitter-x-line mr-2"></i>
+                    Share on X
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => copyToClipboard(generateSocialContent('x'))}
+                    className="border-black text-black hover:bg-black/10"
+                    data-testid="button-copy-x"
+                  >
+                    <Copy className="h-4 w-4" />
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          {/* Instagram Post Preview */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            whileHover={{ scale: 1.02 }}
+          >
+            <Card className="overflow-hidden border-2 border-transparent hover:border-[#833AB4]/40 transition-all bg-gradient-to-br from-[#833AB4]/10 via-[#FD1D1D]/10 to-[#F77737]/10">
+              <div className="bg-gradient-to-r from-[#833AB4] via-[#FD1D1D] to-[#F77737] p-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center">
+                    <i className="ri-instagram-line text-[#833AB4] text-2xl"></i>
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-bold text-white text-lg">Instagram</h3>
+                    <p className="text-white/90 text-sm">Visual Stories</p>
+                  </div>
+                </div>
+              </div>
+              <CardContent className="p-5">
+                <div className="bg-white border rounded-lg p-4 mb-4 max-h-48 overflow-y-auto shadow-sm">
+                  <p className="text-sm text-neutral-800 whitespace-pre-wrap leading-relaxed">
+                    {generateSocialContent('instagram')}
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    onClick={() => shareContent('instagram', generateSocialContent('instagram'))}
+                    className="flex-1 bg-gradient-to-r from-[#833AB4] via-[#FD1D1D] to-[#F77737] hover:opacity-90 text-white"
+                    data-testid="button-share-instagram"
+                  >
+                    <i className="ri-instagram-line mr-2"></i>
+                    Copy for Instagram
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => copyToClipboard(generateSocialContent('instagram'))}
+                    className="border-[#833AB4] text-[#833AB4] hover:bg-[#833AB4]/10"
+                    data-testid="button-copy-instagram"
+                  >
+                    <Copy className="h-4 w-4" />
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          {/* Facebook Post Preview */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            whileHover={{ scale: 1.02 }}
+          >
+            <Card className="overflow-hidden border-2 border-[#1877F2]/20 hover:border-[#1877F2]/40 transition-all bg-gradient-to-br from-[#1877F2]/5 to-white">
+              <div className="bg-[#1877F2] p-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center">
+                    <i className="ri-facebook-fill text-[#1877F2] text-2xl"></i>
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-bold text-white text-lg">Facebook</h3>
+                    <p className="text-white/90 text-sm">Community Network</p>
+                  </div>
+                </div>
+              </div>
+              <CardContent className="p-5">
+                <div className="bg-white border rounded-lg p-4 mb-4 max-h-48 overflow-y-auto shadow-sm">
+                  <p className="text-sm text-neutral-800 whitespace-pre-wrap leading-relaxed">
+                    {generateSocialContent('facebook')}
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    onClick={() => shareContent('facebook', generateSocialContent('facebook'))}
+                    className="flex-1 bg-[#1877F2] hover:bg-[#166FE5] text-white"
+                    data-testid="button-share-facebook"
+                  >
+                    <i className="ri-facebook-fill mr-2"></i>
+                    Share on Facebook
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => copyToClipboard(generateSocialContent('facebook'))}
+                    className="border-[#1877F2] text-[#1877F2] hover:bg-[#1877F2]/10"
+                    data-testid="button-copy-facebook"
+                  >
+                    <Copy className="h-4 w-4" />
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </div>
+
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="bg-gradient-to-r from-teal-50 to-emerald-50 border-2 border-teal-200 rounded-xl p-6 mt-6"
+        >
+          <div className="flex items-start gap-4">
+            <div className="w-12 h-12 bg-teal-600 rounded-full flex items-center justify-center flex-shrink-0">
+              <img src="/attached_assets/CC_Logo_Teal.png" alt="Circular Computing" className="w-8 h-8" />
             </div>
-          </CardContent>
-        </Card>
+            <div>
+              <h4 className="font-bold text-teal-900 mb-2 text-lg">Circular Computing Partnership</h4>
+              <p className="text-sm text-teal-800 leading-relaxed">
+                All social content includes Circular Computing branding to help spread awareness about sustainable IT solutions. 
+                Customize the content while keeping the partnership attribution to maximize impact! 🌱
+              </p>
+            </div>
+          </div>
+        </motion.div>
       </section>
 
       {/* CTA Section */}
