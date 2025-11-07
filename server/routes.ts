@@ -1033,8 +1033,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // For backward compatibility, use first product for old fields
       const firstProduct = validatedData.products[0];
       
-      // Create RMA request log (not an actual RMA yet)
-      const requestLog = await storage.createRmaRequestLog({
+      // Create RMA request log with initial status "submitted"
+      let requestLog = await storage.createRmaRequestLog({
         userId: targetUserId,
         requestNumber,
         fullName: validatedData.fullName,
@@ -1058,70 +1058,81 @@ export async function registerRoutes(app: Express): Promise<Server> {
         processedAt: null,
       });
       
-      // Send notifications asynchronously (don't block response)
-      (async () => {
-        try {
-          // Get admin settings to check for webhook configuration
-          const adminSettings = await storage.getSystemSetting('admin_portal');
-          const hasWebhook = !!adminSettings?.settingValue?.rmaWebhookUrl;
-          
-          // Import email helpers in case we need them (for fallback or when no webhook)
-          const { sendRmaNotification, sendNewUserNotification } = await import('./email-service.js');
-          
-          let webhookSuccess = false;
-          
-          if (hasWebhook) {
-            // Try webhook first
-            try {
-              const webhookResult = await sendRmaWebhookNotification(requestLog);
-              webhookSuccess = webhookResult.success;
-              
-              if (!webhookSuccess) {
-                console.error('Webhook notification failed, falling back to email');
-              }
-            } catch (webhookError) {
-              console.error('Webhook notification error, falling back to email:', webhookError);
-            }
-          }
-          
-          // Send email notifications if:
-          // 1. No webhook configured, OR
-          // 2. Webhook failed
-          if (!hasWebhook || !webhookSuccess) {
-            // Send RMA request notification
-            if (adminSettings?.settingValue?.rmaNotificationEmails) {
-              const firstProduct = validatedData.products[0];
-              await sendRmaNotification(
-                adminSettings.settingValue.rmaNotificationEmails,
-                {
-                  rmaNumber: requestLog.requestNumber,
-                  customerName: validatedData.fullName,
-                  customerEmail: validatedData.email,
-                  productDetails: firstProduct.productMakeModel,
-                  serialNumber: firstProduct.manufacturerSerialNumber,
-                  faultDescription: firstProduct.faultDescription,
-                }
-              );
-            }
+      // Send notifications synchronously to determine final status
+      let webhookSuccess = false;
+      let finalStatus: "submitted" | "approved" = "submitted";
+      
+      try {
+        // Get admin settings to check for webhook configuration
+        const adminSettings = await storage.getSystemSetting('admin_portal');
+        const hasWebhook = !!adminSettings?.settingValue?.rmaWebhookUrl;
+        
+        // Import email helpers in case we need them (for fallback or when no webhook)
+        const { sendRmaNotification, sendNewUserNotification } = await import('./email-service.js');
+        
+        if (hasWebhook) {
+          // Try webhook first
+          try {
+            const webhookResult = await sendRmaWebhookNotification(requestLog);
+            webhookSuccess = webhookResult.success;
             
-            // Send new user notification if applicable
-            if (newUserCreated && adminSettings?.settingValue?.newUserAlertEmails) {
-              await sendNewUserNotification(
-                adminSettings.settingValue.newUserAlertEmails,
-                {
-                  userName: validatedData.fullName,
-                  userEmail: validatedData.email,
-                  userCompany: validatedData.companyName,
-                  rmaNumber: requestLog.requestNumber,
-                }
-              );
+            // If webhook succeeds, mark as approved
+            if (webhookSuccess) {
+              finalStatus = "approved";
+              console.log(`✅ Webhook succeeded - RMA request ${requestNumber} marked as approved`);
+            } else {
+              console.error('Webhook notification failed - RMA request remains as submitted');
             }
+          } catch (webhookError) {
+            console.error('Webhook notification error - RMA request remains as submitted:', webhookError);
           }
-        } catch (notificationError) {
-          console.error('Failed to send notifications:', notificationError);
-          // Don't fail the request if notification sending fails
         }
-      })();
+        
+        // Send email notifications if:
+        // 1. No webhook configured, OR
+        // 2. Webhook failed
+        if (!hasWebhook || !webhookSuccess) {
+          // Send RMA request notification
+          if (adminSettings?.settingValue?.rmaNotificationEmails) {
+            const firstProduct = validatedData.products[0];
+            await sendRmaNotification(
+              adminSettings.settingValue.rmaNotificationEmails,
+              {
+                rmaNumber: requestLog.requestNumber,
+                customerName: validatedData.fullName,
+                customerEmail: validatedData.email,
+                productDetails: firstProduct.productMakeModel,
+                serialNumber: firstProduct.manufacturerSerialNumber,
+                faultDescription: firstProduct.faultDescription,
+              }
+            );
+          }
+          
+          // Send new user notification if applicable
+          if (newUserCreated && adminSettings?.settingValue?.newUserAlertEmails) {
+            await sendNewUserNotification(
+              adminSettings.settingValue.newUserAlertEmails,
+              {
+                userName: validatedData.fullName,
+                userEmail: validatedData.email,
+                userCompany: validatedData.companyName,
+                rmaNumber: requestLog.requestNumber,
+              }
+            );
+          }
+        }
+      } catch (notificationError) {
+        console.error('Failed to send notifications:', notificationError);
+        // Don't fail the request if notification sending fails
+      }
+      
+      // Update RMA request status based on webhook result
+      if (finalStatus === "approved") {
+        const updatedLog = await storage.updateRmaRequestLog(requestLog.id, { status: "approved" });
+        if (updatedLog) {
+          requestLog = updatedLog;
+        }
+      }
       
       // Return request log (not an RMA)
       res.status(201).json({
