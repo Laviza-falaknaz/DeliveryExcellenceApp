@@ -68,23 +68,81 @@ All achievements, milestones, and gamification settings are fully configurable v
 ## Deployment
 
 ### Production Deployment Process
-The application automatically handles database initialization during deployment:
+The application automatically handles complete database initialization during deployment:
 
-1. **Schema Push**: On application startup, the schema is automatically pushed to the database using Drizzle Kit's programmatic API. This ensures all tables (including ESG measurement parameters and impact equivalency settings) are created before seeding.
+#### 1. Schema Push
+On application startup, the database schema is automatically pushed using Drizzle Kit's programmatic API. This creates all necessary tables before seeding begins.
 
-2. **Data Seeding**: After schema push, the application seeds essential data:
-   - Water projects
-   - System settings (password webhook, sustainability metrics)
-   - Organizational metrics
-   - Impact equivalency settings (trees, car miles, phone charges, etc.)
-   - ESG measurement parameters (carbon, water, minerals per laptop)
-   - Gamification data
-   - ESG targets
+#### 2. Configuration Data Seeding (Automatic)
+All admin configuration data is **automatically seeded** in production. This seeding is **idempotent** (can be run multiple times safely without duplicating data):
 
-3. **Security**: Default admin user creation is **disabled in production** for security. Admin users must be created manually using database tools or an admin creation script.
+**Sustainability Configuration:**
+- Water Projects (Ethiopia, Rwanda, Uganda initiatives)
+- System Settings (password webhook URL, sustainability metrics)
+- Organizational Metrics (total units deployed, company-wide carbon/water savings)
+- Impact Equivalency Settings (trees, car miles, phone charges, plastic bottles, homes powered, flights offset)
+- ESG Measurement Parameters (carbon/water/minerals per laptop, families helped)
+- Key Performance Insights (8 KPI metrics across environmental, social, governance categories)
 
-### Manual Admin User Creation
-In production, administrators must be created manually through direct database access or a dedicated admin creation endpoint. The default development credentials (lavizaniazi2001@gmail.com / admin123) are never created in production environments.
+**Gamification Configuration:**
+- Gamification Tiers (7 levels: Explorer → Pioneer → Innovator → Vanguard → Champion → Visionary → Legacy)
+- Achievements (10 configurable achievements with points, icons, thresholds)
+- Milestones (7 journey milestones from 1,000 to 50,000 points)
+- Gamification Settings (points per order, streak bonuses, tier multipliers)
 
-### Deployment Timeout
-Database initialization (schema push + seeding) has a 60-second timeout. Monitor first production deployment to ensure completion within this window.
+**ESG Reporting:**
+- ESG Targets (carbon reduction, water conservation, circular economy, social impact goals)
+
+**Admin Portal Configuration:**
+All seeded data can be modified via the admin portal:
+- `/admin/sustainability-settings` - ESG parameters and metrics
+- `/admin/gamification-management` - Achievements, milestones, settings
+- `/admin/water-project-management` - Water project details
+- `/admin/kpi-management` - Key performance insights
+
+Any changes made in development via the admin portal should be re-applied in production after deployment.
+
+#### 3. Data NOT Seeded (User/Transactional Data)
+The following data is **NEVER automatically seeded** in production:
+- Users (except manually created admins)
+- Orders and Order Items
+- RMAs and RMA Items
+- RMA Request Logs
+- Environmental Impact Records (tied to orders)
+- Support Tickets
+- Case Studies (must be added manually)
+
+#### 4. Security & Admin Access
+**Default admin user creation is DISABLED in production** for security. The development test user (lavizaniazi2001@gmail.com / admin123) is only created in NODE_ENV=development.
+
+**Production Admin Creation:**
+Administrators must be created manually in production using one of these methods:
+1. Direct database INSERT via Replit database console
+2. SQL query with bcrypt-hashed password
+3. Custom admin creation script (recommended)
+
+Example SQL for manual admin creation:
+```sql
+INSERT INTO users (username, password, name, company, email, phone_number, is_admin, notification_preferences)
+VALUES (
+  'admin@example.com',
+  '$2b$10$[BCRYPT_HASH]',  -- Generate with: bcrypt.hash('password', 10)
+  'Admin User',
+  'Company Name',
+  'admin@example.com',
+  '+1234567890',
+  true,
+  '{"orderUpdates":true,"environmentalImpact":true,"charityUpdates":true,"serviceReminders":true}'::jsonb
+);
+```
+
+#### 5. Deployment Checklist
+- [ ] Review admin portal configurations before deployment
+- [ ] Create production admin user manually after first deployment
+- [ ] Verify all seeded configuration data via admin portal
+- [ ] Test environmental impact calculations
+- [ ] Validate gamification system operation
+- [ ] Confirm water project data displays correctly
+
+#### 6. Deployment Timeout
+Database initialization (schema push + seeding) has a 60-second timeout. Monitor the first production deployment to ensure completion within this window. All seeding operations are optimized to check for existing data before inserting.
