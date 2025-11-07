@@ -23,6 +23,18 @@ Session-based authentication uses Passport.js with bcrypt for password hashing. 
 ### Environmental Impact Tracking
 A core feature, it tracks metrics like carbon saved, water provided, and minerals saved. It includes visualizations such as progress bars and charts, integrating with water projects and case studies to demonstrate real-world impact and gamify engagement.
 
+### Gamification System
+The platform includes a comprehensive gamification system with configurable achievements and milestones:
+
+#### Impact Level Achievements
+- **Bronze Impact**: Awarded at 5,000kg CO₂ saved (1,500 points)
+- **Silver Impact**: Awarded at 25,000kg CO₂ saved (5,000 points, Innovator tier)
+- **Gold Impact**: Awarded at 75,000kg CO₂ saved (10,000 points, Vanguard tier)
+- **Water Provider**: Awarded when helping 75 families with clean water (3,000 points, Innovator tier)
+
+#### Admin Management
+All achievements, milestones, and gamification settings are fully configurable via the Admin Panel at `/admin/gamification-management`. Admins can create, edit, and delete achievements, adjusting thresholds, reward points, icons, and active status. The seeding system is idempotent, allowing safe redeployment without data duplication.
+
 ## External Dependencies
 
 ### Core Technologies
