@@ -3780,5 +3780,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Recalculate all environmental impact
+  app.post("/api/impact/recalculate", isAuthenticated, async (req, res) => {
+    try {
+      console.log('Starting environmental impact recalculation...');
+      const result = await storage.recalculateAllEnvironmentalImpact();
+      console.log(`Recalculation complete: ${result.updated} updated, ${result.errors} errors`);
+      res.json({ 
+        success: true, 
+        message: `Recalculated impact for ${result.updated} orders`,
+        updated: result.updated,
+        errors: result.errors
+      });
+    } catch (error) {
+      console.error("Error recalculating environmental impact:", error);
+      res.status(500).json({ error: "Failed to recalculate environmental impact" });
+    }
+  });
+
   return httpServer;
 }
