@@ -30,6 +30,23 @@ import { queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
+// Helper function to map icon names to emojis
+const getAchievementEmoji = (iconName: string): string => {
+  const iconMap: Record<string, string> = {
+    'ri-shopping-cart-line': '🛒',
+    'ri-leaf-line': '🌿',
+    'ri-water-flash-line': '💧',
+    'ri-shopping-bag-3-line': '🛍️',
+    'ri-share-line': '📤',
+    'ri-customer-service-2-line': '🎧',
+    'ri-fire-line': '🔥',
+    'ri-plant-line': '🌱',
+    'ri-recycle-line': '♻️',
+    'ri-flag-line': '🚩',
+  };
+  return iconMap[iconName] || '🏆';
+};
+
 interface ESGScoreData {
   totalScore: number;
   breakdown: {
@@ -740,11 +757,11 @@ export default function ESGReport() {
                             <CardContent className="pt-6 relative z-10">
                               <div className="flex items-start gap-3">
                                 <motion.div 
-                                  className="p-2 rounded-lg bg-primary/20"
-                                  animate={{ rotate: [0, 5, -5, 0] }}
+                                  className="text-4xl"
+                                  animate={{ rotate: [0, 5, -5, 0], scale: [1, 1.1, 1] }}
                                   transition={{ duration: 3, repeat: Infinity }}
                                 >
-                                  <Award className="w-6 h-6 text-primary" />
+                                  {getAchievementEmoji(achData.icon)}
                                 </motion.div>
                                 <div className="flex-1">
                                   <h4 className="font-semibold mb-1 text-primary">{achData.name}</h4>
@@ -753,7 +770,7 @@ export default function ESGReport() {
                                   </p>
                                   <Badge variant="default" className="text-xs">
                                     <Sparkles className="w-3 h-3 mr-1" />
-                                    +{achData.rewardPoints} points
+                                    +{achData.points} points
                                   </Badge>
                                 </div>
                               </div>
@@ -794,13 +811,18 @@ export default function ESGReport() {
                           <Card className="opacity-80 hover:opacity-100 transition-opacity cursor-pointer">
                             <CardContent className="pt-6">
                               <div className="flex items-start gap-3">
-                                <motion.div 
-                                  className="p-2 rounded-lg bg-muted"
-                                  animate={progress > 50 ? { scale: [1, 1.1, 1] } : {}}
-                                  transition={{ duration: 2, repeat: Infinity }}
-                                >
-                                  <Lock className="w-6 h-6 text-muted-foreground" />
-                                </motion.div>
+                                <div className="relative">
+                                  <motion.div 
+                                    className="text-4xl grayscale opacity-40"
+                                    animate={progress > 50 ? { scale: [1, 1.1, 1] } : {}}
+                                    transition={{ duration: 2, repeat: Infinity }}
+                                  >
+                                    {getAchievementEmoji(achData.icon)}
+                                  </motion.div>
+                                  <div className="absolute inset-0 flex items-center justify-center">
+                                    <Lock className="w-5 h-5 text-muted-foreground" />
+                                  </div>
+                                </div>
                                 <div className="flex-1">
                                   <h4 className="font-semibold mb-1">{achData.name}</h4>
                                   <p className="text-sm text-muted-foreground mb-3">
