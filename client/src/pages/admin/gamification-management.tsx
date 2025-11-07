@@ -208,7 +208,9 @@ export default function GamificationManagement() {
                 <p>Loading...</p>
               ) : (
                 <div className="grid gap-4 md:grid-cols-2">
-                  {(achievements as any[])?.map((achievement: any) => (
+                  {(achievements as any[])?.map((item: any) => {
+                    const achievement = item.achievement || item; // Handle both formats
+                    return (
                     <Card key={achievement.id}>
                       <CardContent className="p-4">
                         <div className="flex items-start gap-3">
@@ -256,7 +258,8 @@ export default function GamificationManagement() {
                         </div>
                       </CardContent>
                     </Card>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </CardContent>

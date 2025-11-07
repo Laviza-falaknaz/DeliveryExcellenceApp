@@ -1812,19 +1812,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // ====================
-  // GAMIFICATION ROUTES
+  // GAMIFICATION ROUTES (Admin)
   // ====================
 
   // Achievement Routes
-  app.get("/api/gamification/achievements", isAuthenticated, async (req, res) => {
-    try {
-      const achievements = await storage.getAllAchievements();
-      res.json(achievements);
-    } catch (error) {
-      res.status(500).json({ message: "Internal server error" });
-    }
-  });
-
+  // Note: GET /api/gamification/achievements is defined in user-facing section below
+  
   app.get("/api/gamification/achievements/:id", isAuthenticated, async (req, res) => {
     try {
       const achievement = await storage.getAchievement(parseInt(req.params.id));
