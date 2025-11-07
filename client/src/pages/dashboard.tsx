@@ -30,13 +30,19 @@ interface Achievement {
   name: string;
   description: string;
   icon: string;
-  pointsAwarded: number;
+  points: number;
+  badgeColor: string;
 }
 
-interface UserAchievement {
+interface AchievementProgress {
   id: number;
+  userId: number;
+  achievementId: number;
+  currentValue: string;
+  progressPercent: number;
+  isUnlocked: boolean;
+  unlockedAt: string | null;
   achievement: Achievement;
-  unlockedAt: string;
 }
 
 interface RMA {
@@ -73,9 +79,11 @@ export default function Dashboard() {
     queryKey: ["/api/gamification/user-progress"],
   });
   
-  const { data: userAchievements = [] } = useQuery<UserAchievement[]>({
-    queryKey: ["/api/gamification/user-achievements"],
+  const { data: allAchievements = [] } = useQuery<AchievementProgress[]>({
+    queryKey: ["/api/gamification/achievements"],
   });
+
+  const userAchievements = allAchievements.filter(a => a.isUnlocked);
 
   const { data: orders = [] } = useQuery<Order[]>({
     queryKey: ["/api/orders"],
@@ -439,7 +447,7 @@ export default function Dashboard() {
                       <div className="text-xs font-medium text-gray-900 mb-0.5">
                         {ua.achievement.name}
                       </div>
-                      <div className="text-xs text-amber-700 font-medium">+{ua.achievement.pointsAwarded}</div>
+                      <div className="text-xs text-amber-700 font-medium">+{ua.achievement.points}</div>
                     </div>
                   ))}
                   {userAchievements.length === 0 && (
@@ -466,7 +474,7 @@ export default function Dashboard() {
                 <Button 
                   variant="outline" 
                   className="w-full mt-3 border-gray-300 hover:bg-gray-50 text-sm"
-                  onClick={() => setLocation('/achievements')}
+                  onClick={() => setLocation('/esg-report?tab=achievements')}
                   data-testid="button-view-achievements"
                 >
                   View All Achievements

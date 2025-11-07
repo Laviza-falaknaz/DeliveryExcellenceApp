@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -160,6 +160,12 @@ interface KeyPerformanceInsight {
 
 export default function ESGReport() {
   const { toast } = useToast();
+  
+  // Handle tab query parameter from URL
+  const [activeTab, setActiveTab] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('tab') || 'impact';
+  });
 
   const { data: user } = useQuery<UserData>({
     queryKey: ["/api/auth/me"],
@@ -543,7 +549,7 @@ export default function ESGReport() {
       </Card>
 
       {/* Detailed Impact & Gamification Tabs */}
-      <Tabs defaultValue="impact" className="w-full">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="impact" data-testid="tab-impact">
             <Leaf className="w-4 h-4 mr-2" />
