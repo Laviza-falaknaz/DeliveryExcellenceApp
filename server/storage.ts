@@ -1213,27 +1213,32 @@ export class DatabaseStorage implements IStorage {
   // Helper function to calculate and update environmental impact for an order
   async calculateAndUpdateEnvironmentalImpact(orderId: number, userId: number): Promise<void> {
     try {
-      // Get sustainability metrics from system settings
-      const settingsData = await this.getSystemSetting('sustainability_metrics');
-      const metrics = settingsData?.settingValue || {
-        carbonReductionPerLaptop: 316000,
-        resourcePreservationPerLaptop: 1200000,
-        waterSavedPerLaptop: 190000,
-        eWasteReductionPercentage: 0,
-        familiesHelpedPerLaptop: 1,
-        treesEquivalentPerLaptop: 3,
-      };
+      // Get ESG measurement parameters from database
+      const parameters = await this.getActiveEsgMeasurementParameters();
+      
+      // Create a map for easy lookup
+      const parameterMap: Record<string, number> = {};
+      parameters.forEach(param => {
+        parameterMap[param.parameterKey] = parseFloat(param.parameterValue.toString());
+      });
+      
+      // Extract values with fallbacks
+      const carbonPerLaptop = (parameterMap['carbon_per_laptop'] ?? 316) * 1000; // Convert kg to grams
+      const waterProvidedPerLaptop = parameterMap['water_provided_per_laptop'] ?? 60; // Liters
+      const mineralsPerLaptop = parameterMap['minerals_saved_per_laptop'] ?? 1200; // Grams
+      const waterSavedPerLaptop = parameterMap['water_saved_per_laptop'] ?? 190000; // Liters
+      const familiesPerLaptop = parameterMap['families_helped_per_laptop'] ?? 1;
 
       // Get order items to calculate total quantity
       const items = await this.getOrderItems(orderId);
       const totalQuantity = items.reduce((sum, item) => sum + (item.quantity || 1), 0);
 
       // Calculate impact based on quantity
-      const carbonSaved = Math.round((metrics.carbonReductionPerLaptop ?? 316000) * totalQuantity);
-      const waterProvided = Math.round((metrics.waterSavedPerLaptop ?? 190000) * totalQuantity);
-      const mineralsSaved = Math.round((metrics.resourcePreservationPerLaptop ?? 1200000) * totalQuantity);
-      const treesEquivalent = Math.round((metrics.treesEquivalentPerLaptop ?? 3) * totalQuantity);
-      const familiesHelped = Math.round((metrics.familiesHelpedPerLaptop ?? 1) * totalQuantity);
+      const carbonSaved = Math.round(carbonPerLaptop * totalQuantity);
+      const waterProvided = Math.round(waterProvidedPerLaptop * totalQuantity);
+      const mineralsSaved = Math.round(mineralsPerLaptop * totalQuantity);
+      const treesEquivalent = Math.round((carbonSaved / 1000) / 21); // Carbon in kg divided by 21kg per tree
+      const familiesHelped = Math.round(familiesPerLaptop * totalQuantity);
 
       // Check if impact record exists for this order
       const existingImpact = await this.getEnvironmentalImpactByOrderId(orderId);
@@ -1463,19 +1468,19 @@ export class DatabaseStorage implements IStorage {
   }
 
   async recalculateOrganizationalMetrics(totalUnits: number, updatedBy?: number): Promise<void> {
-    // Get sustainability settings to get per-laptop metrics
-    const settings = await this.getSystemSetting('sustainability_metrics');
+    // Get ESG measurement parameters from database
+    const parameters = await this.getActiveEsgMeasurementParameters();
     
-    if (!settings?.settingValue) {
-      console.warn('Sustainability metrics settings not found, cannot recalculate organizational metrics');
-      return;
-    }
-
-    const {
-      carbonReductionPerLaptop = 316000, // grams
-      waterSavedPerLaptop = 190000, // liters
-      familiesHelpedPerLaptop = 1
-    } = settings.settingValue as any;
+    // Create a map for easy lookup
+    const parameterMap: Record<string, number> = {};
+    parameters.forEach(param => {
+      parameterMap[param.parameterKey] = parseFloat(param.parameterValue.toString());
+    });
+    
+    // Extract values with fallbacks (convert kg to grams for carbon)
+    const carbonReductionPerLaptop = (parameterMap['carbon_per_laptop'] ?? 316) * 1000; // Convert kg to grams
+    const waterSavedPerLaptop = parameterMap['water_saved_per_laptop'] ?? 190000; // liters
+    const familiesHelpedPerLaptop = parameterMap['families_helped_per_laptop'] ?? 1;
 
     // Calculate derived metrics
     const totalCarbonSaved = totalUnits * carbonReductionPerLaptop;
