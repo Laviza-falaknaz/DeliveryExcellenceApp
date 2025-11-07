@@ -2437,9 +2437,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
+      // Mark request as approved after successful notification
+      await storage.updateRmaRequestLog(requestId, { status: "approved" });
+
       res.json({ 
         success: true, 
-        message: "RMA request details sent to webhook",
+        message: "RMA request details sent to webhook and marked as approved",
         requestNumber: request.requestNumber 
       });
     } catch (error) {

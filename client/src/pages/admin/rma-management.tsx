@@ -105,9 +105,10 @@ export function RMAManagement() {
       return apiRequest("POST", `/api/admin/rma-requests/${id}/resend`, {});
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/rma-requests"] });
       toast({ 
-        title: "Notification Sent",
-        description: "RMA request details have been sent successfully"
+        title: "Notification Sent & Approved",
+        description: "RMA request has been sent successfully and marked as approved"
       });
     },
     onError: () => {
