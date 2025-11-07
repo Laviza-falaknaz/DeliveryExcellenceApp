@@ -24,7 +24,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Edit, Trash2, Trophy, Target } from "lucide-react";
+import { Plus, Edit, Trash2, Trophy, Target, Rocket } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 
 export default function GamificationManagement() {
@@ -33,6 +33,22 @@ export default function GamificationManagement() {
   const [milestoneDialogOpen, setMilestoneDialogOpen] = useState(false);
   const [editingAchievement, setEditingAchievement] = useState<any>(null);
   const [editingMilestone, setEditingMilestone] = useState<any>(null);
+
+  const backfillShippingBonusesMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest("POST", "/api/admin/gamification/backfill-shipping-bonuses", {});
+      return response.json();
+    },
+    onSuccess: (data: any) => {
+      toast({
+        title: "Shipping bonuses backfilled successfully",
+        description: `Processed ${data.processed} shipped orders, awarded ${data.awarded} new bonuses`,
+      });
+    },
+    onError: () => {
+      toast({ title: "Failed to backfill shipping bonuses", variant: "destructive" });
+    },
+  });
 
   const { data: achievements, isLoading: isLoadingAchievements } = useQuery({
     queryKey: ["/api/gamification/achievements"],
@@ -191,16 +207,27 @@ export default function GamificationManagement() {
                   <CardTitle>Achievements</CardTitle>
                   <CardDescription>Define achievements users can unlock</CardDescription>
                 </div>
-                <Button
-                  onClick={() => {
-                    setEditingAchievement(null);
-                    setAchievementDialogOpen(true);
-                  }}
-                  data-testid="button-create-achievement"
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Create Achievement
-                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => backfillShippingBonusesMutation.mutate()}
+                    disabled={backfillShippingBonusesMutation.isPending}
+                    data-testid="button-backfill-shipping-bonuses"
+                  >
+                    <Rocket className="h-4 w-4 mr-2" />
+                    {backfillShippingBonusesMutation.isPending ? "Backfilling..." : "Backfill Shipping XP"}
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      setEditingAchievement(null);
+                      setAchievementDialogOpen(true);
+                    }}
+                    data-testid="button-create-achievement"
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Create Achievement
+                  </Button>
+                </div>
               </div>
             </CardHeader>
             <CardContent>
