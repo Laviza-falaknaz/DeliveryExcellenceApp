@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Users, ShoppingCart, Wrench, HelpCircle, Droplets, FileText, Palette, Database, Trophy, Key, Settings, Leaf, BarChart3, Target } from "lucide-react";
+import { Users, ShoppingCart, Wrench, HelpCircle, Droplets, FileText, Palette, Database, Trophy, Key, Settings, Leaf, BarChart3, Target, Settings2, Sparkles } from "lucide-react";
 import { UserManagement } from "./admin/user-management";
 import { OrderManagement } from "./admin/order-management";
 import { RMAManagement } from "./admin/rma-management";
@@ -16,6 +16,8 @@ import { AdminSettings } from "./admin/admin-settings";
 import { SustainabilitySettings } from "./admin/sustainability-settings";
 import { KeyPerformanceInsightsManagement } from "./admin/key-performance-insights";
 import { EsgTargetsManagement } from "./admin/esg-targets-management";
+import { EsgParameters } from "./admin/esg-parameters";
+import { ImpactEquivalencySettings } from "./admin/impact-equivalency-settings";
 
 interface AdminSettingsData {
   visibleTabs: string[];
@@ -33,8 +35,10 @@ const ALL_TABS = [
   { id: "gamification", label: "Gamification", icon: Trophy, component: GamificationManagement },
   { id: "api-keys", label: "API Keys", icon: Key, component: ApiKeyManagement },
   { id: "sustainability", label: "Sustainability", icon: Leaf, component: SustainabilitySettings },
-  { id: "key-insights", label: "Key Insights", icon: BarChart3, component: KeyPerformanceInsightsManagement },
+  { id: "esg-parameters", label: "ESG Parameters", icon: Settings2, component: EsgParameters },
+  { id: "impact-equivalency", label: "Impact Equivalency", icon: Sparkles, component: ImpactEquivalencySettings },
   { id: "esg-targets", label: "ESG Targets", icon: Target, component: EsgTargetsManagement },
+  { id: "key-performance-insights", label: "KPI Insights", icon: BarChart3, component: KeyPerformanceInsightsManagement },
   { id: "theme", label: "Theme", icon: Palette, component: ThemeSettings },
   { id: "connection", label: "Connection", icon: Database, component: ConnectionSettings },
 ];
