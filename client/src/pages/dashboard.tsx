@@ -339,11 +339,11 @@ export default function Dashboard() {
                       <Droplet className="h-5 w-5 text-blue-700" />
                     </div>
                     <div className="text-2xl font-bold text-gray-900 mb-0.5">
-                      {(impact?.waterProvided || 0).toFixed(0)} L
+                      {((impact?.waterSaved || 0) / 1000).toFixed(0)} kL
                     </div>
                     <div className="text-sm text-gray-600 mb-1">Water Saved</div>
                     <div className="text-xs text-blue-700 font-medium">
-                      +{Math.floor((impact?.waterProvided || 0) * 0.08)}% this month
+                      +{Math.floor(((impact?.waterSaved || 0) / 1000) * 0.08)}% this month
                     </div>
                   </CardContent>
                 </Card>
