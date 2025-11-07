@@ -838,187 +838,196 @@ export default function ESGReport() {
           </Card>
         </TabsContent>
 
-        {/* Journey/Milestones Tab - Gamified Curvy Road */}
+        {/* Journey/Milestones Tab - Gamified Road Map */}
         <TabsContent value="milestones" className="space-y-6">
-          <Card className="overflow-hidden">
+          <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Footprints className="w-5 h-5" />
-                Your Sustainability Journey
-              </CardTitle>
-              <CardDescription>
-                Follow the winding path to sustainability excellence
-              </CardDescription>
+              <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+              >
+                <CardTitle className="flex items-center gap-2">
+                  <Footprints className="w-5 h-5 text-primary" />
+                  Your Sustainability Journey
+                </CardTitle>
+                <CardDescription>
+                  Progress through milestones on your path to sustainability excellence
+                </CardDescription>
+              </motion.div>
             </CardHeader>
             <CardContent className="p-6">
-              <div className="relative w-full" style={{ minHeight: '600px' }}>
-                {/* SVG Curvy Road */}
-                <svg 
-                  className="w-full h-full absolute inset-0" 
-                  viewBox="0 0 800 600" 
-                  preserveAspectRatio="xMidYMid meet"
-                  style={{ overflow: 'visible' }}
-                >
-                  {/* Background decorative elements */}
-                  <defs>
-                    <linearGradient id="pathGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                      <stop offset="0%" stopColor="#08ABAB" stopOpacity="0.3" />
-                      <stop offset="100%" stopColor="#08ABAB" stopOpacity="0.1" />
-                    </linearGradient>
-                  </defs>
-
-                  {/* Curvy Road Path */}
-                  <motion.path
-                    d="M 100 550 Q 150 480, 200 450 T 350 380 Q 450 320, 500 280 T 650 150 Q 700 100, 750 50"
-                    stroke="url(#pathGradient)"
-                    strokeWidth="40"
-                    fill="none"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    initial={{ pathLength: 0 }}
-                    animate={{ pathLength: 1 }}
-                    transition={{ duration: 2, ease: "easeInOut" }}
-                  />
-
-                  {/* Road Border */}
-                  <motion.path
-                    d="M 100 550 Q 150 480, 200 450 T 350 380 Q 450 320, 500 280 T 650 150 Q 700 100, 750 50"
-                    stroke="#08ABAB"
-                    strokeWidth="2"
-                    fill="none"
-                    strokeDasharray="10,5"
-                    initial={{ pathLength: 0 }}
-                    animate={{ pathLength: 1 }}
-                    transition={{ duration: 2, ease: "easeInOut", delay: 0.5 }}
-                  />
-                </svg>
-
-                {/* Milestone Markers positioned along the curvy path */}
+              {/* Horizontal Journey Path */}
+              <div className="relative">
                 {sortedMilestones.map((milestone: any, index: number) => {
                   const isReached = reachedMilestoneIds.includes(milestone.id);
                   const isNext = !isReached && !sortedMilestones.slice(0, index).some((m: any) => !reachedMilestoneIds.includes(m.id));
-                  
-                  // Position milestones along the curve using approximated coordinates
-                  const positions = [
-                    { x: 100, y: 550 },  // Start
-                    { x: 200, y: 450 },
-                    { x: 350, y: 380 },
-                    { x: 500, y: 280 },
-                    { x: 600, y: 200 },
-                    { x: 700, y: 120 },
-                    { x: 750, y: 50 },   // End
-                  ];
-                  
-                  const pos = positions[index] || positions[positions.length - 1];
                   const lastReachedIndex = sortedMilestones.findIndex((m: any, i: number) => 
                     i > 0 && !reachedMilestoneIds.includes(m.id)
                   ) - 1;
                   const isCurrentPosition = index === Math.max(0, lastReachedIndex);
                   
                   return (
-                    <motion.g
+                    <motion.div
                       key={milestone.id}
-                      initial={{ opacity: 0, scale: 0 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: index * 0.2, duration: 0.5 }}
+                      className="relative mb-12 last:mb-0"
+                      initial={{ opacity: 0, x: -50 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.15, duration: 0.5 }}
                       data-testid={`milestone-${milestone.id}`}
                     >
-                      {/* Footprint/Marker */}
-                      <motion.circle
-                        cx={pos.x}
-                        cy={pos.y}
-                        r="20"
-                        className={cn(
-                          "cursor-pointer",
-                          isReached ? "fill-primary" : isNext ? "fill-primary/50" : "fill-muted"
-                        )}
-                        stroke={isReached ? "#08ABAB" : "#888"}
-                        strokeWidth="3"
-                        whileHover={{ scale: 1.2 }}
-                        whileTap={{ scale: 0.9 }}
-                      />
-                      
-                      {/* Milestone number/icon */}
-                      <text
-                        x={pos.x}
-                        y={pos.y + 5}
-                        textAnchor="middle"
-                        className="font-bold text-sm pointer-events-none"
-                        fill={isReached ? "white" : "#666"}
-                      >
-                        {isReached ? "✓" : index + 1}
-                      </text>
-
-                      {/* Character at current position */}
-                      {isCurrentPosition && (
-                        <motion.g
-                          initial={{ y: -20, opacity: 0 }}
-                          animate={{ y: 0, opacity: 1 }}
-                          transition={{ delay: 1, duration: 0.5 }}
-                        >
-                          <motion.circle
-                            cx={pos.x}
-                            cy={pos.y - 60}
-                            r="25"
-                            fill="#FFD700"
-                            stroke="#FFA500"
-                            strokeWidth="3"
-                            animate={{ 
-                              y: [0, -5, 0],
-                            }}
-                            transition={{ 
-                              repeat: Infinity, 
-                              duration: 1.5,
-                              ease: "easeInOut"
-                            }}
-                          />
-                          <text
-                            x={pos.x}
-                            y={pos.y - 52}
-                            textAnchor="middle"
-                            className="text-2xl pointer-events-none"
-                          >
-                            🏃
-                          </text>
-                        </motion.g>
+                      {/* Connecting Line */}
+                      {index < sortedMilestones.length - 1 && (
+                        <div className="absolute left-12 top-20 bottom-0 w-1 bg-gradient-to-b from-primary/30 to-border -z-10" />
                       )}
 
-                      {/* Milestone info card (on hover or always visible) */}
-                      {(isReached || isNext) && (
-                        <foreignObject
-                          x={pos.x + 30}
-                          y={pos.y - 40}
-                          width="200"
-                          height="100"
-                          className="pointer-events-none"
-                        >
+                      {/* Milestone Card */}
+                      <motion.div
+                        className="flex items-start gap-6"
+                        whileHover={{ x: 8 }}
+                        transition={{ type: "spring", stiffness: 300 }}
+                      >
+                        {/* Milestone Marker */}
+                        <div className="relative flex-shrink-0">
                           <motion.div
-                            className="bg-card border border-border rounded-lg p-3 shadow-lg"
-                            initial={{ opacity: 0, x: -10 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: index * 0.2 + 0.3 }}
+                            className={cn(
+                              "w-24 h-24 rounded-full flex items-center justify-center text-2xl font-bold relative z-10",
+                              "border-4 transition-all duration-300",
+                              isReached
+                                ? "bg-primary border-primary text-primary-foreground shadow-lg shadow-primary/50"
+                                : isNext
+                                ? "bg-primary/20 border-primary text-primary animate-pulse"
+                                : "bg-muted border-muted-foreground/30 text-muted-foreground"
+                            )}
+                            whileHover={{ scale: 1.1, rotate: isReached ? 0 : 5 }}
                           >
-                            <h4 className="font-semibold text-sm mb-1 text-foreground">
-                              {milestone.title}
-                            </h4>
-                            <p className="text-xs text-muted-foreground mb-2">
-                              {milestone.description}
-                            </p>
-                            {milestone.requiredScore !== null && (
-                              <Badge 
-                                variant={isReached ? "default" : "secondary"} 
-                                className="text-xs"
-                              >
-                                {isReached ? "✓ Completed" : `${milestone.requiredScore} pts`}
-                              </Badge>
+                            {isReached ? (
+                              <Zap className="w-12 h-12" />
+                            ) : (
+                              <span className="text-3xl">{index + 1}</span>
                             )}
                           </motion.div>
-                        </foreignObject>
-                      )}
-                    </motion.g>
+
+                          {/* Character at current position */}
+                          {isCurrentPosition && (
+                            <motion.div
+                              className="absolute -right-6 top-0 text-5xl"
+                              initial={{ scale: 0, rotate: -45 }}
+                              animate={{ scale: 1, rotate: 0 }}
+                              transition={{ delay: 0.8, type: "spring", stiffness: 200 }}
+                            >
+                              <motion.div
+                                animate={{ 
+                                  y: [-8, 0, -8],
+                                  rotate: [0, 5, -5, 0]
+                                }}
+                                transition={{ 
+                                  repeat: Infinity, 
+                                  duration: 2,
+                                  ease: "easeInOut"
+                                }}
+                              >
+                                🏃
+                              </motion.div>
+                            </motion.div>
+                          )}
+                        </div>
+
+                        {/* Milestone Content */}
+                        <motion.div
+                          className={cn(
+                            "flex-1 p-6 rounded-xl border-2 transition-all duration-300",
+                            isReached
+                              ? "bg-primary/5 border-primary/30 shadow-md"
+                              : isNext
+                              ? "bg-primary/5 border-primary/50 shadow-sm"
+                              : "bg-card border-border"
+                          )}
+                          whileHover={{ 
+                            scale: 1.02,
+                            boxShadow: "0 8px 24px rgba(0,0,0,0.12)"
+                          }}
+                        >
+                          <div className="flex items-start justify-between gap-4 mb-3">
+                            <div className="flex-1">
+                              <h3 className={cn(
+                                "text-xl font-bold mb-2",
+                                isReached && "text-primary"
+                              )}>
+                                {milestone.title}
+                              </h3>
+                              <p className="text-muted-foreground">
+                                {milestone.description}
+                              </p>
+                            </div>
+                            
+                            {isReached && (
+                              <motion.div
+                                className="flex-shrink-0"
+                                initial={{ scale: 0, rotate: -180 }}
+                                animate={{ scale: 1, rotate: 0 }}
+                                transition={{ delay: index * 0.15 + 0.3, type: "spring" }}
+                              >
+                                <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
+                                  <Star className="w-6 h-6 text-primary fill-primary" />
+                                </div>
+                              </motion.div>
+                            )}
+                          </div>
+
+                          <div className="flex items-center gap-4 flex-wrap">
+                            {milestone.requiredScore !== null && (
+                              <Badge 
+                                variant={isReached ? "default" : "secondary"}
+                                className="text-sm px-3 py-1"
+                              >
+                                {isReached ? (
+                                  <>
+                                    <Sparkles className="w-4 h-4 mr-1" />
+                                    Completed
+                                  </>
+                                ) : (
+                                  <>
+                                    <Target className="w-4 h-4 mr-1" />
+                                    {milestone.requiredScore} points required
+                                  </>
+                                )}
+                              </Badge>
+                            )}
+
+                            {isNext && (
+                              <motion.div
+                                className="text-sm font-medium text-primary flex items-center gap-2"
+                                animate={{ opacity: [1, 0.6, 1] }}
+                                transition={{ repeat: Infinity, duration: 2 }}
+                              >
+                                <ChevronRight className="w-4 h-4" />
+                                Next milestone
+                              </motion.div>
+                            )}
+                          </div>
+                        </motion.div>
+                      </motion.div>
+                    </motion.div>
                   );
                 })}
               </div>
+
+              {/* Empty State */}
+              {sortedMilestones.length === 0 && (
+                <motion.div
+                  className="text-center py-12"
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <Footprints className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">Your Journey Awaits!</h3>
+                  <p className="text-muted-foreground">
+                    Complete actions to unlock milestones and track your progress.
+                  </p>
+                </motion.div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
