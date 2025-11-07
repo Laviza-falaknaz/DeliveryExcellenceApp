@@ -130,24 +130,42 @@ export default function Dashboard() {
   // Mutation to recalculate environmental impact
   const recalculateMutation = useMutation({
     mutationFn: async () => {
-      return apiRequest("/api/impact/recalculate", {
+      const response = await fetch("/api/impact/recalculate", {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
       });
+      
+      if (!response.ok) {
+        throw new Error("Failed to recalculate");
+      }
+      
+      return response.json();
     },
     onSuccess: (data: any) => {
       toast({
         title: "🚀 Impact Recalculated!",
         description: `Updated ${data.updated} orders successfully!`,
       });
-      // Invalidate all relevant queries to refresh data
-      queryClient.invalidateQueries({ queryKey: ["/api/environmental-impact"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/impact/trends"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/impact/equivalents"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/impact/by-order"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/orders"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/gamification/user-progress"] });
+      // Invalidate all relevant queries to refresh data with refetch
+      queryClient.invalidateQueries({ queryKey: ["/api/environmental-impact"], refetchType: "all" });
+      queryClient.invalidateQueries({ queryKey: ["/api/impact"], refetchType: "all" });
+      queryClient.invalidateQueries({ queryKey: ["/api/impact/trends"], refetchType: "all" });
+      queryClient.invalidateQueries({ queryKey: ["/api/impact/equivalents"], refetchType: "all" });
+      queryClient.invalidateQueries({ queryKey: ["/api/impact/by-order"], refetchType: "all" });
+      queryClient.invalidateQueries({ queryKey: ["/api/orders"], refetchType: "all" });
+      queryClient.invalidateQueries({ queryKey: ["/api/gamification/user-progress"], refetchType: "all" });
+      queryClient.invalidateQueries({ queryKey: ["/api/gamification/achievements"], refetchType: "all" });
+      
+      // Force refetch after a short delay
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500);
     },
     onError: (error: any) => {
+      console.error("Recalculation error:", error);
       toast({
         title: "Error",
         description: "Failed to recalculate impact. Please try again.",
@@ -166,26 +184,59 @@ export default function Dashboard() {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-teal-50">
       <div className="max-w-7xl mx-auto p-4">
         
-        {/* Rocket Animation */}
+        {/* Rocket Animation with Fire Trail */}
         <AnimatePresence>
           {showRocket && (
-            <motion.div
-              initial={{ x: -100, y: window.innerHeight }}
-              animate={{ 
-                x: window.innerWidth + 100, 
-                y: -100,
-                rotate: -45
-              }}
-              exit={{ opacity: 0 }}
-              transition={{ 
-                duration: 2,
-                ease: "easeInOut"
-              }}
-              className="fixed z-50 pointer-events-none"
-              style={{ fontSize: '64px' }}
-            >
-              🚀
-            </motion.div>
+            <>
+              {/* Rocket */}
+              <motion.div
+                initial={{ x: -100, y: window.innerHeight / 2 }}
+                animate={{ 
+                  x: window.innerWidth + 100, 
+                  y: 100,
+                }}
+                exit={{ opacity: 0 }}
+                transition={{ 
+                  duration: 1.5,
+                  ease: [0.43, 0.13, 0.23, 0.96]
+                }}
+                className="fixed z-50 pointer-events-none"
+                style={{ fontSize: '80px', transform: 'rotate(-45deg)' }}
+              >
+                🚀
+              </motion.div>
+              
+              {/* Fire Trail - Multiple particles */}
+              {[...Array(12)].map((_, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ 
+                    x: -100, 
+                    y: window.innerHeight / 2,
+                    opacity: 1,
+                    scale: 1
+                  }}
+                  animate={{ 
+                    x: window.innerWidth + 100, 
+                    y: 100,
+                    opacity: 0,
+                    scale: 0
+                  }}
+                  transition={{ 
+                    duration: 1.5,
+                    ease: [0.43, 0.13, 0.23, 0.96],
+                    delay: i * 0.05
+                  }}
+                  className="fixed z-40 pointer-events-none"
+                  style={{ 
+                    fontSize: `${60 - i * 3}px`,
+                    left: `${-20 - i * 15}px`
+                  }}
+                >
+                  {i % 3 === 0 ? '🔥' : i % 3 === 1 ? '💨' : '✨'}
+                </motion.div>
+              ))}
+            </>
           )}
         </AnimatePresence>
 
