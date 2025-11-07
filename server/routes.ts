@@ -515,6 +515,130 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get monthly impact trends
+  app.get("/api/impact/trends", isAuthenticated, async (req, res) => {
+    try {
+      const user = req.user as User;
+      const impacts = await storage.getEnvironmentalImpactByUserId(user.id);
+      
+      // Group impacts by month
+      const monthlyData: Record<string, any> = {};
+      const now = new Date();
+      
+      // Initialize last 6 months with zero values
+      for (let i = 5; i >= 0; i--) {
+        const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        const monthKey = date.toLocaleString('default', { month: 'short' });
+        monthlyData[monthKey] = {
+          name: monthKey,
+          carbon: 0,
+          water: 0,
+          minerals: 0,
+          waterSaved: 0,
+        };
+      }
+      
+      // Aggregate impacts by month
+      impacts.forEach(impact => {
+        if (impact.createdAt) {
+          const impactDate = new Date(impact.createdAt);
+          const monthKey = impactDate.toLocaleString('default', { month: 'short' });
+          
+          if (monthlyData[monthKey]) {
+            monthlyData[monthKey].carbon += (impact.carbonSaved / 1000); // Convert to kg
+            monthlyData[monthKey].water += impact.waterProvided;
+            monthlyData[monthKey].minerals += impact.mineralsSaved;
+            monthlyData[monthKey].waterSaved += 0; // Will calculate based on orders
+          }
+        }
+      });
+      
+      // Calculate cumulative values
+      const months = Object.keys(monthlyData);
+      let cumulativeCarbon = 0;
+      let cumulativeWater = 0;
+      let cumulativeMinerals = 0;
+      let cumulativeWaterSaved = 0;
+      
+      const cumulativeData = months.map(month => {
+        cumulativeCarbon += monthlyData[month].carbon;
+        cumulativeWater += monthlyData[month].water;
+        cumulativeMinerals += monthlyData[month].minerals;
+        cumulativeWaterSaved += monthlyData[month].waterSaved;
+        
+        return {
+          name: month,
+          carbon: Math.round(cumulativeCarbon),
+          water: Math.round(cumulativeWater),
+          minerals: Math.round(cumulativeMinerals),
+          waterSaved: Math.round(cumulativeWaterSaved),
+        };
+      });
+      
+      res.json(cumulativeData);
+    } catch (error) {
+      console.error("Error fetching impact trends:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Get water projects grouped by region
+  app.get("/api/impact/water-by-region", isAuthenticated, async (req, res) => {
+    try {
+      const waterProjects = await storage.getWaterProjects();
+      
+      // Group by location/region
+      const regionData: Record<string, number> = {};
+      
+      waterProjects.forEach(project => {
+        const region = project.location;
+        if (!regionData[region]) {
+          regionData[region] = 0;
+        }
+        regionData[region] += project.waterProvided;
+      });
+      
+      // Convert to array format for charts
+      const chartData = Object.keys(regionData).map(region => ({
+        name: region,
+        water: regionData[region],
+      }));
+      
+      res.json(chartData);
+    } catch (error) {
+      console.error("Error fetching water by region:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Get material/resource breakdown
+  app.get("/api/impact/material-breakdown", isAuthenticated, async (req, res) => {
+    try {
+      const user = req.user as User;
+      const impact = await storage.getTotalEnvironmentalImpact(user.id);
+      
+      if (!impact || !impact.mineralsSaved) {
+        return res.json([]);
+      }
+      
+      // Calculate estimated material breakdown based on typical laptop composition
+      const totalMinerals = impact.mineralsSaved;
+      
+      const breakdown = [
+        { name: "Aluminum", value: Math.round(totalMinerals * 0.35), percentage: 35 },
+        { name: "Copper", value: Math.round(totalMinerals * 0.20), percentage: 20 },
+        { name: "Plastics", value: Math.round(totalMinerals * 0.25), percentage: 25 },
+        { name: "Rare Earth", value: Math.round(totalMinerals * 0.10), percentage: 10 },
+        { name: "Other", value: Math.round(totalMinerals * 0.10), percentage: 10 },
+      ];
+      
+      res.json(breakdown);
+    } catch (error) {
+      console.error("Error fetching material breakdown:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // RMA routes
   app.get("/api/rma", isAuthenticated, async (req, res) => {
     try {

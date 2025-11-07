@@ -7,7 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
 import { formatEnvironmentalImpact } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
-import { Trophy, Star, TrendingUp } from "lucide-react";
+import { Trophy, Star, TrendingUp, Sparkles } from "lucide-react";
 import { ProgressRing } from "@/components/gamification/progress-ring";
 import { Confetti } from "@/components/gamification/confetti";
 import carbonIcon from "@assets/Carbon Icon CC_1757609284710.png";
@@ -29,29 +29,13 @@ import {
   PieChart,
   Pie,
   Cell,
+  Area,
+  AreaChart,
 } from "recharts";
 import { Link } from "wouter";
 import { Copy, Share2 } from "lucide-react";
 
-// Mock data for charts - would be replaced by actual data in a real implementation
-const monthlyData = [
-  { name: "Jan", carbon: 120, water: 1200, minerals: 300 },
-  { name: "Feb", carbon: 180, water: 1800, minerals: 380 },
-  { name: "Mar", carbon: 220, water: 2100, minerals: 420 },
-  { name: "Apr", carbon: 260, water: 2400, minerals: 490 },
-  { name: "May", carbon: 290, water: 2700, minerals: 540 },
-  { name: "Jun", carbon: 310, water: 2900, minerals: 580 },
-];
-
-const materialBreakdown = [
-  { name: "Aluminum", value: 35 },
-  { name: "Copper", value: 20 },
-  { name: "Plastics", value: 25 },
-  { name: "Rare Earth", value: 10 },
-  { name: "Other", value: 10 },
-];
-
-const COLORS = ["#4caf50", "#03a9f4", "#ffa726", "#f44336", "#9c27b0"];
+const COLORS = ["#08ABAB", "#4caf50", "#03a9f4", "#ffa726", "#f44336"];
 
 export default function Impact() {
   const { impact, isLoadingImpact } = useImpact();
@@ -60,6 +44,19 @@ export default function Impact() {
   
   const { data: milestones = [] } = useQuery({
     queryKey: ["/api/gamification/milestones"],
+  });
+
+  // Fetch real data from API
+  const { data: monthlyData = [], isLoading: isLoadingTrends } = useQuery<any[]>({
+    queryKey: ["/api/impact/trends"],
+  });
+
+  const { data: waterByRegion = [], isLoading: isLoadingWaterRegion } = useQuery<any[]>({
+    queryKey: ["/api/impact/water-by-region"],
+  });
+
+  const { data: materialBreakdown = [], isLoading: isLoadingMaterials } = useQuery<any[]>({
+    queryKey: ["/api/impact/material-breakdown"],
   });
 
   // Create personalized social media content
@@ -310,6 +307,7 @@ Learn more about sustainable IT solutions: circularcomputing.com
                     <p className="text-3xl font-bold mt-1">
                       {impact.familiesHelped}
                     </p>
+                    <p className="text-xs text-neutral-400 mt-1">families helped</p>
                   </div>
                   <div className="h-12 w-12 rounded-full bg-secondary/10 flex items-center justify-center">
                     <img src={waterIcon} alt="Water Icon" className="w-7 h-7" />
@@ -317,14 +315,17 @@ Learn more about sustainable IT solutions: circularcomputing.com
                 </div>
                 <div className="mt-2">
                   <div className="flex justify-between mb-1 text-sm">
-                    <span>Impact level</span>
-                    <span>High</span>
+                    <span>Water volume</span>
+                    <span>{formatEnvironmentalImpact(impact.waterProvided, "litres")}</span>
                   </div>
-                  <Progress value={78} className="h-2" />
+                  <Progress 
+                    value={Math.min(100, (impact.waterProvided / 10000) * 100)} 
+                    className="h-2" 
+                  />
                 </div>
-                <div className="mt-4 text-sm flex items-center text-secondary">
+                <div className="mt-4 text-sm flex items-center text-[#08ABAB]">
                   <i className="ri-group-line mr-1"></i>
-                  <span>Figure for 1 week supply per family</span>
+                  <span>1 week supply per family</span>
                 </div>
               </CardContent>
             </Card>
@@ -348,14 +349,17 @@ Learn more about sustainable IT solutions: circularcomputing.com
                 </div>
                 <div className="mt-2">
                   <div className="flex justify-between mb-1 text-sm">
-                    <span>Impact level</span>
-                    <span>Medium</span>
+                    <span>Progress to 10 kg</span>
+                    <span>{Math.min(100, Math.round((impact.mineralsSaved / 10000) * 100))}%</span>
                   </div>
-                  <Progress value={45} className="h-2" />
+                  <Progress 
+                    value={Math.min(100, (impact.mineralsSaved / 10000) * 100)} 
+                    className="h-2" 
+                  />
                 </div>
-                <div className="mt-4 text-sm flex items-center text-secondary">
+                <div className="mt-4 text-sm flex items-center text-[#08ABAB]">
                   <i className="ri-earth-line mr-1"></i>
-                  <span>Reduced mining impact by 68%</span>
+                  <span>Mining impact reduced</span>
                 </div>
               </CardContent>
             </Card>
@@ -367,7 +371,7 @@ Learn more about sustainable IT solutions: circularcomputing.com
                   <div className="flex items-center justify-between mb-4">
                     <div>
                       <h3 className="text-sm font-medium text-neutral-500">
-                        Litres of Water Saved
+                        Water Saved
                       </h3>
                     <p className="text-3xl font-bold mt-1">
                       {formatEnvironmentalImpact(impact.waterSaved || 0, "litres")}
@@ -379,14 +383,17 @@ Learn more about sustainable IT solutions: circularcomputing.com
                 </div>
                 <div className="mt-2">
                   <div className="flex justify-between mb-1 text-sm">
-                    <span>Impact level</span>
-                    <span>Medium</span>
+                    <span>Progress to 1M litres</span>
+                    <span>{Math.min(100, Math.round(((impact.waterSaved || 0) / 1000000) * 100))}%</span>
                   </div>
-                  <Progress value={55} className="h-2" />
+                  <Progress 
+                    value={Math.min(100, ((impact.waterSaved || 0) / 1000000) * 100)} 
+                    className="h-2" 
+                  />
                 </div>
-                <div className="mt-4 text-sm flex items-center text-secondary">
+                <div className="mt-4 text-sm flex items-center text-[#08ABAB]">
                   <i className="ri-recycle-line mr-1"></i>
-                  <span>Water conservation through reuse</span>
+                  <span>Water conservation via reuse</span>
                 </div>
               </CardContent>
             </Card>
@@ -407,119 +414,216 @@ Learn more about sustainable IT solutions: circularcomputing.com
 
       {/* Impact Trends Chart */}
       <section className="mb-8">
-        <Card>
-          <CardHeader>
-            <CardTitle>Environmental Impact Trends</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="h-80">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={monthlyData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Line
-                    type="monotone"
-                    dataKey="carbon"
-                    stroke="#4caf50"
-                    strokeWidth={2}
-                    name="Carbon Saved (kg)"
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="water"
-                    stroke="#03a9f4"
-                    strokeWidth={2}
-                    name="Water Provided (L)"
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="minerals"
-                    stroke="#ffa726"
-                    strokeWidth={2}
-                    name="Resources Preserved (g)"
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="waterSaved"
-                    stroke="#08ABAB"
-                    strokeWidth={2}
-                    name="Water Saved (L)"
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+        >
+          <Card className="border-[#08ABAB]/20">
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <Sparkles className="h-5 w-5 text-[#08ABAB]" />
+                <CardTitle>Your Environmental Impact Journey</CardTitle>
+              </div>
+              <p className="text-sm text-neutral-500 mt-1">
+                Cumulative impact growth over the last 6 months
+              </p>
+            </CardHeader>
+            <CardContent>
+              {isLoadingTrends ? (
+                <Skeleton className="h-80 w-full" />
+              ) : monthlyData.length > 0 ? (
+                <div className="h-80">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={monthlyData}>
+                      <defs>
+                        <linearGradient id="colorCarbon" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#4caf50" stopOpacity={0.8}/>
+                          <stop offset="95%" stopColor="#4caf50" stopOpacity={0}/>
+                        </linearGradient>
+                        <linearGradient id="colorWater" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#03a9f4" stopOpacity={0.8}/>
+                          <stop offset="95%" stopColor="#03a9f4" stopOpacity={0}/>
+                        </linearGradient>
+                        <linearGradient id="colorMinerals" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#ffa726" stopOpacity={0.8}/>
+                          <stop offset="95%" stopColor="#ffa726" stopOpacity={0}/>
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
+                      <XAxis dataKey="name" />
+                      <YAxis />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                          border: '1px solid #08ABAB',
+                          borderRadius: '8px',
+                        }}
+                      />
+                      <Legend />
+                      <Area
+                        type="monotone"
+                        dataKey="carbon"
+                        stroke="#4caf50"
+                        fillOpacity={1}
+                        fill="url(#colorCarbon)"
+                        strokeWidth={3}
+                        name="Carbon Saved (kg)"
+                      />
+                      <Area
+                        type="monotone"
+                        dataKey="water"
+                        stroke="#03a9f4"
+                        fillOpacity={1}
+                        fill="url(#colorWater)"
+                        strokeWidth={3}
+                        name="Water Provided (L)"
+                      />
+                      <Area
+                        type="monotone"
+                        dataKey="minerals"
+                        stroke="#ffa726"
+                        fillOpacity={1}
+                        fill="url(#colorMinerals)"
+                        strokeWidth={3}
+                        name="Resources Preserved (g)"
+                      />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+              ) : (
+                <div className="h-80 flex items-center justify-center text-neutral-500">
+                  <div className="text-center">
+                    <TrendingUp className="h-12 w-12 mx-auto mb-2 opacity-30" />
+                    <p>Start making orders to see your impact trends!</p>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </motion.div>
       </section>
 
       {/* Impact Breakdown */}
       <section className="mb-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Resources Preserved Breakdown</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={materialBreakdown}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    outerRadius={80}
-                    fill="#8884d8"
-                    dataKey="value"
-                    label={({ name, percent }) =>
-                      `${name}: ${(percent * 100).toFixed(0)}%`
-                    }
-                  >
-                    {materialBreakdown.map((entry, index) => (
-                      <Cell
-                        key={`cell-${index}`}
-                        fill={COLORS[index % COLORS.length]}
-                      />
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.3 }}
+        >
+          <Card className="border-[#08ABAB]/20 h-full">
+            <CardHeader>
+              <CardTitle>Resources Preserved Breakdown</CardTitle>
+              <p className="text-sm text-neutral-500 mt-1">
+                Materials saved from new manufacturing
+              </p>
+            </CardHeader>
+            <CardContent>
+              {isLoadingMaterials ? (
+                <Skeleton className="h-64 w-full" />
+              ) : materialBreakdown.length > 0 ? (
+                <>
+                  <div className="h-64">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={materialBreakdown}
+                          cx="50%"
+                          cy="50%"
+                          labelLine={false}
+                          outerRadius={80}
+                          fill="#8884d8"
+                          dataKey="value"
+                          label={({ name, percent }) =>
+                            `${name}: ${(percent * 100).toFixed(0)}%`
+                          }
+                        >
+                          {materialBreakdown.map((entry, index) => (
+                            <Cell
+                              key={`cell-${index}`}
+                              fill={COLORS[index % COLORS.length]}
+                            />
+                          ))}
+                        </Pie>
+                        <Tooltip
+                          formatter={(value: number) => [`${value}g`, 'Weight']}
+                          contentStyle={{
+                            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                            border: '1px solid #08ABAB',
+                            borderRadius: '8px',
+                          }}
+                        />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+                  <div className="mt-4 grid grid-cols-2 gap-2 text-sm">
+                    {materialBreakdown.map((item, index) => (
+                      <div key={index} className="flex items-center gap-2">
+                        <div
+                          className="w-3 h-3 rounded-full"
+                          style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                        />
+                        <span className="text-neutral-600">{item.name}: {formatEnvironmentalImpact(item.value, 'g')}</span>
+                      </div>
                     ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
+                  </div>
+                </>
+              ) : (
+                <div className="h-64 flex items-center justify-center text-neutral-500">
+                  <p>No material data available yet</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </motion.div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Water Impact by Region</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={[
-                    { name: "Ethiopia", water: 950 },
-                    { name: "Rwanda", water: 750 },
-                    { name: "Uganda", water: 500 },
-                    { name: "Kenya", water: 300 },
-                  ]}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar
-                    dataKey="water"
-                    fill="#0288D1"
-                    name="Water Provided (L)"
-                  />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.4 }}
+        >
+          <Card className="border-[#08ABAB]/20 h-full">
+            <CardHeader>
+              <CardTitle>Water Impact by Region</CardTitle>
+              <p className="text-sm text-neutral-500 mt-1">
+                Clean water provided to communities
+              </p>
+            </CardHeader>
+            <CardContent>
+              {isLoadingWaterRegion ? (
+                <Skeleton className="h-64 w-full" />
+              ) : waterByRegion.length > 0 ? (
+                <div className="h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={waterByRegion}>
+                      <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
+                      <XAxis dataKey="name" />
+                      <YAxis />
+                      <Tooltip
+                        formatter={(value: number) => [`${value}L`, 'Water Provided']}
+                        contentStyle={{
+                          backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                          border: '1px solid #08ABAB',
+                          borderRadius: '8px',
+                        }}
+                      />
+                      <Bar
+                        dataKey="water"
+                        fill="#08ABAB"
+                        name="Water Provided (L)"
+                        radius={[8, 8, 0, 0]}
+                      />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              ) : (
+                <div className="h-64 flex items-center justify-center text-neutral-500">
+                  <p>No water project data available yet</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </motion.div>
       </section>
 
       {/* Sustainability Story */}
