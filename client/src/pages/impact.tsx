@@ -459,111 +459,199 @@ Learn more about sustainable IT solutions: circularcomputing.com
         )}
       </section>
 
-      {/* Impact Trends Chart */}
+      {/* Impact Trends Charts */}
       <section className="mb-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-        >
-          <Card className="border-[#08ABAB]/20">
-            <CardHeader>
-              <div className="flex items-center gap-2">
-                <Sparkles className="h-5 w-5 text-[#08ABAB]" />
-                <CardTitle>Your Environmental Impact Journey</CardTitle>
-              </div>
-              <p className="text-sm text-neutral-500 mt-1">
-                Cumulative impact growth over the last 6 months
-              </p>
-            </CardHeader>
-            <CardContent>
-              {isLoadingTrends ? (
-                <Skeleton className="h-80 w-full" />
-              ) : monthlyData.length > 0 ? (
-                <div className="h-80">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={monthlyData}>
-                      <defs>
-                        <linearGradient id="colorCarbon" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#4caf50" stopOpacity={0.8}/>
-                          <stop offset="95%" stopColor="#4caf50" stopOpacity={0}/>
-                        </linearGradient>
-                        <linearGradient id="colorWater" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#03a9f4" stopOpacity={0.8}/>
-                          <stop offset="95%" stopColor="#03a9f4" stopOpacity={0}/>
-                        </linearGradient>
-                        <linearGradient id="colorMinerals" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#ffa726" stopOpacity={0.8}/>
-                          <stop offset="95%" stopColor="#ffa726" stopOpacity={0}/>
-                        </linearGradient>
-                      </defs>
-                      <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
-                      <XAxis dataKey="name" />
-                      <YAxis 
-                        label={{ value: 'Relative Impact (%)', angle: -90, position: 'insideLeft' }}
-                        domain={[0, 100]}
-                      />
-                      <Tooltip
-                        contentStyle={{
-                          backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                          border: '1px solid #08ABAB',
-                          borderRadius: '8px',
-                        }}
-                        formatter={(value: any, name: string, props: any) => {
-                          // Show actual values in tooltip, not normalized ones
-                          const data = props.payload;
-                          if (name === 'Carbon Saved (kg)') {
-                            return [`${data.carbonActual.toLocaleString()} kg`, name];
-                          } else if (name === 'Water Provided (L)') {
-                            return [`${data.waterActual.toLocaleString()} L`, name];
-                          } else if (name === 'Resources Preserved (g)') {
-                            return [`${(data.mineralsActual / 1000).toLocaleString()} kg`, 'Resources Preserved (kg)'];
-                          }
-                          return [value, name];
-                        }}
-                      />
-                      <Legend />
-                      <Area
-                        type="monotone"
-                        dataKey="carbon"
-                        stroke="#4caf50"
-                        fillOpacity={1}
-                        fill="url(#colorCarbon)"
-                        strokeWidth={3}
-                        name="Carbon Saved (kg)"
-                      />
-                      <Area
-                        type="monotone"
-                        dataKey="water"
-                        stroke="#03a9f4"
-                        fillOpacity={1}
-                        fill="url(#colorWater)"
-                        strokeWidth={3}
-                        name="Water Provided (L)"
-                      />
-                      <Area
-                        type="monotone"
-                        dataKey="minerals"
-                        stroke="#ffa726"
-                        fillOpacity={1}
-                        fill="url(#colorMinerals)"
-                        strokeWidth={3}
-                        name="Resources Preserved (g)"
-                      />
-                    </AreaChart>
-                  </ResponsiveContainer>
-                </div>
-              ) : (
-                <div className="h-80 flex items-center justify-center text-neutral-500">
-                  <div className="text-center">
-                    <TrendingUp className="h-12 w-12 mx-auto mb-2 opacity-30" />
-                    <p>Start making orders to see your impact trends!</p>
+        <div className="mb-4">
+          <div className="flex items-center gap-2 mb-2">
+            <Sparkles className="h-5 w-5 text-[#08ABAB]" />
+            <h2 className="text-2xl font-bold">Your Environmental Impact Journey</h2>
+          </div>
+          <p className="text-sm text-neutral-500">
+            Cumulative impact growth over the last 6 months
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Carbon Saved Chart */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+          >
+            <Card className="border-green-200 bg-gradient-to-br from-green-50/50 to-white">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
+                    <img src={carbonIcon} alt="Carbon" className="w-5 h-5" />
                   </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </motion.div>
+                  Carbon Saved
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {isLoadingTrends ? (
+                  <Skeleton className="h-64 w-full" />
+                ) : rawMonthlyData.length > 0 ? (
+                  <div className="h-64">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart data={rawMonthlyData}>
+                        <defs>
+                          <linearGradient id="colorCarbon" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#4caf50" stopOpacity={0.8}/>
+                            <stop offset="95%" stopColor="#4caf50" stopOpacity={0.1}/>
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
+                        <XAxis dataKey="name" tick={{ fontSize: 12 }} />
+                        <YAxis tick={{ fontSize: 12 }} />
+                        <Tooltip
+                          contentStyle={{
+                            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                            border: '1px solid #4caf50',
+                            borderRadius: '8px',
+                            fontSize: '12px'
+                          }}
+                          formatter={(value: any) => [`${Number(value).toLocaleString()} kg`, 'Carbon Saved']}
+                        />
+                        <Area
+                          type="monotone"
+                          dataKey="carbon"
+                          stroke="#4caf50"
+                          fillOpacity={1}
+                          fill="url(#colorCarbon)"
+                          strokeWidth={2}
+                        />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </div>
+                ) : (
+                  <div className="h-64 flex items-center justify-center text-neutral-400">
+                    <p className="text-sm">No data yet</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          {/* Water Provided Chart */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            <Card className="border-blue-200 bg-gradient-to-br from-blue-50/50 to-white">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                    <img src={waterIcon} alt="Water" className="w-5 h-5" />
+                  </div>
+                  Water Provided
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {isLoadingTrends ? (
+                  <Skeleton className="h-64 w-full" />
+                ) : rawMonthlyData.length > 0 ? (
+                  <div className="h-64">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart data={rawMonthlyData}>
+                        <defs>
+                          <linearGradient id="colorWater" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#03a9f4" stopOpacity={0.8}/>
+                            <stop offset="95%" stopColor="#03a9f4" stopOpacity={0.1}/>
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
+                        <XAxis dataKey="name" tick={{ fontSize: 12 }} />
+                        <YAxis tick={{ fontSize: 12 }} />
+                        <Tooltip
+                          contentStyle={{
+                            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                            border: '1px solid #03a9f4',
+                            borderRadius: '8px',
+                            fontSize: '12px'
+                          }}
+                          formatter={(value: any) => [`${Number(value).toLocaleString()} L`, 'Water Provided']}
+                        />
+                        <Area
+                          type="monotone"
+                          dataKey="water"
+                          stroke="#03a9f4"
+                          fillOpacity={1}
+                          fill="url(#colorWater)"
+                          strokeWidth={2}
+                        />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </div>
+                ) : (
+                  <div className="h-64 flex items-center justify-center text-neutral-400">
+                    <p className="text-sm">No data yet</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          {/* Resources Preserved Chart */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+          >
+            <Card className="border-orange-200 bg-gradient-to-br from-orange-50/50 to-white">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center">
+                    <img src={resourceIcon} alt="Resources" className="w-5 h-5" />
+                  </div>
+                  Resources Preserved
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {isLoadingTrends ? (
+                  <Skeleton className="h-64 w-full" />
+                ) : rawMonthlyData.length > 0 ? (
+                  <div className="h-64">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart data={rawMonthlyData}>
+                        <defs>
+                          <linearGradient id="colorMinerals" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#ffa726" stopOpacity={0.8}/>
+                            <stop offset="95%" stopColor="#ffa726" stopOpacity={0.1}/>
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
+                        <XAxis dataKey="name" tick={{ fontSize: 12 }} />
+                        <YAxis tick={{ fontSize: 12 }} />
+                        <Tooltip
+                          contentStyle={{
+                            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                            border: '1px solid #ffa726',
+                            borderRadius: '8px',
+                            fontSize: 12
+                          }}
+                          formatter={(value: any) => [`${(Number(value) / 1000).toLocaleString()} kg`, 'Resources Preserved']}
+                        />
+                        <Area
+                          type="monotone"
+                          dataKey="minerals"
+                          stroke="#ffa726"
+                          fillOpacity={1}
+                          fill="url(#colorMinerals)"
+                          strokeWidth={2}
+                        />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </div>
+                ) : (
+                  <div className="h-64 flex items-center justify-center text-neutral-400">
+                    <p className="text-sm">No data yet</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </motion.div>
+        </div>
       </section>
 
       {/* Impact Visualizations */}
