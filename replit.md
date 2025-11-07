@@ -52,3 +52,27 @@ A core feature, it tracks metrics like carbon saved, water provided, and mineral
 - **Lucide React**: Icon library
 - **Recharts**: Data visualization
 - **@zxing/library**: QR code scanning
+
+## Deployment
+
+### Production Deployment Process
+The application automatically handles database initialization during deployment:
+
+1. **Schema Push**: On application startup, the schema is automatically pushed to the database using Drizzle Kit's programmatic API. This ensures all tables (including ESG measurement parameters and impact equivalency settings) are created before seeding.
+
+2. **Data Seeding**: After schema push, the application seeds essential data:
+   - Water projects
+   - System settings (password webhook, sustainability metrics)
+   - Organizational metrics
+   - Impact equivalency settings (trees, car miles, phone charges, etc.)
+   - ESG measurement parameters (carbon, water, minerals per laptop)
+   - Gamification data
+   - ESG targets
+
+3. **Security**: Default admin user creation is **disabled in production** for security. Admin users must be created manually using database tools or an admin creation script.
+
+### Manual Admin User Creation
+In production, administrators must be created manually through direct database access or a dedicated admin creation endpoint. The default development credentials (lavizaniazi2001@gmail.com / admin123) are never created in production environments.
+
+### Deployment Timeout
+Database initialization (schema push + seeding) has a 60-second timeout. Monitor first production deployment to ensure completion within this window.
