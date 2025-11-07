@@ -561,9 +561,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/impact/trends", isAuthenticated, async (req, res) => {
     try {
       const user = req.user as User;
-      const impacts = await storage.getEnvironmentalImpactByUserId(user.id);
+      const orders = await storage.getOrdersByUserId(user.id);
       
-      // Group impacts by month
+      // Group impacts by month based on dispatch date from delivery timeline
       const monthlyData: Record<string, any> = {};
       const now = new Date();
       
@@ -576,44 +576,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
           carbon: 0,
           water: 0,
           minerals: 0,
-          waterSaved: 0,
         };
       }
       
-      // Aggregate impacts by month
-      impacts.forEach(impact => {
-        if (impact.createdAt) {
-          const impactDate = new Date(impact.createdAt);
-          const monthKey = impactDate.toLocaleString('default', { month: 'short' });
+      // Process each order and group by dispatch date from timeline
+      for (const order of orders) {
+        const timeline = await storage.getDeliveryTimeline(order.id);
+        const impact = await storage.getEnvironmentalImpactByOrderId(order.id);
+        
+        if (timeline?.dispatchDate && impact) {
+          const dispatchDate = new Date(timeline.dispatchDate);
+          const monthKey = dispatchDate.toLocaleString('default', { month: 'short' });
           
           if (monthlyData[monthKey]) {
             monthlyData[monthKey].carbon += (impact.carbonSaved / 1000); // Convert to kg
             monthlyData[monthKey].water += impact.waterProvided;
             monthlyData[monthKey].minerals += impact.mineralsSaved;
-            monthlyData[monthKey].waterSaved += 0; // Will calculate based on orders
           }
         }
-      });
+      }
       
       // Calculate cumulative values
       const months = Object.keys(monthlyData);
       let cumulativeCarbon = 0;
       let cumulativeWater = 0;
       let cumulativeMinerals = 0;
-      let cumulativeWaterSaved = 0;
       
       const cumulativeData = months.map(month => {
         cumulativeCarbon += monthlyData[month].carbon;
         cumulativeWater += monthlyData[month].water;
         cumulativeMinerals += monthlyData[month].minerals;
-        cumulativeWaterSaved += monthlyData[month].waterSaved;
         
         return {
           name: month,
           carbon: Math.round(cumulativeCarbon),
           water: Math.round(cumulativeWater),
           minerals: Math.round(cumulativeMinerals),
-          waterSaved: Math.round(cumulativeWaterSaved),
         };
       });
       
@@ -712,6 +710,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
             ? orders.find(o => o.id === impact.orderId)
             : null;
           
+          // Get dispatch date from delivery timeline
+          let displayDate = order?.orderDate || impact.createdAt;
+          if (order) {
+            const timeline = await storage.getDeliveryTimeline(order.id);
+            if (timeline?.dispatchDate) {
+              displayDate = timeline.dispatchDate;
+            }
+          }
+          
           const carbonKg = impact.carbonSaved / 1000; // Convert to kg
           const mineralsKg = impact.mineralsSaved / 1000; // Convert to kg
           
@@ -721,7 +728,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           
           return {
             orderNumber: order?.orderNumber || 'N/A',
-            orderDate: order?.orderDate || impact.createdAt,
+            orderDate: displayDate,
             carbonSaved: carbonKg,
             waterProvided: impact.waterProvided,
             mineralsSaved: mineralsKg,
