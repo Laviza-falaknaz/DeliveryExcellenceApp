@@ -42,6 +42,10 @@ export default function Impact() {
   const { toast } = useToast();
   const [showConfetti, setShowConfetti] = useState(false);
   
+  const { data: user } = useQuery<any>({
+    queryKey: ["/api/auth/me"],
+  });
+  
   const { data: milestones = [] } = useQuery<any[]>({
     queryKey: ["/api/gamification/milestones"],
   });
@@ -172,12 +176,14 @@ Learn more about sustainable IT solutions: circularcomputing.com
           </p>
         </div>
         <div className="mt-4 md:mt-0 flex gap-2">
-          <Button 
-            variant="outline"
-          >
-            <i className="ri-download-line mr-2"></i>
-            <span>Download Report</span>
-          </Button>
+          {user?.isAdmin && (
+            <Button 
+              variant="outline"
+            >
+              <i className="ri-download-line mr-2"></i>
+              <span>Download Report</span>
+            </Button>
+          )}
           <Button 
             variant="outline"
             asChild
