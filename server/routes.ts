@@ -3490,8 +3490,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/gamification/achievements", isAuthenticated, async (req, res) => {
     try {
       const userId = (req.user as User).id;
-      const achievements = await storage.getUserAchievementProgressWithDetails(userId);
-      res.json(achievements);
+      
+      // Get all achievements from the system
+      const allAchievements = await storage.getAllAchievements();
+      
+      // Get user's achievement progress
+      const userProgress = await storage.getUserAchievementProgressWithDetails(userId);
+      
+      // Create a map of user progress by achievement ID
+      const progressMap = new Map(
+        userProgress.map(p => [p.achievementId, p])
+      );
+      
+      // Merge all achievements with user progress
+      const achievementsWithProgress = allAchievements.map(achievement => {
+        const progress = progressMap.get(achievement.id);
+        
+        return {
+          id: progress?.id || null,
+          userId,
+          achievementId: achievement.id,
+          currentValue: progress?.currentValue || "0",
+          progressPercent: progress?.progressPercent || 0,
+          isUnlocked: progress?.isUnlocked || false,
+          unlockedAt: progress?.unlockedAt || null,
+          achievement: achievement
+        };
+      });
+      
+      res.json(achievementsWithProgress);
     } catch (error) {
       console.error("Error fetching user achievements:", error);
       res.status(500).json({ error: "Failed to fetch achievements" });
