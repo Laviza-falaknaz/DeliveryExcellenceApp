@@ -342,7 +342,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const user = req.user as User;
       const orders = await storage.getOrdersByUserId(user.id);
-      res.json(orders);
+      
+      const ordersWithTimeline = await Promise.all(
+        orders.map(async (order) => {
+          const timeline = await storage.getDeliveryTimeline(order.id);
+          
+          let currentStatus = order.status;
+          let displayDate = order.orderDate;
+          let expectedShipping = order.estimatedDelivery;
+          
+          if (timeline) {
+            if (timeline.orderCompleted) {
+              currentStatus = 'completed';
+              displayDate = timeline.orderCompleted;
+            } else if (timeline.dispatchDate) {
+              currentStatus = 'shipped';
+              displayDate = timeline.dispatchDate;
+              expectedShipping = timeline.dispatchDate;
+            } else if (timeline.dateFulfilled) {
+              currentStatus = 'quality_check';
+              displayDate = timeline.dateFulfilled;
+            } else if (timeline.sentToWarehouse) {
+              currentStatus = 'in_production';
+              displayDate = timeline.sentToWarehouse;
+            } else if (timeline.paymentDate) {
+              currentStatus = 'processing';
+              displayDate = timeline.paymentDate;
+            } else if (timeline.orderDate) {
+              currentStatus = 'placed';
+              displayDate = timeline.orderDate;
+            }
+          }
+          
+          return {
+            ...order,
+            timelineStatus: currentStatus,
+            timelineDate: displayDate,
+            timelineExpectedShipping: expectedShipping,
+            deliveryTimeline: timeline,
+          };
+        })
+      );
+      
+      res.json(ordersWithTimeline);
     } catch (error) {
       res.status(500).json({ message: "Internal server error" });
     }

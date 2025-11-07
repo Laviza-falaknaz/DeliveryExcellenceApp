@@ -73,7 +73,8 @@ export default function Orders() {
       const matchesSearch = searchTerm === "" || 
         order.orderNumber.toLowerCase().includes(searchTerm.toLowerCase());
       
-      const matchesStatus = statusFilter === null || statusFilter === "all" || order.status === statusFilter;
+      const effectiveStatus = (order as any).timelineStatus || order.status;
+      const matchesStatus = statusFilter === null || statusFilter === "all" || effectiveStatus === statusFilter;
       
       return matchesSearch && matchesStatus;
     });
@@ -353,7 +354,7 @@ export default function Orders() {
                         className="border-b border-neutral-100 hover:bg-neutral-50 transition-colors"
                       >
                         <TableCell className="py-4 px-6 text-sm text-neutral-700">
-                          {order.orderDate ? formatUKDate(order.orderDate) : 'N/A'}
+                          {(order as any).timelineDate ? formatUKDate((order as any).timelineDate) : (order.orderDate ? formatUKDate(order.orderDate) : 'N/A')}
                         </TableCell>
                         <TableCell className="py-4 px-6 text-sm">
                           <span className="text-primary font-medium cursor-pointer hover:underline">
@@ -361,8 +362,8 @@ export default function Orders() {
                           </span>
                         </TableCell>
                         <TableCell className="py-4 px-6">
-                          <Badge className={`text-xs ${getStatusColor(order.status)}`}>
-                            {getStatusLabel(order.status)}
+                          <Badge className={`text-xs ${getStatusColor((order as any).timelineStatus || order.status)}`}>
+                            {getStatusLabel((order as any).timelineStatus || order.status)}
                           </Badge>
                         </TableCell>
                         <TableCell className="py-4 px-6 text-sm font-medium text-neutral-700">
@@ -372,7 +373,7 @@ export default function Orders() {
                           {formatPrice(order.totalAmount, order.currency)}
                         </TableCell>
                         <TableCell className="py-4 px-6 text-sm text-neutral-700">
-                          {order.estimatedDelivery ? formatUKDate(order.estimatedDelivery) : 'TBC'}
+                          {(order as any).timelineExpectedShipping ? formatUKDate((order as any).timelineExpectedShipping) : (order.estimatedDelivery ? formatUKDate(order.estimatedDelivery) : 'TBC')}
                         </TableCell>
                         <TableCell className="py-4 px-6 text-center">
                           <Button
@@ -417,12 +418,14 @@ export default function Orders() {
               <div>
                 <DialogTitle className="text-2xl">{selectedOrder?.orderNumber}</DialogTitle>
                 <DialogDescription className="mt-1">
-                  {selectedOrder?.orderDate && `Ordered on ${formatUKDate(selectedOrder.orderDate)}`}
+                  {selectedOrder && (selectedOrder as any).timelineDate 
+                    ? `Latest update: ${formatUKDate((selectedOrder as any).timelineDate)}`
+                    : selectedOrder?.orderDate && `Ordered on ${formatUKDate(selectedOrder.orderDate)}`}
                 </DialogDescription>
               </div>
               {selectedOrder && (
-                <Badge className={`${getStatusColor(selectedOrder.status)} text-sm px-3 py-1`}>
-                  {getStatusLabel(selectedOrder.status)}
+                <Badge className={`${getStatusColor((selectedOrder as any).timelineStatus || selectedOrder.status)} text-sm px-3 py-1`}>
+                  {getStatusLabel((selectedOrder as any).timelineStatus || selectedOrder.status)}
                 </Badge>
               )}
             </div>
