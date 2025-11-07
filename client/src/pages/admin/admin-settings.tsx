@@ -20,6 +20,10 @@ const AVAILABLE_TABS = [
   { id: "gamification", label: "Gamification", description: "Achievement and rewards management" },
   { id: "api-keys", label: "API Keys", description: "API key management" },
   { id: "sustainability", label: "Sustainability", description: "Environmental impact metrics configuration" },
+  { id: "esg-parameters", label: "ESG Parameters", description: "Environmental impact calculation parameters" },
+  { id: "impact-equivalency", label: "Impact Equivalency", description: "Impact visualization conversions" },
+  { id: "esg-targets", label: "ESG Targets", description: "Environmental, social, and governance targets" },
+  { id: "key-performance-insights", label: "KPI Insights", description: "Key performance indicators and analytics" },
   { id: "theme", label: "Theme", description: "Theme and branding settings" },
   { id: "connection", label: "Connection", description: "Database connection settings" },
 ];
