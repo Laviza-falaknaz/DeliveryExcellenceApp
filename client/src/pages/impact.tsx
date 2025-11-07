@@ -56,8 +56,27 @@ export default function Impact() {
   ).sort((a: any, b: any) => a.displayOrder - b.displayOrder);
 
   // Fetch real data from API
-  const { data: monthlyData = [], isLoading: isLoadingTrends } = useQuery<any[]>({
+  const { data: rawMonthlyData = [], isLoading: isLoadingTrends } = useQuery<any[]>({
     queryKey: ["/api/impact/trends"],
+  });
+
+  // Normalize data for better visualization (scales all metrics to 0-100 range)
+  const monthlyData = rawMonthlyData.map((item: any) => {
+    const maxCarbon = Math.max(...rawMonthlyData.map((d: any) => d.carbon));
+    const maxWater = Math.max(...rawMonthlyData.map((d: any) => d.water));
+    const maxMinerals = Math.max(...rawMonthlyData.map((d: any) => d.minerals));
+
+    return {
+      name: item.name,
+      // Store actual values for tooltip
+      carbonActual: item.carbon,
+      waterActual: item.water,
+      mineralsActual: item.minerals,
+      // Normalized values for chart display (0-100 scale)
+      carbon: maxCarbon > 0 ? (item.carbon / maxCarbon) * 100 : 0,
+      water: maxWater > 0 ? (item.water / maxWater) * 100 : 0,
+      minerals: maxMinerals > 0 ? (item.minerals / maxMinerals) * 100 : 0,
+    };
   });
 
   const { data: impactEquivalents = [], isLoading: isLoadingEquivalents } = useQuery<any[]>({
@@ -480,12 +499,27 @@ Learn more about sustainable IT solutions: circularcomputing.com
                       </defs>
                       <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
                       <XAxis dataKey="name" />
-                      <YAxis />
+                      <YAxis 
+                        label={{ value: 'Relative Impact (%)', angle: -90, position: 'insideLeft' }}
+                        domain={[0, 100]}
+                      />
                       <Tooltip
                         contentStyle={{
                           backgroundColor: 'rgba(255, 255, 255, 0.95)',
                           border: '1px solid #08ABAB',
                           borderRadius: '8px',
+                        }}
+                        formatter={(value: any, name: string, props: any) => {
+                          // Show actual values in tooltip, not normalized ones
+                          const data = props.payload;
+                          if (name === 'Carbon Saved (kg)') {
+                            return [`${data.carbonActual.toLocaleString()} kg`, name];
+                          } else if (name === 'Water Provided (L)') {
+                            return [`${data.waterActual.toLocaleString()} L`, name];
+                          } else if (name === 'Resources Preserved (g)') {
+                            return [`${(data.mineralsActual / 1000).toLocaleString()} kg`, 'Resources Preserved (kg)'];
+                          }
+                          return [value, name];
                         }}
                       />
                       <Legend />
