@@ -68,6 +68,23 @@ interface Order {
   estimatedDelivery?: string;
 }
 
+// Helper function to map icon names to emojis
+const getAchievementEmoji = (iconName: string): string => {
+  const iconMap: Record<string, string> = {
+    'ri-shopping-cart-line': '🛒',
+    'ri-leaf-line': '🌿',
+    'ri-water-flash-line': '💧',
+    'ri-shopping-bag-3-line': '🛍️',
+    'ri-share-line': '📤',
+    'ri-customer-service-2-line': '🎧',
+    'ri-fire-line': '🔥',
+    'ri-plant-line': '🌱',
+    'ri-recycle-line': '♻️',
+    'ri-flag-line': '🚩',
+  };
+  return iconMap[iconName] || '🏆';
+};
+
 export default function Dashboard() {
   const [, setLocation] = useLocation();
   
@@ -443,7 +460,7 @@ export default function Dashboard() {
                       className="text-center p-3 rounded-lg bg-gradient-to-br from-amber-50 to-yellow-50 hover:from-amber-100 hover:to-yellow-100 transition-all cursor-pointer border border-amber-200"
                       data-testid={`achievement-${ua.achievement.id}`}
                     >
-                      <div className="text-3xl mb-1">{ua.achievement.icon}</div>
+                      <div className="text-3xl mb-1">{getAchievementEmoji(ua.achievement.icon)}</div>
                       <div className="text-xs font-medium text-gray-900 mb-0.5">
                         {ua.achievement.name}
                       </div>
