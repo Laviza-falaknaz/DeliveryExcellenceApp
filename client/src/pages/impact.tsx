@@ -46,9 +46,14 @@ export default function Impact() {
     queryKey: ["/api/auth/me"],
   });
   
-  const { data: milestones = [] } = useQuery<any[]>({
-    queryKey: ["/api/gamification/milestones"],
+  const { data: achievements = [] } = useQuery<any[]>({
+    queryKey: ["/api/gamification/achievements"],
   });
+  
+  // Filter for impact level achievements
+  const impactAchievements = achievements.filter((a: any) => 
+    ['bronze_impact', 'silver_impact', 'gold_impact', 'water_provider'].includes(a.code)
+  ).sort((a: any, b: any) => a.displayOrder - b.displayOrder);
 
   // Fetch real data from API
   const { data: monthlyData = [], isLoading: isLoadingTrends } = useQuery<any[]>({
@@ -196,7 +201,7 @@ Learn more about sustainable IT solutions: circularcomputing.com
       {showConfetti && <Confetti active={showConfetti} />}
       
       {/* Milestone Progress Overview */}
-      {milestones.length > 0 && (
+      {impactAchievements.length > 0 && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -211,14 +216,26 @@ Learn more about sustainable IT solutions: circularcomputing.com
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                {milestones.slice(0, 4).map((milestone: any) => {
+                {impactAchievements.map((achievement: any) => {
+                  // Calculate progress based on achievement type
+                  let currentValue = 0;
+                  let targetValue = parseFloat(achievement.thresholdValue);
+                  
+                  if (achievement.thresholdType === 'carbon_saved') {
+                    currentValue = impact?.carbonSaved || 0;
+                  } else if (achievement.thresholdType === 'families_helped') {
+                    currentValue = (impact?.familiesHelped || 0) * 1; // Already in correct unit
+                    // For families, convert to grams for display consistency with threshold
+                    targetValue = parseFloat(achievement.thresholdValue);
+                  }
+                  
                   const progress = impact ? 
-                    Math.min(100, (impact.carbonSaved / milestone.targetValue) * 100) : 0;
+                    Math.min(100, (currentValue / targetValue) * 100) : 0;
                   const isCompleted = progress >= 100;
                   
                   return (
                     <motion.div
-                      key={milestone.id}
+                      key={achievement.id}
                       className="flex flex-col items-center"
                       whileHover={{ scale: 1.05 }}
                       onClick={() => {
@@ -234,9 +251,14 @@ Learn more about sustainable IT solutions: circularcomputing.com
                         strokeWidth={8}
                         color={isCompleted ? "#08ABAB" : "#d1d5db"}
                       />
-                      <h4 className="text-sm font-medium mt-3 text-center">{milestone.name}</h4>
+                      <div className="mt-3 flex items-center justify-center">
+                        <i className={`${achievement.icon} text-2xl text-[#08ABAB]`}></i>
+                      </div>
+                      <h4 className="text-sm font-medium mt-2 text-center">{achievement.name}</h4>
                       <p className="text-xs text-neutral-500 text-center mt-1">
-                        {formatEnvironmentalImpact(milestone.targetValue, "g")}
+                        {achievement.thresholdType === 'carbon_saved' 
+                          ? formatEnvironmentalImpact(targetValue, "g")
+                          : `${targetValue} families`}
                       </p>
                       {isCompleted && (
                         <div className="flex items-center gap-1 mt-2 text-[#08ABAB]">
