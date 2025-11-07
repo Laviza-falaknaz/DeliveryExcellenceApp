@@ -767,6 +767,74 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin: ESG Measurement Parameters routes
+  app.get("/api/admin/esg-parameters", isAuthenticated, async (req, res) => {
+    try {
+      const user = req.user as User;
+      if (!user.isAdmin) {
+        return res.status(403).json({ message: "Forbidden: Admin access required" });
+      }
+      
+      const parameters = await storage.getAllEsgMeasurementParameters();
+      res.json(parameters);
+    } catch (error) {
+      console.error("Error fetching ESG measurement parameters:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/admin/esg-parameters", isAuthenticated, async (req, res) => {
+    try {
+      const user = req.user as User;
+      if (!user.isAdmin) {
+        return res.status(403).json({ message: "Forbidden: Admin access required" });
+      }
+      
+      const parameter = await storage.createEsgMeasurementParameter(req.body);
+      res.status(201).json(parameter);
+    } catch (error) {
+      console.error("Error creating ESG measurement parameter:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.put("/api/admin/esg-parameters/:id", isAuthenticated, async (req, res) => {
+    try {
+      const user = req.user as User;
+      if (!user.isAdmin) {
+        return res.status(403).json({ message: "Forbidden: Admin access required" });
+      }
+      
+      const id = parseInt(req.params.id);
+      const updated = await storage.updateEsgMeasurementParameter(id, req.body);
+      
+      if (!updated) {
+        return res.status(404).json({ message: "Parameter not found" });
+      }
+      
+      res.json(updated);
+    } catch (error) {
+      console.error("Error updating ESG measurement parameter:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.delete("/api/admin/esg-parameters/:id", isAuthenticated, async (req, res) => {
+    try {
+      const user = req.user as User;
+      if (!user.isAdmin) {
+        return res.status(403).json({ message: "Forbidden: Admin access required" });
+      }
+      
+      const id = parseInt(req.params.id);
+      await storage.deleteEsgMeasurementParameter(id);
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting ESG measurement parameter:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // RMA routes
   app.get("/api/rma", isAuthenticated, async (req, res) => {
     try {
