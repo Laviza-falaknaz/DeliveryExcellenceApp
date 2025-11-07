@@ -523,7 +523,7 @@ export default function ESGReport() {
 
       {/* Detailed Impact & Gamification Tabs */}
       <Tabs defaultValue="impact" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="impact" data-testid="tab-impact">
             <Leaf className="w-4 h-4 mr-2" />
             Impact Breakdown
@@ -535,10 +535,6 @@ export default function ESGReport() {
           <TabsTrigger value="milestones" data-testid="tab-milestones">
             <Target className="w-4 h-4 mr-2" />
             Milestones
-          </TabsTrigger>
-          <TabsTrigger value="leaderboard" data-testid="tab-leaderboard">
-            <Users className="w-4 h-4 mr-2" />
-            Leaderboard
           </TabsTrigger>
         </TabsList>
 
@@ -755,7 +751,7 @@ export default function ESGReport() {
         </TabsContent>
 
         {/* Journey/Milestones Tab */}
-        <TabsContent value="journey" className="space-y-6">
+        <TabsContent value="milestones" className="space-y-6">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -819,104 +815,6 @@ export default function ESGReport() {
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
-
-        {/* Leaderboard Tab */}
-        <TabsContent value="leaderboard" className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Benchmark Card */}
-            <Card className="lg:col-span-1">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-lg">
-                  <TrendingUp className="w-5 h-5" />
-                  Your Ranking
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="text-center p-6 bg-primary/5 rounded-lg">
-                  <p className="text-5xl font-bold text-primary" data-testid="user-rank">
-                    #{benchmarkData?.rank || 0}
-                  </p>
-                  <p className="text-sm text-muted-foreground mt-2">
-                    out of {benchmarkData?.totalUsers || 0} users
-                  </p>
-                </div>
-                
-                <Separator />
-                
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">Your Score</span>
-                    <span className="font-semibold" data-testid="benchmark-user-score">
-                      {benchmarkData?.userScore || 0}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">Average Score</span>
-                    <span className="font-semibold" data-testid="benchmark-average">
-                      {benchmarkData?.averageScore || 0}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">Percentile</span>
-                    <Badge variant="secondary" data-testid="benchmark-percentile">
-                      Top {100 - (benchmarkData?.percentile || 0)}%
-                    </Badge>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Leaderboard Card */}
-            <Card className="lg:col-span-2">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Users className="w-5 h-5" />
-                  Global Leaderboard
-                </CardTitle>
-                <CardDescription>
-                  Top sustainability champions
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {leaderboardData?.map((entry: any, index: number) => (
-                    <div 
-                      key={entry.userId}
-                      className={cn(
-                        "flex items-center gap-4 p-4 rounded-lg border",
-                        entry.userId === user?.id && "bg-primary/5 border-primary/50"
-                      )}
-                      data-testid={`leaderboard-rank-${entry.rank}`}
-                    >
-                      <div className="flex items-center justify-center w-8 h-8 rounded-full bg-muted font-bold text-sm">
-                        {index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : entry.rank}
-                      </div>
-                      
-                      <div className="flex-1">
-                        <p className="font-semibold">{entry.name}</p>
-                        <Badge 
-                          variant="secondary" 
-                          className="text-xs mt-1"
-                          style={{ 
-                            backgroundColor: `${entry.tierColor}20`,
-                            borderColor: entry.tierColor
-                          }}
-                        >
-                          {entry.tier}
-                        </Badge>
-                      </div>
-                      
-                      <div className="text-right">
-                        <p className="font-bold text-lg">{entry.totalScore}</p>
-                        <p className="text-xs text-muted-foreground">points</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
         </TabsContent>
       </Tabs>
     </div>
