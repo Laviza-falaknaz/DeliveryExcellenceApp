@@ -611,30 +611,112 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get material/resource breakdown
-  app.get("/api/impact/material-breakdown", isAuthenticated, async (req, res) => {
+  // Get impact equivalents (relatable comparisons)
+  app.get("/api/impact/equivalents", isAuthenticated, async (req, res) => {
     try {
       const user = req.user as User;
       const impact = await storage.getTotalEnvironmentalImpact(user.id);
       
-      if (!impact || !impact.mineralsSaved) {
+      if (!impact) {
         return res.json([]);
       }
       
-      // Calculate estimated material breakdown based on typical laptop composition
-      const totalMinerals = impact.mineralsSaved;
+      const carbonKg = impact.carbonSaved / 1000; // Convert grams to kg
       
-      const breakdown = [
-        { name: "Aluminum", value: Math.round(totalMinerals * 0.35), percentage: 35 },
-        { name: "Copper", value: Math.round(totalMinerals * 0.20), percentage: 20 },
-        { name: "Plastics", value: Math.round(totalMinerals * 0.25), percentage: 25 },
-        { name: "Rare Earth", value: Math.round(totalMinerals * 0.10), percentage: 10 },
-        { name: "Other", value: Math.round(totalMinerals * 0.10), percentage: 10 },
+      // Calculate various equivalents
+      const equivalents = [
+        {
+          name: "Trees Planted",
+          value: impact.treesEquivalent,
+          icon: "ri-plant-line",
+          description: `${impact.treesEquivalent} trees planted`,
+          color: "#4caf50"
+        },
+        {
+          name: "Car Miles Saved",
+          value: Math.round(carbonKg * 2.5), // ~0.4 kg CO2 per mile
+          icon: "ri-car-line",
+          description: `${Math.round(carbonKg * 2.5)} miles not driven`,
+          color: "#03a9f4"
+        },
+        {
+          name: "Phone Charges",
+          value: Math.round(carbonKg * 1000), // ~1kg CO2 per 1000 charges
+          icon: "ri-smartphone-line",
+          description: `${Math.round(carbonKg * 1000)} full charges`,
+          color: "#ffa726"
+        },
+        {
+          name: "Plastic Bottles",
+          value: Math.round(carbonKg * 20), // ~50g CO2 per bottle
+          icon: "ri-delete-bin-line",
+          description: `${Math.round(carbonKg * 20)} bottles recycled`,
+          color: "#f44336"
+        },
+        {
+          name: "Homes Powered",
+          value: Math.round(carbonKg / 365), // ~365 kg CO2 per home per day
+          icon: "ri-home-line",
+          description: `${Math.round(carbonKg / 365)} day(s) of power`,
+          color: "#9c27b0"
+        },
+        {
+          name: "Flights Offset",
+          value: Math.round(carbonKg / 90), // ~90 kg CO2 per short flight
+          icon: "ri-flight-takeoff-line",
+          description: `${Math.round(carbonKg / 90)} short flight(s)`,
+          color: "#08ABAB"
+        }
       ];
       
-      res.json(breakdown);
+      res.json(equivalents);
     } catch (error) {
-      console.error("Error fetching material breakdown:", error);
+      console.error("Error fetching impact equivalents:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Get impact by order
+  app.get("/api/impact/by-order", isAuthenticated, async (req, res) => {
+    try {
+      const user = req.user as User;
+      const impacts = await storage.getEnvironmentalImpactByUserId(user.id);
+      
+      // Get orders for this user
+      const orders = await storage.getOrdersByUserId(user.id);
+      
+      // Map ALL impacts to orders with calculated total impact score
+      const orderImpacts = await Promise.all(
+        impacts.map(async (impact) => {
+          const order = impact.orderId 
+            ? orders.find(o => o.id === impact.orderId)
+            : null;
+          
+          const carbonKg = impact.carbonSaved / 1000; // Convert to kg
+          const mineralsKg = impact.mineralsSaved / 1000; // Convert to kg
+          
+          // Calculate normalized total impact score
+          // Weight carbon and minerals more heavily than water
+          const totalImpact = (carbonKg * 10) + (impact.waterProvided / 10) + (mineralsKg * 5);
+          
+          return {
+            orderNumber: order?.orderNumber || 'N/A',
+            orderDate: order?.orderDate || impact.createdAt,
+            carbonSaved: carbonKg,
+            waterProvided: impact.waterProvided,
+            mineralsSaved: mineralsKg,
+            totalImpact: totalImpact
+          };
+        })
+      );
+      
+      // Sort by total impact descending, then take top 10
+      orderImpacts.sort((a, b) => b.totalImpact - a.totalImpact);
+      const topOrders = orderImpacts.slice(0, 10);
+      
+      res.json(topOrders);
+    } catch (error) {
+      console.error("Error fetching impact by order:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });

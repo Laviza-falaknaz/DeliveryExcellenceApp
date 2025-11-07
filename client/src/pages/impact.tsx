@@ -51,12 +51,12 @@ export default function Impact() {
     queryKey: ["/api/impact/trends"],
   });
 
-  const { data: waterByRegion = [], isLoading: isLoadingWaterRegion } = useQuery<any[]>({
-    queryKey: ["/api/impact/water-by-region"],
+  const { data: impactEquivalents = [], isLoading: isLoadingEquivalents } = useQuery<any[]>({
+    queryKey: ["/api/impact/equivalents"],
   });
 
-  const { data: materialBreakdown = [], isLoading: isLoadingMaterials } = useQuery<any[]>({
-    queryKey: ["/api/impact/material-breakdown"],
+  const { data: impactByOrder = [], isLoading: isLoadingByOrder } = useQuery<any[]>({
+    queryKey: ["/api/impact/by-order"],
   });
 
   // Create personalized social media content
@@ -504,7 +504,7 @@ Learn more about sustainable IT solutions: circularcomputing.com
         </motion.div>
       </section>
 
-      {/* Impact Breakdown */}
+      {/* Impact Visualizations */}
       <section className="mb-8 grid grid-cols-1 md:grid-cols-2 gap-6">
         <motion.div
           initial={{ opacity: 0, x: -20 }}
@@ -513,64 +513,53 @@ Learn more about sustainable IT solutions: circularcomputing.com
         >
           <Card className="border-[#08ABAB]/20 h-full">
             <CardHeader>
-              <CardTitle>Resources Preserved Breakdown</CardTitle>
+              <CardTitle>Your Impact in Relatable Terms</CardTitle>
               <p className="text-sm text-neutral-500 mt-1">
-                Materials saved from new manufacturing
+                See your carbon savings in everyday comparisons
               </p>
             </CardHeader>
             <CardContent>
-              {isLoadingMaterials ? (
-                <Skeleton className="h-64 w-full" />
-              ) : materialBreakdown.length > 0 ? (
-                <>
-                  <div className="h-64">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <PieChart>
-                        <Pie
-                          data={materialBreakdown}
-                          cx="50%"
-                          cy="50%"
-                          labelLine={false}
-                          outerRadius={80}
-                          fill="#8884d8"
-                          dataKey="value"
-                          label={({ name, percent }) =>
-                            `${name}: ${(percent * 100).toFixed(0)}%`
-                          }
-                        >
-                          {materialBreakdown.map((entry, index) => (
-                            <Cell
-                              key={`cell-${index}`}
-                              fill={COLORS[index % COLORS.length]}
-                            />
-                          ))}
-                        </Pie>
-                        <Tooltip
-                          formatter={(value: number) => [`${value}g`, 'Weight']}
-                          contentStyle={{
-                            backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                            border: '1px solid #08ABAB',
-                            borderRadius: '8px',
-                          }}
-                        />
-                      </PieChart>
-                    </ResponsiveContainer>
-                  </div>
-                  <div className="mt-4 grid grid-cols-2 gap-2 text-sm">
-                    {materialBreakdown.map((item, index) => (
-                      <div key={index} className="flex items-center gap-2">
-                        <div
-                          className="w-3 h-3 rounded-full"
-                          style={{ backgroundColor: COLORS[index % COLORS.length] }}
-                        />
-                        <span className="text-neutral-600">{item.name}: {formatEnvironmentalImpact(item.value, 'g')}</span>
+              {isLoadingEquivalents ? (
+                <Skeleton className="h-80 w-full" />
+              ) : impactEquivalents.length > 0 ? (
+                <div className="grid grid-cols-2 gap-3">
+                  {impactEquivalents.map((equivalent, index) => (
+                    <motion.div
+                      key={index}
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: 0.05 * index }}
+                      whileHover={{ scale: 1.05 }}
+                      className="p-4 rounded-lg border-2 transition-all cursor-pointer"
+                      style={{ 
+                        borderColor: equivalent.color,
+                        backgroundColor: `${equivalent.color}10`
+                      }}
+                    >
+                      <div className="flex flex-col items-center text-center">
+                        <i 
+                          className={`${equivalent.icon} text-3xl mb-2`}
+                          style={{ color: equivalent.color }}
+                        ></i>
+                        <p className="text-2xl font-bold" style={{ color: equivalent.color }}>
+                          {equivalent.value}
+                        </p>
+                        <p className="text-xs font-medium text-neutral-700 mt-1">
+                          {equivalent.name}
+                        </p>
+                        <p className="text-xs text-neutral-500 mt-1">
+                          {equivalent.description.replace(`${equivalent.value} `, '')}
+                        </p>
                       </div>
-                    ))}
-                  </div>
-                </>
+                    </motion.div>
+                  ))}
+                </div>
               ) : (
-                <div className="h-64 flex items-center justify-center text-neutral-500">
-                  <p>No material data available yet</p>
+                <div className="h-80 flex items-center justify-center text-neutral-500">
+                  <div className="text-center">
+                    <Sparkles className="h-12 w-12 mx-auto mb-2 opacity-30" />
+                    <p>Make your first order to see impact equivalents!</p>
+                  </div>
                 </div>
               )}
             </CardContent>
@@ -584,41 +573,58 @@ Learn more about sustainable IT solutions: circularcomputing.com
         >
           <Card className="border-[#08ABAB]/20 h-full">
             <CardHeader>
-              <CardTitle>Water Impact by Region</CardTitle>
+              <CardTitle>Impact by Order</CardTitle>
               <p className="text-sm text-neutral-500 mt-1">
-                Clean water provided to communities
+                See which orders made the biggest environmental difference
               </p>
             </CardHeader>
             <CardContent>
-              {isLoadingWaterRegion ? (
-                <Skeleton className="h-64 w-full" />
-              ) : waterByRegion.length > 0 ? (
-                <div className="h-64">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={waterByRegion}>
-                      <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
-                      <XAxis dataKey="name" />
-                      <YAxis />
-                      <Tooltip
-                        formatter={(value: number) => [`${value}L`, 'Water Provided']}
-                        contentStyle={{
-                          backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                          border: '1px solid #08ABAB',
-                          borderRadius: '8px',
-                        }}
-                      />
-                      <Bar
-                        dataKey="water"
-                        fill="#08ABAB"
-                        name="Water Provided (L)"
-                        radius={[8, 8, 0, 0]}
-                      />
-                    </BarChart>
-                  </ResponsiveContainer>
+              {isLoadingByOrder ? (
+                <Skeleton className="h-80 w-full" />
+              ) : impactByOrder.length > 0 ? (
+                <div className="space-y-3">
+                  {impactByOrder.slice(0, 6).map((order, index) => (
+                    <motion.div
+                      key={index}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.05 * index }}
+                      className="p-3 rounded-lg bg-gradient-to-r from-[#08ABAB]/5 to-transparent border border-[#08ABAB]/20 hover:border-[#08ABAB]/40 transition-all"
+                    >
+                      <div className="flex justify-between items-start mb-2">
+                        <div>
+                          <p className="font-medium text-sm">Order {order.orderNumber}</p>
+                          <p className="text-xs text-neutral-500">
+                            {new Date(order.orderDate).toLocaleDateString()}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-lg font-bold text-[#08ABAB]">#{index + 1}</p>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-3 gap-2 text-xs">
+                        <div className="text-center p-2 bg-green-50 rounded">
+                          <p className="font-semibold text-green-700">{order.carbonSaved.toFixed(1)} kg</p>
+                          <p className="text-green-600">Carbon</p>
+                        </div>
+                        <div className="text-center p-2 bg-blue-50 rounded">
+                          <p className="font-semibold text-blue-700">{order.waterProvided}L</p>
+                          <p className="text-blue-600">Water</p>
+                        </div>
+                        <div className="text-center p-2 bg-orange-50 rounded">
+                          <p className="font-semibold text-orange-700">{order.mineralsSaved.toFixed(1)} kg</p>
+                          <p className="text-orange-600">Minerals</p>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
                 </div>
               ) : (
-                <div className="h-64 flex items-center justify-center text-neutral-500">
-                  <p>No water project data available yet</p>
+                <div className="h-80 flex items-center justify-center text-neutral-500">
+                  <div className="text-center">
+                    <Trophy className="h-12 w-12 mx-auto mb-2 opacity-30" />
+                    <p>Make your first order to see impact by order!</p>
+                  </div>
                 </div>
               )}
             </CardContent>
