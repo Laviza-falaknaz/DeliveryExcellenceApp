@@ -85,10 +85,10 @@ All admin configuration data is **automatically seeded** in production. This see
 - Key Performance Insights (8 KPI metrics across environmental, social, governance categories)
 
 **Gamification Configuration:**
-- Gamification Tiers (7 levels: Explorer → Pioneer → Innovator → Vanguard → Champion → Visionary → Legacy)
-- Achievements (10 configurable achievements with points, icons, thresholds)
-- Milestones (7 journey milestones from 1,000 to 50,000 points)
-- Gamification Settings (points per order, streak bonuses, tier multipliers)
+- Gamification Tiers (3 levels: Explorer → Innovator → Vanguard)
+- Achievements (14 configurable achievements with points, icons, thresholds)
+- Milestones (7 journey milestones from 0 to 10,000 points)
+- Gamification Settings (scoring weights, feature toggles, leaderboard config, scoring normalization)
 
 **ESG Reporting:**
 - ESG Targets (carbon reduction, water conservation, circular economy, social impact goals)
