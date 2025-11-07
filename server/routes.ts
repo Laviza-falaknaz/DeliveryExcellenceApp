@@ -45,7 +45,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     session({
       store: new PgSession({
         conString: process.env.DATABASE_URL,
-        createTableIfMissing: true,
         ttl: 24 * 60 * 60, // 24 hours in seconds
       }),
       cookie: { 

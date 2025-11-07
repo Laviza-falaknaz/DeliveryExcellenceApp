@@ -36,16 +36,23 @@ export default function GamificationManagement() {
 
   const backfillShippingBonusesMutation = useMutation({
     mutationFn: async () => {
+      console.log('Backfill mutation started');
       const response = await apiRequest("POST", "/api/admin/gamification/backfill-shipping-bonuses", {});
-      return response.json();
+      console.log('Backfill response received:', response.status);
+      const data = await response.json();
+      console.log('Backfill data:', data);
+      return data;
     },
     onSuccess: (data: any) => {
+      console.log('Backfill success:', data);
       toast({
         title: "Shipping bonuses backfilled successfully",
         description: `Processed ${data.processed} shipped orders, awarded ${data.awarded} new bonuses`,
       });
+      queryClient.invalidateQueries({ queryKey: ["/api/gamification/user-progress"] });
     },
-    onError: () => {
+    onError: (error: any) => {
+      console.error('Backfill error:', error);
       toast({ title: "Failed to backfill shipping bonuses", variant: "destructive" });
     },
   });
