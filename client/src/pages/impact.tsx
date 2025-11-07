@@ -733,7 +733,7 @@ Learn more about sustainable IT solutions: circularcomputing.com
                 <Skeleton className="h-80 w-full" />
               ) : impactByOrder.length > 0 ? (
                 <div className="space-y-3">
-                  {impactByOrder.slice(0, 6).map((order, index) => (
+                  {impactByOrder.slice(0, 4).map((order, index) => (
                     <motion.div
                       key={index}
                       initial={{ opacity: 0, x: -20 }}
