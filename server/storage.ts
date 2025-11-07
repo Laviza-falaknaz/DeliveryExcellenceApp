@@ -30,7 +30,8 @@ import {
   userMilestoneEvents, UserMilestoneEvent, InsertUserMilestoneEvent,
   esgScores, EsgScore, InsertEsgScore,
   gamificationSettings, GamificationSetting, InsertGamificationSetting,
-  impactEquivalencySettings, ImpactEquivalencySetting, InsertImpactEquivalencySetting
+  impactEquivalencySettings, ImpactEquivalencySetting, InsertImpactEquivalencySetting,
+  esgMeasurementParameters, EsgMeasurementParameter, InsertEsgMeasurementParameter
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, sum, like, and, sql } from "drizzle-orm";
@@ -278,6 +279,14 @@ export interface IStorage {
   createImpactEquivalencySetting(setting: InsertImpactEquivalencySetting): Promise<ImpactEquivalencySetting>;
   updateImpactEquivalencySetting(id: number, data: Partial<ImpactEquivalencySetting>): Promise<ImpactEquivalencySetting | undefined>;
   deleteImpactEquivalencySetting(id: number): Promise<void>;
+
+  // ESG Measurement Parameters operations
+  getAllEsgMeasurementParameters(): Promise<EsgMeasurementParameter[]>;
+  getActiveEsgMeasurementParameters(): Promise<EsgMeasurementParameter[]>;
+  getEsgMeasurementParameterByKey(key: string): Promise<EsgMeasurementParameter | undefined>;
+  createEsgMeasurementParameter(parameter: InsertEsgMeasurementParameter): Promise<EsgMeasurementParameter>;
+  updateEsgMeasurementParameter(id: number, data: Partial<EsgMeasurementParameter>): Promise<EsgMeasurementParameter | undefined>;
+  deleteEsgMeasurementParameter(id: number): Promise<void>;
 }
 
 // Database storage implementation using Drizzle ORM - blueprint:javascript_database
@@ -1867,6 +1876,41 @@ export class DatabaseStorage implements IStorage {
 
   async deleteImpactEquivalencySetting(id: number): Promise<void> {
     await db.delete(impactEquivalencySettings).where(eq(impactEquivalencySettings.id, id));
+  }
+
+  // ESG Measurement Parameters operations
+  async getAllEsgMeasurementParameters(): Promise<EsgMeasurementParameter[]> {
+    return db.select().from(esgMeasurementParameters).orderBy(esgMeasurementParameters.displayOrder);
+  }
+
+  async getActiveEsgMeasurementParameters(): Promise<EsgMeasurementParameter[]> {
+    return db.select().from(esgMeasurementParameters)
+      .where(eq(esgMeasurementParameters.isActive, true))
+      .orderBy(esgMeasurementParameters.displayOrder);
+  }
+
+  async getEsgMeasurementParameterByKey(key: string): Promise<EsgMeasurementParameter | undefined> {
+    const result = await db.select().from(esgMeasurementParameters)
+      .where(eq(esgMeasurementParameters.parameterKey, key))
+      .limit(1);
+    return result[0];
+  }
+
+  async createEsgMeasurementParameter(parameter: InsertEsgMeasurementParameter): Promise<EsgMeasurementParameter> {
+    const result = await db.insert(esgMeasurementParameters).values(parameter).returning();
+    return result[0];
+  }
+
+  async updateEsgMeasurementParameter(id: number, data: Partial<EsgMeasurementParameter>): Promise<EsgMeasurementParameter | undefined> {
+    const result = await db.update(esgMeasurementParameters)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(esgMeasurementParameters.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async deleteEsgMeasurementParameter(id: number): Promise<void> {
+    await db.delete(esgMeasurementParameters).where(eq(esgMeasurementParameters.id, id));
   }
 }
 
