@@ -305,9 +305,9 @@ Learn more about sustainable IT solutions: circularcomputing.com
           </>
         ) : impact ? (
           <>
-            <motion.div whileHover={{ scale: 1.02 }} transition={{ duration: 0.2 }}>
-              <Card className="border-[#08ABAB]/20 hover:border-[#08ABAB]/40 transition-all">
-                <CardContent className="p-6">
+            <motion.div whileHover={{ scale: 1.02 }} transition={{ duration: 0.2 }} className="h-full">
+              <Card className="border-[#08ABAB]/20 hover:border-[#08ABAB]/40 transition-all h-full">
+                <CardContent className="p-6 h-full flex flex-col">
                   <div className="flex items-center justify-between mb-4">
                     <div>
                       <h3 className="text-sm font-medium text-neutral-500">
@@ -343,9 +343,9 @@ Learn more about sustainable IT solutions: circularcomputing.com
             </Card>
           </motion.div>
 
-            <motion.div whileHover={{ scale: 1.02 }} transition={{ duration: 0.2 }}>
-              <Card className="border-[#08ABAB]/20 hover:border-[#08ABAB]/40 transition-all">
-                <CardContent className="p-6">
+            <motion.div whileHover={{ scale: 1.02 }} transition={{ duration: 0.2 }} className="h-full">
+              <Card className="border-[#08ABAB]/20 hover:border-[#08ABAB]/40 transition-all h-full">
+                <CardContent className="p-6 h-full flex flex-col">
                   <div className="flex items-center justify-between mb-4">
                     <div>
                       <h3 className="text-sm font-medium text-neutral-500">
@@ -354,7 +354,7 @@ Learn more about sustainable IT solutions: circularcomputing.com
                     <p className="text-3xl font-bold mt-1">
                       {impact.familiesHelped}
                     </p>
-                    <p className="text-xs text-neutral-400 mt-1">families helped</p>
+                    <p className="text-xs text-neutral-400">families helped</p>
                   </div>
                   <div className="h-12 w-12 rounded-full bg-secondary/10 flex items-center justify-center">
                     <img src={waterIcon} alt="Water Icon" className="w-7 h-7" />
@@ -378,11 +378,11 @@ Learn more about sustainable IT solutions: circularcomputing.com
             </Card>
           </motion.div>
 
-            <motion.div whileHover={{ scale: 1.02 }} transition={{ duration: 0.2 }}>
-              <Card className="border-[#08ABAB]/20 hover:border-[#08ABAB]/40 transition-all">
-                <CardContent className="p-6">
+            <motion.div whileHover={{ scale: 1.02 }} transition={{ duration: 0.2 }} className="h-full">
+              <Card className="border-[#08ABAB]/20 hover:border-[#08ABAB]/40 transition-all h-full">
+                <CardContent className="p-6 h-full flex flex-col">
                   <div className="flex items-center justify-between mb-4">
-                    <div>
+                    <div className="flex-1">
                       <h3 className="text-sm font-medium text-neutral-500">
                         Resource Preservation
                       </h3>
@@ -412,11 +412,11 @@ Learn more about sustainable IT solutions: circularcomputing.com
             </Card>
           </motion.div>
 
-            <motion.div whileHover={{ scale: 1.02 }} transition={{ duration: 0.2 }}>
-              <Card className="border-[#08ABAB]/20 hover:border-[#08ABAB]/40 transition-all">
-                <CardContent className="p-6">
+            <motion.div whileHover={{ scale: 1.02 }} transition={{ duration: 0.2 }} className="h-full">
+              <Card className="border-[#08ABAB]/20 hover:border-[#08ABAB]/40 transition-all h-full">
+                <CardContent className="p-6 h-full flex flex-col">
                   <div className="flex items-center justify-between mb-4">
-                    <div>
+                    <div className="flex-1">
                       <h3 className="text-sm font-medium text-neutral-500">
                         Water Saved
                       </h3>
