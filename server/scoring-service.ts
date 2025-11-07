@@ -296,6 +296,49 @@ export class ScoringService {
       totalUsers
     };
   }
+
+  async awardShippingBonus(userId: number, orderId: number): Promise<void> {
+    const existingScore = await storage.getCurrentUserEsgScore(userId);
+    
+    if (!existingScore) {
+      await this.updateUserESGScore(userId);
+      const newScore = await storage.getCurrentUserEsgScore(userId);
+      if (!newScore) return;
+      
+      const metadata = newScore.metadata || {};
+      const shippingBonuses = metadata.shippingBonuses || [];
+      
+      if (!shippingBonuses.includes(orderId)) {
+        shippingBonuses.push(orderId);
+        await storage.updateEsgScore(newScore.id, {
+          totalScore: newScore.totalScore + 1000,
+          metadata: { ...metadata, shippingBonuses }
+        });
+      }
+      return;
+    }
+
+    const metadata = existingScore.metadata || {};
+    const shippingBonuses = metadata.shippingBonuses || [];
+    
+    if (shippingBonuses.includes(orderId)) {
+      return;
+    }
+
+    shippingBonuses.push(orderId);
+    const newTotalScore = existingScore.totalScore + 1000;
+    const tier = await storage.getTierByScore(newTotalScore);
+
+    await storage.updateEsgScore(existingScore.id, {
+      totalScore: newTotalScore,
+      tierId: tier?.id || existingScore.tierId,
+      metadata: { ...metadata, shippingBonuses },
+      calculatedAt: new Date()
+    });
+
+    await this.checkAndUnlockAchievements(userId);
+    await this.checkAndReachMilestones(userId, newTotalScore);
+  }
 }
 
 export const scoringService = new ScoringService();
