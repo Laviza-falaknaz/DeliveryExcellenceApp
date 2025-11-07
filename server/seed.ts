@@ -9,32 +9,36 @@ export async function seedDatabase() {
   console.log("🌱 Starting database seeding...");
 
   try {
-    // Check if we already have a test user
-    const existingUsers = await db.select().from(users).limit(1);
-    
-    if (existingUsers.length === 0) {
-      console.log("Creating initial test user...");
+    // Only create test user in development environment (security: never create default admin in production)
+    if (process.env.NODE_ENV === "development") {
+      const existingUsers = await db.select().from(users).limit(1);
       
-      // Create test user with hashed password
-      const hashedPassword = await bcrypt.hash("admin123", 10);
-      
-      await db.insert(users).values({
-        username: "lavizaniazi2001@gmail.com",
-        password: hashedPassword,
-        name: "Admin User",
-        company: "A2C",
-        email: "lavizaniazi2001@gmail.com",
-        phoneNumber: "+44 1234 567890",
-        isAdmin: true,
-        notificationPreferences: {
-          orderUpdates: true,
-          environmentalImpact: true,
-          charityUpdates: true,
-          serviceReminders: true,
-        },
-      });
-      
-      console.log("✅ Test user created: lavizaniazi2001@gmail.com / admin123");
+      if (existingUsers.length === 0) {
+        console.log("Creating initial test user...");
+        
+        // Create test user with hashed password
+        const hashedPassword = await bcrypt.hash("admin123", 10);
+        
+        await db.insert(users).values({
+          username: "lavizaniazi2001@gmail.com",
+          password: hashedPassword,
+          name: "Admin User",
+          company: "A2C",
+          email: "lavizaniazi2001@gmail.com",
+          phoneNumber: "+44 1234 567890",
+          isAdmin: true,
+          notificationPreferences: {
+            orderUpdates: true,
+            environmentalImpact: true,
+            charityUpdates: true,
+            serviceReminders: true,
+          },
+        });
+        
+        console.log("✅ Test user created: lavizaniazi2001@gmail.com / admin123");
+      }
+    } else {
+      console.log("📦 Production mode - skipping default admin user creation (must be created manually)");
     }
 
     // Check if we already have water projects

@@ -3,6 +3,31 @@ import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import path from "path";
 import { seedDatabase } from "./seed";
+import { db } from "./db";
+import * as schema from "@shared/schema";
+import { createRequire } from "node:module";
+
+// Function to push database schema programmatically
+async function pushDatabaseSchema() {
+  try {
+    console.log('📦 Pushing database schema...');
+    
+    // Use require to import drizzle-kit/api (ESM workaround)
+    const require = createRequire(import.meta.url);
+    const { pushSchema } = require('drizzle-kit/api');
+    
+    // Push schema to database
+    const result = await pushSchema(schema, db);
+    
+    // Apply the changes
+    await result.apply();
+    
+    console.log('✅ Database schema pushed successfully');
+  } catch (error) {
+    console.error('⚠️ Error pushing database schema:', error);
+    throw error;
+  }
+}
 
 const app = express();
 app.use(express.json({ limit: '50mb' })); // Increased limit for bulk uploads
@@ -44,21 +69,22 @@ app.use((req, res, next) => {
 (async () => {
   const server = await registerRoutes(app);
 
-  // Only seed database in development, skip in production for faster deployment
-  if (app.get("env") === "development") {
-    Promise.race([
-      seedDatabase(),
-      new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Seed timeout')), 30000)
-      )
-    ])
-      .then(() => console.log('✅ Database seeding completed'))
-      .catch((error) => {
-        console.error('⚠️ Database seeding failed or timed out:', error.message);
-      });
-  } else {
-    console.log('📦 Production mode - skipping database seeding');
-  }
+  // Push database schema and seed data in both development and production
+  // Schema push ensures tables exist before seeding
+  // Seeding only inserts missing data (checked via queries in seed.ts)
+  Promise.race([
+    (async () => {
+      await pushDatabaseSchema();
+      await seedDatabase();
+    })(),
+    new Promise((_, reject) => 
+      setTimeout(() => reject(new Error('Schema push/seed timeout')), 60000)
+    )
+  ])
+    .then(() => console.log('✅ Database initialization completed'))
+    .catch((error) => {
+      console.error('⚠️ Database initialization failed or timed out:', error.message);
+    });
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
