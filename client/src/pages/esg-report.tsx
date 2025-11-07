@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -235,6 +236,13 @@ export default function ESGReport() {
 
   const reachedMilestoneIds = userMilestones?.map((m: any) => m.milestoneId) || [];
   const sortedMilestones = milestones?.sort((a: any, b: any) => a.orderIndex - b.orderIndex) || [];
+
+  // Auto-trigger score calculation when achievements are empty (initializes progress tracking)
+  useEffect(() => {
+    if (!calculateScoreMutation.isPending && achievements !== undefined && achievements.length === 0) {
+      calculateScoreMutation.mutate();
+    }
+  }, [achievements, calculateScoreMutation]);
 
   if (isScoreLoading) {
     return (
