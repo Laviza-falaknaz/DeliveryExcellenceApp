@@ -222,12 +222,18 @@ function Router() {
 
 function App() {
   const [showLaunchAnimation, setShowLaunchAnimation] = useState(() => {
-    const hasSeenAnimation = sessionStorage.getItem('hasSeenLaunchAnimation');
-    return !hasSeenAnimation;
+    const lastShown = localStorage.getItem('lastLaunchAnimation');
+    const now = Date.now();
+    const oneHour = 60 * 60 * 1000;
+    
+    if (!lastShown || (now - parseInt(lastShown)) > oneHour) {
+      return true;
+    }
+    return false;
   });
 
   const handleAnimationComplete = () => {
-    sessionStorage.setItem('hasSeenLaunchAnimation', 'true');
+    localStorage.setItem('lastLaunchAnimation', Date.now().toString());
     setShowLaunchAnimation(false);
   };
 
