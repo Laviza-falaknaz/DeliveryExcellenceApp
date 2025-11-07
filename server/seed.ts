@@ -1,5 +1,5 @@
 import { db } from "./db";
-import { users, waterProjects, systemSettings, organizationalMetrics, impactEquivalencySettings } from "@shared/schema";
+import { users, waterProjects, systemSettings, organizationalMetrics, impactEquivalencySettings, esgMeasurementParameters } from "@shared/schema";
 import bcrypt from "bcryptjs";
 import { eq } from "drizzle-orm";
 import { seedGamificationData } from "./gamification-seed";
@@ -230,6 +230,68 @@ export async function seedDatabase() {
       ]);
       
       console.log("✅ Impact equivalency settings created");
+    }
+
+    // Check and seed ESG measurement parameters
+    const existingEsgParameters = await db.select().from(esgMeasurementParameters).limit(1);
+    
+    if (existingEsgParameters.length === 0) {
+      console.log("Creating ESG measurement parameters...");
+      
+      await db.insert(esgMeasurementParameters).values([
+        {
+          parameterKey: 'carbon_per_laptop',
+          parameterName: 'Carbon Saved per Laptop',
+          parameterValue: '316', // 316 kg CO2 saved per laptop
+          unit: 'kg',
+          category: 'environmental',
+          description: 'Amount of CO2 emissions saved by choosing a remanufactured laptop over a new one',
+          displayOrder: 1,
+          isActive: true,
+        },
+        {
+          parameterKey: 'water_provided_per_laptop',
+          parameterName: 'Clean Water Provided per Laptop',
+          parameterValue: '60', // 60 liters provided per laptop through charity partnership
+          unit: 'liters',
+          category: 'social',
+          description: 'Liters of clean water provided to communities through charity: water partnership per laptop sold',
+          displayOrder: 2,
+          isActive: true,
+        },
+        {
+          parameterKey: 'minerals_saved_per_laptop',
+          parameterName: 'Minerals Preserved per Laptop',
+          parameterValue: '1200', // 1200 grams of minerals saved per laptop
+          unit: 'grams',
+          category: 'environmental',
+          description: 'Precious metals and minerals conserved by remanufacturing instead of mining new materials',
+          displayOrder: 3,
+          isActive: true,
+        },
+        {
+          parameterKey: 'water_saved_per_laptop',
+          parameterName: 'Water Saved per Laptop',
+          parameterValue: '190000', // 190,000 liters of water saved per laptop
+          unit: 'liters',
+          category: 'environmental',
+          description: 'Water consumption avoided in manufacturing process by choosing remanufactured laptops',
+          displayOrder: 4,
+          isActive: true,
+        },
+        {
+          parameterKey: 'families_helped_per_laptop',
+          parameterName: 'Families Helped per Laptop',
+          parameterValue: '1', // 1 family helped per laptop
+          unit: 'families',
+          category: 'social',
+          description: 'Number of families receiving clean water access through charity partnership per laptop',
+          displayOrder: 5,
+          isActive: true,
+        },
+      ]);
+      
+      console.log("✅ ESG measurement parameters created");
     }
 
     // Seed gamification data
