@@ -3851,6 +3851,50 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Backfill shipping bonuses for previously shipped orders
+  app.post("/api/admin/gamification/backfill-shipping-bonuses", requireAdmin, async (req, res) => {
+    try {
+      console.log('Starting shipping bonus backfill...');
+      const { scoringService } = await import("./scoring-service");
+      const allOrders = await storage.getAllOrders();
+      
+      const shippedOrders = allOrders.filter(order => order.status === 'shipped');
+      let processed = 0;
+      let awarded = 0;
+      let errors = 0;
+
+      for (const order of shippedOrders) {
+        try {
+          const existingScore = await storage.getCurrentUserEsgScore(order.userId);
+          const metadata = existingScore?.metadata || {};
+          const shippingBonuses = metadata.shippingBonuses || [];
+          
+          if (!shippingBonuses.includes(order.id)) {
+            await scoringService.awardShippingBonus(order.userId, order.id);
+            awarded++;
+          }
+          processed++;
+        } catch (error) {
+          console.error(`Error awarding shipping bonus for order ${order.id}:`, error);
+          errors++;
+        }
+      }
+
+      console.log(`Backfill complete: ${processed} shipped orders processed, ${awarded} bonuses awarded, ${errors} errors`);
+      res.json({
+        success: true,
+        message: `Processed ${processed} shipped orders, awarded ${awarded} new bonuses`,
+        processed,
+        awarded,
+        errors,
+        totalShippedOrders: shippedOrders.length
+      });
+    } catch (error) {
+      console.error("Error backfilling shipping bonuses:", error);
+      res.status(500).json({ error: "Failed to backfill shipping bonuses" });
+    }
+  });
+
   // Recalculate all environmental impact
   app.post("/api/impact/recalculate", isAuthenticated, async (req, res) => {
     try {
