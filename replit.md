@@ -32,6 +32,13 @@ The platform includes a comprehensive gamification system with configurable achi
 - **Gold Impact**: Awarded at 75,000kg CO₂ saved (10,000 points, Vanguard tier)
 - **Water Provider**: Awarded when helping 75 families with clean water (3,000 points, Innovator tier)
 
+#### Automatic Achievement Unlocking
+Achievements are **automatically unlocked** when users meet the criteria. The system triggers ESG score recalculation and achievement checking after:
+- Order creation (user-facing and admin routes)
+- Order item addition (user-facing and admin routes)
+
+Each achievement check is error-isolated (wrapped in try/catch) to ensure order creation never fails due to gamification scoring issues. The implementation uses the `scoringService.updateUserESGScore()` function which calculates total environmental impact and unlocks any newly-earned achievements.
+
 #### Admin Management
 All achievements, milestones, and gamification settings are fully configurable via the Admin Panel at `/admin/gamification-management`. Admins can create, edit, and delete achievements, adjusting thresholds, reward points, icons, and active status. The seeding system is idempotent, allowing safe redeployment without data duplication.
 
