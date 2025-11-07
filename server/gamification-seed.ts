@@ -5,21 +5,21 @@ import {
   gamificationSettings,
   gamificationMilestones
 } from "@shared/schema";
+import { sql } from "drizzle-orm";
 
 export async function seedGamificationData() {
   console.log("Seeding gamification data...");
 
   try {
-    // Check if gamification data is already seeded
-    const existingTiers = await db.select().from(gamificationTiers).limit(1);
-    if (existingTiers.length > 0) {
-      console.log("Gamification data already seeded");
-      return;
-    }
-
-    // 1. Seed Gamification Tiers
-    console.log("Creating gamification tiers...");
-    const [explorerTier] = await db.insert(gamificationTiers).values({
+    // Check if gamification tiers exist
+    const existingTiers = await db.select().from(gamificationTiers);
+    
+    let explorerTier, innovatorTier, vanguardTier;
+    
+    if (existingTiers.length === 0) {
+      // 1. Seed Gamification Tiers (only if they don't exist)
+      console.log("Creating gamification tiers...");
+      [explorerTier] = await db.insert(gamificationTiers).values({
       name: "Explorer",
       minScore: 0,
       maxScore: 999,
@@ -30,33 +30,45 @@ export async function seedGamificationData() {
       isActive: true,
     }).returning();
 
-    const [innovatorTier] = await db.insert(gamificationTiers).values({
-      name: "Innovator",
-      minScore: 1000,
-      maxScore: 4999,
-      colorAccent: "#08ABAB",
-      icon: "ri-lightbulb-line",
-      benefits: ["All Explorer benefits", "Advanced analytics", "Social sharing", "Quarterly impact reports"],
-      displayOrder: 2,
-      isActive: true,
-    }).returning();
+      [innovatorTier] = await db.insert(gamificationTiers).values({
+        name: "Innovator",
+        minScore: 1000,
+        maxScore: 4999,
+        colorAccent: "#08ABAB",
+        icon: "ri-lightbulb-line",
+        benefits: ["All Explorer benefits", "Advanced analytics", "Social sharing", "Quarterly impact reports"],
+        displayOrder: 2,
+        isActive: true,
+      }).returning();
 
-    const [vanguardTier] = await db.insert(gamificationTiers).values({
-      name: "Vanguard",
-      minScore: 5000,
-      maxScore: null,
-      colorAccent: "#FFD700",
-      icon: "ri-vip-crown-line",
-      benefits: ["All Innovator benefits", "Priority support", "Custom impact reports", "Industry benchmarking", "Exclusive case studies"],
-      displayOrder: 3,
-      isActive: true,
-    }).returning();
+      [vanguardTier] = await db.insert(gamificationTiers).values({
+        name: "Vanguard",
+        minScore: 5000,
+        maxScore: null,
+        colorAccent: "#FFD700",
+        icon: "ri-vip-crown-line",
+        benefits: ["All Innovator benefits", "Priority support", "Custom impact reports", "Industry benchmarking", "Exclusive case studies"],
+        displayOrder: 3,
+        isActive: true,
+      }).returning();
 
-    console.log("✅ Gamification tiers created");
+      console.log("✅ Gamification tiers created");
+    } else {
+      // Use existing tiers
+      console.log("Using existing gamification tiers");
+      explorerTier = existingTiers.find(t => t.name === "Explorer");
+      innovatorTier = existingTiers.find(t => t.name === "Innovator");
+      vanguardTier = existingTiers.find(t => t.name === "Vanguard");
+    }
 
     // 2. Seed Gamification Achievements
-    console.log("Creating achievements...");
-    await db.insert(gamificationAchievements).values([
+    console.log("Seeding achievements...");
+    
+    // Get existing achievements to check which ones to skip
+    const existingAchievements = await db.select().from(gamificationAchievements);
+    const existingCodes = new Set(existingAchievements.map(a => a.code));
+    
+    const achievementsToSeed = [
       {
         code: "first_order",
         name: "First Steps",
@@ -189,13 +201,81 @@ export async function seedGamificationData() {
         displayOrder: 10,
         isActive: true,
       },
-    ]);
-
-    console.log("✅ Achievements created");
+      {
+        code: "bronze_impact",
+        name: "Bronze Impact",
+        description: "Save 5,000kg of CO₂ emissions through sustainable technology",
+        icon: "ri-medal-line",
+        category: "environmental",
+        thresholdType: "carbon_saved",
+        thresholdValue: "5000000",
+        rewardPoints: 1500,
+        shareCopy: "Bronze Impact achieved! 5,000kg of CO₂ saved with remanufactured tech! 🥉",
+        displayOrder: 11,
+        isActive: true,
+      },
+      {
+        code: "silver_impact",
+        name: "Silver Impact",
+        description: "Save 25,000kg of CO₂ emissions through sustainable technology",
+        icon: "ri-medal-2-line",
+        category: "environmental",
+        thresholdType: "carbon_saved",
+        thresholdValue: "25000000",
+        rewardPoints: 5000,
+        tierRequired: innovatorTier?.id,
+        shareCopy: "Silver Impact achieved! 25,000kg of CO₂ saved and making a real difference! 🥈",
+        displayOrder: 12,
+        isActive: true,
+      },
+      {
+        code: "gold_impact",
+        name: "Gold Impact",
+        description: "Save 75,000kg of CO₂ emissions through sustainable technology",
+        icon: "ri-award-line",
+        category: "environmental",
+        thresholdType: "carbon_saved",
+        thresholdValue: "75000000",
+        rewardPoints: 10000,
+        tierRequired: vanguardTier?.id,
+        shareCopy: "Gold Impact achieved! 75,000kg of CO₂ saved - leading the sustainability revolution! 🥇",
+        displayOrder: 13,
+        isActive: true,
+      },
+      {
+        code: "water_provider",
+        name: "Water Provider",
+        description: "Provide clean water to 75 families through sustainable choices",
+        icon: "ri-drop-line",
+        category: "social",
+        thresholdType: "families_helped",
+        thresholdValue: "75",
+        rewardPoints: 3000,
+        tierRequired: innovatorTier?.id,
+        shareCopy: "Water Provider badge unlocked! Helped bring clean water to 75 families! 💧",
+        displayOrder: 14,
+        isActive: true,
+      },
+    ];
+    
+    // Filter out achievements that already exist
+    const newAchievements = achievementsToSeed.filter(a => !existingCodes.has(a.code));
+    
+    if (newAchievements.length > 0) {
+      await db.insert(gamificationAchievements).values(newAchievements);
+      console.log(`✅ Added ${newAchievements.length} new achievements`);
+    } else {
+      console.log("All achievements already exist");
+    }
 
     // 3. Seed Gamification Milestones
-    console.log("Creating milestones...");
-    await db.insert(gamificationMilestones).values([
+    console.log("Seeding gamification milestones...");
+    
+    // Get existing milestones to check which ones to skip
+    const existingMilestones = await db.select().from(gamificationMilestones);
+    const existingMilestoneTitles = new Set(existingMilestones.map(m => m.title));
+    
+    const milestonesToSeed = [
       {
         tierId: null,
         title: "Journey Begins",
@@ -259,13 +339,26 @@ export async function seedGamificationData() {
         orderIndex: 7,
         isActive: true,
       },
-    ]);
-
-    console.log("✅ Milestones created");
+    ];
+    
+    // Filter out milestones that already exist (by title)
+    const newMilestones = milestonesToSeed.filter(m => !existingMilestoneTitles.has(m.title));
+    
+    if (newMilestones.length > 0) {
+      await db.insert(gamificationMilestones).values(newMilestones);
+      console.log(`✅ Added ${newMilestones.length} new milestones`);
+    } else {
+      console.log("All milestones already exist");
+    }
 
     // 4. Seed Gamification Settings
-    console.log("Creating gamification settings...");
-    await db.insert(gamificationSettings).values([
+    console.log("Seeding gamification settings...");
+    
+    // Get existing settings to check which ones to skip
+    const existingSettings = await db.select().from(gamificationSettings);
+    const existingSettingKeys = new Set(existingSettings.map(s => s.settingKey));
+    
+    const settingsToSeed = [
       {
         settingKey: "scoring_weights",
         settingValue: {
@@ -308,9 +401,17 @@ export async function seedGamificationData() {
         },
         description: "Multipliers for converting environmental metrics to points",
       },
-    ]);
-
-    console.log("✅ Gamification settings created");
+    ];
+    
+    // Filter out settings that already exist
+    const newSettings = settingsToSeed.filter(s => !existingSettingKeys.has(s.settingKey));
+    
+    if (newSettings.length > 0) {
+      await db.insert(gamificationSettings).values(newSettings);
+      console.log(`✅ Added ${newSettings.length} new gamification settings`);
+    } else {
+      console.log("All gamification settings already exist");
+    }
     console.log("Gamification data seeded successfully!");
     
   } catch (error) {

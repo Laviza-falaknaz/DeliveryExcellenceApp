@@ -122,16 +122,16 @@ export default function GamificationManagement() {
     const formData = new FormData(e.currentTarget);
     
     const data = {
+      code: formData.get("code") as string,
       name: formData.get("name") as string,
       description: formData.get("description") as string,
       category: formData.get("category") as string,
       icon: formData.get("icon") as string,
-      badgeColor: formData.get("badgeColor") as string,
-      points: parseInt(formData.get("points") as string),
-      criteria: {
-        type: formData.get("criteriaType") as string,
-        threshold: parseInt(formData.get("threshold") as string),
-      },
+      thresholdType: formData.get("thresholdType") as string,
+      thresholdValue: formData.get("thresholdValue") as string,
+      rewardPoints: parseInt(formData.get("rewardPoints") as string),
+      shareCopy: formData.get("shareCopy") as string || null,
+      displayOrder: parseInt(formData.get("displayOrder") as string) || 0,
       isActive: formData.get("isActive") === "on",
     };
 
@@ -208,13 +208,12 @@ export default function GamificationManagement() {
                 <p>Loading...</p>
               ) : (
                 <div className="grid gap-4 md:grid-cols-2">
-                  {achievements?.map((achievement: any) => (
+                  {(achievements as any[])?.map((achievement: any) => (
                     <Card key={achievement.id}>
                       <CardContent className="p-4">
                         <div className="flex items-start gap-3">
                           <div
-                            className="h-12 w-12 rounded-full flex items-center justify-center text-white text-xl flex-shrink-0"
-                            style={{ backgroundColor: achievement.badgeColor }}
+                            className="h-12 w-12 rounded-full flex items-center justify-center text-white text-xl flex-shrink-0 bg-[#08ABAB]"
                           >
                             <i className={achievement.icon}></i>
                           </div>
@@ -248,7 +247,7 @@ export default function GamificationManagement() {
                               <Badge variant="outline" className="capitalize">
                                 {achievement.category}
                               </Badge>
-                              <Badge className="bg-[#08ABAB]">{achievement.points} XP</Badge>
+                              <Badge className="bg-[#08ABAB]">{achievement.rewardPoints} XP</Badge>
                               <Badge variant={achievement.isActive ? "default" : "secondary"}>
                                 {achievement.isActive ? "Active" : "Inactive"}
                               </Badge>
@@ -289,7 +288,7 @@ export default function GamificationManagement() {
                 <p>Loading...</p>
               ) : (
                 <div className="grid gap-4 md:grid-cols-2">
-                  {milestones?.map((milestone: any) => (
+                  {(milestones as any[])?.map((milestone: any) => (
                     <Card key={milestone.id}>
                       <CardContent className="p-4">
                         <div className="flex items-start gap-3">
@@ -359,6 +358,22 @@ export default function GamificationManagement() {
           <form onSubmit={handleSaveAchievement}>
             <div className="grid gap-4 py-4">
               <div className="grid gap-2">
+                <Label htmlFor="code">Code (unique identifier)</Label>
+                <Input
+                  id="code"
+                  name="code"
+                  defaultValue={editingAchievement?.code}
+                  placeholder="bronze_impact"
+                  required
+                  readOnly={!!editingAchievement}
+                  className={editingAchievement ? "bg-neutral-100 cursor-not-allowed" : ""}
+                  data-testid="input-achievement-code"
+                />
+                {editingAchievement && (
+                  <p className="text-sm text-neutral-500">Code cannot be changed after creation</p>
+                )}
+              </div>
+              <div className="grid gap-2">
                 <Label htmlFor="name">Name</Label>
                 <Input
                   id="name"
@@ -387,20 +402,19 @@ export default function GamificationManagement() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="environmental">Environmental</SelectItem>
-                      <SelectItem value="orders">Orders</SelectItem>
-                      <SelectItem value="engagement">Engagement</SelectItem>
-                      <SelectItem value="milestones">Milestones</SelectItem>
                       <SelectItem value="social">Social</SelectItem>
+                      <SelectItem value="governance">Governance</SelectItem>
+                      <SelectItem value="engagement">Engagement</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="points">Points</Label>
+                  <Label htmlFor="rewardPoints">Reward Points</Label>
                   <Input
-                    id="points"
-                    name="points"
+                    id="rewardPoints"
+                    name="rewardPoints"
                     type="number"
-                    defaultValue={editingAchievement?.points || 100}
+                    defaultValue={editingAchievement?.rewardPoints || 100}
                     required
                     data-testid="input-achievement-points"
                   />
@@ -419,40 +433,55 @@ export default function GamificationManagement() {
                   />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="badgeColor">Badge Color (Hex)</Label>
+                  <Label htmlFor="displayOrder">Display Order</Label>
                   <Input
-                    id="badgeColor"
-                    name="badgeColor"
-                    type="color"
-                    defaultValue={editingAchievement?.badgeColor || "#08ABAB"}
+                    id="displayOrder"
+                    name="displayOrder"
+                    type="number"
+                    defaultValue={editingAchievement?.displayOrder || 0}
                     required
-                    data-testid="input-achievement-color"
+                    data-testid="input-achievement-display-order"
                   />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">
-                  <Label htmlFor="criteriaType">Criteria Type</Label>
-                  <Input
-                    id="criteriaType"
-                    name="criteriaType"
-                    defaultValue={editingAchievement?.criteria?.type || "orders_count"}
-                    placeholder="orders_count"
-                    required
-                    data-testid="input-achievement-criteria-type"
-                  />
+                  <Label htmlFor="thresholdType">Threshold Type</Label>
+                  <Select name="thresholdType" defaultValue={editingAchievement?.thresholdType || "carbon_saved"}>
+                    <SelectTrigger data-testid="select-achievement-threshold-type">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="carbon_saved">Carbon Saved (grams)</SelectItem>
+                      <SelectItem value="families_helped">Families Helped</SelectItem>
+                      <SelectItem value="minerals_saved">Minerals Saved (grams)</SelectItem>
+                      <SelectItem value="orders_count">Orders Count</SelectItem>
+                      <SelectItem value="esg_score">ESG Score</SelectItem>
+                      <SelectItem value="impact_shared">Impact Shared</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="threshold">Threshold</Label>
+                  <Label htmlFor="thresholdValue">Threshold Value</Label>
                   <Input
-                    id="threshold"
-                    name="threshold"
+                    id="thresholdValue"
+                    name="thresholdValue"
                     type="number"
-                    defaultValue={editingAchievement?.criteria?.threshold || 1}
+                    defaultValue={editingAchievement?.thresholdValue || "1000"}
                     required
                     data-testid="input-achievement-threshold"
                   />
                 </div>
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="shareCopy">Share Copy (optional)</Label>
+                <Input
+                  id="shareCopy"
+                  name="shareCopy"
+                  defaultValue={editingAchievement?.shareCopy || ""}
+                  placeholder="I just unlocked an achievement!"
+                  data-testid="input-achievement-share-copy"
+                />
               </div>
               <div className="flex items-center space-x-2">
                 <Switch
