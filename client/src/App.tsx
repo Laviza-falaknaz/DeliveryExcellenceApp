@@ -21,6 +21,7 @@ import WarrantyClaim from "@/pages/warranty-claim";
 import OrderJourneyPage from "@/pages/order-journey";
 import { AdminDashboard } from "@/pages/admin-dashboard";
 import { ImpactEquivalencySettings } from "@/pages/admin/impact-equivalency-settings";
+import { EsgParameters } from "@/pages/admin/esg-parameters";
 import SustainabilityQuizPage from "@/pages/sustainability-quiz-page";
 import WasteSortingGamePage from "@/pages/waste-sorting-game-page";
 import { useEffect, useState } from "react";
@@ -207,6 +208,11 @@ function Router() {
       <Route path="/admin/impact-equivalency-settings">
         <AdminProtectedRoute>
           <ImpactEquivalencySettings />
+        </AdminProtectedRoute>
+      </Route>
+      <Route path="/admin/esg-parameters">
+        <AdminProtectedRoute>
+          <EsgParameters />
         </AdminProtectedRoute>
       </Route>
       <Route component={NotFound} />
