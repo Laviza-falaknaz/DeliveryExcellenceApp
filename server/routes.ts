@@ -623,51 +623,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const carbonKg = impact.carbonSaved / 1000; // Convert grams to kg
       
-      // Calculate various equivalents
-      const equivalents = [
-        {
-          name: "Trees Planted",
-          value: impact.treesEquivalent,
-          icon: "ri-plant-line",
-          description: `${impact.treesEquivalent} trees planted`,
-          color: "#4caf50"
-        },
-        {
-          name: "Car Miles Saved",
-          value: Math.round(carbonKg * 2.5), // ~0.4 kg CO2 per mile
-          icon: "ri-car-line",
-          description: `${Math.round(carbonKg * 2.5)} miles not driven`,
-          color: "#03a9f4"
-        },
-        {
-          name: "Phone Charges",
-          value: Math.round(carbonKg * 1000), // ~1kg CO2 per 1000 charges
-          icon: "ri-smartphone-line",
-          description: `${Math.round(carbonKg * 1000)} full charges`,
-          color: "#ffa726"
-        },
-        {
-          name: "Plastic Bottles",
-          value: Math.round(carbonKg * 20), // ~50g CO2 per bottle
-          icon: "ri-delete-bin-line",
-          description: `${Math.round(carbonKg * 20)} bottles recycled`,
-          color: "#f44336"
-        },
-        {
-          name: "Homes Powered",
-          value: Math.round(carbonKg / 365), // ~365 kg CO2 per home per day
-          icon: "ri-home-line",
-          description: `${Math.round(carbonKg / 365)} day(s) of power`,
-          color: "#9c27b0"
-        },
-        {
-          name: "Flights Offset",
-          value: Math.round(carbonKg / 90), // ~90 kg CO2 per short flight
-          icon: "ri-flight-takeoff-line",
-          description: `${Math.round(carbonKg / 90)} short flight(s)`,
-          color: "#08ABAB"
+      // Fetch configured equivalency settings from database
+      const settings = await storage.getActiveImpactEquivalencySettings();
+      
+      // Calculate equivalents based on configured settings
+      const equivalents = settings.map(setting => {
+        let value: number;
+        const conversionFactor = parseFloat(setting.conversionFactor.toString());
+        
+        // Calculate value based on operation type
+        if (setting.conversionOperation === 'divide') {
+          value = Math.round(carbonKg / conversionFactor);
+        } else {
+          value = Math.round(carbonKg * conversionFactor);
         }
-      ];
+        
+        return {
+          name: setting.name,
+          value: value,
+          icon: setting.icon,
+          description: `${value} ${setting.description}`,
+          color: setting.color
+        };
+      });
       
       res.json(equivalents);
     } catch (error) {
@@ -717,6 +695,74 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(topOrders);
     } catch (error) {
       console.error("Error fetching impact by order:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Admin: Impact Equivalency Settings routes
+  app.get("/api/admin/impact-equivalency-settings", isAuthenticated, async (req, res) => {
+    try {
+      const user = req.user as User;
+      if (!user.isAdmin) {
+        return res.status(403).json({ message: "Forbidden: Admin access required" });
+      }
+      
+      const settings = await storage.getAllImpactEquivalencySettings();
+      res.json(settings);
+    } catch (error) {
+      console.error("Error fetching impact equivalency settings:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/admin/impact-equivalency-settings", isAuthenticated, async (req, res) => {
+    try {
+      const user = req.user as User;
+      if (!user.isAdmin) {
+        return res.status(403).json({ message: "Forbidden: Admin access required" });
+      }
+      
+      const setting = await storage.createImpactEquivalencySetting(req.body);
+      res.status(201).json(setting);
+    } catch (error) {
+      console.error("Error creating impact equivalency setting:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.put("/api/admin/impact-equivalency-settings/:id", isAuthenticated, async (req, res) => {
+    try {
+      const user = req.user as User;
+      if (!user.isAdmin) {
+        return res.status(403).json({ message: "Forbidden: Admin access required" });
+      }
+      
+      const id = parseInt(req.params.id);
+      const updated = await storage.updateImpactEquivalencySetting(id, req.body);
+      
+      if (!updated) {
+        return res.status(404).json({ message: "Setting not found" });
+      }
+      
+      res.json(updated);
+    } catch (error) {
+      console.error("Error updating impact equivalency setting:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.delete("/api/admin/impact-equivalency-settings/:id", isAuthenticated, async (req, res) => {
+    try {
+      const user = req.user as User;
+      if (!user.isAdmin) {
+        return res.status(403).json({ message: "Forbidden: Admin access required" });
+      }
+      
+      const id = parseInt(req.params.id);
+      await storage.deleteImpactEquivalencySetting(id);
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting impact equivalency setting:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });

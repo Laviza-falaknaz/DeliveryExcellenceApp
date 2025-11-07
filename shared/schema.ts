@@ -819,3 +819,28 @@ export const insertGamificationSettingSchema = createInsertSchema(gamificationSe
 
 export type GamificationSetting = typeof gamificationSettings.$inferSelect;
 export type InsertGamificationSetting = z.infer<typeof insertGamificationSettingSchema>;
+
+// Impact Equivalency Settings schema - configurable conversion factors for impact visualizations
+export const impactEquivalencySettings = pgTable("impact_equivalency_settings", {
+  id: serial("id").primaryKey(),
+  equivalencyType: text("equivalency_type").notNull().unique(), // 'trees', 'car_miles', 'phone_charges', etc.
+  name: text("name").notNull(), // Display name: "Trees Planted"
+  description: text("description").notNull(), // e.g., "trees planted"
+  conversionFactor: numeric("conversion_factor", { precision: 15, scale: 5 }).notNull(), // Factor to multiply or divide carbon by
+  conversionOperation: text("conversion_operation").notNull().default("multiply"), // 'multiply' or 'divide'
+  icon: text("icon").notNull(), // Remix icon class e.g., 'ri-plant-line'
+  color: text("color").notNull(), // Hex color code e.g., '#22c55e'
+  displayOrder: integer("display_order").notNull().default(0),
+  isActive: boolean("is_active").notNull().default(true),
+  updatedAt: timestamp("updated_at").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertImpactEquivalencySettingSchema = createInsertSchema(impactEquivalencySettings).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type ImpactEquivalencySetting = typeof impactEquivalencySettings.$inferSelect;
+export type InsertImpactEquivalencySetting = z.infer<typeof insertImpactEquivalencySettingSchema>;

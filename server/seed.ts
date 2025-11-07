@@ -1,5 +1,5 @@
 import { db } from "./db";
-import { users, waterProjects, systemSettings, organizationalMetrics } from "@shared/schema";
+import { users, waterProjects, systemSettings, organizationalMetrics, impactEquivalencySettings } from "@shared/schema";
 import bcrypt from "bcryptjs";
 import { eq } from "drizzle-orm";
 import { seedGamificationData } from "./gamification-seed";
@@ -152,6 +152,84 @@ export async function seedDatabase() {
       ]);
       
       console.log("✅ Organizational metrics created");
+    }
+
+    // Check and seed impact equivalency settings
+    const existingEquivalencySettings = await db.select().from(impactEquivalencySettings).limit(1);
+    
+    if (existingEquivalencySettings.length === 0) {
+      console.log("Creating impact equivalency settings...");
+      
+      await db.insert(impactEquivalencySettings).values([
+        {
+          equivalencyType: 'trees',
+          name: 'Trees Planted',
+          description: 'trees planted',
+          conversionFactor: '21', // Divide by 21 (21kg CO2 per tree per year)
+          conversionOperation: 'divide',
+          icon: 'ri-plant-line',
+          color: '#22c55e',
+          displayOrder: 1,
+          isActive: true,
+        },
+        {
+          equivalencyType: 'car_miles',
+          name: 'Car Miles Saved',
+          description: 'miles not driven',
+          conversionFactor: '2.5', // Multiply by 2.5 (~0.4 kg CO2 per mile)
+          conversionOperation: 'multiply',
+          icon: 'ri-car-line',
+          color: '#3b82f6',
+          displayOrder: 2,
+          isActive: true,
+        },
+        {
+          equivalencyType: 'phone_charges',
+          name: 'Phone Charges',
+          description: 'full charges',
+          conversionFactor: '1000', // Multiply by 1000 (~1kg CO2 per 1000 charges)
+          conversionOperation: 'multiply',
+          icon: 'ri-smartphone-line',
+          color: '#f97316',
+          displayOrder: 3,
+          isActive: true,
+        },
+        {
+          equivalencyType: 'plastic_bottles',
+          name: 'Plastic Bottles',
+          description: 'bottles recycled',
+          conversionFactor: '20', // Multiply by 20 (~50g CO2 per bottle)
+          conversionOperation: 'multiply',
+          icon: 'ri-delete-bin-line',
+          color: '#ef4444',
+          displayOrder: 4,
+          isActive: true,
+        },
+        {
+          equivalencyType: 'homes_powered',
+          name: 'Homes Powered',
+          description: 'day(s) of power',
+          conversionFactor: '365', // Divide by 365 (~365 kg CO2 per home per day)
+          conversionOperation: 'divide',
+          icon: 'ri-home-line',
+          color: '#a855f7',
+          displayOrder: 5,
+          isActive: true,
+        },
+        {
+          equivalencyType: 'flights_offset',
+          name: 'Flights Offset',
+          description: 'short flight(s)',
+          conversionFactor: '90', // Divide by 90 (~90 kg CO2 per short flight)
+          conversionOperation: 'divide',
+          icon: 'ri-flight-takeoff-line',
+          color: '#08ABAB',
+          displayOrder: 6,
+          isActive: true,
+        },
+      ]);
+      
+      console.log("✅ Impact equivalency settings created");
     }
 
     // Seed gamification data

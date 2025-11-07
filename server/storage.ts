@@ -29,7 +29,8 @@ import {
   gamificationMilestones, GamificationMilestone, InsertGamificationMilestone,
   userMilestoneEvents, UserMilestoneEvent, InsertUserMilestoneEvent,
   esgScores, EsgScore, InsertEsgScore,
-  gamificationSettings, GamificationSetting, InsertGamificationSetting
+  gamificationSettings, GamificationSetting, InsertGamificationSetting,
+  impactEquivalencySettings, ImpactEquivalencySetting, InsertImpactEquivalencySetting
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, sum, like, and, sql } from "drizzle-orm";
@@ -269,6 +270,14 @@ export interface IStorage {
   getGamificationSetting(key: string): Promise<GamificationSetting | undefined>;
   setGamificationSetting(key: string, value: any, description?: string): Promise<GamificationSetting>;
   updateGamificationSetting(id: number, data: Partial<GamificationSetting>): Promise<GamificationSetting | undefined>;
+
+  // Impact Equivalency Settings operations
+  getAllImpactEquivalencySettings(): Promise<ImpactEquivalencySetting[]>;
+  getActiveImpactEquivalencySettings(): Promise<ImpactEquivalencySetting[]>;
+  getImpactEquivalencySettingByType(type: string): Promise<ImpactEquivalencySetting | undefined>;
+  createImpactEquivalencySetting(setting: InsertImpactEquivalencySetting): Promise<ImpactEquivalencySetting>;
+  updateImpactEquivalencySetting(id: number, data: Partial<ImpactEquivalencySetting>): Promise<ImpactEquivalencySetting | undefined>;
+  deleteImpactEquivalencySetting(id: number): Promise<void>;
 }
 
 // Database storage implementation using Drizzle ORM - blueprint:javascript_database
@@ -1824,6 +1833,40 @@ export class DatabaseStorage implements IStorage {
       .where(eq(gamificationSettings.id, id))
       .returning();
     return updated || undefined;
+  }
+
+  // Impact Equivalency Settings operations
+  async getAllImpactEquivalencySettings(): Promise<ImpactEquivalencySetting[]> {
+    return db.select().from(impactEquivalencySettings).orderBy(impactEquivalencySettings.displayOrder);
+  }
+
+  async getActiveImpactEquivalencySettings(): Promise<ImpactEquivalencySetting[]> {
+    return db.select().from(impactEquivalencySettings)
+      .where(eq(impactEquivalencySettings.isActive, true))
+      .orderBy(impactEquivalencySettings.displayOrder);
+  }
+
+  async getImpactEquivalencySettingByType(type: string): Promise<ImpactEquivalencySetting | undefined> {
+    const [setting] = await db.select().from(impactEquivalencySettings)
+      .where(eq(impactEquivalencySettings.equivalencyType, type));
+    return setting || undefined;
+  }
+
+  async createImpactEquivalencySetting(setting: InsertImpactEquivalencySetting): Promise<ImpactEquivalencySetting> {
+    const [created] = await db.insert(impactEquivalencySettings).values(setting).returning();
+    return created;
+  }
+
+  async updateImpactEquivalencySetting(id: number, data: Partial<ImpactEquivalencySetting>): Promise<ImpactEquivalencySetting | undefined> {
+    const [updated] = await db.update(impactEquivalencySettings)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(impactEquivalencySettings.id, id))
+      .returning();
+    return updated || undefined;
+  }
+
+  async deleteImpactEquivalencySetting(id: number): Promise<void> {
+    await db.delete(impactEquivalencySettings).where(eq(impactEquivalencySettings.id, id));
   }
 }
 
