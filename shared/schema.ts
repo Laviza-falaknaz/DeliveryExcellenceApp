@@ -844,3 +844,27 @@ export const insertImpactEquivalencySettingSchema = createInsertSchema(impactEqu
 
 export type ImpactEquivalencySetting = typeof impactEquivalencySettings.$inferSelect;
 export type InsertImpactEquivalencySetting = z.infer<typeof insertImpactEquivalencySettingSchema>;
+
+// ESG Measurement Parameters schema - configurable base values for impact calculations
+export const esgMeasurementParameters = pgTable("esg_measurement_parameters", {
+  id: serial("id").primaryKey(),
+  parameterKey: text("parameter_key").notNull().unique(), // 'carbon_per_laptop', 'water_per_laptop', etc.
+  parameterName: text("parameter_name").notNull(), // Display name: "Carbon Saved per Laptop"
+  parameterValue: numeric("parameter_value", { precision: 15, scale: 2 }).notNull(), // The numeric value
+  unit: text("unit").notNull(), // 'kg', 'liters', 'grams', etc.
+  category: text("category").notNull(), // 'environmental', 'social'
+  description: text("description"), // Help text explaining what this parameter represents
+  displayOrder: integer("display_order").notNull().default(0),
+  isActive: boolean("is_active").notNull().default(true),
+  updatedAt: timestamp("updated_at").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertEsgMeasurementParameterSchema = createInsertSchema(esgMeasurementParameters).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type EsgMeasurementParameter = typeof esgMeasurementParameters.$inferSelect;
+export type InsertEsgMeasurementParameter = z.infer<typeof insertEsgMeasurementParameterSchema>;
