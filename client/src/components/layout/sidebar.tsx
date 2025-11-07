@@ -159,6 +159,20 @@ export default function Sidebar() {
             >
               Admin Portal
             </NavItem>
+            <NavItem
+              href="/admin/esg-parameters"
+              icon="ri-settings-3-line"
+              active={location === "/admin/esg-parameters"}
+            >
+              ESG Parameters
+            </NavItem>
+            <NavItem
+              href="/admin/impact-equivalency-settings"
+              icon="ri-flask-line"
+              active={location === "/admin/impact-equivalency-settings"}
+            >
+              Impact Equivalency
+            </NavItem>
           </NavSection>
         )}
       </div>

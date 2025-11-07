@@ -85,8 +85,62 @@ export function EsgParameters() {
     );
   }
 
-  const environmentalParams = parameters.filter(p => p.category === 'environmental');
-  const socialParams = parameters.filter(p => p.category === 'social');
+  const parametersByCategory = parameters.reduce((acc, param) => {
+    if (!acc[param.category]) {
+      acc[param.category] = [];
+    }
+    acc[param.category].push(param);
+    return acc;
+  }, {} as Record<string, EsgMeasurementParameter[]>);
+
+  const categoryTitles: Record<string, string> = {
+    environmental: 'Environmental Parameters',
+    social: 'Social Impact Parameters',
+    governance: 'Governance Parameters',
+  };
+
+  const categoryDescriptions: Record<string, string> = {
+    environmental: 'Configure the environmental impact metrics per laptop',
+    social: 'Configure the social impact metrics per laptop',
+    governance: 'Configure the governance and compliance metrics per laptop',
+  };
+
+  const sortedCategories = Object.keys(parametersByCategory).sort();
+
+  const renderParameterCard = (param: EsgMeasurementParameter) => (
+    <div
+      key={param.id}
+      className="border rounded-lg p-4 hover:border-[#08ABAB] transition-colors"
+    >
+      <div className="flex items-center justify-between">
+        <div className="flex-1">
+          <div className="flex items-center gap-2 mb-1">
+            <h3 className="font-semibold">{param.parameterName}</h3>
+            {!param.isActive && (
+              <span className="text-xs bg-neutral-200 text-neutral-600 px-2 py-1 rounded">
+                Inactive
+              </span>
+            )}
+          </div>
+          <p className="text-sm text-neutral-600 mb-1">
+            <span className="font-medium text-[#08ABAB]">{param.parameterValue} {param.unit}</span> per laptop
+          </p>
+          {param.description && (
+            <p className="text-xs text-neutral-500">{param.description}</p>
+          )}
+        </div>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => handleEdit(param)}
+          data-testid={`button-edit-${param.parameterKey}`}
+        >
+          <Edit2 className="h-4 w-4 mr-1" />
+          Edit
+        </Button>
+      </div>
+    </div>
+  );
 
   return (
     <div className="container mx-auto p-6 max-w-6xl">
@@ -96,104 +150,28 @@ export function EsgParameters() {
           <h1 className="text-3xl font-bold">ESG Measurement Parameters</h1>
         </div>
         <p className="text-neutral-600">
-          Configure the base values used to calculate environmental and social impact for each remanufactured laptop sold. These parameters determine the carbon saved, water provided, and other sustainability metrics.
+          Configure the base values used to calculate environmental, social, and governance impact for each remanufactured laptop sold. These parameters determine the carbon saved, water provided, and other sustainability metrics.
         </p>
       </div>
 
       <div className="space-y-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Environmental Parameters</CardTitle>
-            <CardDescription>
-              Configure the environmental impact metrics per laptop
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {environmentalParams.map((param) => (
-                <div
-                  key={param.id}
-                  className="border rounded-lg p-4 hover:border-[#08ABAB] transition-colors"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h3 className="font-semibold">{param.parameterName}</h3>
-                        {!param.isActive && (
-                          <span className="text-xs bg-neutral-200 text-neutral-600 px-2 py-1 rounded">
-                            Inactive
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-sm text-neutral-600 mb-1">
-                        <span className="font-medium text-[#08ABAB]">{param.parameterValue} {param.unit}</span> per laptop
-                      </p>
-                      {param.description && (
-                        <p className="text-xs text-neutral-500">{param.description}</p>
-                      )}
-                    </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleEdit(param)}
-                      data-testid={`button-edit-${param.parameterKey}`}
-                    >
-                      <Edit2 className="h-4 w-4 mr-1" />
-                      Edit
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Social Impact Parameters</CardTitle>
-            <CardDescription>
-              Configure the social impact metrics per laptop
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {socialParams.map((param) => (
-                <div
-                  key={param.id}
-                  className="border rounded-lg p-4 hover:border-[#08ABAB] transition-colors"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h3 className="font-semibold">{param.parameterName}</h3>
-                        {!param.isActive && (
-                          <span className="text-xs bg-neutral-200 text-neutral-600 px-2 py-1 rounded">
-                            Inactive
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-sm text-neutral-600 mb-1">
-                        <span className="font-medium text-[#08ABAB]">{param.parameterValue} {param.unit}</span> per laptop
-                      </p>
-                      {param.description && (
-                        <p className="text-xs text-neutral-500">{param.description}</p>
-                      )}
-                    </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleEdit(param)}
-                      data-testid={`button-edit-${param.parameterKey}`}
-                    >
-                      <Edit2 className="h-4 w-4 mr-1" />
-                      Edit
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+        {sortedCategories.map((category) => (
+          <Card key={category}>
+            <CardHeader>
+              <CardTitle>
+                {categoryTitles[category] || `${category.charAt(0).toUpperCase() + category.slice(1)} Parameters`}
+              </CardTitle>
+              <CardDescription>
+                {categoryDescriptions[category] || `Configure the ${category} impact metrics per laptop`}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {parametersByCategory[category].map(renderParameterCard)}
+              </div>
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
@@ -279,6 +257,7 @@ export function EsgParameters() {
                     <SelectContent>
                       <SelectItem value="environmental">Environmental</SelectItem>
                       <SelectItem value="social">Social</SelectItem>
+                      <SelectItem value="governance">Governance</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
