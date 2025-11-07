@@ -72,6 +72,7 @@ export interface IStorage {
   getTotalEnvironmentalImpact(userId: number): Promise<{
     carbonSaved: number;
     waterProvided: number;
+    waterSaved: number;
     mineralsSaved: number;
     treesEquivalent: number;
     familiesHelped: number;
@@ -420,6 +421,7 @@ export class DatabaseStorage implements IStorage {
   async getTotalEnvironmentalImpact(userId: number): Promise<{
     carbonSaved: number;
     waterProvided: number;
+    waterSaved: number;
     mineralsSaved: number;
     treesEquivalent: number;
     familiesHelped: number;
@@ -428,6 +430,7 @@ export class DatabaseStorage implements IStorage {
       .select({
         carbonSaved: sum(environmentalImpact.carbonSaved),
         waterProvided: sum(environmentalImpact.waterProvided),
+        waterSaved: sum(environmentalImpact.waterSaved),
         mineralsSaved: sum(environmentalImpact.mineralsSaved),
         treesEquivalent: sum(environmentalImpact.treesEquivalent),
         familiesHelped: sum(environmentalImpact.familiesHelped),
@@ -438,6 +441,7 @@ export class DatabaseStorage implements IStorage {
     return {
       carbonSaved: Number(result.carbonSaved) || 0,
       waterProvided: Number(result.waterProvided) || 0,
+      waterSaved: Number(result.waterSaved) || 0,
       mineralsSaved: Number(result.mineralsSaved) || 0,
       treesEquivalent: Number(result.treesEquivalent) || 0,
       familiesHelped: Number(result.familiesHelped) || 0,
@@ -1236,6 +1240,7 @@ export class DatabaseStorage implements IStorage {
       // Calculate impact based on quantity
       const carbonSaved = Math.round(carbonPerLaptop * totalQuantity);
       const waterProvided = Math.round(waterProvidedPerLaptop * totalQuantity);
+      const waterSaved = Math.round(waterSavedPerLaptop * totalQuantity);
       const mineralsSaved = Math.round(mineralsPerLaptop * totalQuantity);
       const treesEquivalent = Math.round((carbonSaved / 1000) / 21); // Carbon in kg divided by 21kg per tree
       const familiesHelped = Math.round(familiesPerLaptop * totalQuantity);
@@ -1249,6 +1254,7 @@ export class DatabaseStorage implements IStorage {
           .set({
             carbonSaved,
             waterProvided,
+            waterSaved,
             mineralsSaved,
             treesEquivalent,
             familiesHelped,
@@ -1261,6 +1267,7 @@ export class DatabaseStorage implements IStorage {
           orderId,
           carbonSaved,
           waterProvided,
+          waterSaved,
           mineralsSaved,
           treesEquivalent,
           familiesHelped,

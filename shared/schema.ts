@@ -112,7 +112,8 @@ export const environmentalImpact = pgTable("environmental_impact", {
   userId: integer("user_id").notNull().references(() => users.id),
   orderId: integer("order_id").references(() => orders.id),
   carbonSaved: integer("carbon_saved").notNull(), // in grams
-  waterProvided: integer("water_provided").notNull(), // in liters
+  waterProvided: integer("water_provided").notNull(), // in liters (charity water provided)
+  waterSaved: integer("water_saved").notNull().default(0), // in liters (manufacturing water saved)
   mineralsSaved: integer("minerals_saved").notNull(), // in grams
   treesEquivalent: integer("trees_equivalent").notNull(),
   familiesHelped: integer("families_helped").notNull(),

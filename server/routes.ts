@@ -861,7 +861,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Parameter not found" });
       }
       
-      res.json(updated);
+      // Recalculate environmental impact for all existing orders with updated parameters
+      const recalcResult = await storage.recalculateAllEnvironmentalImpact();
+      console.log(`Recalculated environmental impact after ESG parameter update: ${recalcResult.updated} orders updated, ${recalcResult.errors} errors`);
+      
+      res.json({
+        parameter: updated,
+        recalculated: recalcResult
+      });
     } catch (error) {
       console.error("Error updating ESG measurement parameter:", error);
       res.status(500).json({ message: "Internal server error" });
