@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { useImpact } from "@/hooks/use-impact";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -9,8 +9,12 @@ import {
   Trophy, Package, ShieldCheck, Target, Award, 
   TrendingUp, Droplet, Leaf, Recycle, Users, 
   ChevronRight, FileText, MessageSquare, Clock,
-  Zap, Star, BarChart3, Brain, Gamepad2, AlertCircle, Truck
+  Zap, Star, BarChart3, Brain, Gamepad2, AlertCircle, Truck, Rocket
 } from "lucide-react";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 
 interface User {
   id: number;
@@ -87,6 +91,8 @@ const getAchievementEmoji = (iconName: string): string => {
 
 export default function Dashboard() {
   const [, setLocation] = useLocation();
+  const { toast } = useToast();
+  const [showRocket, setShowRocket] = useState(false);
   
   const { data: user } = useQuery<User>({
     queryKey: ["/api/auth/me"],
@@ -121,14 +127,83 @@ export default function Dashboard() {
   const weeklyTarget = 50;
   const weeklyProgress = Math.min((((impact?.carbonSaved || 0) / 1000) % weeklyTarget) / weeklyTarget * 100, 100);
 
+  // Mutation to recalculate environmental impact
+  const recalculateMutation = useMutation({
+    mutationFn: async () => {
+      return apiRequest("/api/impact/recalculate", {
+        method: "POST",
+      });
+    },
+    onSuccess: (data: any) => {
+      toast({
+        title: "🚀 Impact Recalculated!",
+        description: `Updated ${data.updated} orders successfully!`,
+      });
+      // Invalidate all relevant queries to refresh data
+      queryClient.invalidateQueries({ queryKey: ["/api/environmental-impact"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/impact/trends"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/impact/equivalents"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/impact/by-order"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/orders"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/gamification/user-progress"] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: "Failed to recalculate impact. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleShootRocket = () => {
+    setShowRocket(true);
+    recalculateMutation.mutate();
+    setTimeout(() => setShowRocket(false), 2000);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-teal-50">
       <div className="max-w-7xl mx-auto p-4">
         
+        {/* Rocket Animation */}
+        <AnimatePresence>
+          {showRocket && (
+            <motion.div
+              initial={{ x: -100, y: window.innerHeight }}
+              animate={{ 
+                x: window.innerWidth + 100, 
+                y: -100,
+                rotate: -45
+              }}
+              exit={{ opacity: 0 }}
+              transition={{ 
+                duration: 2,
+                ease: "easeInOut"
+              }}
+              className="fixed z-50 pointer-events-none"
+              style={{ fontSize: '64px' }}
+            >
+              🚀
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Header */}
-        <div className="mb-4">
-          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-gray-600 mt-0.5">Welcome back! Here's your sustainability impact overview</p>
+        <div className="mb-4 flex items-start justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+            <p className="text-gray-600 mt-0.5">Welcome back! Here's your sustainability impact overview</p>
+          </div>
+          <Button
+            onClick={handleShootRocket}
+            disabled={recalculateMutation.isPending}
+            className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white shadow-lg hover:shadow-xl transition-all"
+            data-testid="button-shoot-rocket"
+          >
+            <Rocket className="mr-2 h-5 w-5" />
+            {recalculateMutation.isPending ? "Launching..." : "Shoot the Rocket"}
+          </Button>
         </div>
 
         {/* Tier Banner */}
