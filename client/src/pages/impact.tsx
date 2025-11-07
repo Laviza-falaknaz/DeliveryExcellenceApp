@@ -42,7 +42,7 @@ export default function Impact() {
   const { toast } = useToast();
   const [showConfetti, setShowConfetti] = useState(false);
   
-  const { data: milestones = [] } = useQuery({
+  const { data: milestones = [] } = useQuery<any[]>({
     queryKey: ["/api/gamification/milestones"],
   });
 
@@ -187,7 +187,7 @@ Learn more about sustainable IT solutions: circularcomputing.com
         </div>
       </div>
 
-      {showConfetti && <Confetti />}
+      {showConfetti && <Confetti active={showConfetti} />}
       
       {/* Milestone Progress Overview */}
       {milestones.length > 0 && (
