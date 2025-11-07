@@ -237,7 +237,10 @@ export default function ESGReport() {
   const unlockedAchievements = achievements?.filter((a: any) => a.isUnlocked) || [];
   const lockedAchievements = achievements?.filter((a: any) => !a.isUnlocked) || [];
 
-  const reachedMilestoneIds = userMilestones?.map((m: any) => m.milestoneId) || [];
+  // Calculate which journey milestones have been reached based on score
+  const reachedMilestoneIds = milestones?.filter((m: any) => 
+    (scoreData?.totalScore || 0) >= m.requiredScore
+  ).map((m: any) => m.id) || [];
   const sortedMilestones = milestones?.sort((a: any, b: any) => a.orderIndex - b.orderIndex) || [];
 
   // Auto-trigger score calculation once when achievements are empty (initializes progress tracking)
