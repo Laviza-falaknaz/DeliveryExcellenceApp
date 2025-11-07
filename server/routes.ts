@@ -25,7 +25,7 @@ import session from "express-session";
 import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
 import crypto from "crypto";
-import MemoryStore from "memorystore";
+import connectPgSimple from "connect-pg-simple";
 import bcrypt from "bcryptjs";
 import { requireAdmin } from "./admin-middleware";
 
@@ -38,14 +38,21 @@ declare module "express-session" {
 export async function registerRoutes(app: Express): Promise<Server> {
   const httpServer = createServer(app);
 
-  // Setup session
-  const SessionStore = MemoryStore(session);
+  // Setup session with PostgreSQL store
+  const PgSession = connectPgSimple(session);
+  
   app.use(
     session({
-      cookie: { maxAge: 24 * 60 * 60 * 1000 }, // 24 hours
-      store: new SessionStore({
-        checkPeriod: 86400000, // prune expired entries every 24h
+      store: new PgSession({
+        conString: process.env.DATABASE_URL,
+        createTableIfMissing: true,
+        ttl: 24 * 60 * 60, // 24 hours in seconds
       }),
+      cookie: { 
+        maxAge: 24 * 60 * 60 * 1000, // 24 hours in milliseconds
+        secure: process.env.NODE_ENV === 'production',
+        httpOnly: true,
+      },
       resave: false,
       saveUninitialized: false,
       secret: process.env.SESSION_SECRET || "circular-computing-secret",
