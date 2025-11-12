@@ -86,10 +86,7 @@ export function RemanufacturedTipsManagement() {
 
   const createMutation = useMutation({
     mutationFn: async (tipData: Partial<RemanufacturedTip>) => {
-      return apiRequest("/api/crud/remanufactured-tips", {
-        method: "POST",
-        body: JSON.stringify(tipData),
-      });
+      return apiRequest("POST", "/api/crud/remanufactured-tips", tipData);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/crud/remanufactured-tips"] });
@@ -103,10 +100,7 @@ export function RemanufacturedTipsManagement() {
 
   const updateMutation = useMutation({
     mutationFn: async ({ id, data }: { id: number; data: Partial<RemanufacturedTip> }) => {
-      return apiRequest(`/api/crud/remanufactured-tips/${id}`, {
-        method: "PATCH",
-        body: JSON.stringify(data),
-      });
+      return apiRequest("PATCH", `/api/crud/remanufactured-tips/${id}`, data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/crud/remanufactured-tips"] });
@@ -122,9 +116,7 @@ export function RemanufacturedTipsManagement() {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
-      return apiRequest(`/api/crud/remanufactured-tips/${id}`, {
-        method: "DELETE",
-      });
+      return apiRequest("DELETE", `/api/crud/remanufactured-tips/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/crud/remanufactured-tips"] });
