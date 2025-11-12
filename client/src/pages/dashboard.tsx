@@ -9,7 +9,8 @@ import {
   Trophy, Package, ShieldCheck, Target, Award, 
   TrendingUp, Droplet, Leaf, Recycle, Users, 
   ChevronRight, FileText, MessageSquare, Clock,
-  Zap, Star, BarChart3, Brain, Gamepad2, AlertCircle, Truck, Rocket
+  Zap, Star, BarChart3, Brain, Gamepad2, AlertCircle, Truck, Rocket,
+  RotateCcw, HelpCircle, Book, BookOpen, Phone
 } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -123,9 +124,6 @@ export default function Dashboard() {
 
   const tierNames = ['Bronze Partner', 'Silver Partner', 'Gold Partner', 'Platinum Partner', 'Diamond Partner'];
   const tierName = tierNames[Math.min(Math.floor((userProgress?.level || 1) / 2), 4)];
-  
-  const weeklyTarget = 50;
-  const weeklyProgress = Math.min((((impact?.carbonSaved || 0) / 1000) % weeklyTarget) / weeklyTarget * 100, 100);
 
   // Mutation to recalculate environmental impact
   const recalculateMutation = useMutation({
@@ -243,8 +241,7 @@ export default function Dashboard() {
         {/* Header */}
         <div className="mb-4 flex items-start justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-            <p className="text-gray-600 mt-0.5">Welcome back! Here's your sustainability impact overview</p>
+            <h1 className="text-3xl font-bold text-gray-900">Welcome to Your Sustainable IT Hub</h1>
           </div>
           <Button
             onClick={handleShootRocket}
@@ -267,13 +264,12 @@ export default function Dashboard() {
                   <span className="text-sm font-medium">Tier {userProgress?.level || 1}</span>
                 </div>
                 <h2 className="text-2xl font-bold mb-1">{tierName}</h2>
-                <div className="flex items-center gap-2 mb-2">
+                <div className="flex items-center gap-2 mb-3">
                   <Trophy className="h-4 w-4" />
                   <span className="text-base">{userProgress?.totalPoints || 0} Credits</span>
                 </div>
-                <p className="text-sm text-white/90 mb-2">Welcome to your sustainability dashboard overview.</p>
                 <div className="flex items-center gap-2 text-sm mb-1">
-                  <span>Progress to Gold Partner</span>
+                  <span>Progress to {tierNames[Math.min(Math.floor((userProgress?.level || 1) / 2) + 1, 4)]}</span>
                   <span className="font-medium">{((userProgress?.totalPoints || 0) % 1000) / 10}%</span>
                 </div>
                 <div className="w-64">
@@ -316,7 +312,7 @@ export default function Dashboard() {
                 <TrendingUp className="h-5 w-5 text-teal-600" />
                 Sustainability Metrics
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
                 
                 <Card className="shadow-md border-0 bg-gradient-to-br from-green-50 to-emerald-50">
                   <CardContent className="p-4">
@@ -359,6 +355,21 @@ export default function Dashboard() {
                     <div className="text-sm text-gray-600 mb-1">Materials Saved</div>
                     <div className="text-xs text-amber-700 font-medium">
                       +{Math.floor(((impact?.mineralsSaved || 0) / 1000) * 0.12)}% this month
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="shadow-md border-0 bg-gradient-to-br from-sky-50 to-blue-50">
+                  <CardContent className="p-4">
+                    <div className="bg-sky-100 w-10 h-10 rounded-lg flex items-center justify-center mb-2">
+                      <Users className="h-5 w-5 text-sky-700" />
+                    </div>
+                    <div className="text-2xl font-bold text-gray-900 mb-0.5">
+                      {impact?.waterProvided || 0} L
+                    </div>
+                    <div className="text-sm text-gray-600 mb-1">Clean Water Provided</div>
+                    <div className="text-xs text-sky-700 font-medium">
+                      Supporting clean water projects
                     </div>
                   </CardContent>
                 </Card>
@@ -629,44 +640,6 @@ export default function Dashboard() {
           {/* Right Column - 1/3 width */}
           <div className="space-y-4">
             
-            {/* Weekly Sustainability Target */}
-            <Card className="shadow-md border-0 bg-gradient-to-br from-amber-50 to-orange-50">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="bg-amber-200 p-2 rounded-lg">
-                    <Target className="h-5 w-5 text-amber-800" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-bold text-gray-900 text-sm">Weekly Target</h3>
-                    <Badge className="bg-amber-600 text-white hover:bg-amber-600 mt-0.5 text-xs">
-                      In Progress
-                    </Badge>
-                  </div>
-                </div>
-
-                <p className="text-sm text-gray-700 mb-3">
-                  Save {weeklyTarget} kg CO₂ this week
-                </p>
-
-                <div className="mb-3">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-xs font-medium text-gray-700">
-                      {(((impact?.carbonSaved || 0) / 1000) % weeklyTarget).toFixed(1)} kg / {weeklyTarget} kg
-                    </span>
-                    <span className="text-xs font-bold text-amber-800">{weeklyProgress.toFixed(0)}%</span>
-                  </div>
-                  <Progress value={weeklyProgress} className="h-2 bg-white/50" />
-                </div>
-
-                <div className="bg-white/70 rounded-lg p-2 flex items-center gap-2">
-                  <Trophy className="h-4 w-4 text-amber-700 flex-shrink-0" />
-                  <span className="text-xs text-amber-900 font-medium">
-                    Award + Partnership Credit
-                  </span>
-                </div>
-              </CardContent>
-            </Card>
-
             {/* Quick Actions */}
             <Card className="shadow-md border-0">
               <CardHeader className="border-b bg-gray-50 pb-2 pt-2">
@@ -683,6 +656,15 @@ export default function Dashboard() {
                 </Button>
                 
                 <Button 
+                  className="w-full justify-start bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white text-sm h-9"
+                  onClick={() => setLocation('/rma')}
+                  data-testid="button-create-rma"
+                >
+                  <RotateCcw className="h-4 w-4 mr-2" />
+                  Create RMA
+                </Button>
+
+                <Button 
                   className="w-full justify-start bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white text-sm h-9"
                   onClick={() => setLocation('/impact')}
                   data-testid="button-view-impact"
@@ -691,89 +673,41 @@ export default function Dashboard() {
                   View Impact
                 </Button>
 
-                <div className="pt-2 border-t">
-                  <h4 className="text-xs font-medium text-gray-700 mb-2">More Actions</h4>
-                  
-                  <button 
-                    className="w-full text-left px-2 py-1.5 rounded-md hover:bg-gray-100 text-xs flex items-center gap-2 transition-colors"
-                    onClick={() => setLocation('/support')}
-                    data-testid="link-support-center"
-                  >
-                    <ShieldCheck className="h-4 w-4 text-gray-600" />
-                    <span className="text-gray-700">Support Center</span>
-                  </button>
+                <Button 
+                  className="w-full justify-start bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 text-white text-sm h-9"
+                  onClick={() => setLocation('/support')}
+                  data-testid="button-troubleshooting"
+                >
+                  <HelpCircle className="h-4 w-4 mr-2" />
+                  Troubleshooting
+                </Button>
 
-                  <button 
-                    className="w-full text-left px-2 py-1.5 rounded-md hover:bg-gray-100 text-xs flex items-center gap-2 transition-colors"
-                    onClick={() => setLocation('/warranty')}
-                    data-testid="link-documents"
-                  >
-                    <FileText className="h-4 w-4 text-gray-600" />
-                    <span className="text-gray-700">Documents</span>
-                  </button>
+                <Button 
+                  className="w-full justify-start bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-700 hover:to-teal-600 text-white text-sm h-9"
+                  onClick={() => setLocation('/impact?tab=remanufacturing')}
+                  data-testid="button-about-remanufacturing"
+                >
+                  <BookOpen className="h-4 w-4 mr-2" />
+                  About Remanufacturing
+                </Button>
 
-                  <button 
-                    className="w-full text-left px-2 py-1.5 rounded-md hover:bg-gray-100 text-xs flex items-center gap-2 transition-colors"
-                    onClick={() => setLocation('/support')}
-                    data-testid="link-messages"
-                  >
-                    <MessageSquare className="h-4 w-4 text-gray-600" />
-                    <span className="text-gray-700">Messages</span>
-                  </button>
-                </div>
-              </CardContent>
-            </Card>
+                <Button 
+                  className="w-full justify-start bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-700 hover:to-indigo-600 text-white text-sm h-9"
+                  onClick={() => setLocation('/impact?tab=case-studies')}
+                  data-testid="button-case-studies"
+                >
+                  <Book className="h-4 w-4 mr-2" />
+                  Case Studies
+                </Button>
 
-            {/* Weekly Goal */}
-            <Card className="shadow-md border-0">
-              <CardHeader className="border-b bg-gray-50 pb-2 pt-2">
-                <CardTitle className="text-base font-semibold text-gray-900 flex items-center gap-2">
-                  <BarChart3 className="h-4 w-4 text-teal-600" />
-                  Weekly Goals
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-3">
-                <div className="mb-3">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-xs text-gray-600">Actions This Week</span>
-                    <span className="text-xl font-bold text-teal-600">3/5</span>
-                  </div>
-                  <Progress value={60} className="h-2 bg-gray-200" />
-                  <p className="text-xs text-gray-500 mt-1">2 days left</p>
-                </div>
-
-                <div className="space-y-1.5">
-                  <div className="flex items-center gap-2 text-xs">
-                    <div className="w-4 h-4 rounded-full bg-teal-100 flex items-center justify-center flex-shrink-0">
-                      <div className="w-1.5 h-1.5 rounded-full bg-teal-600"></div>
-                    </div>
-                    <span className="text-gray-700">Track an order</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-xs">
-                    <div className="w-4 h-4 rounded-full bg-teal-100 flex items-center justify-center flex-shrink-0">
-                      <div className="w-1.5 h-1.5 rounded-full bg-teal-600"></div>
-                    </div>
-                    <span className="text-gray-700">View impact report</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-xs">
-                    <div className="w-4 h-4 rounded-full bg-teal-100 flex items-center justify-center flex-shrink-0">
-                      <div className="w-1.5 h-1.5 rounded-full bg-teal-600"></div>
-                    </div>
-                    <span className="text-gray-700">Check metrics</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-xs opacity-50">
-                    <div className="w-4 h-4 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
-                      <div className="w-1.5 h-1.5 rounded-full bg-gray-400"></div>
-                    </div>
-                    <span className="text-gray-500">Submit feedback</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-xs opacity-50">
-                    <div className="w-4 h-4 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
-                      <div className="w-1.5 h-1.5 rounded-full bg-gray-400"></div>
-                    </div>
-                    <span className="text-gray-500">Share impact</span>
-                  </div>
-                </div>
+                <Button 
+                  className="w-full justify-start bg-gradient-to-r from-rose-600 to-rose-500 hover:from-rose-700 hover:to-rose-600 text-white text-sm h-9"
+                  onClick={() => setLocation('/support')}
+                  data-testid="button-contact"
+                >
+                  <Phone className="h-4 w-4 mr-2" />
+                  Contact
+                </Button>
               </CardContent>
             </Card>
           </div>
