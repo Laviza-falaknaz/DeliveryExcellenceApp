@@ -7,6 +7,13 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Table,
   TableBody,
   TableCell,
@@ -26,6 +33,34 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, Edit, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
+
+const CATEGORIES = [
+  { value: "Setup", color: "#10B981" },
+  { value: "Configuration", color: "#3B82F6" },
+  { value: "Maintenance", color: "#8B5CF6" },
+  { value: "Important", color: "#EF4444" },
+  { value: "Verification", color: "#F59E0B" },
+  { value: "Care", color: "#06B6D4" },
+];
+
+const ICONS = [
+  { class: "ri-information-line", label: "Info" },
+  { class: "ri-settings-line", label: "Settings" },
+  { class: "ri-tools-line", label: "Tools" },
+  { class: "ri-alert-line", label: "Alert" },
+  { class: "ri-check-line", label: "Check" },
+  { class: "ri-lightbulb-line", label: "Lightbulb" },
+  { class: "ri-heart-line", label: "Heart" },
+  { class: "ri-star-line", label: "Star" },
+  { class: "ri-shield-check-line", label: "Shield" },
+  { class: "ri-battery-line", label: "Battery" },
+  { class: "ri-download-line", label: "Download" },
+  { class: "ri-upload-line", label: "Upload" },
+  { class: "ri-refresh-line", label: "Refresh" },
+  { class: "ri-time-line", label: "Time" },
+  { class: "ri-save-line", label: "Save" },
+  { class: "ri-folder-line", label: "Folder" },
+];
 
 type RemanufacturedTip = {
   id: number;
@@ -104,8 +139,8 @@ export function RemanufacturedTipsManagement() {
         title: tip?.title || "",
         content: tip?.content || "",
         icon: tip?.icon || "ri-information-line",
-        category: tip?.category || "",
-        categoryColor: tip?.categoryColor || "#08ABAB",
+        category: tip?.category || "Setup",
+        categoryColor: tip?.categoryColor || "#10B981",
         displayOrder: tip?.displayOrder ?? 0,
         isActive: tip?.isActive ?? true,
       },
@@ -148,56 +183,107 @@ export function RemanufacturedTipsManagement() {
             className="min-h-24"
           />
         </div>
+        
         <div>
           <Label htmlFor="category">Category</Label>
-          <Input
-            id="category"
-            {...form.register("category", { required: true })}
-            placeholder="e.g., Setup, Configuration, Maintenance"
-            data-testid="input-category"
+          <Controller
+            name="category"
+            control={form.control}
+            render={({ field }) => (
+              <Select
+                value={field.value}
+                onValueChange={(value) => {
+                  field.onChange(value);
+                  const categoryData = CATEGORIES.find(c => c.value === value);
+                  if (categoryData) {
+                    form.setValue("categoryColor", categoryData.color);
+                  }
+                }}
+              >
+                <SelectTrigger data-testid="select-category">
+                  <SelectValue placeholder="Select a category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {CATEGORIES.map((cat) => (
+                    <SelectItem key={cat.value} value={cat.value}>
+                      <div className="flex items-center gap-2">
+                        <div
+                          className="w-4 h-4 rounded"
+                          style={{ backgroundColor: cat.color }}
+                        />
+                        {cat.value}
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
           />
         </div>
+
         <div>
-          <Label htmlFor="categoryColor">Category Color (Hex)</Label>
-          <div className="flex gap-2">
-            <Input
+          <Label htmlFor="categoryColor">Category Color</Label>
+          <div className="flex gap-2 items-center">
+            <input
+              type="color"
               id="categoryColor"
-              {...form.register("categoryColor", {
-                required: true,
-                pattern: /^#[0-9A-Fa-f]{6}$/,
-              })}
-              placeholder="#08ABAB"
+              {...form.register("categoryColor", { required: true })}
+              className="h-10 w-20 rounded border cursor-pointer"
               data-testid="input-color"
+            />
+            <Input
+              {...form.register("categoryColor", { required: true })}
+              placeholder="#10B981"
+              className="flex-1"
             />
             <div
               className="w-12 h-10 rounded border"
-              style={{ backgroundColor: form.watch("categoryColor") || "#08ABAB" }}
+              style={{ backgroundColor: form.watch("categoryColor") || "#10B981" }}
             />
           </div>
           <p className="text-xs text-gray-500 mt-1">
-            Enter a hex color code (e.g., #08ABAB for teal)
+            Pick a color or enter a hex code manually
           </p>
         </div>
+
         <div>
-          <Label htmlFor="icon">Icon (Remix Icon Class)</Label>
-          <Input
-            id="icon"
-            {...form.register("icon", { required: true })}
-            placeholder="ri-information-line"
-            data-testid="input-icon"
+          <Label htmlFor="icon">Icon</Label>
+          <Controller
+            name="icon"
+            control={form.control}
+            render={({ field }) => (
+              <div className="space-y-2">
+                <div className="grid grid-cols-8 gap-2 p-3 border rounded bg-gray-50">
+                  {ICONS.map((iconData) => (
+                    <button
+                      key={iconData.class}
+                      type="button"
+                      onClick={() => field.onChange(iconData.class)}
+                      className={`p-2 rounded hover:bg-white transition-colors ${
+                        field.value === iconData.class
+                          ? "bg-primary text-white"
+                          : "bg-white"
+                      }`}
+                      title={iconData.label}
+                      data-testid={`button-icon-${iconData.class}`}
+                    >
+                      <i className={`${iconData.class} text-xl`}></i>
+                    </button>
+                  ))}
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-gray-600">Selected:</span>
+                  <i className={`${field.value} text-2xl`}></i>
+                  <code className="text-xs text-gray-500">{field.value}</code>
+                </div>
+              </div>
+            )}
           />
           <p className="text-xs text-gray-500 mt-1">
-            Browse icons at{" "}
-            <a
-              href="https://remixicon.com/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-primary hover:underline"
-            >
-              remixicon.com
-            </a>
+            Click an icon above to select it
           </p>
         </div>
+
         <div>
           <Label htmlFor="displayOrder">Display Order</Label>
           <Input
