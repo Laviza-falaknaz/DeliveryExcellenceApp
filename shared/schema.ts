@@ -349,6 +349,7 @@ export const systemSettings = pgTable("system_settings", {
     rmaWebhookUrl?: string; // Webhook URL for RMA request notifications
     newUserAlertEmails?: string[]; // Email addresses to notify on new user creation
     documentDownloadApiUrl?: string; // External API URL for document downloads
+    supportPhoneNumber?: string; // Support phone number for customer contact
     // Sustainability metrics per laptop (in grams for carbon/minerals, liters for water)
     carbonReductionPerLaptop?: number; // in grams (e.g., 316000 for 316 KGS)
     resourcePreservationPerLaptop?: number; // in grams (e.g., 1200000 for 1200 KGS)

@@ -47,9 +47,33 @@ export default function Warranty() {
   const [rmaBasket, setRmaBasket] = useState<any[]>([]);
   const [showBasket, setShowBasket] = useState(false);
   
+  // Dialog states for content
+  const [showManualsDialog, setShowManualsDialog] = useState(false);
+  const [showBatteryDialog, setShowBatteryDialog] = useState(false);
+  
   // Scanner refs
   const videoRef = useRef<HTMLVideoElement>(null);
   const codeReader = useRef<BrowserMultiFormatReader | null>(null);
+  const checkStatusRef = useRef<HTMLDivElement>(null);
+  
+  // Fetch support phone number
+  const { data: supportSettings } = useQuery<{ supportPhoneNumber: string }>({
+    queryKey: ["/api/settings/support"],
+  });
+  const supportPhoneNumber = supportSettings?.supportPhoneNumber || '+971581317591';
+  
+  // Helper function for traffic light badge color
+  const getWarrantyBadgeClass = (status: string, daysRemaining?: number) => {
+    if (status === 'Expired') {
+      return 'bg-red-100 text-red-800 hover:bg-red-100'; // Red for expired
+    } else if (status === 'Active' && daysRemaining !== undefined) {
+      if (daysRemaining <= 30) {
+        return 'bg-amber-100 text-amber-800 hover:bg-amber-100'; // Amber for expiring soon
+      }
+      return 'bg-green-100 text-green-800 hover:bg-green-100'; // Green for active with time
+    }
+    return 'bg-green-100 text-green-800 hover:bg-green-100'; // Default green
+  };
   
   // Initialize scanner
   useEffect(() => {
@@ -392,7 +416,7 @@ export default function Warranty() {
             value="warranty" 
             className="hover:bg-neutral-100 transition-colors data-[state=active]:bg-[#08ABAB] data-[state=active]:text-white data-[state=active]:hover:bg-[#08ABAB]"
           >
-            Warranty Information
+            Warranty Checker
           </TabsTrigger>
           <TabsTrigger 
             value="troubleshooting" 
@@ -404,7 +428,7 @@ export default function Warranty() {
         
         {/* Warranty Information Tab */}
         <TabsContent value="warranty" className="space-y-6">
-          <Card>
+          <Card ref={checkStatusRef}>
             <CardHeader>
               <CardTitle>Check Warranty Status</CardTitle>
               <CardDescription>
@@ -502,10 +526,13 @@ export default function Warranty() {
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-xl font-semibold">Warranty Details</CardTitle>
                     <Badge 
-                      variant={warrantyInfo.warrantyStatus === "Active" ? "default" : "secondary"} 
-                      className={warrantyInfo.warrantyStatus === "Active" ? "bg-green-100 text-green-800 hover:bg-green-100" : ""}
+                      variant="secondary"
+                      className={getWarrantyBadgeClass(warrantyInfo.warrantyStatus, warrantyInfo.daysRemaining)}
                     >
                       {warrantyInfo.warrantyStatus}
+                      {warrantyInfo.warrantyStatus === "Active" && warrantyInfo.daysRemaining <= 30 && warrantyInfo.daysRemaining > 0 && (
+                        <span className="ml-1">({warrantyInfo.daysRemaining} days left)</span>
+                      )}
                     </Badge>
                   </CardHeader>
                   <CardContent className="pt-4">
@@ -539,18 +566,34 @@ export default function Warranty() {
                         <p className="text-base">{warrantyInfo.additionalCoverage || "None"}</p>
                       </div>
                       
-                      <Alert className="bg-primary/5 border-primary/20">
-                        <CheckCircle className="h-4 w-4 text-primary" />
-                        <AlertTitle>Registration Status: {warrantyInfo.registrationStatus}</AlertTitle>
-                        <AlertDescription>
-                          Your product is fully registered and covered under our warranty policy.
-                        </AlertDescription>
-                      </Alert>
+                      {warrantyInfo.warrantyStatus === 'Expired' ? (
+                        <Alert className="bg-red-50 border-red-200">
+                          <AlertCircle className="h-4 w-4 text-red-600" />
+                          <AlertTitle className="text-red-800">Registration Status</AlertTitle>
+                          <AlertDescription className="text-red-700">
+                            Your warranty has expired and your product is no longer covered.
+                          </AlertDescription>
+                        </Alert>
+                      ) : (
+                        <Alert className="bg-primary/5 border-primary/20">
+                          <CheckCircle className="h-4 w-4 text-primary" />
+                          <AlertTitle>Registration Status: {warrantyInfo.registrationStatus}</AlertTitle>
+                          <AlertDescription>
+                            Your product is fully registered and covered under our warranty policy.
+                          </AlertDescription>
+                        </Alert>
+                      )}
                     </div>
                   </CardContent>
                   <CardFooter className="flex justify-between">
                     <div className="flex gap-2">
-                      <Button variant="outline" onClick={() => serialForm.reset()}>
+                      <Button variant="outline" onClick={() => {
+                        serialForm.reset();
+                        setSearchPerformed(false);
+                        setWarrantyInfo(null);
+                        checkStatusRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        setTimeout(() => serialForm.setFocus('serialNumber'), 500);
+                      }}>
                         Check Another Product
                       </Button>
                       <Button 
@@ -687,10 +730,9 @@ export default function Warranty() {
                     <li>Model-specific guides for optimal performance and maintenance</li>
                     <li>Installation and setup instructions for all components</li>
                   </ul>
-                  <a href="https://my-warranty.com/kbtopic/manuals-downloads/" target="_blank" rel="noreferrer" className="text-primary hover:underline text-sm flex items-center">
+                  <Button variant="link" className="text-primary hover:underline text-sm p-0 h-auto" onClick={() => setShowManualsDialog(true)}>
                     <span>Browse official manuals</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-1"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
-                  </a>
+                  </Button>
                 </div>
                 
                 <div className="border rounded-lg p-4 bg-secondary/5">
@@ -704,10 +746,9 @@ export default function Warranty() {
                     <li>View current capacity compared to design capacity</li>
                     <li>Batteries at less than 80% capacity within warranty period may qualify for replacement</li>
                   </ul>
-                  <a href="https://my-warranty.com/kb/battery-capacity-how-its-tested/" target="_blank" rel="noreferrer" className="text-secondary hover:underline text-sm flex items-center">
+                  <Button variant="link" className="text-secondary hover:underline text-sm p-0 h-auto" onClick={() => setShowBatteryDialog(true)}>
                     <span>Check battery health status</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-1"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
-                  </a>
+                  </Button>
                 </div>
               </div>
             </CardContent>
@@ -813,9 +854,11 @@ export default function Warranty() {
                       Contact our technical support team directly for immediate assistance
                     </p>
                     <div className="space-y-2 w-full">
-                      <Button variant="outline" className="w-full">
-                        <i className="ri-phone-line mr-2"></i>
-                        Call Support
+                      <Button variant="outline" className="w-full" asChild>
+                        <a href={`tel:${supportPhoneNumber}`}>
+                          <i className="ri-phone-line mr-2"></i>
+                          Call Support
+                        </a>
                       </Button>
                       <Button variant="outline" className="w-full">
                         <i className="ri-chat-1-line mr-2"></i>
@@ -911,6 +954,207 @@ export default function Warranty() {
                 Continue to RMA Form ({rmaBasket.length} device{rmaBasket.length > 1 ? 's' : ''})
               </Button>
             )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Office Manuals Dialog */}
+      <Dialog open={showManualsDialog} onOpenChange={setShowManualsDialog}>
+        <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Official Manuals & Documentation</DialogTitle>
+            <DialogDescription>
+              Access comprehensive documentation and user guides for your remanufactured laptop
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-6 py-4">
+            <div>
+              <h3 className="font-semibold text-lg mb-3">Manufacturer-Specific Manuals</h3>
+              <div className="space-y-4">
+                <div className="border rounded-lg p-4">
+                  <h4 className="font-medium mb-2">Dell Laptops</h4>
+                  <p className="text-sm text-neutral-600 mb-2">Complete service manuals and troubleshooting guides for all Dell models</p>
+                  <ul className="text-sm text-neutral-700 list-disc list-inside space-y-1">
+                    <li>Hardware service manuals with diagrams</li>
+                    <li>Setup and quick start guides</li>
+                    <li>BIOS configuration documentation</li>
+                    <li>Driver and software installation guides</li>
+                  </ul>
+                </div>
+                
+                <div className="border rounded-lg p-4">
+                  <h4 className="font-medium mb-2">Lenovo Laptops</h4>
+                  <p className="text-sm text-neutral-600 mb-2">Official documentation and support resources for Lenovo devices</p>
+                  <ul className="text-sm text-neutral-700 list-disc list-inside space-y-1">
+                    <li>ThinkPad and IdeaPad user manuals</li>
+                    <li>Hardware maintenance manuals</li>
+                    <li>System recovery and restore guides</li>
+                    <li>Specifications and feature documentation</li>
+                  </ul>
+                </div>
+                
+                <div className="border rounded-lg p-4">
+                  <h4 className="font-medium mb-2">HP Laptops</h4>
+                  <p className="text-sm text-neutral-600 mb-2">Comprehensive user manuals and technical specifications</p>
+                  <ul className="text-sm text-neutral-700 list-disc list-inside space-y-1">
+                    <li>EliteBook and ProBook documentation</li>
+                    <li>Component replacement guides</li>
+                    <li>Performance tuning recommendations</li>
+                    <li>Warranty and support information</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            
+            <div>
+              <h3 className="font-semibold text-lg mb-3">General Guides</h3>
+              <ul className="space-y-2 text-sm text-neutral-700">
+                <li className="flex items-start">
+                  <CheckCircle className="h-4 w-4 text-green-600 mr-2 mt-0.5 flex-shrink-0" />
+                  <span>Model-specific guides for optimal performance and maintenance</span>
+                </li>
+                <li className="flex items-start">
+                  <CheckCircle className="h-4 w-4 text-green-600 mr-2 mt-0.5 flex-shrink-0" />
+                  <span>Installation and setup instructions for all components</span>
+                </li>
+                <li className="flex items-start">
+                  <CheckCircle className="h-4 w-4 text-green-600 mr-2 mt-0.5 flex-shrink-0" />
+                  <span>Troubleshooting flowcharts and diagnostic procedures</span>
+                </li>
+                <li className="flex items-start">
+                  <CheckCircle className="h-4 w-4 text-green-600 mr-2 mt-0.5 flex-shrink-0" />
+                  <span>Safety precautions and compliance information</span>
+                </li>
+              </ul>
+            </div>
+            
+            <Alert className="bg-blue-50 border-blue-200">
+              <HelpCircle className="h-4 w-4 text-blue-600" />
+              <AlertTitle className="text-blue-800">Need a Specific Manual?</AlertTitle>
+              <AlertDescription className="text-blue-700">
+                Contact our support team with your laptop model number to receive the exact manual you need.
+              </AlertDescription>
+            </Alert>
+          </div>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowManualsDialog(false)}>
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Battery Health Analysis Dialog */}
+      <Dialog open={showBatteryDialog} onOpenChange={setShowBatteryDialog}>
+        <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Battery Health Analysis Guide</DialogTitle>
+            <DialogDescription>
+              Learn how to check and maintain your laptop battery's health
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-6 py-4">
+            <div>
+              <h3 className="font-semibold text-lg mb-3">How to Access Battery Diagnostics</h3>
+              <div className="space-y-4">
+                <div className="border rounded-lg p-4 bg-neutral-50">
+                  <h4 className="font-medium mb-2">Method 1: BIOS Diagnostics (Recommended)</h4>
+                  <ol className="text-sm text-neutral-700 list-decimal list-inside space-y-1">
+                    <li>Restart your laptop</li>
+                    <li>Press F2 (or Del/F10 depending on manufacturer) during startup to enter BIOS</li>
+                    <li>Navigate to "Power Management" or "Battery Information" section</li>
+                    <li>View current capacity compared to design capacity</li>
+                    <li>Check cycle count and health status</li>
+                  </ol>
+                </div>
+                
+                <div className="border rounded-lg p-4 bg-neutral-50">
+                  <h4 className="font-medium mb-2">Method 2: Built-in Diagnostic Tools</h4>
+                  <ul className="text-sm text-neutral-700 list-disc list-inside space-y-1">
+                    <li><strong>Dell:</strong> Run Dell SupportAssist and select "Battery Check"</li>
+                    <li><strong>Lenovo:</strong> Use Lenovo Vantage {'->'} Hardware Settings {'->'} Power</li>
+                    <li><strong>HP:</strong> Open HP Support Assistant {'->'} Troubleshooting {'->'} Battery Test</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            
+            <div>
+              <h3 className="font-semibold text-lg mb-3">Understanding Battery Health</h3>
+              <div className="space-y-3">
+                <div className="flex items-start gap-3">
+                  <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                    <CheckCircle className="h-5 w-5 text-green-600" />
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-sm">80-100% Health (Excellent)</h4>
+                    <p className="text-sm text-neutral-600">Battery is in great condition and performing as expected</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start gap-3">
+                  <div className="h-10 w-10 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
+                    <AlertCircle className="h-5 w-5 text-amber-600" />
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-sm">60-80% Health (Fair)</h4>
+                    <p className="text-sm text-neutral-600">Battery shows normal wear, still functional but may need replacement soon</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start gap-3">
+                  <div className="h-10 w-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
+                    <AlertCircle className="h-5 w-5 text-red-600" />
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-sm">Below 60% Health (Replace)</h4>
+                    <p className="text-sm text-neutral-600">Battery capacity significantly reduced, replacement recommended</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div>
+              <h3 className="font-semibold text-lg mb-3">Warranty Coverage</h3>
+              <Alert className="bg-primary/5 border-primary/20">
+                <CheckCircle className="h-4 w-4 text-primary" />
+                <AlertTitle>Battery Warranty Terms</AlertTitle>
+                <AlertDescription>
+                  Batteries showing less than 80% capacity within the first 12 months may qualify for free replacement under warranty. Contact support to initiate a battery replacement request.
+                </AlertDescription>
+              </Alert>
+            </div>
+            
+            <div>
+              <h3 className="font-semibold text-lg mb-3">Battery Care Tips</h3>
+              <ul className="space-y-2 text-sm text-neutral-700">
+                <li className="flex items-start">
+                  <CheckCircle className="h-4 w-4 text-green-600 mr-2 mt-0.5 flex-shrink-0" />
+                  <span>Avoid leaving battery at 0% or 100% for extended periods</span>
+                </li>
+                <li className="flex items-start">
+                  <CheckCircle className="h-4 w-4 text-green-600 mr-2 mt-0.5 flex-shrink-0" />
+                  <span>Keep laptop in a cool, dry environment when possible</span>
+                </li>
+                <li className="flex items-start">
+                  <CheckCircle className="h-4 w-4 text-green-600 mr-2 mt-0.5 flex-shrink-0" />
+                  <span>Use manufacturer-approved chargers only</span>
+                </li>
+                <li className="flex items-start">
+                  <CheckCircle className="h-4 w-4 text-green-600 mr-2 mt-0.5 flex-shrink-0" />
+                  <span>Perform full discharge/charge cycles monthly to calibrate battery meter</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowBatteryDialog(false)}>
+              Close
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

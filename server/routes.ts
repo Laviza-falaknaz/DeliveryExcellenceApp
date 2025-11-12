@@ -2120,6 +2120,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         visibleTabs: ['users', 'orders', 'rmas', 'tickets', 'water-projects', 'case-studies', 'gamification', 'api-keys', 'sustainability', 'key-insights', 'esg-targets', 'theme', 'connection'],
         rmaNotificationEmails: [],
         newUserAlertEmails: [],
+        supportPhoneNumber: '+971581317591',
       };
 
       const settings = setting?.settingValue || defaultSettings;
@@ -2138,6 +2139,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         newUserAlertEmails: z.array(z.string().email()),
         documentDownloadApiUrl: z.string().url().regex(/^https:\/\//, "URL must use HTTPS protocol").optional(),
         rmaWebhookUrl: z.string().url().regex(/^https:\/\//, "URL must use HTTPS protocol").optional(),
+        supportPhoneNumber: z.string().regex(/^\+[1-9]\d{1,14}$/, "Phone number must be in E.164 format (e.g., +971581317591)").optional(),
       });
 
       const validatedSettings = settingsSchema.parse(req.body);
@@ -2173,6 +2175,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(setting);
     } catch (error) {
       console.error("Error fetching serial lookup settings:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Get support settings (accessible to all authenticated users)
+  app.get("/api/settings/support", isAuthenticated, async (req, res) => {
+    try {
+      const setting = await storage.getSystemSetting('admin_portal');
+      
+      // Default support phone number if none exists
+      const defaultPhone = '+971581317591';
+      const supportPhoneNumber = setting?.settingValue?.supportPhoneNumber || defaultPhone;
+      
+      res.json({ supportPhoneNumber });
+    } catch (error) {
+      console.error("Error fetching support settings:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });
