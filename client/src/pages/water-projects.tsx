@@ -28,7 +28,7 @@ export default function WaterProjects() {
             Projects by charity: water
           </h1>
           <p className="text-neutral-600">
-            See how your laptop purchases help provide clean water to communities in need.
+            See how your laptop purchases help provide clean water to communities in need
           </p>
         </div>
         <div className="mt-4 md:mt-0 flex">
@@ -38,7 +38,7 @@ export default function WaterProjects() {
             asChild
           >
             <a href="https://www.charitywater.org/" target="_blank" rel="noreferrer">
-              About charity: water
+              Visit charity: water
             </a>
           </Button>
         </div>
@@ -67,66 +67,161 @@ export default function WaterProjects() {
                     </h3>
                     <span className="text-neutral-500 ml-2">receiving clean water</span>
                   </div>
-                  <p className="text-neutral-600 mb-4">
+                  <p className="text-neutral-600">
                     <span className="font-semibold">Figure is for 1 week supply per family</span>
                   </p>
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span className="font-medium">Progress to Next Project</span>
-                      <span>{Math.round(progressValue)}%</span>
-                    </div>
-                    <Progress value={progressValue} className="h-2" />
-                    <p className="text-sm text-neutral-500">
-                      Just {25 - (impact.familiesHelped || 0)} more families to fund a new water point
-                    </p>
-                  </div>
                 </>
               ) : (
                 <p className="text-neutral-500">No impact data available yet. Start making purchases to contribute!</p>
               )}
             </div>
             <div className="flex items-center justify-center">
-              <motion.div
-                animate={{ y: [0, -10, 0] }}
-                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-              >
-                <svg width="250" height="250" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  {/* Background circle */}
-                  <circle cx="100" cy="100" r="95" fill="#FFF9C4" stroke="#F57F17" strokeWidth="2" />
-                  
-                  {/* Jerry can main body */}
-                  <path d="M60 70 L60 150 Q60 160, 70 160 L130 160 Q140 160, 140 150 L140 70 Q140 60, 130 60 L70 60 Q60 60, 60 70 Z" fill="#FBC02D" stroke="#F57F17" strokeWidth="2" />
-                  
-                  {/* Jerry can spout/neck */}
-                  <rect x="120" y="50" width="25" height="20" fill="#FBC02D" stroke="#F57F17" strokeWidth="2" rx="3" />
-                  
-                  {/* Jerry can cap */}
-                  <circle cx="132.5" cy="55" r="8" fill="#F57F17" stroke="#E65100" strokeWidth="2" />
-                  <circle cx="132.5" cy="55" r="4" fill="#FF8F00" />
-                  
-                  {/* Handle */}
-                  <path d="M50 80 Q45 85, 45 95 Q45 105, 50 110" stroke="#F57F17" strokeWidth="4" fill="none" strokeLinecap="round" />
-                  <rect x="48" y="85" width="12" height="20" fill="#FBC02D" stroke="#F57F17" strokeWidth="2" rx="2" />
-                  
-                  {/* Water level inside jerry can */}
-                  <path d="M65 75 L65 145 Q65 155, 75 155 L125 155 Q135 155, 135 145 L135 75 Z" fill="#2196F3" fillOpacity="0.7" />
-                  
-                  {/* Water surface ripples */}
-                  <path d="M70 80 Q85 75, 100 80 Q115 85, 130 80" stroke="#1976D2" strokeWidth="2" fill="none" strokeLinecap="round" />
-                  <path d="M70 85 Q85 80, 100 85 Q115 90, 130 85" stroke="#1976D2" strokeWidth="1" fill="none" strokeLinecap="round" />
-                  
-                  {/* Jerry can ridges/details */}
-                  <line x1="75" y1="70" x2="125" y2="70" stroke="#F57F17" strokeWidth="1" />
-                  <line x1="75" y1="140" x2="125" y2="140" stroke="#F57F17" strokeWidth="1" />
-                  
-                  {/* Water drops near spout */}
-                  <path d="M130 45 C130 40, 135 40, 135 45 C135 50, 130 50, 130 45 Z" fill="#2196F3" />
-                  <path d="M140 40 C140 35, 145 35, 145 40 C145 45, 140 45, 140 40 Z" fill="#2196F3" />
-                  
-                  {/* Ground/base line */}
-                  <ellipse cx="100" cy="170" rx="50" ry="8" fill="#E0E0E0" fillOpacity="0.5" />
-                </svg>
-              </motion.div>
+              <div className="relative w-[280px] h-[280px]">
+                {/* Animated laptop transforming into water droplets */}
+                <motion.div
+                  className="absolute inset-0"
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 1 }}
+                >
+                  {/* Laptop */}
+                  <svg width="280" height="280" viewBox="0 0 280 280" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    {/* Laptop base */}
+                    <motion.rect
+                      x="60"
+                      y="140"
+                      width="160"
+                      height="10"
+                      rx="2"
+                      fill="#08ABAB"
+                      initial={{ opacity: 1 }}
+                      animate={{ opacity: [1, 0.8, 1] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    />
+                    
+                    {/* Laptop screen */}
+                    <motion.rect
+                      x="70"
+                      y="80"
+                      width="140"
+                      height="60"
+                      rx="3"
+                      fill="#08ABAB"
+                      stroke="#066B6B"
+                      strokeWidth="2"
+                      initial={{ opacity: 1 }}
+                      animate={{ opacity: [1, 0.8, 1] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    />
+                    
+                    {/* Screen content - recycling symbol */}
+                    <motion.path
+                      d="M140 100 L150 110 L145 110 L145 115 L135 115 L135 110 L130 110 Z"
+                      fill="#FF9E1C"
+                      initial={{ opacity: 0.6 }}
+                      animate={{ opacity: [0.6, 1, 0.6] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    />
+                  </svg>
+                </motion.div>
+
+                {/* Animated water droplets flowing from laptop */}
+                {[0, 1, 2, 3, 4].map((i) => (
+                  <motion.div
+                    key={i}
+                    className="absolute"
+                    style={{ left: `${120 + i * 15}px`, top: '150px' }}
+                    initial={{ y: 0, opacity: 0 }}
+                    animate={{
+                      y: [0, 60, 80],
+                      opacity: [0, 1, 0],
+                    }}
+                    transition={{
+                      duration: 2,
+                      delay: i * 0.3,
+                      repeat: Infinity,
+                      ease: "easeOut",
+                    }}
+                  >
+                    <svg width="20" height="24" viewBox="0 0 20 24" fill="none">
+                      <path
+                        d="M10 0C10 0 0 10 0 16C0 20.4 4.5 24 10 24C15.5 24 20 20.4 20 16C20 10 10 0 10 0Z"
+                        fill="#08ABAB"
+                        fillOpacity="0.8"
+                      />
+                    </svg>
+                  </motion.div>
+                ))}
+
+                {/* Water waves at bottom */}
+                <motion.div
+                  className="absolute bottom-8 left-1/2 -translate-x-1/2"
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ delay: 1 }}
+                >
+                  <svg width="200" height="60" viewBox="0 0 200 60" fill="none">
+                    <motion.path
+                      d="M0 30 Q25 20, 50 30 T100 30 T150 30 T200 30"
+                      stroke="#08ABAB"
+                      strokeWidth="3"
+                      fill="none"
+                      initial={{ pathLength: 0 }}
+                      animate={{ pathLength: 1 }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    />
+                    <motion.path
+                      d="M0 40 Q25 30, 50 40 T100 40 T150 40 T200 40"
+                      stroke="#08ABAB"
+                      strokeWidth="2"
+                      fill="none"
+                      strokeOpacity="0.6"
+                      initial={{ pathLength: 0 }}
+                      animate={{ pathLength: 1 }}
+                      transition={{ duration: 2, delay: 0.3, repeat: Infinity }}
+                    />
+                    <motion.path
+                      d="M0 50 Q25 40, 50 50 T100 50 T150 50 T200 50"
+                      stroke="#08ABAB"
+                      strokeWidth="1.5"
+                      fill="none"
+                      strokeOpacity="0.4"
+                      initial={{ pathLength: 0 }}
+                      animate={{ pathLength: 1 }}
+                      transition={{ duration: 2, delay: 0.6, repeat: Infinity }}
+                    />
+                  </svg>
+                </motion.div>
+
+                {/* Hearts/impact symbols */}
+                {[0, 1].map((i) => (
+                  <motion.div
+                    key={`heart-${i}`}
+                    className="absolute"
+                    style={{ 
+                      left: `${50 + i * 140}px`,
+                      top: '180px'
+                    }}
+                    initial={{ scale: 0, opacity: 0 }}
+                    animate={{
+                      scale: [0, 1.2, 1],
+                      opacity: [0, 1, 0],
+                    }}
+                    transition={{
+                      duration: 3,
+                      delay: i * 1.5,
+                      repeat: Infinity,
+                    }}
+                  >
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                      <path
+                        d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+                        fill="#FF9E1C"
+                      />
+                    </svg>
+                  </motion.div>
+                ))}
+              </div>
             </div>
           </div>
         </CardContent>
@@ -144,7 +239,7 @@ export default function WaterProjects() {
       ) : waterProjects && waterProjects.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           {waterProjects.map((project) => (
-            <Card key={project.id} className="overflow-hidden">
+            <Card key={project.id} className="overflow-hidden flex flex-col">
               <div className="h-48 overflow-hidden">
                 <img
                   src={project.imageUrl}
@@ -153,10 +248,10 @@ export default function WaterProjects() {
                 />
               </div>
               <CardHeader className="pb-2">
-                <CardTitle>{project.name}</CardTitle>
+                <CardTitle className="min-h-[3.5rem] flex items-start">{project.name}</CardTitle>
                 <CardDescription>{project.location}</CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="flex-grow">
                 <p className="text-neutral-700 text-sm mb-4">
                   {project.description}
                 </p>
@@ -171,7 +266,7 @@ export default function WaterProjects() {
                   </div>
                 </div>
               </CardContent>
-              <CardFooter>
+              <CardFooter className="mt-auto">
                 <Button variant="outline" className="w-full bg-[#08ABAB] border-[#08ABAB] text-white hover:bg-[#FF9E1C] hover:text-black hover:border-[#FF9E1C] transition-colors" asChild>
                   <a href={
                     project.name === "Uganda Rainwater Harvesting" 
@@ -278,19 +373,19 @@ export default function WaterProjects() {
                     <div className="space-y-4">
                       <div className="p-4 bg-secondary/5 rounded-lg">
                         <h4 className="font-medium">Alem's Story - Ethiopia</h4>
-                        <p className="text-sm text-neutral-700 mt-1">
+                        <p className="text-sm text-neutral-700 mt-1 italic font-serif">
                           "Before the well, I walked 3 hours every day to collect water for my family. Now, I can attend school and dream of becoming a doctor. Clean water changed my whole future."
                         </p>
                       </div>
                       <div className="p-4 bg-secondary/5 rounded-lg">
                         <h4 className="font-medium">Mutesi's Village - Rwanda</h4>
-                        <p className="text-sm text-neutral-700 mt-1">
+                        <p className="text-sm text-neutral-700 mt-1 italic font-serif">
                           "Our village used to suffer from many illnesses. Since the water project was completed, our children are healthier, and our community is thriving with new businesses and opportunities."
                         </p>
                       </div>
                       <div className="p-4 bg-secondary/5 rounded-lg">
                         <h4 className="font-medium">Baraka's Community - Uganda</h4>
-                        <p className="text-sm text-neutral-700 mt-1">
+                        <p className="text-sm text-neutral-700 mt-1 italic font-serif">
                           "The new rainwater harvesting system provides clean water throughout the year. Our school attendance has improved by 40%, and waterborne diseases have decreased dramatically."
                         </p>
                       </div>
