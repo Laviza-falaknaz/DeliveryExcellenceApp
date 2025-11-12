@@ -161,7 +161,7 @@ export default function CaseStudies() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           
           {/* Salvation Army Trading Company Case Study */}
-          <Card>
+          <Card className="flex flex-col">
             <div className="h-48 overflow-hidden">
               <img
                 src="https://circularcomputing.com/wp-content/uploads/2025/08/case-salavation.png"
@@ -170,15 +170,15 @@ export default function CaseStudies() {
               />
             </div>
             <CardHeader>
-              <CardTitle>Salvation Army Trading Company</CardTitle>
+              <CardTitle className="min-h-[3.5rem] flex items-start">Salvation Army Trading Company</CardTitle>
               <CardDescription>Charity & Social Services</CardDescription>
             </CardHeader>
-            <CardContent>
-              <p className="text-neutral-700 mb-4">
+            <CardContent className="flex-grow">
+              <p className="text-neutral-700">
                 Through managing over 260 charity shops and thousands of clothing donation banks, SATCoL facilitates substantial fundraising for the Salvation Army's charitable programs.
               </p>
             </CardContent>
-            <CardFooter>
+            <CardFooter className="mt-auto">
               <Button variant="outline" className="w-full" asChild>
                 <a href="https://circularcomputing.com/case-studies/salvation-army-trading-company/" target="_blank" rel="noreferrer">
                   Read Full Case Study
@@ -188,7 +188,7 @@ export default function CaseStudies() {
           </Card>
 
           {/* Tourism Ireland Case Study */}
-          <Card>
+          <Card className="flex flex-col">
             <div className="h-48 overflow-hidden">
               <img
                 src="https://circularcomputing.com/wp-content/uploads/2025/07/tour-123.jpg"
@@ -197,15 +197,15 @@ export default function CaseStudies() {
               />
             </div>
             <CardHeader>
-              <CardTitle>Tourism Ireland</CardTitle>
+              <CardTitle className="min-h-[3.5rem] flex items-start">Tourism Ireland</CardTitle>
               <CardDescription>Tourism & Marketing</CardDescription>
             </CardHeader>
-            <CardContent>
-              <p className="text-neutral-700 mb-4">
+            <CardContent className="flex-grow">
+              <p className="text-neutral-700">
                 Tourism Ireland is responsible for marketing Ireland overseas as a leading holiday and Business Events destination. Delivering world-class campaigns in 13+ markets.
               </p>
             </CardContent>
-            <CardFooter>
+            <CardFooter className="mt-auto">
               <Button variant="outline" className="w-full" asChild>
                 <a href="https://circularcomputing.com/case-studies/tourism-ireland/" target="_blank" rel="noreferrer">
                   Read Full Case Study
@@ -215,7 +215,7 @@ export default function CaseStudies() {
           </Card>
 
           {/* Weightmans Case Study */}
-          <Card>
+          <Card className="flex flex-col">
             <div className="h-48 overflow-hidden">
               <img
                 src="https://circularcomputing.com/wp-content/uploads/2025/06/upscalemedia-transformed-1-scaled.jpeg"
@@ -224,15 +224,15 @@ export default function CaseStudies() {
               />
             </div>
             <CardHeader>
-              <CardTitle>Weightmans</CardTitle>
+              <CardTitle className="min-h-[3.5rem] flex items-start">Weightmans</CardTitle>
               <CardDescription>Legal Services</CardDescription>
             </CardHeader>
-            <CardContent>
-              <p className="text-neutral-700 mb-4">
+            <CardContent className="flex-grow">
+              <p className="text-neutral-700">
                 Weightmans integrates sustainability into their core strategy with Circular Computing's remanufactured laptops. Like many large organisations, Weightmans recognised the vital role technology plays in their daily operations.
               </p>
             </CardContent>
-            <CardFooter>
+            <CardFooter className="mt-auto">
               <Button variant="outline" className="w-full" asChild>
                 <a href="https://circularcomputing.com/case-studies/weightmans/" target="_blank" rel="noreferrer">
                   Read Full Case Study
@@ -242,7 +242,7 @@ export default function CaseStudies() {
           </Card>
 
           {/* Cavan County Council Case Study */}
-          <Card>
+          <Card className="flex flex-col">
             <div className="h-48 overflow-hidden">
               <img
                 src="https://circularcomputing.com/wp-content/uploads/2025/06/Edited-image.png"
@@ -251,15 +251,15 @@ export default function CaseStudies() {
               />
             </div>
             <CardHeader>
-              <CardTitle>Cavan County Council</CardTitle>
+              <CardTitle className="min-h-[3.5rem] flex items-start">Cavan County Council</CardTitle>
               <CardDescription>Local Government</CardDescription>
             </CardHeader>
-            <CardContent>
-              <p className="text-neutral-700 mb-4">
+            <CardContent className="flex-grow">
+              <p className="text-neutral-700">
                 Cavan County Council needed to modernise its IT estate while advancing its Climate Action Implementation Plan and aligned with Ireland's 'Buying Greener' Green Public Procurement Strategy.
               </p>
             </CardContent>
-            <CardFooter>
+            <CardFooter className="mt-auto">
               <Button variant="outline" className="w-full" asChild>
                 <a href="https://circularcomputing.com/case-studies/cavan-county-council/" target="_blank" rel="noreferrer">
                   Read Full Case Study
@@ -269,7 +269,7 @@ export default function CaseStudies() {
           </Card>
 
           {/* WWF Case Study */}
-          <Card>
+          <Card className="flex flex-col">
             <div className="h-48 overflow-hidden">
               <img
                 src={wwfImage}
@@ -278,15 +278,15 @@ export default function CaseStudies() {
               />
             </div>
             <CardHeader>
-              <CardTitle>WWF</CardTitle>
+              <CardTitle className="min-h-[3.5rem] flex items-start">WWF</CardTitle>
               <CardDescription>Environmental Conservation</CardDescription>
             </CardHeader>
-            <CardContent>
-              <p className="text-neutral-700 mb-4">
+            <CardContent className="flex-grow">
+              <p className="text-neutral-700">
                 WWF chose remanufactured technology to align with their mission of environmental conservation and sustainable practices.
               </p>
             </CardContent>
-            <CardFooter>
+            <CardFooter className="mt-auto">
               <Button variant="outline" className="w-full" asChild>
                 <a href="https://circularcomputing.com/case-studies/wwf/" target="_blank" rel="noreferrer">
                   Read Full Case Study
@@ -296,7 +296,7 @@ export default function CaseStudies() {
           </Card>
 
           {/* Royal Mint Case Study */}
-          <Card>
+          <Card className="flex flex-col">
             <div className="h-48 overflow-hidden">
               <img
                 src={royalMintImage}
@@ -305,15 +305,15 @@ export default function CaseStudies() {
               />
             </div>
             <CardHeader>
-              <CardTitle>Royal Mint</CardTitle>
+              <CardTitle className="min-h-[3.5rem] flex items-start">Royal Mint</CardTitle>
               <CardDescription>Government & Financial Services</CardDescription>
             </CardHeader>
-            <CardContent>
-              <p className="text-neutral-700 mb-4">
+            <CardContent className="flex-grow">
+              <p className="text-neutral-700">
                 The Royal Mint implemented remanufactured technology solutions as part of their commitment to sustainable operations.
               </p>
             </CardContent>
-            <CardFooter>
+            <CardFooter className="mt-auto">
               <Button variant="outline" className="w-full" asChild>
                 <a href="https://circularcomputing.com/case-studies/royal-mint/" target="_blank" rel="noreferrer">
                   Read Full Case Study

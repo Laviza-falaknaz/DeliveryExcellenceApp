@@ -196,7 +196,7 @@ Learn more about sustainable IT solutions: circularcomputing.com
             Your Impact
           </h1>
           <p className="text-neutral-600">
-            Track the positive impact of your remanufactured laptop purchases
+            Track the positive impact of your remanufactured laptop purchases to date
           </p>
         </div>
         <div className="mt-4 md:mt-0 flex gap-2">
@@ -321,19 +321,7 @@ Learn more about sustainable IT solutions: circularcomputing.com
                       <img src={carbonIcon} alt="Carbon Icon" className="w-7 h-7" />
                     </div>
                   </div>
-                  <div className="mt-2">
-                    <div className="flex justify-between mb-1 text-sm">
-                      <span>Progress to 1 tonne</span>
-                      <span>
-                        {Math.round((impact.carbonSaved / 1000000) * 100)}%
-                      </span>
-                    </div>
-                    <Progress
-                      value={(impact.carbonSaved / 1000000) * 100}
-                      className="h-2"
-                    />
-                  </div>
-                  <div className="mt-4 text-sm flex items-center text-[#08ABAB]">
+                  <div className="mt-auto text-sm flex items-center text-[#08ABAB]">
                     <TrendingUp className="h-4 w-4 mr-1" />
                     <span>
                       Equivalent to planting {impact.treesEquivalent} trees
@@ -355,22 +343,15 @@ Learn more about sustainable IT solutions: circularcomputing.com
                       {impact.familiesHelped}
                     </p>
                     <p className="text-xs text-neutral-400">families helped</p>
+                    <p className="text-xs text-neutral-500 mt-1">
+                      {formatEnvironmentalImpact(impact.waterProvided, "litres")} volume
+                    </p>
                   </div>
                   <div className="h-12 w-12 rounded-full bg-secondary/10 flex items-center justify-center">
                     <img src={waterIcon} alt="Water Icon" className="w-7 h-7" />
                   </div>
                 </div>
-                <div className="mt-2">
-                  <div className="flex justify-between mb-1 text-sm">
-                    <span>Water volume</span>
-                    <span>{formatEnvironmentalImpact(impact.waterProvided, "litres")}</span>
-                  </div>
-                  <Progress 
-                    value={Math.min(100, (impact.waterProvided / 10000) * 100)} 
-                    className="h-2" 
-                  />
-                </div>
-                <div className="mt-4 text-sm flex items-center text-[#08ABAB]">
+                <div className="mt-auto text-sm flex items-center text-[#08ABAB]">
                   <i className="ri-group-line mr-1"></i>
                   <span>1 week supply per family</span>
                 </div>
@@ -394,17 +375,7 @@ Learn more about sustainable IT solutions: circularcomputing.com
                     <img src={resourceIcon} alt="Resource Icon" className="w-7 h-7" />
                   </div>
                 </div>
-                <div className="mt-2">
-                  <div className="flex justify-between mb-1 text-sm">
-                    <span>Progress to 10 kg</span>
-                    <span>{Math.min(100, Math.round((impact.mineralsSaved / 10000) * 100))}%</span>
-                  </div>
-                  <Progress 
-                    value={Math.min(100, (impact.mineralsSaved / 10000) * 100)} 
-                    className="h-2" 
-                  />
-                </div>
-                <div className="mt-4 text-sm flex items-center text-[#08ABAB]">
+                <div className="mt-auto text-sm flex items-center text-[#08ABAB]">
                   <i className="ri-earth-line mr-1"></i>
                   <span>Mining impact reduced</span>
                 </div>
@@ -428,17 +399,7 @@ Learn more about sustainable IT solutions: circularcomputing.com
                     <img src={waterDropletsIcon} alt="Water Icon" className="w-7 h-7" />
                   </div>
                 </div>
-                <div className="mt-2">
-                  <div className="flex justify-between mb-1 text-sm">
-                    <span>Progress to 1M litres</span>
-                    <span>{Math.min(100, Math.round(((impact.waterSaved || 0) / 1000000) * 100))}%</span>
-                  </div>
-                  <Progress 
-                    value={Math.min(100, ((impact.waterSaved || 0) / 1000000) * 100)} 
-                    className="h-2" 
-                  />
-                </div>
-                <div className="mt-4 text-sm flex items-center text-[#08ABAB]">
+                <div className="mt-auto text-sm flex items-center text-[#08ABAB]">
                   <i className="ri-recycle-line mr-1"></i>
                   <span>Water conservation via reuse</span>
                 </div>
@@ -462,16 +423,13 @@ Learn more about sustainable IT solutions: circularcomputing.com
       {/* Impact Trends Charts */}
       <section className="mb-8">
         <div className="mb-4">
-          <div className="flex items-center gap-2 mb-2">
-            <Sparkles className="h-5 w-5 text-[#08ABAB]" />
-            <h2 className="text-2xl font-bold">Your Environmental Impact Journey</h2>
-          </div>
+          <h2 className="text-2xl font-bold mb-2">Your Environmental Impact Journey</h2>
           <p className="text-sm text-neutral-500">
-            Cumulative impact growth over the last 6 months
+            Impact to date across all purchases
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Carbon Saved Chart */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -651,6 +609,66 @@ Learn more about sustainable IT solutions: circularcomputing.com
               </CardContent>
             </Card>
           </motion.div>
+
+          {/* Water Saved Chart */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+          >
+            <Card className="border-purple-200 bg-gradient-to-br from-purple-50/50 to-white">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center">
+                    <img src={waterDropletsIcon} alt="Water Saved" className="w-5 h-5" />
+                  </div>
+                  Water Saved
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {isLoadingTrends ? (
+                  <Skeleton className="h-64 w-full" />
+                ) : rawMonthlyData.length > 0 ? (
+                  <div className="h-64">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart data={rawMonthlyData}>
+                        <defs>
+                          <linearGradient id="colorWaterSaved" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#9333ea" stopOpacity={0.8}/>
+                            <stop offset="95%" stopColor="#9333ea" stopOpacity={0.1}/>
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
+                        <XAxis dataKey="name" tick={{ fontSize: 12 }} />
+                        <YAxis tick={{ fontSize: 12 }} />
+                        <Tooltip
+                          contentStyle={{
+                            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                            border: '1px solid #9333ea',
+                            borderRadius: '8px',
+                            fontSize: '12px'
+                          }}
+                          formatter={(value: any) => [`${Number(value).toLocaleString()} L`, 'Water Saved']}
+                        />
+                        <Area
+                          type="monotone"
+                          dataKey="waterSaved"
+                          stroke="#9333ea"
+                          fillOpacity={1}
+                          fill="url(#colorWaterSaved)"
+                          strokeWidth={2}
+                        />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </div>
+                ) : (
+                  <div className="h-64 flex items-center justify-center text-neutral-400">
+                    <p className="text-sm">No data yet</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </motion.div>
         </div>
       </section>
 
@@ -698,7 +716,7 @@ Learn more about sustainable IT solutions: circularcomputing.com
                           {equivalent.name}
                         </p>
                         <p className="text-xs text-neutral-500 mt-1">
-                          {equivalent.description.replace(`${equivalent.value} `, '')}
+                          {equivalent.description.replace(`${equivalent.value} `, '').replace(/\(s\)/g, '')}
                         </p>
                       </div>
                     </motion.div>
@@ -846,12 +864,11 @@ Learn more about sustainable IT solutions: circularcomputing.com
       {/* Share My Success Section */}
       <section className="mb-8">
         <div className="mb-6">
-          <h2 className="text-2xl font-bold flex items-center gap-2 mb-2">
-            <Share2 className="h-6 w-6 text-teal-600" />
+          <h2 className="text-2xl font-bold mb-2">
             Share Your Sustainability Impact
           </h2>
           <p className="text-neutral-600">
-            Inspire others by showcasing your environmental achievements on social media
+            Inspire others by sharing your sustainability wins with your network
           </p>
         </div>
 
@@ -1045,25 +1062,6 @@ Learn more about sustainable IT solutions: circularcomputing.com
           </motion.div>
         </div>
 
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-          className="bg-gradient-to-r from-teal-50 to-emerald-50 border-2 border-teal-200 rounded-xl p-6 mt-6"
-        >
-          <div className="flex items-start gap-4">
-            <div className="w-12 h-12 bg-teal-600 rounded-full flex items-center justify-center flex-shrink-0">
-              <img src="/attached_assets/CC_Logo_Teal.png" alt="Circular Computing" className="w-8 h-8" />
-            </div>
-            <div>
-              <h4 className="font-bold text-teal-900 mb-2 text-lg">Circular Computing Partnership</h4>
-              <p className="text-sm text-teal-800 leading-relaxed">
-                All social content includes Circular Computing branding to help spread awareness about sustainable IT solutions. 
-                Customize the content while keeping the partnership attribution to maximize impact! 🌱
-              </p>
-            </div>
-          </div>
-        </motion.div>
       </section>
 
       {/* CTA Section */}
@@ -1072,7 +1070,7 @@ Learn more about sustainable IT solutions: circularcomputing.com
           <div className="flex flex-col md:flex-row items-center">
             <div className="flex-1">
               <h3 className="text-xl font-semibold text-primary mb-2">
-                Share Your Sustainability Journey
+                Share the Story Only Your Business Can Tell
               </h3>
               <p className="text-neutral-700 mb-4">
                 Your organization's commitment to sustainable IT is making a real
