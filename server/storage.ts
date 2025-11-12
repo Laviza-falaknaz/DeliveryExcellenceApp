@@ -8,6 +8,7 @@ import {
   rmaItems, RmaItem, InsertRmaItem,
   rmaRequestLogs, RmaRequestLog, InsertRmaRequestLog,
   waterProjects, WaterProject, InsertWaterProject,
+  remanufacturedTips, RemanufacturedTip, InsertRemanufacturedTip,
   supportTickets, SupportTicket, InsertSupportTicket,
   caseStudies, CaseStudy, InsertCaseStudy,
   deliveryTimelines, DeliveryTimeline, InsertDeliveryTimeline,
@@ -109,6 +110,13 @@ export interface IStorage {
   createWaterProject(project: InsertWaterProject): Promise<WaterProject>;
   updateWaterProject(id: number, data: Partial<WaterProject>): Promise<WaterProject | undefined>;
   deleteWaterProject(id: number): Promise<void>;
+
+  // Remanufactured tips operations
+  getRemanufacturedTips(): Promise<RemanufacturedTip[]>;
+  getRemanufacturedTip(id: number): Promise<RemanufacturedTip | undefined>;
+  createRemanufacturedTip(tip: InsertRemanufacturedTip): Promise<RemanufacturedTip>;
+  updateRemanufacturedTip(id: number, data: Partial<RemanufacturedTip>): Promise<RemanufacturedTip | undefined>;
+  deleteRemanufacturedTip(id: number): Promise<void>;
 
   // Support ticket operations
   getSupportTicket(id: number): Promise<SupportTicket | undefined>;
@@ -748,6 +756,31 @@ export class DatabaseStorage implements IStorage {
 
   async deleteWaterProject(id: number): Promise<void> {
     await db.delete(waterProjects).where(eq(waterProjects.id, id));
+  }
+
+  // Remanufactured tips operations
+  async getRemanufacturedTips(): Promise<RemanufacturedTip[]> {
+    return db.select().from(remanufacturedTips).where(eq(remanufacturedTips.isActive, true)).orderBy(remanufacturedTips.displayOrder);
+  }
+
+  async getRemanufacturedTip(id: number): Promise<RemanufacturedTip | undefined> {
+    const [tip] = await db.select().from(remanufacturedTips).where(eq(remanufacturedTips.id, id));
+    return tip || undefined;
+  }
+
+  async createRemanufacturedTip(insertTip: InsertRemanufacturedTip): Promise<RemanufacturedTip> {
+    const [tip] = await db.insert(remanufacturedTips).values(insertTip).returning();
+    return tip;
+  }
+
+  async updateRemanufacturedTip(id: number, data: Partial<RemanufacturedTip>): Promise<RemanufacturedTip | undefined> {
+    const updateData = { ...data, updatedAt: new Date() };
+    const [updated] = await db.update(remanufacturedTips).set(updateData).where(eq(remanufacturedTips.id, id)).returning();
+    return updated || undefined;
+  }
+
+  async deleteRemanufacturedTip(id: number): Promise<void> {
+    await db.delete(remanufacturedTips).where(eq(remanufacturedTips.id, id));
   }
 
   async deleteCaseStudy(id: number): Promise<void> {

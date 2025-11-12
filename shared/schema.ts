@@ -239,6 +239,29 @@ export const insertWaterProjectSchema = createInsertSchema(waterProjects).omit({
   createdAt: true,
 });
 
+// Remanufactured tips schema
+export const remanufacturedTips = pgTable("remanufactured_tips", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  content: text("content").notNull(),
+  icon: text("icon").notNull().default("ri-information-line"), // Remix icon class
+  category: text("category").notNull(), // Setup, Configuration, Maintenance, Important, Verification, Care, etc.
+  categoryColor: text("category_color").notNull().default("#08ABAB"), // Hex color code for category theming
+  displayOrder: integer("display_order").notNull().default(0), // For sorting
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertRemanufacturedTipSchema = createInsertSchema(remanufacturedTips).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type RemanufacturedTip = typeof remanufacturedTips.$inferSelect;
+export type InsertRemanufacturedTip = z.infer<typeof insertRemanufacturedTipSchema>;
+
 // Support ticket schema
 export const supportTicketStatusEnum = pgEnum("support_ticket_status", [
   "open",
