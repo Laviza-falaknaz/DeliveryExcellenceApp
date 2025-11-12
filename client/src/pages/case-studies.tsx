@@ -323,7 +323,7 @@ export default function CaseStudies() {
           </Card>
 
           {/* East England Ambulance Service Case Study */}
-          <Card>
+          <Card className="flex flex-col">
             <div className="h-48 overflow-hidden">
               <img
                 src={ambulanceImage}
@@ -332,15 +332,15 @@ export default function CaseStudies() {
               />
             </div>
             <CardHeader>
-              <CardTitle>East England Ambulance Service</CardTitle>
+              <CardTitle className="min-h-[3.5rem] flex items-start">East England Ambulance Service</CardTitle>
               <CardDescription>Healthcare & Emergency Services</CardDescription>
             </CardHeader>
-            <CardContent>
-              <p className="text-neutral-700 mb-4">
+            <CardContent className="flex-grow">
+              <p className="text-neutral-700">
                 East England Ambulance Service adopted remanufactured technology to support their critical healthcare operations whilst reducing environmental impact.
               </p>
             </CardContent>
-            <CardFooter>
+            <CardFooter className="mt-auto">
               <Button variant="outline" className="w-full" asChild>
                 <a href="https://circularcomputing.com/case-studies/east-england-ambulance-service/" target="_blank" rel="noreferrer">
                   Read Full Case Study
@@ -350,7 +350,7 @@ export default function CaseStudies() {
           </Card>
 
           {/* Chichester High School Case Study */}
-          <Card>
+          <Card className="flex flex-col">
             <div className="h-48 overflow-hidden">
               <img
                 src={chichesterImage}
@@ -359,15 +359,15 @@ export default function CaseStudies() {
               />
             </div>
             <CardHeader>
-              <CardTitle>Chichester High School</CardTitle>
+              <CardTitle className="min-h-[3.5rem] flex items-start">Chichester High School</CardTitle>
               <CardDescription>Education</CardDescription>
             </CardHeader>
-            <CardContent>
-              <p className="text-neutral-700 mb-4">
+            <CardContent className="flex-grow">
+              <p className="text-neutral-700">
                 Chichester High School integrated remanufactured laptops to provide students with quality technology whilst teaching sustainability.
               </p>
             </CardContent>
-            <CardFooter>
+            <CardFooter className="mt-auto">
               <Button variant="outline" className="w-full" asChild>
                 <a href="https://circularcomputing.com/case-studies/chichester-high-school/" target="_blank" rel="noreferrer">
                   Read Full Case Study
@@ -377,7 +377,7 @@ export default function CaseStudies() {
           </Card>
 
           {/* The Pensions Authority Case Study */}
-          <Card>
+          <Card className="flex flex-col">
             <div className="h-48 overflow-hidden">
               <img
                 src={pensionsImage}
@@ -386,15 +386,15 @@ export default function CaseStudies() {
               />
             </div>
             <CardHeader>
-              <CardTitle>The Pensions Authority</CardTitle>
+              <CardTitle className="min-h-[3.5rem] flex items-start">The Pensions Authority</CardTitle>
               <CardDescription>Government & Public Services</CardDescription>
             </CardHeader>
-            <CardContent>
-              <p className="text-neutral-700 mb-4">
+            <CardContent className="flex-grow">
+              <p className="text-neutral-700">
                 The Pensions Authority chose remanufactured technology as part of their sustainable procurement strategy.
               </p>
             </CardContent>
-            <CardFooter>
+            <CardFooter className="mt-auto">
               <Button variant="outline" className="w-full" asChild>
                 <a href="https://circularcomputing.com/case-studies/the-pensions-authority/" target="_blank" rel="noreferrer">
                   Read Full Case Study
@@ -404,7 +404,7 @@ export default function CaseStudies() {
           </Card>
 
           {/* London Borough of Barking and Dagenham Case Study */}
-          <Card>
+          <Card className="flex flex-col">
             <div className="h-48 overflow-hidden">
               <img
                 src={barkingImage}
@@ -413,15 +413,15 @@ export default function CaseStudies() {
               />
             </div>
             <CardHeader>
-              <CardTitle>London Borough of Barking and Dagenham</CardTitle>
+              <CardTitle className="min-h-[3.5rem] flex items-start">London Borough of Barking and Dagenham</CardTitle>
               <CardDescription>Local Government</CardDescription>
             </CardHeader>
-            <CardContent>
-              <p className="text-neutral-700 mb-4">
+            <CardContent className="flex-grow">
+              <p className="text-neutral-700">
                 London Borough of Barking and Dagenham implemented remanufactured technology solutions to support their environmental goals.
               </p>
             </CardContent>
-            <CardFooter>
+            <CardFooter className="mt-auto">
               <Button variant="outline" className="w-full" asChild>
                 <a href="https://circularcomputing.com/case-studies/london-borough-of-barking-and-dagenham/" target="_blank" rel="noreferrer">
                   Read Full Case Study
@@ -431,7 +431,7 @@ export default function CaseStudies() {
           </Card>
 
           {/* Together for Mental Wellbeing Case Study */}
-          <Card>
+          <Card className="flex flex-col">
             <div className="h-48 overflow-hidden">
               <img
                 src={mentalWellbeingImage}
@@ -440,15 +440,15 @@ export default function CaseStudies() {
               />
             </div>
             <CardHeader>
-              <CardTitle>Together for Mental Wellbeing</CardTitle>
+              <CardTitle className="min-h-[3.5rem] flex items-start">Together for Mental Wellbeing</CardTitle>
               <CardDescription>Mental Health & Charity</CardDescription>
             </CardHeader>
-            <CardContent>
-              <p className="text-neutral-700 mb-4">
+            <CardContent className="flex-grow">
+              <p className="text-neutral-700">
                 Together for Mental Wellbeing chose remanufactured laptops to support their mission whilst reducing costs and environmental impact.
               </p>
             </CardContent>
-            <CardFooter>
+            <CardFooter className="mt-auto">
               <Button variant="outline" className="w-full" asChild>
                 <a href="https://circularcomputing.com/case-studies/together-for-mental-wellbeing/" target="_blank" rel="noreferrer">
                   Read Full Case Study
@@ -458,7 +458,7 @@ export default function CaseStudies() {
           </Card>
 
           {/* Google Cloud and Formula E Hackathon Case Study */}
-          <Card>
+          <Card className="flex flex-col">
             <div className="h-48 overflow-hidden">
               <img
                 src={googleFormulaEImage}
@@ -467,15 +467,15 @@ export default function CaseStudies() {
               />
             </div>
             <CardHeader>
-              <CardTitle>Google Cloud and Formula E Hackathon</CardTitle>
+              <CardTitle className="min-h-[3.5rem] flex items-start">Google Cloud and Formula E Hackathon</CardTitle>
               <CardDescription>Technology & Innovation</CardDescription>
             </CardHeader>
-            <CardContent>
-              <p className="text-neutral-700 mb-4">
+            <CardContent className="flex-grow">
+              <p className="text-neutral-700">
                 Google Cloud and Formula E Hackathon showcased sustainable technology practices by using remanufactured equipment for their innovation event.
               </p>
             </CardContent>
-            <CardFooter>
+            <CardFooter className="mt-auto">
               <Button variant="outline" className="w-full" asChild>
                 <a href="https://circularcomputing.com/case-studies/google-cloud-and-formula-e-hackathon/" target="_blank" rel="noreferrer">
                   Read Full Case Study
@@ -485,7 +485,7 @@ export default function CaseStudies() {
           </Card>
 
           {/* Kent County Council Case Study */}
-          <Card>
+          <Card className="flex flex-col">
             <div className="h-48 overflow-hidden">
               <img
                 src={kentImage}
@@ -494,15 +494,15 @@ export default function CaseStudies() {
               />
             </div>
             <CardHeader>
-              <CardTitle>Kent County Council</CardTitle>
+              <CardTitle className="min-h-[3.5rem] flex items-start">Kent County Council</CardTitle>
               <CardDescription>Local Government</CardDescription>
             </CardHeader>
-            <CardContent>
-              <p className="text-neutral-700 mb-4">
+            <CardContent className="flex-grow">
+              <p className="text-neutral-700">
                 Kent County Council adopted remanufactured technology as part of their sustainable procurement strategy and commitment to environmental responsibility.
               </p>
             </CardContent>
-            <CardFooter>
+            <CardFooter className="mt-auto">
               <Button variant="outline" className="w-full" asChild>
                 <a href="https://circularcomputing.com/case-studies/kent-county_council/" target="_blank" rel="noreferrer">
                   Read Full Case Study
@@ -512,7 +512,7 @@ export default function CaseStudies() {
           </Card>
 
           {/* Kings College Hospital Foundation Case Study */}
-          <Card>
+          <Card className="flex flex-col">
             <div className="h-48 overflow-hidden">
               <img
                 src={kingsCollegeImage}
@@ -521,15 +521,15 @@ export default function CaseStudies() {
               />
             </div>
             <CardHeader>
-              <CardTitle>Kings College Hospital Foundation</CardTitle>
+              <CardTitle className="min-h-[3.5rem] flex items-start">Kings College Hospital Foundation</CardTitle>
               <CardDescription>Healthcare Foundation</CardDescription>
             </CardHeader>
-            <CardContent>
-              <p className="text-neutral-700 mb-4">
+            <CardContent className="flex-grow">
+              <p className="text-neutral-700">
                 Kings College Hospital Foundation integrated remanufactured technology to support their healthcare mission whilst reducing environmental impact.
               </p>
             </CardContent>
-            <CardFooter>
+            <CardFooter className="mt-auto">
               <Button variant="outline" className="w-full" asChild>
                 <a href="https://circularcomputing.com/case-studies/kings-college-hospital-foundation/" target="_blank" rel="noreferrer">
                   Read Full Case Study
@@ -539,7 +539,7 @@ export default function CaseStudies() {
           </Card>
 
           {/* Balfour Beatty Case Study */}
-          <Card>
+          <Card className="flex flex-col">
             <div className="h-48 overflow-hidden">
               <img
                 src={balfourBeattyImage}
@@ -548,15 +548,15 @@ export default function CaseStudies() {
               />
             </div>
             <CardHeader>
-              <CardTitle>Balfour Beatty</CardTitle>
+              <CardTitle className="min-h-[3.5rem] flex items-start">Balfour Beatty</CardTitle>
               <CardDescription>Construction & Infrastructure</CardDescription>
             </CardHeader>
-            <CardContent>
-              <p className="text-neutral-700 mb-4">
+            <CardContent className="flex-grow">
+              <p className="text-neutral-700">
                 Balfour Beatty chose remanufactured technology solutions to align with their sustainability goals and reduce environmental impact across their operations.
               </p>
             </CardContent>
-            <CardFooter>
+            <CardFooter className="mt-auto">
               <Button variant="outline" className="w-full" asChild>
                 <a href="https://circularcomputing.com/case-studies/balfour-beatty/" target="_blank" rel="noreferrer">
                   Read Full Case Study
