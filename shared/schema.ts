@@ -250,7 +250,7 @@ export const remanufacturedTips = pgTable("remanufactured_tips", {
   displayOrder: integer("display_order").notNull().default(0), // For sorting
   isActive: boolean("is_active").notNull().default(true),
   createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()),
 });
 
 export const insertRemanufacturedTipSchema = createInsertSchema(remanufacturedTips).omit({

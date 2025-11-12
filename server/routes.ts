@@ -13,6 +13,7 @@ import {
   insertCaseStudySchema,
   insertDeliveryTimelineSchema,
   insertWaterProjectSchema,
+  insertRemanufacturedTipSchema,
   insertAchievementSchema,
   insertMilestoneSchema,
   insertUserProgressSchema,
@@ -1269,6 +1270,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Remanufactured tips routes (public)
+  app.get("/api/remanufactured-tips", async (req, res) => {
+    try {
+      const tips = await storage.getRemanufacturedTips();
+      res.json(tips);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.get("/api/remanufactured-tips/:id", async (req, res) => {
+    try {
+      const tipId = parseInt(req.params.id);
+      const tip = await storage.getRemanufacturedTip(tipId);
+      
+      if (!tip) {
+        return res.status(404).json({ message: "Tip not found" });
+      }
+      
+      res.json(tip);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Support ticket routes
   app.get("/api/support-tickets", isAuthenticated, async (req, res) => {
     try {
@@ -1823,6 +1849,62 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete("/api/crud/water-projects/:id", requireAdmin, async (req, res) => {
     try {
       await storage.deleteWaterProject(parseInt(req.params.id));
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Remanufactured Tips API
+  app.get("/api/crud/remanufactured-tips", requireAdmin, async (req, res) => {
+    try {
+      const tips = await storage.getAllRemanufacturedTips();
+      res.json(tips);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.get("/api/crud/remanufactured-tips/:id", requireAdmin, async (req, res) => {
+    try {
+      const tip = await storage.getRemanufacturedTip(parseInt(req.params.id));
+      if (!tip) {
+        return res.status(404).json({ message: "Remanufactured tip not found" });
+      }
+      res.json(tip);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/crud/remanufactured-tips", requireAdmin, async (req, res) => {
+    try {
+      const validated = insertRemanufacturedTipSchema.parse(req.body);
+      const tip = await storage.createRemanufacturedTip(validated);
+      res.status(201).json(tip);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.patch("/api/crud/remanufactured-tips/:id", requireAdmin, async (req, res) => {
+    try {
+      const tip = await storage.updateRemanufacturedTip(parseInt(req.params.id), req.body);
+      if (!tip) {
+        return res.status(404).json({ message: "Remanufactured tip not found" });
+      }
+      res.json(tip);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.delete("/api/crud/remanufactured-tips/:id", requireAdmin, async (req, res) => {
+    try {
+      await storage.deleteRemanufacturedTip(parseInt(req.params.id));
       res.status(204).send();
     } catch (error) {
       res.status(500).json({ message: "Internal server error" });

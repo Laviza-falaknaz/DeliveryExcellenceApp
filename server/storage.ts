@@ -113,6 +113,7 @@ export interface IStorage {
 
   // Remanufactured tips operations
   getRemanufacturedTips(): Promise<RemanufacturedTip[]>;
+  getAllRemanufacturedTips(): Promise<RemanufacturedTip[]>;
   getRemanufacturedTip(id: number): Promise<RemanufacturedTip | undefined>;
   createRemanufacturedTip(tip: InsertRemanufacturedTip): Promise<RemanufacturedTip>;
   updateRemanufacturedTip(id: number, data: Partial<RemanufacturedTip>): Promise<RemanufacturedTip | undefined>;
@@ -760,7 +761,11 @@ export class DatabaseStorage implements IStorage {
 
   // Remanufactured tips operations
   async getRemanufacturedTips(): Promise<RemanufacturedTip[]> {
-    return db.select().from(remanufacturedTips).where(eq(remanufacturedTips.isActive, true)).orderBy(remanufacturedTips.displayOrder);
+    return db.select().from(remanufacturedTips).where(eq(remanufacturedTips.isActive, true)).orderBy(remanufacturedTips.displayOrder, remanufacturedTips.createdAt);
+  }
+
+  async getAllRemanufacturedTips(): Promise<RemanufacturedTip[]> {
+    return db.select().from(remanufacturedTips).orderBy(remanufacturedTips.displayOrder, remanufacturedTips.createdAt);
   }
 
   async getRemanufacturedTip(id: number): Promise<RemanufacturedTip | undefined> {
