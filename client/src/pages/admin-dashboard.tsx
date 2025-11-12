@@ -1,13 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Users, ShoppingCart, Wrench, HelpCircle, Droplets, FileText, Palette, Database, Trophy, Key, Settings, Leaf, BarChart3, Target, Settings2, Sparkles } from "lucide-react";
+import { Users, ShoppingCart, Wrench, HelpCircle, Droplets, FileText, Palette, Database, Trophy, Key, Settings, Leaf, BarChart3, Target, Settings2, Sparkles, Lightbulb } from "lucide-react";
 import { UserManagement } from "./admin/user-management";
 import { OrderManagement } from "./admin/order-management";
 import { RMAManagement } from "./admin/rma-management";
 import { SupportTicketManagement } from "./admin/support-ticket-management";
 import { WaterProjectManagement } from "./admin/water-project-management";
 import { CaseStudyManagement } from "./admin/case-study-management";
+import { RemanufacturedTipsManagement } from "./admin/remanufactured-tips-management";
 import { ThemeSettings } from "./admin/theme-settings";
 import { ConnectionSettings } from "./admin/connection-settings";
 import GamificationManagement from "./admin/gamification-management";
@@ -32,6 +33,7 @@ const ALL_TABS = [
   { id: "tickets", label: "Tickets", icon: HelpCircle, component: SupportTicketManagement },
   { id: "water-projects", label: "Water Projects", icon: Droplets, component: WaterProjectManagement },
   { id: "case-studies", label: "Case Studies", icon: FileText, component: CaseStudyManagement },
+  { id: "remanufactured-tips", label: "Remanufactured Tips", icon: Lightbulb, component: RemanufacturedTipsManagement },
   { id: "gamification", label: "Gamification", icon: Trophy, component: GamificationManagement },
   { id: "api-keys", label: "API Keys", icon: Key, component: ApiKeyManagement },
   { id: "sustainability", label: "Sustainability", icon: Leaf, component: SustainabilitySettings },

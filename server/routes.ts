@@ -2199,7 +2199,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Default settings if none exist
       const defaultSettings = {
-        visibleTabs: ['users', 'orders', 'rmas', 'tickets', 'water-projects', 'case-studies', 'gamification', 'api-keys', 'sustainability', 'key-insights', 'esg-targets', 'theme', 'connection'],
+        visibleTabs: ['users', 'orders', 'rmas', 'tickets', 'water-projects', 'case-studies', 'remanufactured-tips', 'gamification', 'api-keys', 'sustainability', 'key-insights', 'esg-targets', 'theme', 'connection'],
         rmaNotificationEmails: [],
         newUserAlertEmails: [],
         supportPhoneNumber: '+971581317591',
