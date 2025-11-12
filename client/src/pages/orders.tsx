@@ -306,7 +306,7 @@ export default function Orders() {
                     Expected Shipping Date ↓
                   </TableHead>
                   <TableHead className="text-center font-medium text-neutral-600 py-4 px-6">
-                    Actions
+                    View Order
                   </TableHead>
                 </TableRow>
               </TableHeader>
@@ -357,7 +357,11 @@ export default function Orders() {
                           {(order as any).timelineDate ? formatUKDate((order as any).timelineDate) : (order.orderDate ? formatUKDate(order.orderDate) : 'N/A')}
                         </TableCell>
                         <TableCell className="py-4 px-6 text-sm">
-                          <span className="text-primary font-medium cursor-pointer hover:underline">
+                          <span 
+                            className="text-primary font-medium cursor-pointer hover:underline"
+                            onClick={() => handleViewOrderDetails(order)}
+                            data-testid={`link-order-${order.id}`}
+                          >
                             {order.orderNumber}
                           </span>
                         </TableCell>
