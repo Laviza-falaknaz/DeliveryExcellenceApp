@@ -165,14 +165,27 @@ export default function WarrantyClaim() {
       // Map basket data to products array
       const products = basketData.map(device => ({
         productMakeModel: device.productName || "",
-        manufacturerSerialNumber: device.serialNumber || "",
-        inHouseSerialNumber: "",
+        manufacturerSerialNumber: device.manufacturerSerialNumber || "",
+        inHouseSerialNumber: device.inhouseSerialNumber || "",
         faultDescription: "",
         isAutoFilled: false,
         isCrmMiss: false,
       }));
       
       form.setValue('products', products);
+      
+      // Trigger autofill for each product with a delay to avoid rate limiting
+      const triggerAutofills = async () => {
+        for (let i = 0; i < products.length; i++) {
+          if (products[i].manufacturerSerialNumber || products[i].inHouseSerialNumber) {
+            // Add delay between requests to avoid rate limiting
+            await new Promise(resolve => setTimeout(resolve, i * 1000)); // 1 second delay between each request
+            await handleAutofill(i);
+          }
+        }
+      };
+      
+      triggerAutofills();
     }
   }, [basketData, form]);
   

@@ -135,7 +135,8 @@ export default function Warranty() {
     
     // Prepare basket data for transfer to warranty-claim page
     const basketData = rmaBasket.map(device => ({
-      serialNumber: device.serialNumber,
+      manufacturerSerialNumber: device.manufacturerSerialNumber || '',
+      inhouseSerialNumber: device.serialNumber || '',
       productName: device.productName,
       warrantyStatus: device.warrantyStatus
     }));
@@ -282,6 +283,7 @@ export default function Warranty() {
         // Map API response to UI format
         setWarrantyInfo({
           serialNumber: result.warranty.serialNumber,
+          manufacturerSerialNumber: result.warranty.manufacturerSerialNumber,
           productName: result.warranty.productDescription,
           purchaseDate: result.warranty.startDate,
           warrantyEnd: result.warranty.endDate,
