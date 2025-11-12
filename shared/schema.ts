@@ -356,6 +356,7 @@ export const systemSettings = pgTable("system_settings", {
     eWasteReductionPercentage?: number; // percentage (e.g., 0 for 0%)
     familiesHelpedPerLaptop?: number; // number of families (e.g., 1)
     treesEquivalentPerLaptop?: number; // number of trees equivalent
+    powerAutomateSerialLookupUrl?: string; // Power Automate URL for serial number lookup
   }>(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

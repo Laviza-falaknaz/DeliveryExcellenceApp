@@ -97,6 +97,26 @@ export async function seedDatabase() {
       console.log("✅ Password webhook setting created");
     }
 
+    // Check if Power Automate serial lookup URL setting exists
+    const existingSerialLookupSetting = await db
+      .select()
+      .from(systemSettings)
+      .where(eq(systemSettings.settingKey, 'serial_lookup'))
+      .limit(1);
+    
+    if (existingSerialLookupSetting.length === 0) {
+      console.log("Creating serial lookup setting...");
+      
+      await db.insert(systemSettings).values({
+        settingKey: 'serial_lookup',
+        settingValue: {
+          powerAutomateSerialLookupUrl: 'https://01f7d87362b64cf3a95fbd0a0c6bc1.28.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/1cb5b4bb76f44fa594528ecc2a799812/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=IWxO9ZCrNZUx9a_InGB4zoR7rNcyETORigbC51XVv04'
+        },
+      });
+      
+      console.log("✅ Serial lookup setting created");
+    }
+
     // Check if sustainability metrics setting exists
     const existingSustainabilitySetting = await db
       .select()

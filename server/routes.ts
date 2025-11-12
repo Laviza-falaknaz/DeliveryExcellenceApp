@@ -2160,6 +2160,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get serial lookup settings (accessible to all authenticated users for RMA form)
+  app.get("/api/settings/serial_lookup", isAuthenticated, async (req, res) => {
+    try {
+      const setting = await storage.getSystemSetting('serial_lookup');
+      
+      // Return empty if no setting found
+      if (!setting) {
+        return res.json({ settingValue: {} });
+      }
+      
+      res.json(setting);
+    } catch (error) {
+      console.error("Error fetching serial lookup settings:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Admin User Management
   app.get("/api/admin/users", requireAdmin, async (req, res) => {
     try {

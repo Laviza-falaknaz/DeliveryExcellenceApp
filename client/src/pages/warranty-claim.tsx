@@ -11,16 +11,28 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Upload, FileText, X, Camera, QrCode, AlertTriangle, Plus, Trash2 } from "lucide-react";
+import { Upload, FileText, X, Camera, QrCode, AlertTriangle, Plus, Trash2, Search, CheckCircle2, Loader2, AlertCircle } from "lucide-react";
 import { BrowserMultiFormatReader, NotFoundException } from "@zxing/library";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
+import * as XLSX from 'xlsx';
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
+// Product schema - updated to make serial numbers conditionally required
 const productSchema = z.object({
-  productMakeModel: z.string().min(1, "Product make and model is required"),
-  manufacturerSerialNumber: z.string().min(1, "Manufacturer serial number is required"),
-  inHouseSerialNumber: z.string().min(1, "In-house serial number is required"),
+  productMakeModel: z.string().optional(),
+  manufacturerSerialNumber: z.string().optional(),
+  inHouseSerialNumber: z.string().optional(),
   faultDescription: z.string().min(10, "Fault description must be at least 10 characters"),
+  isAutoFilled: z.boolean().optional().default(false),
+  isCrmMiss: z.boolean().optional().default(false),
+}).refine((data) => {
+  // At least one serial number must be provided
+  return (data.manufacturerSerialNumber && data.manufacturerSerialNumber.trim() !== '') || 
+         (data.inHouseSerialNumber && data.inHouseSerialNumber.trim() !== '');
+}, {
+  message: "At least one serial number (Manufacturer or In-house) must be provided",
+  path: ["manufacturerSerialNumber"], // Show error on manufacturer field
 });
 
 const warrantyClaimSchema = z.object({
@@ -40,6 +52,12 @@ const warrantyClaimSchema = z.object({
 
 type WarrantyClaimFormValues = z.infer<typeof warrantyClaimSchema>;
 
+interface AutofillResponse {
+  manufacturerSerialNumber: string;
+  inhouseSerialNumber: string;
+  ProductDescription: string;
+}
+
 export default function WarrantyClaim() {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -51,6 +69,8 @@ export default function WarrantyClaim() {
   const [showEmailChangeDialog, setShowEmailChangeDialog] = useState(false);
   const [emailChangeDecision, setEmailChangeDecision] = useState<'track' | 'new' | null>(null);
   const [pendingSubmitData, setPendingSubmitData] = useState<WarrantyClaimFormValues | null>(null);
+  const [autofillLoadingStates, setAutofillLoadingStates] = useState<Record<number, boolean>>({});
+  const [crmMissProducts, setCrmMissProducts] = useState<Set<number>>(new Set());
   
   // Fetch current user data
   const { data: currentUser } = useQuery<{
@@ -61,6 +81,15 @@ export default function WarrantyClaim() {
     phoneNumber?: string;
   }>({
     queryKey: ["/api/auth/me"],
+  });
+
+  // Fetch serial lookup settings
+  const { data: serialLookupSettings } = useQuery<{
+    settingValue: {
+      powerAutomateSerialLookupUrl?: string;
+    };
+  }>({
+    queryKey: ["/api/settings/serial_lookup"],
   });
   
   // Parse basket data from URL params
@@ -111,6 +140,8 @@ export default function WarrantyClaim() {
         manufacturerSerialNumber: "",
         inHouseSerialNumber: "",
         faultDescription: "",
+        isAutoFilled: false,
+        isCrmMiss: false,
       }],
       consent: false,
     },
@@ -135,8 +166,10 @@ export default function WarrantyClaim() {
       const products = basketData.map(device => ({
         productMakeModel: device.productName || "",
         manufacturerSerialNumber: device.serialNumber || "",
-        inHouseSerialNumber: "", // Will need to be filled by user
-        faultDescription: "", // Will need to be filled by user
+        inHouseSerialNumber: "",
+        faultDescription: "",
+        isAutoFilled: false,
+        isCrmMiss: false,
       }));
       
       form.setValue('products', products);
@@ -212,6 +245,8 @@ export default function WarrantyClaim() {
               title: "Serial Number Scanned",
               description: `Serial number captured: ${serialNumber}`,
             });
+            // Trigger autofill after scanning
+            handleAutofill(productIndex);
           } else {
             toast({
               title: "Invalid Code",
@@ -246,6 +281,193 @@ export default function WarrantyClaim() {
     stopScanner();
     setIsScannerOpen(false);
     setScannerError(null);
+  };
+
+  // Autofill functionality
+  const handleAutofill = async (productIndex: number) => {
+    const product = form.getValues(`products.${productIndex}`);
+    const lookupUrl = serialLookupSettings?.settingValue?.powerAutomateSerialLookupUrl;
+
+    if (!lookupUrl) {
+      toast({
+        title: "Configuration Error",
+        description: "Serial lookup API URL is not configured. Please contact your administrator.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Check if at least one serial number is provided
+    if (!product.manufacturerSerialNumber && !product.inHouseSerialNumber) {
+      toast({
+        title: "Missing Serial Number",
+        description: "Please enter at least one serial number to lookup product information.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setAutofillLoadingStates(prev => ({ ...prev, [productIndex]: true }));
+
+    try {
+      const payload = {
+        manufacturerSerialNumber: product.manufacturerSerialNumber || "not required",
+        inhouseSerialNumber: product.inHouseSerialNumber || "not required",
+      };
+
+      const response = await fetch(lookupUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to lookup serial number');
+      }
+
+      const data: AutofillResponse = await response.json();
+
+      // Check if product was found
+      if (!data.ProductDescription || data.ProductDescription === "") {
+        // CRM miss - mark as such and allow manual entry
+        setCrmMissProducts(prev => new Set(prev).add(productIndex));
+        form.setValue(`products.${productIndex}.isCrmMiss`, true);
+        
+        toast({
+          title: "Product Not Found in CRM",
+          description: "This unit is not present in our system. You can still continue by manually entering the product details.",
+          variant: "destructive",
+        });
+      } else {
+        // Success - populate fields
+        if (data.manufacturerSerialNumber && !product.manufacturerSerialNumber) {
+          form.setValue(`products.${productIndex}.manufacturerSerialNumber`, data.manufacturerSerialNumber);
+        }
+        if (data.inhouseSerialNumber && !product.inHouseSerialNumber) {
+          form.setValue(`products.${productIndex}.inHouseSerialNumber`, data.inhouseSerialNumber);
+        }
+        if (data.ProductDescription) {
+          form.setValue(`products.${productIndex}.productMakeModel`, data.ProductDescription);
+        }
+        
+        form.setValue(`products.${productIndex}.isAutoFilled`, true);
+        form.setValue(`products.${productIndex}.isCrmMiss`, false);
+        setCrmMissProducts(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(productIndex);
+          return newSet;
+        });
+
+        toast({
+          title: "Product Information Retrieved",
+          description: "Product details have been automatically filled.",
+        });
+      }
+    } catch (error) {
+      console.error('Autofill error:', error);
+      toast({
+        title: "Lookup Failed",
+        description: "Unable to retrieve product information. Please enter details manually.",
+        variant: "destructive",
+      });
+      
+      // Mark as CRM miss on error
+      setCrmMissProducts(prev => new Set(prev).add(productIndex));
+      form.setValue(`products.${productIndex}.isCrmMiss`, true);
+    } finally {
+      setAutofillLoadingStates(prev => ({ ...prev, [productIndex]: false }));
+    }
+  };
+
+  // Handle Enter key for autofill
+  const handleSerialKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, productIndex: number) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleAutofill(productIndex);
+    }
+  };
+
+  // Handle Excel upload and parsing
+  const handleExcelUpload = async (file: File) => {
+    try {
+      const data = await file.arrayBuffer();
+      const workbook = XLSX.read(data, { type: 'array' });
+      const sheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[sheetName];
+      const jsonData: any[] = XLSX.utils.sheet_to_json(worksheet);
+
+      if (jsonData.length === 0) {
+        toast({
+          title: "Empty File",
+          description: "The uploaded Excel file contains no data.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Map Excel columns to product fields
+      const products = jsonData.map((row: any) => ({
+        manufacturerSerialNumber: row['Manufacturer Serial'] || row['ManufacturerSerial'] || row['Manufacturer Serial Number'] || "",
+        inHouseSerialNumber: row['Inhouse Serial'] || row['InhouseSerial'] || row['In-house Serial Number'] || "",
+        productMakeModel: row['Product'] || row['ProductDescription'] || row['Product Make and Model'] || "",
+        faultDescription: row['Fault'] || row['FaultDescription'] || row['Issue'] || "",
+        isAutoFilled: false,
+        isCrmMiss: false,
+      }));
+
+      form.setValue('products', products);
+
+      toast({
+        title: "Excel Data Loaded",
+        description: `${products.length} product(s) loaded from Excel. Fetching product details...`,
+      });
+
+      // Trigger autofill for each product with a delay to avoid rate limiting
+      for (let i = 0; i < products.length; i++) {
+        if (products[i].manufacturerSerialNumber || products[i].inHouseSerialNumber) {
+          // Add delay between requests to avoid rate limiting
+          await new Promise(resolve => setTimeout(resolve, i * 1000)); // 1 second delay between each request
+          await handleAutofill(i);
+        }
+      }
+    } catch (error) {
+      console.error('Excel parsing error:', error);
+      toast({
+        title: "Excel Parsing Failed",
+        description: "Unable to parse the Excel file. Please check the file format.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      // Check if file is CSV or Excel
+      const allowedTypes = [
+        'text/csv',
+        'application/vnd.ms-excel',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      ];
+      
+      if (allowedTypes.includes(file.type) || file.name.endsWith('.csv') || file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) {
+        setUploadedFile(file);
+        // Process Excel file for autofill
+        handleExcelUpload(file);
+      } else {
+        toast({
+          title: "Invalid File Type",
+          description: "Please upload a CSV or Excel file only.",
+          variant: "destructive",
+        });
+      }
+    }
+  };
+
+  const removeFile = () => {
+    setUploadedFile(null);
   };
 
   async function onSubmit(data: WarrantyClaimFormValues) {
@@ -288,6 +510,7 @@ export default function WarrantyClaim() {
       setUploadedFile(null);
       setEmailChangeDecision(null);
       setPendingSubmitData(null);
+      setCrmMissProducts(new Set());
       
     } catch (error) {
       toast({
@@ -307,36 +530,6 @@ export default function WarrantyClaim() {
     if (pendingSubmitData) {
       submitRMA(pendingSubmitData);
     }
-  };
-
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      // Check if file is CSV or Excel
-      const allowedTypes = [
-        'text/csv',
-        'application/vnd.ms-excel',
-        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-      ];
-      
-      if (allowedTypes.includes(file.type) || file.name.endsWith('.csv') || file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) {
-        setUploadedFile(file);
-        toast({
-          title: "File Uploaded",
-          description: `${file.name} has been uploaded successfully.`,
-        });
-      } else {
-        toast({
-          title: "Invalid File Type",
-          description: "Please upload a CSV or Excel file only.",
-          variant: "destructive",
-        });
-      }
-    }
-  };
-
-  const removeFile = () => {
-    setUploadedFile(null);
   };
 
   return (
@@ -506,35 +699,81 @@ export default function WarrantyClaim() {
                 </div>
               </div>
 
+              {/* File Upload - Placed before products for Excel import */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium text-neutral-900">Upload Product List (Optional)</h3>
+                <p className="text-sm text-neutral-600">Upload an Excel file with product details to auto-populate the form. The file should include columns for Manufacturer Serial, Inhouse Serial, Product Description, and Fault Description.</p>
+                
+                <div className="border-2 border-dashed border-neutral-300 rounded-lg p-6 text-center">
+                  {uploadedFile ? (
+                    <div className="flex items-center justify-between bg-neutral-50 p-3 rounded-md">
+                      <div className="flex items-center">
+                        <FileText className="w-5 h-5 text-primary mr-2" />
+                        <span className="text-sm font-medium">{uploadedFile.name}</span>
+                        <span className="text-xs text-neutral-500 ml-2">
+                          ({(uploadedFile.size / 1024).toFixed(1)} KB)
+                        </span>
+                      </div>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={removeFile}
+                        className="text-red-500 hover:text-red-700"
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <div>
+                      <Upload className="mx-auto h-12 w-12 text-neutral-400 mb-4" />
+                      <div className="mb-4">
+                        <p className="text-sm font-medium text-neutral-900">Upload CSV or Excel spreadsheet</p>
+                        <p className="text-xs text-neutral-500">Products will be automatically populated and looked up in the system</p>
+                      </div>
+                      <input
+                        type="file"
+                        id="file-upload"
+                        className="hidden"
+                        accept=".csv,.xlsx,.xls"
+                        onChange={handleFileUpload}
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => document.getElementById('file-upload')?.click()}
+                        className="bg-[#08ABAB] border-[#08ABAB] text-white hover:bg-[#FF9E1C] hover:text-black hover:border-[#FF9E1C] transition-colors"
+                      >
+                        Choose File
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </div>
+
               {/* Product Information */}
               <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-medium text-neutral-900">Products</h3>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      const currentProducts = form.getValues('products');
-                      form.setValue('products', [...currentProducts, {
-                        productMakeModel: "",
-                        manufacturerSerialNumber: "",
-                        inHouseSerialNumber: "",
-                        faultDescription: "",
-                      }]);
-                    }}
-                    data-testid="button-add-product"
-                  >
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add Product
-                  </Button>
-                </div>
+                <h3 className="text-lg font-medium text-neutral-900">Products</h3>
                 
-                {form.watch('products').map((_, index) => (
-                  <Card key={index} className="p-4">
+                {form.watch('products').map((product, index) => (
+                  <Card key={index} className={`p-4 ${crmMissProducts.has(index) ? 'border-amber-500 border-2' : ''}`}>
                     <div className="space-y-4">
                       <div className="flex items-center justify-between mb-2">
-                        <h4 className="text-sm font-semibold text-neutral-700">Product {index + 1}</h4>
+                        <h4 className="text-sm font-semibold text-neutral-700 flex items-center gap-2">
+                          Product {index + 1}
+                          {product.isAutoFilled && !product.isCrmMiss && (
+                            <span className="inline-flex items-center gap-1 text-xs text-green-600">
+                              <CheckCircle2 className="h-3 w-3" />
+                              Auto-filled
+                            </span>
+                          )}
+                          {product.isCrmMiss && (
+                            <span className="inline-flex items-center gap-1 text-xs text-amber-600">
+                              <AlertCircle className="h-3 w-3" />
+                              Not in CRM
+                            </span>
+                          )}
+                        </h4>
                         {form.watch('products').length > 1 && (
                           <Button
                             type="button"
@@ -543,6 +782,12 @@ export default function WarrantyClaim() {
                             onClick={() => {
                               const currentProducts = form.getValues('products');
                               form.setValue('products', currentProducts.filter((_, i) => i !== index));
+                              // Update CRM miss tracking
+                              setCrmMissProducts(prev => {
+                                const newSet = new Set(prev);
+                                newSet.delete(index);
+                                return newSet;
+                              });
                             }}
                             data-testid={`button-remove-product-${index}`}
                             className="text-red-600 hover:text-red-700"
@@ -552,19 +797,14 @@ export default function WarrantyClaim() {
                         )}
                       </div>
 
-                      <FormField
-                        control={form.control}
-                        name={`products.${index}.productMakeModel`}
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Product Make and Model *</FormLabel>
-                            <FormControl>
-                              <Input placeholder="e.g. HP 840 G7" {...field} data-testid={`input-product-model-${index}`} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                      {crmMissProducts.has(index) && (
+                        <Alert className="bg-amber-50 border-amber-200">
+                          <AlertCircle className="h-4 w-4 text-amber-600" />
+                          <AlertDescription className="text-amber-800">
+                            This product was not found in our CRM system. You can still continue by manually entering the product details.
+                          </AlertDescription>
+                        </Alert>
+                      )}
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <FormField
@@ -572,10 +812,15 @@ export default function WarrantyClaim() {
                           name={`products.${index}.manufacturerSerialNumber`}
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Manufacturer's Serial Number *</FormLabel>
+                              <FormLabel>Manufacturer's Serial Number</FormLabel>
                               <div className="flex gap-2">
                                 <FormControl>
-                                  <Input placeholder="e.g. SN12345678" {...field} data-testid={`input-manufacturer-serial-${index}`} />
+                                  <Input 
+                                    placeholder="e.g. SN12345678" 
+                                    {...field} 
+                                    data-testid={`input-manufacturer-serial-${index}`}
+                                    onKeyDown={(e) => handleSerialKeyDown(e, index)}
+                                  />
                                 </FormControl>
                                 <Button
                                   type="button"
@@ -590,6 +835,21 @@ export default function WarrantyClaim() {
                                 >
                                   <QrCode className="h-4 w-4" />
                                 </Button>
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  size="icon"
+                                  className="shrink-0"
+                                  onClick={() => handleAutofill(index)}
+                                  disabled={autofillLoadingStates[index]}
+                                  data-testid={`button-search-manufacturer-${index}`}
+                                >
+                                  {autofillLoadingStates[index] ? (
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                  ) : (
+                                    <Search className="h-4 w-4" />
+                                  )}
+                                </Button>
                               </div>
                               <FormMessage />
                             </FormItem>
@@ -601,15 +861,59 @@ export default function WarrantyClaim() {
                           name={`products.${index}.inHouseSerialNumber`}
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>In-house Serial Number *</FormLabel>
-                              <FormControl>
-                                <Input placeholder="e.g. 1HP840G7I516256W11" {...field} data-testid={`input-inhouse-serial-${index}`} />
-                              </FormControl>
+                              <FormLabel>In-house Serial Number</FormLabel>
+                              <div className="flex gap-2">
+                                <FormControl>
+                                  <Input 
+                                    placeholder="e.g. 1HP840G7I516256W11" 
+                                    {...field} 
+                                    data-testid={`input-inhouse-serial-${index}`}
+                                    onKeyDown={(e) => handleSerialKeyDown(e, index)}
+                                  />
+                                </FormControl>
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  size="icon"
+                                  className="shrink-0"
+                                  onClick={() => handleAutofill(index)}
+                                  disabled={autofillLoadingStates[index]}
+                                  data-testid={`button-search-inhouse-${index}`}
+                                >
+                                  {autofillLoadingStates[index] ? (
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                  ) : (
+                                    <Search className="h-4 w-4" />
+                                  )}
+                                </Button>
+                              </div>
                               <FormMessage />
                             </FormItem>
                           )}
                         />
                       </div>
+
+                      <FormField
+                        control={form.control}
+                        name={`products.${index}.productMakeModel`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>
+                              Product Make and Model
+                              {!product.isCrmMiss && <span className="text-red-500 ml-1">*</span>}
+                            </FormLabel>
+                            <FormControl>
+                              <Input 
+                                placeholder="e.g. HP 840 G7" 
+                                {...field} 
+                                data-testid={`input-product-model-${index}`}
+                                disabled={autofillLoadingStates[index]}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
 
                       <FormField
                         control={form.control}
@@ -632,6 +936,29 @@ export default function WarrantyClaim() {
                     </div>
                   </Card>
                 ))}
+
+                {/* Add Product Button - Moved below product cards */}
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    const currentProducts = form.getValues('products');
+                    form.setValue('products', [...currentProducts, {
+                      productMakeModel: "",
+                      manufacturerSerialNumber: "",
+                      inHouseSerialNumber: "",
+                      faultDescription: "",
+                      isAutoFilled: false,
+                      isCrmMiss: false,
+                    }]);
+                  }}
+                  data-testid="button-add-product"
+                  className="w-full"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Product
+                </Button>
 
                 {/* QR Scanner Dialog */}
                 <Dialog open={isScannerOpen} onOpenChange={setIsScannerOpen}>
@@ -681,57 +1008,6 @@ export default function WarrantyClaim() {
                     </div>
                   </DialogContent>
                 </Dialog>
-              </div>
-
-              {/* File Upload */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-medium text-neutral-900">Additional Documentation</h3>
-                
-                <div className="border-2 border-dashed border-neutral-300 rounded-lg p-6 text-center">
-                  {uploadedFile ? (
-                    <div className="flex items-center justify-between bg-neutral-50 p-3 rounded-md">
-                      <div className="flex items-center">
-                        <FileText className="w-5 h-5 text-primary mr-2" />
-                        <span className="text-sm font-medium">{uploadedFile.name}</span>
-                        <span className="text-xs text-neutral-500 ml-2">
-                          ({(uploadedFile.size / 1024).toFixed(1)} KB)
-                        </span>
-                      </div>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={removeFile}
-                        className="text-red-500 hover:text-red-700"
-                      >
-                        <X className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  ) : (
-                    <div>
-                      <Upload className="mx-auto h-12 w-12 text-neutral-400 mb-4" />
-                      <div className="mb-4">
-                        <p className="text-sm font-medium text-neutral-900">Upload CSV or Excel spreadsheet</p>
-                        <p className="text-xs text-neutral-500">Optional: Upload additional product information or documentation</p>
-                      </div>
-                      <input
-                        type="file"
-                        id="file-upload"
-                        className="hidden"
-                        accept=".csv,.xlsx,.xls"
-                        onChange={handleFileUpload}
-                      />
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={() => document.getElementById('file-upload')?.click()}
-                        className="bg-[#08ABAB] border-[#08ABAB] text-white hover:bg-[#FF9E1C] hover:text-black hover:border-[#FF9E1C] transition-colors"
-                      >
-                        Choose File
-                      </Button>
-                    </div>
-                  )}
-                </div>
               </div>
 
               {/* Consent */}
