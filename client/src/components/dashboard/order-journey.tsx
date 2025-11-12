@@ -733,21 +733,21 @@ export default function OrderJourney({ timeline, environmentalImpact }: OrderJou
     {
       id: "sentToWarehouse",
       label: "Sent to Warehouse",
-      subtitle: "Processing at our eco-fulfillment center",
+      subtitle: "Processed at our world-leading facility",
       date: timeline?.sentToWarehouse || null,
       position: 1
     },
     {
       id: "dispatched",
       label: "Dispatched",
-      subtitle: "Your device is on its way",
+      subtitle: "Your order is on its way",
       date: timeline?.dispatchDate || null,
       position: 2
     },
     {
       id: "invoiceSent",
       label: "Invoice Sent",
-      subtitle: "Digital invoice delivered to your inbox",
+      subtitle: "Invoice delivered to your inbox",
       date: timeline?.invoiceMailed || null,
       position: 3
     },
@@ -761,7 +761,7 @@ export default function OrderJourney({ timeline, environmentalImpact }: OrderJou
     {
       id: "fulfilled",
       label: "Fulfilled",
-      subtitle: "Your sustainable laptop is ready!",
+      subtitle: "Your sustainable laptops are ready!",
       date: timeline?.dateFulfilled || null,
       position: 5
     }
@@ -856,9 +856,9 @@ export default function OrderJourney({ timeline, environmentalImpact }: OrderJou
           animate={{ opacity: 1, y: 0 }}
           className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 bg-clip-text text-transparent mb-2 drop-shadow-sm"
         >
-          Your Sustainable Journey
+          Your Sustainable IT Journey
         </motion.h2>
-        <p className="text-neutral-700 text-sm md:text-base font-medium">Eco-luxury delivery in progress</p>
+        <p className="text-neutral-700 text-sm md:text-base font-medium">Delivery timeline at a glance</p>
       </div>
 
       {/* Enhanced Progress Path */}
@@ -1072,9 +1072,9 @@ export default function OrderJourney({ timeline, environmentalImpact }: OrderJou
                   🎉
                 </motion.div>
                 
-                <h3 className="text-4xl font-bold text-white mb-4">Eco-Mission Complete!</h3>
+                <h3 className="text-4xl font-bold text-white mb-4">Sustainable IT Order Complete!</h3>
                 <p className="text-xl text-white/90 mb-8 flex items-center justify-center gap-2">
-                  Your order is ready <Leaf className="w-6 h-6" /> <Sparkles className="w-6 h-6" />
+                  Your order has been fulfilled – Enjoy <Leaf className="w-6 h-6" /> <Sparkles className="w-6 h-6" />
                 </p>
 
                 {environmentalImpact && (

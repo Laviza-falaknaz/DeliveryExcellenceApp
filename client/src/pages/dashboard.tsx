@@ -253,7 +253,7 @@ export default function Dashboard() {
             data-testid="button-shoot-rocket"
           >
             <Rocket className="mr-2 h-5 w-5" />
-            {recalculateMutation.isPending ? "Launching..." : "Shoot the Rocket"}
+            {recalculateMutation.isPending ? "Charging..." : "Power up the EV"}
           </Button>
         </div>
 
