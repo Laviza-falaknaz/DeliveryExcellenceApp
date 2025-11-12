@@ -580,6 +580,81 @@ export default function Dashboard() {
                 )}
               </CardContent>
             </Card>
+          </div>
+
+          {/* Right Column - 1/3 width */}
+          <div className="space-y-4">
+            
+            {/* Quick Actions */}
+            <Card className="shadow-md border-0">
+              <CardHeader className="border-b bg-gray-50 pb-2 pt-2">
+                <CardTitle className="text-base font-semibold text-gray-900">Quick Actions</CardTitle>
+              </CardHeader>
+              <CardContent className="p-3 space-y-2">
+                <Button 
+                  className="w-full justify-start bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white text-sm h-9 shadow-sm"
+                  onClick={() => setLocation('/orders')}
+                  data-testid="button-track-order"
+                >
+                  <Package className="h-4 w-4 mr-2" />
+                  Track Order
+                </Button>
+                
+                <Button 
+                  className="w-full justify-start bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white text-sm h-9 shadow-sm"
+                  onClick={() => setLocation('/rma')}
+                  data-testid="button-create-rma"
+                >
+                  <RotateCcw className="h-4 w-4 mr-2" />
+                  Create RMA
+                </Button>
+
+                <Button 
+                  className="w-full justify-start bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white text-sm h-9 shadow-sm"
+                  onClick={() => setLocation('/impact')}
+                  data-testid="button-view-impact"
+                >
+                  <Leaf className="h-4 w-4 mr-2" />
+                  View Impact
+                </Button>
+
+                <Button 
+                  className="w-full justify-start bg-gradient-to-r from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600 text-white text-sm h-9 shadow-sm"
+                  onClick={() => setLocation('/support')}
+                  data-testid="button-troubleshooting"
+                >
+                  <HelpCircle className="h-4 w-4 mr-2" />
+                  Troubleshooting
+                </Button>
+
+                <Button 
+                  className="w-full justify-start bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-600 hover:to-cyan-600 text-white text-sm h-9 shadow-sm"
+                  onClick={() => setLocation('/impact?tab=remanufacturing')}
+                  data-testid="button-about-remanufacturing"
+                >
+                  <BookOpen className="h-4 w-4 mr-2" />
+                  About Remanufacturing
+                </Button>
+
+                <Button 
+                  className="w-full justify-start bg-gradient-to-r from-indigo-500 to-blue-600 hover:from-indigo-600 hover:to-blue-700 text-white text-sm h-9 shadow-sm"
+                  onClick={() => setLocation('/impact?tab=case-studies')}
+                  data-testid="button-case-studies"
+                >
+                  <Book className="h-4 w-4 mr-2" />
+                  Case Studies
+                </Button>
+
+                <Button 
+                  className="w-full justify-start bg-gradient-to-r from-fuchsia-500 to-pink-500 hover:from-fuchsia-600 hover:to-pink-600 text-white text-sm h-9 shadow-sm"
+                  onClick={() => setLocation('/support')}
+                  data-testid="button-contact"
+                >
+                  <Phone className="h-4 w-4 mr-2" />
+                  Contact
+                </Button>
+              </CardContent>
+            </Card>
 
             {/* Achievements */}
             <Card className="shadow-md border-0">
@@ -590,7 +665,7 @@ export default function Dashboard() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-4">
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div className="grid grid-cols-2 gap-3">
                   {userAchievements.slice(0, 4).map((ua) => (
                     <div 
                       key={ua.id} 
@@ -632,81 +707,6 @@ export default function Dashboard() {
                   data-testid="button-view-achievements"
                 >
                   View All Achievements
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Right Column - 1/3 width */}
-          <div className="space-y-4">
-            
-            {/* Quick Actions */}
-            <Card className="shadow-md border-0">
-              <CardHeader className="border-b bg-gray-50 pb-2 pt-2">
-                <CardTitle className="text-base font-semibold text-gray-900">Quick Actions</CardTitle>
-              </CardHeader>
-              <CardContent className="p-3 space-y-2">
-                <Button 
-                  className="w-full justify-start bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white text-sm h-9"
-                  onClick={() => setLocation('/orders')}
-                  data-testid="button-track-order"
-                >
-                  <Package className="h-4 w-4 mr-2" />
-                  Track Order
-                </Button>
-                
-                <Button 
-                  className="w-full justify-start bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white text-sm h-9"
-                  onClick={() => setLocation('/rma')}
-                  data-testid="button-create-rma"
-                >
-                  <RotateCcw className="h-4 w-4 mr-2" />
-                  Create RMA
-                </Button>
-
-                <Button 
-                  className="w-full justify-start bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white text-sm h-9"
-                  onClick={() => setLocation('/impact')}
-                  data-testid="button-view-impact"
-                >
-                  <Leaf className="h-4 w-4 mr-2" />
-                  View Impact
-                </Button>
-
-                <Button 
-                  className="w-full justify-start bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 text-white text-sm h-9"
-                  onClick={() => setLocation('/support')}
-                  data-testid="button-troubleshooting"
-                >
-                  <HelpCircle className="h-4 w-4 mr-2" />
-                  Troubleshooting
-                </Button>
-
-                <Button 
-                  className="w-full justify-start bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-700 hover:to-teal-600 text-white text-sm h-9"
-                  onClick={() => setLocation('/impact?tab=remanufacturing')}
-                  data-testid="button-about-remanufacturing"
-                >
-                  <BookOpen className="h-4 w-4 mr-2" />
-                  About Remanufacturing
-                </Button>
-
-                <Button 
-                  className="w-full justify-start bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-700 hover:to-indigo-600 text-white text-sm h-9"
-                  onClick={() => setLocation('/impact?tab=case-studies')}
-                  data-testid="button-case-studies"
-                >
-                  <Book className="h-4 w-4 mr-2" />
-                  Case Studies
-                </Button>
-
-                <Button 
-                  className="w-full justify-start bg-gradient-to-r from-rose-600 to-rose-500 hover:from-rose-700 hover:to-rose-600 text-white text-sm h-9"
-                  onClick={() => setLocation('/support')}
-                  data-testid="button-contact"
-                >
-                  <Phone className="h-4 w-4 mr-2" />
-                  Contact
                 </Button>
               </CardContent>
             </Card>
