@@ -147,7 +147,7 @@ export default function RMA() {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold font-poppins text-neutral-900">RMA Tracking</h1>
-          <p className="text-neutral-600">Manage your return merchandise authorizations</p>
+          <p className="text-neutral-600">Manage your device returns here</p>
         </div>
         <div className="flex gap-3 mt-4 md:mt-0">
           <Button 
