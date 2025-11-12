@@ -198,7 +198,7 @@ export default function Remanufactured() {
           <CardHeader>
             <CardTitle>Benefits of Choosing Remanufactured</CardTitle>
             <CardDescription>
-              Why remanufactured laptops are the smart choice for businesses and individuals
+              Why remanufactured laptops are the smart choice
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -365,7 +365,7 @@ export default function Remanufactured() {
           <CardHeader>
             <CardTitle>Sustainable IT in Conversation - The Podcast</CardTitle>
             <CardDescription>
-              Watch our YouTube content about remanufacturing processes and sustainability
+              Hear industry leaders dig into the real problems within IT sustainability and the solutions that actually work.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -384,17 +384,11 @@ export default function Remanufactured() {
                           <iframe
                             src={video.embedUrl}
                             title={video.title}
-                            className="w-full h-full rounded-t-lg"
+                            className="w-full h-full rounded-lg"
                             frameBorder="0"
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                             allowFullScreen
                           />
-                        </div>
-                        
-                        {/* Video Info */}
-                        <div className="p-4">
-                          <h4 className="font-semibold text-lg text-neutral-900 mb-2">{video.title}</h4>
-                          <p className="text-neutral-600 text-sm">{video.description}</p>
                         </div>
                       </div>
                     </div>
@@ -445,40 +439,6 @@ export default function Remanufactured() {
                 <span className="text-sm text-neutral-500">
                   Video {currentVideo + 1} of {videos.length}
                 </span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex flex-col items-center text-center">
-              <div className="h-12 w-12 rounded-full bg-[#08ABAB]/10 flex items-center justify-center text-[#08ABAB] mb-4">
-                <i className="ri-earth-line text-xl"></i>
-              </div>
-              <h3 className="font-medium mb-2">Our Sustainable IT</h3>
-              <p className="text-neutral-600 mb-4 max-w-md">
-                Join thousands of customers who have chosen remanufactured laptops for their environmental and economic benefits
-              </p>
-              <div className="space-y-2 w-full max-w-sm">
-                <Button 
-                  variant="outline"
-                  className="w-full bg-[#08ABAB] border-[#08ABAB] text-white hover:bg-[#FF9E1C] hover:text-black hover:border-[#FF9E1C] transition-colors"
-                  asChild
-                >
-                  <a href="https://circularcomputing.com/remanufactured-laptops/" target="_blank" rel="noopener noreferrer">
-                    <i className="ri-shopping-cart-line mr-2"></i>
-                    Browse Remanufactured Laptops
-                  </a>
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="w-full bg-[#08ABAB] border-[#08ABAB] text-white hover:bg-[#FF9E1C] hover:text-black hover:border-[#FF9E1C] transition-colors"
-                  onClick={() => window.open('https://circularcomputing.com/contact/', '_blank')}
-                >
-                  <i className="ri-question-line mr-2"></i>
-                  Ask About Our Process
-                </Button>
               </div>
             </div>
           </CardContent>
