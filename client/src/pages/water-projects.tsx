@@ -76,193 +76,47 @@ export default function WaterProjects() {
               )}
             </div>
             <div className="flex items-center justify-center">
-              <div className="relative w-[320px] h-[280px]">
-                <svg width="320" height="280" viewBox="0 0 320 280" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  {/* Left side: Laptop Purchase */}
-                  <g>
-                    <text x="30" y="25" fontSize="12" fontWeight="600" fill="#374151">Your Purchase</text>
-                    
-                    {/* Laptop icon */}
-                    <motion.rect
-                      x="20"
-                      y="40"
-                      width="70"
-                      height="50"
-                      rx="3"
-                      fill="#08ABAB"
-                      stroke="#066B6B"
-                      strokeWidth="2"
-                      initial={{ scale: 1 }}
-                      animate={{ scale: [1, 1.05, 1] }}
-                      transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                    />
-                    <rect x="25" y="45" width="60" height="35" rx="2" fill="#E0F2F1" />
-                    <path d="M50 60 L60 70 L40 70 Z" fill="#08ABAB" />
-                    <circle cx="55" cy="75" r="3" fill="#FF9E1C" />
-                    
-                    {/* Checkmark badge */}
-                    <motion.circle
-                      cx="80"
-                      cy="50"
-                      r="12"
-                      fill="#FF9E1C"
-                      initial={{ scale: 0 }}
-                      animate={{ scale: [0, 1.2, 1] }}
-                      transition={{ duration: 0.6, delay: 0.5, repeat: Infinity, repeatDelay: 3 }}
-                    />
-                    <motion.path
-                      d="M75 50 L78 53 L85 46"
-                      stroke="white"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      fill="none"
-                      initial={{ pathLength: 0 }}
-                      animate={{ pathLength: 1 }}
-                      transition={{ duration: 0.4, delay: 0.7, repeat: Infinity, repeatDelay: 3 }}
-                    />
-                  </g>
-
-                  {/* Arrow with flowing particles */}
-                  <motion.path
-                    d="M100 65 L180 65"
-                    stroke="#08ABAB"
-                    strokeWidth="3"
-                    strokeLinecap="round"
-                    initial={{ pathLength: 0 }}
-                    animate={{ pathLength: 1 }}
-                    transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-                  />
-                  <motion.path
-                    d="M175 60 L185 65 L175 70"
-                    fill="#08ABAB"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: [0, 1, 1] }}
-                    transition={{ duration: 1.5, repeat: Infinity }}
-                  />
-
-                  {/* Flowing dots along arrow */}
-                  {[0, 1, 2].map((i) => (
-                    <motion.circle
-                      key={`dot-${i}`}
-                      cx="100"
-                      cy="65"
-                      r="3"
-                      fill="#FF9E1C"
-                      initial={{ x: 0 }}
-                      animate={{ x: 80 }}
-                      transition={{
-                        duration: 1.5,
-                        delay: i * 0.5,
-                        repeat: Infinity,
-                        ease: "linear"
-                      }}
-                    />
-                  ))}
-
-                  {/* Right side: Water Well & Community */}
-                  <g>
-                    <text x="185" y="25" fontSize="12" fontWeight="600" fill="#374151">Clean Water Impact</text>
-                    
-                    {/* Water well/pump */}
-                    <rect x="200" y="50" width="25" height="40" rx="2" fill="#08ABAB" stroke="#066B6B" strokeWidth="2" />
-                    <rect x="210" y="45" width="5" height="10" fill="#066B6B" />
-                    
-                    {/* Pump handle */}
-                    <motion.path
-                      d="M215 45 Q220 35, 225 40"
-                      stroke="#066B6B"
-                      strokeWidth="3"
-                      strokeLinecap="round"
-                      fill="none"
-                      initial={{ rotate: 0 }}
-                      animate={{ rotate: [-5, 5, -5] }}
-                      transition={{ duration: 2, repeat: Infinity }}
-                      style={{ transformOrigin: "215px 45px" }}
-                    />
-                    
-                    {/* Water flowing from pump */}
-                    {[0, 1, 2].map((i) => (
-                      <motion.path
-                        key={`water-${i}`}
-                        d="M212 90 Q212 95, 212 100"
-                        stroke="#2196F3"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        initial={{ pathLength: 0, opacity: 0 }}
-                        animate={{ 
-                          pathLength: [0, 1, 1],
-                          opacity: [0, 1, 0],
-                          y: [0, 20]
-                        }}
-                        transition={{
-                          duration: 1.5,
-                          delay: i * 0.5,
-                          repeat: Infinity,
-                          ease: "easeOut"
-                        }}
-                      />
-                    ))}
-                  </g>
-
-                  {/* Bottom: Community Impact */}
-                  <g>
-                    <text x="60" y="140" fontSize="12" fontWeight="600" fill="#374151" textAnchor="middle">Families Helped</text>
-                    
-                    {/* Family icons */}
-                    {[0, 1, 2].map((i) => (
-                      <motion.g
-                        key={`family-${i}`}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 1 + i * 0.3, duration: 0.5 }}
-                      >
-                        {/* Person circle */}
-                        <circle cx={40 + i * 35} cy="165" r="8" fill="#08ABAB" />
-                        {/* Person body */}
-                        <path
-                          d={`M${40 + i * 35} 173 L${40 + i * 35} 185 M${35 + i * 35} 178 L${45 + i * 35} 178`}
-                          stroke="#08ABAB"
-                          strokeWidth="3"
-                          strokeLinecap="round"
-                        />
-                        
-                        {/* Water droplet above person */}
-                        <motion.path
-                          d={`M${40 + i * 35} 145 C${40 + i * 35} 145 ${35 + i * 35} 150 ${35 + i * 35} 153 C${35 + i * 35} 156 ${37 + i * 35} 158 ${40 + i * 35} 158 C${43 + i * 35} 158 ${45 + i * 35} 156 ${45 + i * 35} 153 C${45 + i * 35} 150 ${40 + i * 35} 145 ${40 + i * 35} 145 Z`}
-                          fill="#2196F3"
-                          initial={{ opacity: 0, y: -5 }}
-                          animate={{ opacity: [0, 1, 1], y: 0 }}
-                          transition={{
-                            delay: 1.5 + i * 0.3,
-                            duration: 0.5,
-                            repeat: Infinity,
-                            repeatDelay: 2
-                          }}
-                        />
-                      </motion.g>
-                    ))}
-
-                    {/* Impact text */}
-                    <motion.text
-                      x="160"
-                      y="175"
-                      fontSize="14"
-                      fontWeight="700"
-                      fill="#08ABAB"
-                      textAnchor="middle"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: [0, 1, 1] }}
-                      transition={{ delay: 2, duration: 0.5, repeat: Infinity, repeatDelay: 3 }}
-                    >
-                      + Clean Water
-                    </motion.text>
-                  </g>
-
-                  {/* Background subtle circles for depth */}
-                  <circle cx="260" cy="200" r="40" fill="#E0F2F1" opacity="0.3" />
-                  <circle cx="280" cy="160" r="25" fill="#FFF9C4" opacity="0.3" />
+              <motion.div
+                animate={{ y: [0, -10, 0] }}
+                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+              >
+                <svg width="250" height="250" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  {/* Background circle */}
+                  <circle cx="100" cy="100" r="95" fill="#FFF9C4" stroke="#F57F17" strokeWidth="2" />
+                  
+                  {/* Jerry can main body */}
+                  <path d="M60 70 L60 150 Q60 160, 70 160 L130 160 Q140 160, 140 150 L140 70 Q140 60, 130 60 L70 60 Q60 60, 60 70 Z" fill="#FBC02D" stroke="#F57F17" strokeWidth="2" />
+                  
+                  {/* Jerry can spout/neck */}
+                  <rect x="120" y="50" width="25" height="20" fill="#FBC02D" stroke="#F57F17" strokeWidth="2" rx="3" />
+                  
+                  {/* Jerry can cap */}
+                  <circle cx="132.5" cy="55" r="8" fill="#F57F17" stroke="#E65100" strokeWidth="2" />
+                  <circle cx="132.5" cy="55" r="4" fill="#FF8F00" />
+                  
+                  {/* Handle */}
+                  <path d="M50 80 Q45 85, 45 95 Q45 105, 50 110" stroke="#F57F17" strokeWidth="4" fill="none" strokeLinecap="round" />
+                  <rect x="48" y="85" width="12" height="20" fill="#FBC02D" stroke="#F57F17" strokeWidth="2" rx="2" />
+                  
+                  {/* Water level inside jerry can */}
+                  <path d="M65 75 L65 145 Q65 155, 75 155 L125 155 Q135 155, 135 145 L135 75 Z" fill="#2196F3" fillOpacity="0.7" />
+                  
+                  {/* Water surface ripples */}
+                  <path d="M70 80 Q85 75, 100 80 Q115 85, 130 80" stroke="#1976D2" strokeWidth="2" fill="none" strokeLinecap="round" />
+                  <path d="M70 85 Q85 80, 100 85 Q115 90, 130 85" stroke="#1976D2" strokeWidth="1" fill="none" strokeLinecap="round" />
+                  
+                  {/* Jerry can ridges/details */}
+                  <line x1="75" y1="70" x2="125" y2="70" stroke="#F57F17" strokeWidth="1" />
+                  <line x1="75" y1="140" x2="125" y2="140" stroke="#F57F17" strokeWidth="1" />
+                  
+                  {/* Water drops near spout */}
+                  <path d="M130 45 C130 40, 135 40, 135 45 C135 50, 130 50, 130 45 Z" fill="#2196F3" />
+                  <path d="M140 40 C140 35, 145 35, 145 40 C145 45, 140 45, 140 40 Z" fill="#2196F3" />
+                  
+                  {/* Ground/base line */}
+                  <ellipse cx="100" cy="170" rx="50" ry="8" fill="#E0E0E0" fillOpacity="0.5" />
                 </svg>
-              </div>
+              </motion.div>
             </div>
           </div>
         </CardContent>
