@@ -1,5 +1,6 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useState } from "react";
+import { useForm, Controller } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -97,142 +98,149 @@ export function RemanufacturedTipsManagement() {
     },
   });
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    const tipData = {
-      title: formData.get("title") as string,
-      content: formData.get("content") as string,
-      icon: formData.get("icon") as string,
-      category: formData.get("category") as string,
-      categoryColor: formData.get("categoryColor") as string,
-      displayOrder: parseInt(formData.get("displayOrder") as string),
-      isActive: formData.get("isActive") === "true",
+  const TipForm = ({ tip }: { tip?: RemanufacturedTip | null }) => {
+    const form = useForm({
+      defaultValues: {
+        title: tip?.title || "",
+        content: tip?.content || "",
+        icon: tip?.icon || "ri-information-line",
+        category: tip?.category || "",
+        categoryColor: tip?.categoryColor || "#08ABAB",
+        displayOrder: tip?.displayOrder ?? 0,
+        isActive: tip?.isActive ?? true,
+      },
+    });
+
+    const onSubmit = (data: any) => {
+      const tipData = {
+        title: data.title,
+        content: data.content,
+        icon: data.icon,
+        category: data.category,
+        categoryColor: data.categoryColor,
+        displayOrder: parseInt(data.displayOrder),
+        isActive: data.isActive,
+      };
+
+      if (editingTip) {
+        updateMutation.mutate({ id: editingTip.id, data: tipData });
+      } else {
+        createMutation.mutate(tipData);
+      }
     };
 
-    if (editingTip) {
-      updateMutation.mutate({ id: editingTip.id, data: tipData });
-    } else {
-      createMutation.mutate(tipData);
-    }
-  };
-
-  const TipForm = ({ tip }: { tip?: RemanufacturedTip | null }) => (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div>
-        <Label htmlFor="title">Title</Label>
-        <Input
-          id="title"
-          name="title"
-          required
-          defaultValue={tip?.title}
-          data-testid="input-title"
-        />
-      </div>
-      <div>
-        <Label htmlFor="content">Content</Label>
-        <Textarea
-          id="content"
-          name="content"
-          required
-          defaultValue={tip?.content}
-          data-testid="input-content"
-          className="min-h-24"
-        />
-      </div>
-      <div>
-        <Label htmlFor="category">Category</Label>
-        <Input
-          id="category"
-          name="category"
-          required
-          defaultValue={tip?.category}
-          placeholder="e.g., Setup, Configuration, Maintenance"
-          data-testid="input-category"
-        />
-      </div>
-      <div>
-        <Label htmlFor="categoryColor">Category Color (Hex)</Label>
-        <div className="flex gap-2">
+    return (
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <div>
+          <Label htmlFor="title">Title</Label>
           <Input
-            id="categoryColor"
-            name="categoryColor"
-            required
-            defaultValue={tip?.categoryColor || "#08ABAB"}
-            placeholder="#08ABAB"
-            data-testid="input-color"
-            pattern="^#[0-9A-Fa-f]{6}$"
-          />
-          <div
-            className="w-12 h-10 rounded border"
-            style={{ backgroundColor: tip?.categoryColor || "#08ABAB" }}
+            id="title"
+            {...form.register("title", { required: true })}
+            data-testid="input-title"
           />
         </div>
-        <p className="text-xs text-gray-500 mt-1">
-          Enter a hex color code (e.g., #08ABAB for teal)
-        </p>
-      </div>
-      <div>
-        <Label htmlFor="icon">Icon (Remix Icon Class)</Label>
-        <Input
-          id="icon"
-          name="icon"
-          required
-          defaultValue={tip?.icon || "ri-information-line"}
-          placeholder="ri-information-line"
-          data-testid="input-icon"
-        />
-        <p className="text-xs text-gray-500 mt-1">
-          Browse icons at{" "}
-          <a
-            href="https://remixicon.com/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-primary hover:underline"
-          >
-            remixicon.com
-          </a>
-        </p>
-      </div>
-      <div>
-        <Label htmlFor="displayOrder">Display Order</Label>
-        <Input
-          id="displayOrder"
-          name="displayOrder"
-          type="number"
-          required
-          defaultValue={tip?.displayOrder ?? 0}
-          data-testid="input-order"
-        />
-        <p className="text-xs text-gray-500 mt-1">
-          Lower numbers appear first in the carousel
-        </p>
-      </div>
-      <div className="flex items-center gap-2">
-        <Switch
-          id="isActive"
-          name="isActive"
-          defaultChecked={tip?.isActive ?? true}
-          value="true"
-          data-testid="switch-active"
-        />
-        <Label htmlFor="isActive">Active (visible to users)</Label>
-      </div>
-      <Button
-        type="submit"
-        disabled={createMutation.isPending || updateMutation.isPending}
-        data-testid="button-submit"
-      >
-        {editingTip
-          ? updateMutation.isPending
-            ? "Updating..."
-            : "Update Tip"
-          : createMutation.isPending
-            ? "Creating..."
-            : "Create Tip"}
-      </Button>
-    </form>
-  );
+        <div>
+          <Label htmlFor="content">Content</Label>
+          <Textarea
+            id="content"
+            {...form.register("content", { required: true })}
+            data-testid="input-content"
+            className="min-h-24"
+          />
+        </div>
+        <div>
+          <Label htmlFor="category">Category</Label>
+          <Input
+            id="category"
+            {...form.register("category", { required: true })}
+            placeholder="e.g., Setup, Configuration, Maintenance"
+            data-testid="input-category"
+          />
+        </div>
+        <div>
+          <Label htmlFor="categoryColor">Category Color (Hex)</Label>
+          <div className="flex gap-2">
+            <Input
+              id="categoryColor"
+              {...form.register("categoryColor", {
+                required: true,
+                pattern: /^#[0-9A-Fa-f]{6}$/,
+              })}
+              placeholder="#08ABAB"
+              data-testid="input-color"
+            />
+            <div
+              className="w-12 h-10 rounded border"
+              style={{ backgroundColor: form.watch("categoryColor") || "#08ABAB" }}
+            />
+          </div>
+          <p className="text-xs text-gray-500 mt-1">
+            Enter a hex color code (e.g., #08ABAB for teal)
+          </p>
+        </div>
+        <div>
+          <Label htmlFor="icon">Icon (Remix Icon Class)</Label>
+          <Input
+            id="icon"
+            {...form.register("icon", { required: true })}
+            placeholder="ri-information-line"
+            data-testid="input-icon"
+          />
+          <p className="text-xs text-gray-500 mt-1">
+            Browse icons at{" "}
+            <a
+              href="https://remixicon.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary hover:underline"
+            >
+              remixicon.com
+            </a>
+          </p>
+        </div>
+        <div>
+          <Label htmlFor="displayOrder">Display Order</Label>
+          <Input
+            id="displayOrder"
+            type="number"
+            {...form.register("displayOrder", { required: true, valueAsNumber: true })}
+            data-testid="input-order"
+          />
+          <p className="text-xs text-gray-500 mt-1">
+            Lower numbers appear first in the carousel
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Controller
+            name="isActive"
+            control={form.control}
+            render={({ field }) => (
+              <Switch
+                id="isActive"
+                checked={field.value}
+                onCheckedChange={field.onChange}
+                data-testid="switch-active"
+              />
+            )}
+          />
+          <Label htmlFor="isActive">Active (visible to users)</Label>
+        </div>
+        <Button
+          type="submit"
+          disabled={createMutation.isPending || updateMutation.isPending}
+          data-testid="button-submit"
+        >
+          {editingTip
+            ? updateMutation.isPending
+              ? "Updating..."
+              : "Update Tip"
+            : createMutation.isPending
+              ? "Creating..."
+              : "Create Tip"}
+        </Button>
+      </form>
+    );
+  };
 
   return (
     <Card>

@@ -1,5 +1,5 @@
 import { db } from "./db";
-import { users, waterProjects, systemSettings, organizationalMetrics, impactEquivalencySettings, esgMeasurementParameters, keyPerformanceInsights } from "@shared/schema";
+import { users, waterProjects, remanufacturedTips, systemSettings, organizationalMetrics, impactEquivalencySettings, esgMeasurementParameters, keyPerformanceInsights } from "@shared/schema";
 import bcrypt from "bcryptjs";
 import { eq } from "drizzle-orm";
 import { seedGamificationData } from "./gamification-seed";
@@ -75,6 +75,72 @@ export async function seedDatabase() {
       ]);
       
       console.log("✅ Water projects created");
+    }
+
+    // Check if we already have remanufactured tips
+    const existingTips = await db.select().from(remanufacturedTips).limit(1);
+    
+    if (existingTips.length === 0) {
+      console.log("Creating remanufactured tips...");
+      
+      await db.insert(remanufacturedTips).values([
+        {
+          title: "Battery Calibration",
+          content: "Your remanufactured laptop may have a new battery. Run a full discharge and charge cycle 2-3 times to calibrate the battery indicator for accurate readings.",
+          icon: "ri-battery-charge-line",
+          category: "Setup",
+          categoryColor: "#22c55e",
+          displayOrder: 1,
+          isActive: true,
+        },
+        {
+          title: "Driver Updates",
+          content: "Check for the latest drivers from the manufacturer's website. Remanufactured devices may need specific driver versions for optimal performance.",
+          icon: "ri-download-line",
+          category: "Configuration",
+          categoryColor: "#3b82f6",
+          displayOrder: 2,
+          isActive: true,
+        },
+        {
+          title: "Storage Optimization",
+          content: "Your device comes with a fresh SSD. Use built-in disk cleanup tools and avoid unnecessary software to maintain peak performance for years to come.",
+          icon: "ri-hard-drive-line",
+          category: "Maintenance",
+          categoryColor: "#a855f7",
+          displayOrder: 3,
+          isActive: true,
+        },
+        {
+          title: "Warranty Registration",
+          content: "Register your device immediately to activate warranty coverage. Keep your proof of purchase safe - it's essential for any future support needs.",
+          icon: "ri-shield-check-line",
+          category: "Important",
+          categoryColor: "#ef4444",
+          displayOrder: 4,
+          isActive: true,
+        },
+        {
+          title: "Performance Testing",
+          content: "Run stress tests and benchmarks during your first week. This ensures all components are functioning correctly within the return period.",
+          icon: "ri-speed-up-line",
+          category: "Verification",
+          categoryColor: "#08ABAB",
+          displayOrder: 5,
+          isActive: true,
+        },
+        {
+          title: "Thermal Management",
+          content: "Clean air vents regularly and use on hard surfaces. Remanufactured laptops have optimized cooling, but proper ventilation extends lifespan.",
+          icon: "ri-temp-hot-line",
+          category: "Care",
+          categoryColor: "#FF9E1C",
+          displayOrder: 6,
+          isActive: true,
+        },
+      ]);
+      
+      console.log("✅ Remanufactured tips created");
     }
 
     // Check if password webhook setting exists
