@@ -76,151 +76,192 @@ export default function WaterProjects() {
               )}
             </div>
             <div className="flex items-center justify-center">
-              <div className="relative w-[280px] h-[280px]">
-                {/* Animated laptop transforming into water droplets */}
-                <motion.div
-                  className="absolute inset-0"
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 1 }}
-                >
-                  {/* Laptop */}
-                  <svg width="280" height="280" viewBox="0 0 280 280" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    {/* Laptop base */}
-                    <motion.rect
-                      x="60"
-                      y="140"
-                      width="160"
-                      height="10"
-                      rx="2"
-                      fill="#08ABAB"
-                      initial={{ opacity: 1 }}
-                      animate={{ opacity: [1, 0.8, 1] }}
-                      transition={{ duration: 2, repeat: Infinity }}
-                    />
+              <div className="relative w-[320px] h-[280px]">
+                <svg width="320" height="280" viewBox="0 0 320 280" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  {/* Left side: Laptop Purchase */}
+                  <g>
+                    <text x="30" y="25" fontSize="12" fontWeight="600" fill="#374151">Your Purchase</text>
                     
-                    {/* Laptop screen */}
+                    {/* Laptop icon */}
                     <motion.rect
-                      x="70"
-                      y="80"
-                      width="140"
-                      height="60"
+                      x="20"
+                      y="40"
+                      width="70"
+                      height="50"
                       rx="3"
                       fill="#08ABAB"
                       stroke="#066B6B"
                       strokeWidth="2"
-                      initial={{ opacity: 1 }}
-                      animate={{ opacity: [1, 0.8, 1] }}
+                      initial={{ scale: 1 }}
+                      animate={{ scale: [1, 1.05, 1] }}
+                      transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                    />
+                    <rect x="25" y="45" width="60" height="35" rx="2" fill="#E0F2F1" />
+                    <path d="M50 60 L60 70 L40 70 Z" fill="#08ABAB" />
+                    <circle cx="55" cy="75" r="3" fill="#FF9E1C" />
+                    
+                    {/* Checkmark badge */}
+                    <motion.circle
+                      cx="80"
+                      cy="50"
+                      r="12"
+                      fill="#FF9E1C"
+                      initial={{ scale: 0 }}
+                      animate={{ scale: [0, 1.2, 1] }}
+                      transition={{ duration: 0.6, delay: 0.5, repeat: Infinity, repeatDelay: 3 }}
+                    />
+                    <motion.path
+                      d="M75 50 L78 53 L85 46"
+                      stroke="white"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      fill="none"
+                      initial={{ pathLength: 0 }}
+                      animate={{ pathLength: 1 }}
+                      transition={{ duration: 0.4, delay: 0.7, repeat: Infinity, repeatDelay: 3 }}
+                    />
+                  </g>
+
+                  {/* Arrow with flowing particles */}
+                  <motion.path
+                    d="M100 65 L180 65"
+                    stroke="#08ABAB"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                    initial={{ pathLength: 0 }}
+                    animate={{ pathLength: 1 }}
+                    transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                  />
+                  <motion.path
+                    d="M175 60 L185 65 L175 70"
+                    fill="#08ABAB"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: [0, 1, 1] }}
+                    transition={{ duration: 1.5, repeat: Infinity }}
+                  />
+
+                  {/* Flowing dots along arrow */}
+                  {[0, 1, 2].map((i) => (
+                    <motion.circle
+                      key={`dot-${i}`}
+                      cx="100"
+                      cy="65"
+                      r="3"
+                      fill="#FF9E1C"
+                      initial={{ x: 0 }}
+                      animate={{ x: 80 }}
+                      transition={{
+                        duration: 1.5,
+                        delay: i * 0.5,
+                        repeat: Infinity,
+                        ease: "linear"
+                      }}
+                    />
+                  ))}
+
+                  {/* Right side: Water Well & Community */}
+                  <g>
+                    <text x="185" y="25" fontSize="12" fontWeight="600" fill="#374151">Clean Water Impact</text>
+                    
+                    {/* Water well/pump */}
+                    <rect x="200" y="50" width="25" height="40" rx="2" fill="#08ABAB" stroke="#066B6B" strokeWidth="2" />
+                    <rect x="210" y="45" width="5" height="10" fill="#066B6B" />
+                    
+                    {/* Pump handle */}
+                    <motion.path
+                      d="M215 45 Q220 35, 225 40"
+                      stroke="#066B6B"
+                      strokeWidth="3"
+                      strokeLinecap="round"
+                      fill="none"
+                      initial={{ rotate: 0 }}
+                      animate={{ rotate: [-5, 5, -5] }}
                       transition={{ duration: 2, repeat: Infinity }}
+                      style={{ transformOrigin: "215px 45px" }}
                     />
                     
-                    {/* Screen content - recycling symbol */}
-                    <motion.path
-                      d="M140 100 L150 110 L145 110 L145 115 L135 115 L135 110 L130 110 Z"
-                      fill="#FF9E1C"
-                      initial={{ opacity: 0.6 }}
-                      animate={{ opacity: [0.6, 1, 0.6] }}
-                      transition={{ duration: 2, repeat: Infinity }}
-                    />
-                  </svg>
-                </motion.div>
-
-                {/* Animated water droplets flowing from laptop */}
-                {[0, 1, 2, 3, 4].map((i) => (
-                  <motion.div
-                    key={i}
-                    className="absolute"
-                    style={{ left: `${120 + i * 15}px`, top: '150px' }}
-                    initial={{ y: 0, opacity: 0 }}
-                    animate={{
-                      y: [0, 60, 80],
-                      opacity: [0, 1, 0],
-                    }}
-                    transition={{
-                      duration: 2,
-                      delay: i * 0.3,
-                      repeat: Infinity,
-                      ease: "easeOut",
-                    }}
-                  >
-                    <svg width="20" height="24" viewBox="0 0 20 24" fill="none">
-                      <path
-                        d="M10 0C10 0 0 10 0 16C0 20.4 4.5 24 10 24C15.5 24 20 20.4 20 16C20 10 10 0 10 0Z"
-                        fill="#08ABAB"
-                        fillOpacity="0.8"
+                    {/* Water flowing from pump */}
+                    {[0, 1, 2].map((i) => (
+                      <motion.path
+                        key={`water-${i}`}
+                        d="M212 90 Q212 95, 212 100"
+                        stroke="#2196F3"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        initial={{ pathLength: 0, opacity: 0 }}
+                        animate={{ 
+                          pathLength: [0, 1, 1],
+                          opacity: [0, 1, 0],
+                          y: [0, 20]
+                        }}
+                        transition={{
+                          duration: 1.5,
+                          delay: i * 0.5,
+                          repeat: Infinity,
+                          ease: "easeOut"
+                        }}
                       />
-                    </svg>
-                  </motion.div>
-                ))}
+                    ))}
+                  </g>
 
-                {/* Water waves at bottom */}
-                <motion.div
-                  className="absolute bottom-8 left-1/2 -translate-x-1/2"
-                  initial={{ scale: 0.8, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ delay: 1 }}
-                >
-                  <svg width="200" height="60" viewBox="0 0 200 60" fill="none">
-                    <motion.path
-                      d="M0 30 Q25 20, 50 30 T100 30 T150 30 T200 30"
-                      stroke="#08ABAB"
-                      strokeWidth="3"
-                      fill="none"
-                      initial={{ pathLength: 0 }}
-                      animate={{ pathLength: 1 }}
-                      transition={{ duration: 2, repeat: Infinity }}
-                    />
-                    <motion.path
-                      d="M0 40 Q25 30, 50 40 T100 40 T150 40 T200 40"
-                      stroke="#08ABAB"
-                      strokeWidth="2"
-                      fill="none"
-                      strokeOpacity="0.6"
-                      initial={{ pathLength: 0 }}
-                      animate={{ pathLength: 1 }}
-                      transition={{ duration: 2, delay: 0.3, repeat: Infinity }}
-                    />
-                    <motion.path
-                      d="M0 50 Q25 40, 50 50 T100 50 T150 50 T200 50"
-                      stroke="#08ABAB"
-                      strokeWidth="1.5"
-                      fill="none"
-                      strokeOpacity="0.4"
-                      initial={{ pathLength: 0 }}
-                      animate={{ pathLength: 1 }}
-                      transition={{ duration: 2, delay: 0.6, repeat: Infinity }}
-                    />
-                  </svg>
-                </motion.div>
+                  {/* Bottom: Community Impact */}
+                  <g>
+                    <text x="60" y="140" fontSize="12" fontWeight="600" fill="#374151" textAnchor="middle">Families Helped</text>
+                    
+                    {/* Family icons */}
+                    {[0, 1, 2].map((i) => (
+                      <motion.g
+                        key={`family-${i}`}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 1 + i * 0.3, duration: 0.5 }}
+                      >
+                        {/* Person circle */}
+                        <circle cx={40 + i * 35} cy="165" r="8" fill="#08ABAB" />
+                        {/* Person body */}
+                        <path
+                          d={`M${40 + i * 35} 173 L${40 + i * 35} 185 M${35 + i * 35} 178 L${45 + i * 35} 178`}
+                          stroke="#08ABAB"
+                          strokeWidth="3"
+                          strokeLinecap="round"
+                        />
+                        
+                        {/* Water droplet above person */}
+                        <motion.path
+                          d={`M${40 + i * 35} 145 C${40 + i * 35} 145 ${35 + i * 35} 150 ${35 + i * 35} 153 C${35 + i * 35} 156 ${37 + i * 35} 158 ${40 + i * 35} 158 C${43 + i * 35} 158 ${45 + i * 35} 156 ${45 + i * 35} 153 C${45 + i * 35} 150 ${40 + i * 35} 145 ${40 + i * 35} 145 Z`}
+                          fill="#2196F3"
+                          initial={{ opacity: 0, y: -5 }}
+                          animate={{ opacity: [0, 1, 1], y: 0 }}
+                          transition={{
+                            delay: 1.5 + i * 0.3,
+                            duration: 0.5,
+                            repeat: Infinity,
+                            repeatDelay: 2
+                          }}
+                        />
+                      </motion.g>
+                    ))}
 
-                {/* Hearts/impact symbols */}
-                {[0, 1].map((i) => (
-                  <motion.div
-                    key={`heart-${i}`}
-                    className="absolute"
-                    style={{ 
-                      left: `${50 + i * 140}px`,
-                      top: '180px'
-                    }}
-                    initial={{ scale: 0, opacity: 0 }}
-                    animate={{
-                      scale: [0, 1.2, 1],
-                      opacity: [0, 1, 0],
-                    }}
-                    transition={{
-                      duration: 3,
-                      delay: i * 1.5,
-                      repeat: Infinity,
-                    }}
-                  >
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                      <path
-                        d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
-                        fill="#FF9E1C"
-                      />
-                    </svg>
-                  </motion.div>
-                ))}
+                    {/* Impact text */}
+                    <motion.text
+                      x="160"
+                      y="175"
+                      fontSize="14"
+                      fontWeight="700"
+                      fill="#08ABAB"
+                      textAnchor="middle"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: [0, 1, 1] }}
+                      transition={{ delay: 2, duration: 0.5, repeat: Infinity, repeatDelay: 3 }}
+                    >
+                      + Clean Water
+                    </motion.text>
+                  </g>
+
+                  {/* Background subtle circles for depth */}
+                  <circle cx="260" cy="200" r="40" fill="#E0F2F1" opacity="0.3" />
+                  <circle cx="280" cy="160" r="25" fill="#FFF9C4" opacity="0.3" />
+                </svg>
               </div>
             </div>
           </div>
