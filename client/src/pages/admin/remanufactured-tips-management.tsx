@@ -113,8 +113,10 @@ export function RemanufacturedTipsManagement() {
       setEditingTip(null);
       toast({ title: "Tip updated successfully" });
     },
-    onError: () => {
-      toast({ title: "Failed to update tip", variant: "destructive" });
+    onError: (error: any) => {
+      console.error("Update error:", error);
+      const message = error?.message || "Failed to update tip";
+      toast({ title: message, variant: "destructive" });
     },
   });
 

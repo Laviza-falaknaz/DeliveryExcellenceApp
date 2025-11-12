@@ -1892,12 +1892,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.patch("/api/crud/remanufactured-tips/:id", requireAdmin, async (req, res) => {
     try {
-      const tip = await storage.updateRemanufacturedTip(parseInt(req.params.id), req.body);
+      const validated = insertRemanufacturedTipSchema.partial().parse(req.body);
+      const tip = await storage.updateRemanufacturedTip(parseInt(req.params.id), validated);
       if (!tip) {
         return res.status(404).json({ message: "Remanufactured tip not found" });
       }
       res.json(tip);
     } catch (error) {
+      console.error("Error updating remanufactured tip:", error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
       res.status(500).json({ message: "Internal server error" });
     }
   });
