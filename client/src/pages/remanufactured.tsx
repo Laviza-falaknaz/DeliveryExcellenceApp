@@ -202,70 +202,167 @@ export default function Remanufactured() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Accordion type="single" collapsible className="w-full">
-              <AccordionItem value="cost-savings">
-                <AccordionTrigger>Cost Savings & Value</AccordionTrigger>
+            <Accordion type="single" collapsible className="w-full space-y-3">
+              <AccordionItem value="cost-savings" className="border rounded-lg px-4 bg-gradient-to-r from-green-50 to-emerald-50 hover:shadow-md transition-all">
+                <AccordionTrigger className="hover:no-underline">
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-full bg-green-500 flex items-center justify-center text-white flex-shrink-0">
+                      <i className="ri-money-dollar-circle-line text-xl"></i>
+                    </div>
+                    <span className="font-semibold text-lg">Cost Savings & Value</span>
+                  </div>
+                </AccordionTrigger>
                 <AccordionContent>
-                  <div className="space-y-3 text-neutral-700">
-                    <p>Remanufactured laptops offer exceptional value while maintaining premium quality:</p>
-                    <ul className="list-disc list-inside space-y-1 ml-4">
-                      <li>40-60% cost savings compared to new equivalent models</li>
-                      <li>Same performance specifications as original new devices</li>
-                      <li>Lower total cost of ownership over device lifecycle</li>
-                      <li>Predictable budgeting with transparent pricing</li>
-                      <li>Higher return on investment for business deployments</li>
-                    </ul>
+                  <div className="space-y-4 text-neutral-700 pl-14 pr-4 pb-2">
+                    <p className="text-base font-medium">Remanufactured laptops offer exceptional value while maintaining premium quality:</p>
+                    <div className="grid gap-2">
+                      <div className="flex items-start gap-2">
+                        <i className="ri-check-line text-green-600 text-lg mt-0.5"></i>
+                        <span>40-60% cost savings compared to new equivalent models</span>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <i className="ri-check-line text-green-600 text-lg mt-0.5"></i>
+                        <span>Same performance specifications as original new devices</span>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <i className="ri-check-line text-green-600 text-lg mt-0.5"></i>
+                        <span>Lower total cost of ownership over device lifecycle</span>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <i className="ri-check-line text-green-600 text-lg mt-0.5"></i>
+                        <span>Predictable budgeting with transparent pricing</span>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <i className="ri-check-line text-green-600 text-lg mt-0.5"></i>
+                        <span>Higher return on investment for business deployments</span>
+                      </div>
+                    </div>
                   </div>
                 </AccordionContent>
               </AccordionItem>
               
-              <AccordionItem value="sustainability">
-                <AccordionTrigger>Environmental Sustainability</AccordionTrigger>
+              <AccordionItem value="sustainability" className="border rounded-lg px-4 bg-gradient-to-r from-teal-50 to-cyan-50 hover:shadow-md transition-all">
+                <AccordionTrigger className="hover:no-underline">
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-full bg-[#08ABAB] flex items-center justify-center text-white flex-shrink-0">
+                      <i className="ri-leaf-line text-xl"></i>
+                    </div>
+                    <span className="font-semibold text-lg">Environmental Sustainability</span>
+                  </div>
+                </AccordionTrigger>
                 <AccordionContent>
-                  <div className="space-y-3 text-neutral-700">
-                    <p>Every remanufactured laptop creates significant positive environmental impact:</p>
-                    <ul className="list-disc list-inside space-y-1 ml-4">
-                      <li>Prevents electronic waste from entering landfills</li>
-                      <li>Reduces demand for new raw material extraction</li>
-                      <li>Minimizes manufacturing-related carbon emissions</li>
-                      <li>Supports circular economy principles</li>
-                      <li>Contributes to UN Sustainable Development Goals</li>
-                      <li>Partnership with charity: water provides clean water access</li>
-                    </ul>
+                  <div className="space-y-4 text-neutral-700 pl-14 pr-4 pb-2">
+                    <p className="text-base font-medium">Every remanufactured laptop creates significant positive environmental impact:</p>
+                    <div className="grid gap-2">
+                      <div className="flex items-start gap-2">
+                        <i className="ri-check-line text-[#08ABAB] text-lg mt-0.5"></i>
+                        <span>Prevents electronic waste from entering landfills</span>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <i className="ri-check-line text-[#08ABAB] text-lg mt-0.5"></i>
+                        <span>Reduces demand for new raw material extraction</span>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <i className="ri-check-line text-[#08ABAB] text-lg mt-0.5"></i>
+                        <span>Minimizes manufacturing-related carbon emissions</span>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <i className="ri-check-line text-[#08ABAB] text-lg mt-0.5"></i>
+                        <span>Supports circular economy principles</span>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <i className="ri-check-line text-[#08ABAB] text-lg mt-0.5"></i>
+                        <span>Contributes to UN Sustainable Development Goals</span>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <i className="ri-check-line text-[#08ABAB] text-lg mt-0.5"></i>
+                        <span>Partnership with charity: water provides clean water access</span>
+                      </div>
+                    </div>
                   </div>
                 </AccordionContent>
               </AccordionItem>
               
-              <AccordionItem value="reliability">
-                <AccordionTrigger>Reliability & Performance</AccordionTrigger>
+              <AccordionItem value="reliability" className="border rounded-lg px-4 bg-gradient-to-r from-blue-50 to-indigo-50 hover:shadow-md transition-all">
+                <AccordionTrigger className="hover:no-underline">
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-full bg-blue-600 flex items-center justify-center text-white flex-shrink-0">
+                      <i className="ri-shield-check-line text-xl"></i>
+                    </div>
+                    <span className="font-semibold text-lg">Reliability & Performance</span>
+                  </div>
+                </AccordionTrigger>
                 <AccordionContent>
-                  <div className="space-y-3 text-neutral-700">
-                    <p>Our remanufacturing process ensures optimal reliability:</p>
-                    <ul className="list-disc list-inside space-y-1 ml-4">
-                      <li>Comprehensive 100+ point inspection process</li>
-                      <li>Replacement of all wear-prone components</li>
-                      <li>Latest firmware and security updates installed</li>
-                      <li>Stress testing under various operational conditions</li>
-                      <li>Quality certification equivalent to new products</li>
-                      <li>Extended warranty options available</li>
-                    </ul>
+                  <div className="space-y-4 text-neutral-700 pl-14 pr-4 pb-2">
+                    <p className="text-base font-medium">Our remanufacturing process ensures optimal reliability:</p>
+                    <div className="grid gap-2">
+                      <div className="flex items-start gap-2">
+                        <i className="ri-check-line text-blue-600 text-lg mt-0.5"></i>
+                        <span>Comprehensive 100+ point inspection process</span>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <i className="ri-check-line text-blue-600 text-lg mt-0.5"></i>
+                        <span>Replacement of all wear-prone components</span>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <i className="ri-check-line text-blue-600 text-lg mt-0.5"></i>
+                        <span>Latest firmware and security updates installed</span>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <i className="ri-check-line text-blue-600 text-lg mt-0.5"></i>
+                        <span>Stress testing under various operational conditions</span>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <i className="ri-check-line text-blue-600 text-lg mt-0.5"></i>
+                        <span>Quality certification equivalent to new products</span>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <i className="ri-check-line text-blue-600 text-lg mt-0.5"></i>
+                        <span>Extended warranty options available</span>
+                      </div>
+                    </div>
                   </div>
                 </AccordionContent>
               </AccordionItem>
               
-              <AccordionItem value="business-benefits">
-                <AccordionTrigger>Business & Corporate Benefits</AccordionTrigger>
+              <AccordionItem value="business-benefits" className="border rounded-lg px-4 bg-gradient-to-r from-amber-50 to-orange-50 hover:shadow-md transition-all">
+                <AccordionTrigger className="hover:no-underline">
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-full bg-[#FF9E1C] flex items-center justify-center text-white flex-shrink-0">
+                      <i className="ri-briefcase-line text-xl"></i>
+                    </div>
+                    <span className="font-semibold text-lg">Business & Corporate Benefits</span>
+                  </div>
+                </AccordionTrigger>
                 <AccordionContent>
-                  <div className="space-y-3 text-neutral-700">
-                    <p>Remanufactured laptops provide strategic advantages for organizations:</p>
-                    <ul className="list-disc list-inside space-y-1 ml-4">
-                      <li>Enhanced corporate sustainability reporting</li>
-                      <li>Reduced IT procurement budgets with maintained quality</li>
-                      <li>Fast deployment with immediate availability</li>
-                      <li>Simplified asset management and lifecycle planning</li>
-                      <li>Support for ESG (Environmental, Social, Governance) goals</li>
-                      <li>Professional services and bulk deployment support</li>
-                    </ul>
+                  <div className="space-y-4 text-neutral-700 pl-14 pr-4 pb-2">
+                    <p className="text-base font-medium">Remanufactured laptops provide strategic advantages for organizations:</p>
+                    <div className="grid gap-2">
+                      <div className="flex items-start gap-2">
+                        <i className="ri-check-line text-[#FF9E1C] text-lg mt-0.5"></i>
+                        <span>Enhanced corporate sustainability reporting</span>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <i className="ri-check-line text-[#FF9E1C] text-lg mt-0.5"></i>
+                        <span>Reduced IT procurement budgets with maintained quality</span>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <i className="ri-check-line text-[#FF9E1C] text-lg mt-0.5"></i>
+                        <span>Fast deployment with immediate availability</span>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <i className="ri-check-line text-[#FF9E1C] text-lg mt-0.5"></i>
+                        <span>Simplified asset management and lifecycle planning</span>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <i className="ri-check-line text-[#FF9E1C] text-lg mt-0.5"></i>
+                        <span>Support for ESG (Environmental, Social, Governance) goals</span>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <i className="ri-check-line text-[#FF9E1C] text-lg mt-0.5"></i>
+                        <span>Professional services and bulk deployment support</span>
+                      </div>
+                    </div>
                   </div>
                 </AccordionContent>
               </AccordionItem>
