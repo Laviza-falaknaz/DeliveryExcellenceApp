@@ -62,6 +62,8 @@ export default function WarrantyClaim() {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [isFileUploadMode, setIsFileUploadMode] = useState(false); // Track if products loaded from sheet
+  const [uploadedProductCount, setUploadedProductCount] = useState(0); // Number of products from sheet
   const [isScanning, setIsScanning] = useState(false);
   const [isScannerOpen, setIsScannerOpen] = useState(false);
   const [scannerError, setScannerError] = useState<string | null>(null);
@@ -431,10 +433,14 @@ export default function WarrantyClaim() {
       }));
 
       form.setValue('products', products);
+      
+      // Enable file upload mode and set product count
+      setIsFileUploadMode(true);
+      setUploadedProductCount(products.length);
 
       toast({
         title: "Excel Data Loaded",
-        description: `${products.length} product(s) loaded from Excel. Fetching product details...`,
+        description: `${products.length} product(s) detected in your sheet.`,
       });
 
       // Trigger autofill for each product with a delay to avoid rate limiting
@@ -481,6 +487,28 @@ export default function WarrantyClaim() {
 
   const removeFile = () => {
     setUploadedFile(null);
+    setIsFileUploadMode(false);
+    setUploadedProductCount(0);
+  };
+
+  const switchToManualEntry = () => {
+    // Clear uploaded file and reset to manual mode
+    setUploadedFile(null);
+    setIsFileUploadMode(false);
+    setUploadedProductCount(0);
+    // Reset products to single empty product
+    form.setValue('products', [{
+      productMakeModel: "",
+      manufacturerSerialNumber: "",
+      inHouseSerialNumber: "",
+      faultDescription: "",
+      isAutoFilled: false,
+      isCrmMiss: false,
+    }]);
+    toast({
+      title: "Switched to Manual Entry",
+      description: "You can now add products manually.",
+    });
   };
 
   async function onSubmit(data: WarrantyClaimFormValues) {
@@ -712,63 +740,97 @@ export default function WarrantyClaim() {
                 </div>
               </div>
 
-              {/* File Upload - Placed before products for Excel import */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-medium text-neutral-900">Upload Product List (Optional)</h3>
-                <p className="text-sm text-neutral-600">Upload an Excel file with product details to auto-populate the form. The file should include columns for Manufacturer Serial, Inhouse Serial, Product Description, and Fault Description.</p>
-                
-                <div className="border-2 border-dashed border-neutral-300 rounded-lg p-6 text-center">
-                  {uploadedFile ? (
-                    <div className="flex items-center justify-between bg-neutral-50 p-3 rounded-md">
-                      <div className="flex items-center">
-                        <FileText className="w-5 h-5 text-primary mr-2" />
-                        <span className="text-sm font-medium">{uploadedFile.name}</span>
-                        <span className="text-xs text-neutral-500 ml-2">
-                          ({(uploadedFile.size / 1024).toFixed(1)} KB)
-                        </span>
+              {/* File Upload - Placed before products for Excel import - Hide when in file upload mode */}
+              {!isFileUploadMode && (
+                <div className="space-y-4">
+                  <h3 className="text-lg font-medium text-neutral-900">Upload Product List (Optional)</h3>
+                  <p className="text-sm text-neutral-600">Upload an Excel file with product details to auto-populate the form. The file should include columns for Manufacturer Serial, Inhouse Serial, Product Description, and Fault Description.</p>
+                  
+                  <div className="border-2 border-dashed border-neutral-300 rounded-lg p-6 text-center">
+                    {uploadedFile ? (
+                      <div className="flex items-center justify-between bg-neutral-50 p-3 rounded-md">
+                        <div className="flex items-center">
+                          <FileText className="w-5 h-5 text-primary mr-2" />
+                          <span className="text-sm font-medium">{uploadedFile.name}</span>
+                          <span className="text-xs text-neutral-500 ml-2">
+                            ({(uploadedFile.size / 1024).toFixed(1)} KB)
+                          </span>
+                        </div>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={removeFile}
+                          className="text-red-500 hover:text-red-700"
+                        >
+                          <X className="w-4 h-4" />
+                        </Button>
                       </div>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={removeFile}
-                        className="text-red-500 hover:text-red-700"
-                      >
-                        <X className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  ) : (
-                    <div>
-                      <Upload className="mx-auto h-12 w-12 text-neutral-400 mb-4" />
-                      <div className="mb-4">
-                        <p className="text-sm font-medium text-neutral-900">Upload CSV or Excel spreadsheet</p>
-                        <p className="text-xs text-neutral-500">Products will be automatically populated and looked up in the system</p>
+                    ) : (
+                      <div>
+                        <Upload className="mx-auto h-12 w-12 text-neutral-400 mb-4" />
+                        <div className="mb-4">
+                          <p className="text-sm font-medium text-neutral-900">Upload CSV or Excel spreadsheet</p>
+                          <p className="text-xs text-neutral-500">Products will be automatically populated and looked up in the system</p>
+                        </div>
+                        <input
+                          type="file"
+                          id="file-upload"
+                          className="hidden"
+                          accept=".csv,.xlsx,.xls"
+                          onChange={handleFileUpload}
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => document.getElementById('file-upload')?.click()}
+                          className="bg-[#08ABAB] border-[#08ABAB] text-white hover:bg-[#FF9E1C] hover:text-black hover:border-[#FF9E1C] transition-colors"
+                        >
+                          Choose File
+                        </Button>
                       </div>
-                      <input
-                        type="file"
-                        id="file-upload"
-                        className="hidden"
-                        accept=".csv,.xlsx,.xls"
-                        onChange={handleFileUpload}
-                      />
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={() => document.getElementById('file-upload')?.click()}
-                        className="bg-[#08ABAB] border-[#08ABAB] text-white hover:bg-[#FF9E1C] hover:text-black hover:border-[#FF9E1C] transition-colors"
-                      >
-                        Choose File
-                      </Button>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Product Information */}
               <div className="space-y-4">
                 <h3 className="text-lg font-medium text-neutral-900">Products</h3>
                 
-                {form.watch('products').map((product, index) => (
+                {/* Show file upload summary or manual entry */}
+                {isFileUploadMode ? (
+                  <Card className="p-6 bg-green-50 border-green-200">
+                    <div className="space-y-4">
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
+                            <CheckCircle2 className="h-6 w-6 text-green-600" />
+                          </div>
+                          <div>
+                            <h4 className="font-semibold text-green-900">
+                              {uploadedProductCount} product{uploadedProductCount !== 1 ? 's' : ''} detected in your sheet
+                            </h4>
+                            <p className="text-sm text-green-700 mt-1">
+                              Product details loaded from uploaded file and will be included in your request.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={switchToManualEntry}
+                        className="w-full border-green-300 text-green-700 hover:bg-green-100"
+                      >
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add Products Manually Instead
+                      </Button>
+                    </div>
+                  </Card>
+                ) : (
+                  <>
+                    {form.watch('products').map((product, index) => (
                   <Card key={index} className={`p-4 ${crmMissProducts.has(index) ? 'border-amber-500 border-2' : ''}`}>
                     <div className="space-y-4">
                       <div className="flex items-center justify-between mb-2">
@@ -972,6 +1034,8 @@ export default function WarrantyClaim() {
                   <Plus className="h-4 w-4 mr-2" />
                   Add Product
                 </Button>
+                  </>
+                )}
 
                 {/* QR Scanner Dialog */}
                 <Dialog open={isScannerOpen} onOpenChange={setIsScannerOpen}>
