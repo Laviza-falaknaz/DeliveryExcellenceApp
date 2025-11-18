@@ -488,7 +488,7 @@ export default function WarrantyClaim() {
 
       toast({
         title: "Excel Data Loaded",
-        description: `${products.length} product(s) detected and validated. Data will be sent as-is without CRM lookup.`,
+        description: `${products.length} product(s) detected and validated.`,
       });
 
       // Note: When file is uploaded, we DON'T trigger autofill/serial lookup
