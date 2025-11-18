@@ -422,15 +422,60 @@ export default function WarrantyClaim() {
         return;
       }
 
-      // Map Excel columns to product fields
-      const products = jsonData.map((row: any) => ({
-        manufacturerSerialNumber: row['Manufacturer Serial'] || row['ManufacturerSerial'] || row['Manufacturer Serial Number'] || "",
-        inHouseSerialNumber: row['Inhouse Serial'] || row['InhouseSerial'] || row['In-house Serial Number'] || "",
-        productMakeModel: row['Product'] || row['ProductDescription'] || row['Product Make and Model'] || "",
-        faultDescription: row['Fault'] || row['FaultDescription'] || row['Issue'] || "",
-        isAutoFilled: false,
-        isCrmMiss: false,
-      }));
+      console.log('📊 Parsed Excel data:', jsonData);
+      console.log('📋 Available columns:', Object.keys(jsonData[0] || {}));
+
+      // Map Excel columns to product fields (flexible column naming)
+      const products = jsonData.map((row: any, index: number) => {
+        const manufacturerSerial = row['Manufacturer Serial'] || row['ManufacturerSerial'] || row['Manufacturer Serial Number'] || row['manufacturer_serial'] || "";
+        const inhouseSerial = row['Inhouse Serial'] || row['InhouseSerial'] || row['In-house Serial Number'] || row['inhouse_serial'] || "";
+        const product = row['Product'] || row['ProductDescription'] || row['Product Make and Model'] || row['product'] || "";
+        const fault = row['Fault'] || row['FaultDescription'] || row['Fault Description'] || row['Issue'] || row['fault'] || "";
+
+        // Log each product for debugging
+        console.log(`Product ${index + 1}:`, {
+          manufacturerSerial: manufacturerSerial || '(empty)',
+          inhouseSerial: inhouseSerial || '(empty)',
+          product: product || '(empty)',
+          fault: fault || '(empty)'
+        });
+
+        return {
+          manufacturerSerialNumber: manufacturerSerial,
+          inHouseSerialNumber: inhouseSerial,
+          productMakeModel: product,
+          faultDescription: fault,
+          isAutoFilled: false,
+          isCrmMiss: false,
+        };
+      });
+
+      // Validate that products have minimum required data
+      const invalidProducts = products.filter((p, idx) => {
+        const hasSerial = (p.manufacturerSerialNumber && p.manufacturerSerialNumber.trim()) || 
+                         (p.inHouseSerialNumber && p.inHouseSerialNumber.trim());
+        const hasFault = p.faultDescription && p.faultDescription.trim().length >= 10;
+        
+        if (!hasSerial || !hasFault) {
+          console.warn(`Product ${idx + 1} is missing required data:`, {
+            hasSerial,
+            hasFault,
+            faultLength: p.faultDescription?.trim().length || 0
+          });
+        }
+        
+        return !hasSerial || !hasFault;
+      });
+
+      if (invalidProducts.length > 0) {
+        toast({
+          title: "Validation Error",
+          description: `${invalidProducts.length} product(s) in your Excel file are missing required data. Each product must have: (1) at least one serial number and (2) a fault description (minimum 10 characters).`,
+          variant: "destructive",
+        });
+        setUploadedFile(null);
+        return;
+      }
 
       form.setValue('products', products);
       
@@ -438,9 +483,12 @@ export default function WarrantyClaim() {
       setIsFileUploadMode(true);
       setUploadedProductCount(products.length);
 
+      console.log('✅ Excel data validated and loaded successfully');
+      console.log('📦 Products to be submitted:', products);
+
       toast({
         title: "Excel Data Loaded",
-        description: `${products.length} product(s) detected in your sheet and will be sent as-is.`,
+        description: `${products.length} product(s) detected and validated. Data will be sent as-is without CRM lookup.`,
       });
 
       // Note: When file is uploaded, we DON'T trigger autofill/serial lookup
@@ -449,9 +497,10 @@ export default function WarrantyClaim() {
       console.error('Excel parsing error:', error);
       toast({
         title: "Excel Parsing Failed",
-        description: "Unable to parse the Excel file. Please check the file format.",
+        description: "Unable to parse the Excel file. Please check the file format and try again.",
         variant: "destructive",
       });
+      setUploadedFile(null);
     }
   };
 
@@ -519,6 +568,7 @@ export default function WarrantyClaim() {
 
   async function submitRMA(data: WarrantyClaimFormValues) {
     try {
+      console.log('🚀 Starting RMA submission...');
       setIsSubmitting(true);
       
       // Flag if products came from an uploaded Excel file
@@ -538,10 +588,26 @@ export default function WarrantyClaim() {
         } : null
       };
 
-      console.log('Submitting RMA with hasAttachment:', hasAttachment);
+      console.log('📤 Submitting RMA data:');
+      console.log('   Has Attachment:', hasAttachment);
+      console.log('   Product Count:', data.products.length);
+      console.log('   File Upload Mode:', isFileUploadMode);
+      console.log('   Uploaded File:', uploadedFile?.name || 'None');
+      if (hasAttachment) {
+        console.log('   Attachment Info:', rmaData.attachmentInfo);
+      }
+      console.log('   Products:', data.products.map((p, i) => ({
+        index: i + 1,
+        manufacturerSerial: p.manufacturerSerialNumber || '(empty)',
+        inhouseSerial: p.inHouseSerialNumber || '(empty)',
+        product: p.productMakeModel || '(empty)',
+        faultLength: p.faultDescription?.length || 0
+      })));
 
       // Submit RMA request (creates request log, not actual RMA)
+      console.log('📡 Sending request to API...');
       const response: any = await apiRequest("POST", "/api/rmas", rmaData);
+      console.log('✅ API response received:', response);
       
       toast({
         title: "Request Submitted Successfully",
@@ -550,14 +616,25 @@ export default function WarrantyClaim() {
       
       form.reset();
       setUploadedFile(null);
+      setIsFileUploadMode(false);
+      setUploadedProductCount(0);
       setEmailChangeDecision(null);
       setPendingSubmitData(null);
       setCrmMissProducts(new Set());
       
+      console.log('✅ RMA submission completed successfully');
+      
     } catch (error) {
+      console.error('❌ RMA submission error:', error);
+      console.error('Error details:', {
+        name: error instanceof Error ? error.name : 'Unknown',
+        message: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : 'No stack trace'
+      });
+      
       toast({
         title: "Error",
-        description: "Unable to submit your warranty claim request. Please try again.",
+        description: error instanceof Error ? error.message : "Unable to submit your warranty claim request. Please try again.",
         variant: "destructive",
       });
     } finally {
