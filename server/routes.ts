@@ -992,6 +992,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const user = req.user as User;
       
+      console.log('🔔 RMA REQUEST RECEIVED');
+      console.log('   User:', user.email);
+      console.log('   Request body keys:', Object.keys(req.body));
+      console.log('   Product count:', req.body.products?.length);
+      console.log('   Has attachment flag:', req.body.hasAttachment);
+      
       const warrantyClaimSchema = z.object({
         fullName: z.string(),
         companyName: z.string(),
@@ -1020,7 +1026,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }).nullable().optional(),
       });
       
+      console.log('⚙️ Validating request data...');
       const validatedData = warrantyClaimSchema.parse(req.body);
+      console.log('✅ Validation passed');
       
       // Log attachment info
       if (validatedData.hasAttachment) {
@@ -2554,8 +2562,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const setting = await storage.getSystemSetting('admin_portal');
       const webhookUrl = setting?.settingValue?.rmaWebhookUrl;
 
+      console.log('🔍 Webhook configuration check:', {
+        settingExists: !!setting,
+        hasWebhookUrl: !!webhookUrl,
+        webhookUrlPreview: webhookUrl ? webhookUrl.substring(0, 30) + '...' : 'NOT_CONFIGURED'
+      });
+
       if (!webhookUrl) {
-        console.log("No RMA webhook URL configured, skipping webhook notification");
+        console.log("⚠️ No RMA webhook URL configured, skipping webhook notification");
         return { success: false, error: "No webhook URL configured" };
       }
 
@@ -2563,11 +2577,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       try {
         const url = new URL(webhookUrl);
         if (url.protocol !== 'https:') {
-          console.error("RMA webhook URL must use HTTPS protocol");
+          console.error("❌ RMA webhook URL must use HTTPS protocol");
           return { success: false, error: "Webhook URL must use HTTPS" };
         }
+        console.log('✅ Webhook URL validation passed');
       } catch (error) {
-        console.error("Invalid RMA webhook URL configured");
+        console.error("❌ Invalid RMA webhook URL configured:", error);
         return { success: false, error: "Invalid webhook URL" };
       }
 
@@ -2596,11 +2611,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         timestamp: new Date().toISOString()
       };
 
-      console.log('📤 Sending webhook with attachment info:', {
+      console.log('📤 Sending RMA webhook notification');
+      console.log('   Request Number:', request.requestNumber);
+      console.log('   Number of Products:', webhookPayload.numberOfProducts);
+      console.log('   Attachment Info:', {
         hasAttachment: !!webhookPayload.fileAttachment,
         fileName: webhookPayload.fileAttachment?.fileName,
+        fileSize: webhookPayload.fileAttachment?.fileSize,
+        fileType: webhookPayload.fileAttachment?.fileType,
         productCount: webhookPayload.fileAttachment?.productCount
       });
+      console.log('   Payload size:', JSON.stringify(webhookPayload).length, 'bytes');
 
       // Send HTTP POST request to webhook
       const webhookResponse = await fetch(webhookUrl, {
@@ -2612,19 +2633,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
         body: JSON.stringify(webhookPayload)
       });
 
+      console.log('📥 Webhook response status:', webhookResponse.status, webhookResponse.statusText);
+
       if (!webhookResponse.ok) {
-        console.error("Webhook request failed:", webhookResponse.status, webhookResponse.statusText);
+        const responseText = await webhookResponse.text();
+        console.error("❌ Webhook request failed:");
+        console.error("   Status:", webhookResponse.status, webhookResponse.statusText);
+        console.error("   Response:", responseText.substring(0, 500));
         return { 
           success: false, 
-          error: `Webhook failed with status ${webhookResponse.status}`
+          error: `Webhook failed with status ${webhookResponse.status}: ${responseText.substring(0, 100)}`
         };
       }
 
-      console.log("✅ RMA request notification sent to webhook:", webhookUrl);
+      const responseText = await webhookResponse.text();
+      console.log("✅ RMA webhook notification sent successfully");
       console.log("   Request Number:", request.requestNumber);
+      console.log("   Response:", responseText.substring(0, 200));
       return { success: true };
     } catch (error) {
-      console.error("Error sending RMA webhook notification:", error);
+      console.error("❌ Error sending RMA webhook notification:");
+      console.error("   Error type:", error instanceof Error ? error.constructor.name : typeof error);
+      console.error("   Error message:", error instanceof Error ? error.message : String(error));
+      console.error("   Error stack:", error instanceof Error ? error.stack : 'N/A');
       return { 
         success: false, 
         error: error instanceof Error ? error.message : "Unknown error"
