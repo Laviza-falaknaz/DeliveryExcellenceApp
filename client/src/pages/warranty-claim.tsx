@@ -530,6 +530,7 @@ export default function WarrantyClaim() {
       // Convert file to base64 if present
       let fileAttachmentData = null;
       if (uploadedFile) {
+        console.log('Converting uploaded file to base64:', uploadedFile.name);
         try {
           const base64Data = await new Promise<string>((resolve, reject) => {
             const reader = new FileReader();
@@ -549,6 +550,7 @@ export default function WarrantyClaim() {
             type: uploadedFile.type,
             data: base64Data
           };
+          console.log('File converted to base64 successfully. Size:', fileAttachmentData.data.length, 'characters');
         } catch (error) {
           console.error('Failed to convert file to base64:', error);
           toast({
@@ -557,6 +559,8 @@ export default function WarrantyClaim() {
             variant: "destructive",
           });
         }
+      } else {
+        console.log('No file uploaded');
       }
       
       const rmaData = {
@@ -566,6 +570,8 @@ export default function WarrantyClaim() {
         trackWithCurrentUser: emailChangeDecision === 'track' || data.email === originalEmail,
         fileAttachment: fileAttachmentData
       };
+
+      console.log('Submitting RMA with file attachment:', fileAttachmentData ? 'YES' : 'NO');
 
       // Submit RMA request (creates request log, not actual RMA)
       const response: any = await apiRequest("POST", "/api/rmas", rmaData);

@@ -1021,6 +1021,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const validatedData = warrantyClaimSchema.parse(req.body);
       
+      // Log file attachment info
+      if (validatedData.fileAttachment) {
+        console.log('📎 File attachment received:', {
+          name: validatedData.fileAttachment.name,
+          size: validatedData.fileAttachment.size,
+          type: validatedData.fileAttachment.type,
+          hasData: !!validatedData.fileAttachment.data,
+          dataLength: validatedData.fileAttachment.data?.length || 0
+        });
+      } else {
+        console.log('📎 No file attachment in request');
+      }
+      
       // Determine which user ID to use for the request
       let targetUserId = user.id;
       let newUserCreated = false;
@@ -2576,6 +2589,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         createdAt: request.createdAt,
         timestamp: new Date().toISOString()
       };
+
+      console.log('📤 Sending webhook with file attachment:', {
+        hasFile: !!webhookPayload.fileAttachment,
+        fileName: webhookPayload.fileAttachment?.name,
+        fileSize: webhookPayload.fileAttachment?.size,
+        hasData: !!webhookPayload.fileAttachment?.data,
+        dataLength: webhookPayload.fileAttachment?.data?.length || 0
+      });
 
       // Send HTTP POST request to webhook
       const webhookResponse = await fetch(webhookUrl, {
