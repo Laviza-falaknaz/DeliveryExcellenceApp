@@ -440,17 +440,11 @@ export default function WarrantyClaim() {
 
       toast({
         title: "Excel Data Loaded",
-        description: `${products.length} product(s) detected in your sheet.`,
+        description: `${products.length} product(s) detected in your sheet and will be sent as-is.`,
       });
 
-      // Trigger autofill for each product with a delay to avoid rate limiting
-      for (let i = 0; i < products.length; i++) {
-        if (products[i].manufacturerSerialNumber || products[i].inHouseSerialNumber) {
-          // Add delay between requests to avoid rate limiting
-          await new Promise(resolve => setTimeout(resolve, i * 1000)); // 1 second delay between each request
-          await handleAutofill(i);
-        }
-      }
+      // Note: When file is uploaded, we DON'T trigger autofill/serial lookup
+      // The data from the Excel file is sent directly without CRM validation
     } catch (error) {
       console.error('Excel parsing error:', error);
       toast({
