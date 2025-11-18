@@ -527,16 +527,44 @@ export default function WarrantyClaim() {
     try {
       setIsSubmitting(true);
       
+      // Convert file to base64 if present
+      let fileAttachmentData = null;
+      if (uploadedFile) {
+        try {
+          const base64Data = await new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => {
+              const result = reader.result as string;
+              // Extract base64 data (remove data:type;base64, prefix)
+              const base64 = result.split(',')[1];
+              resolve(base64);
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(uploadedFile);
+          });
+          
+          fileAttachmentData = {
+            name: uploadedFile.name,
+            size: uploadedFile.size,
+            type: uploadedFile.type,
+            data: base64Data
+          };
+        } catch (error) {
+          console.error('Failed to convert file to base64:', error);
+          toast({
+            title: "File Upload Warning",
+            description: "Failed to process uploaded file, but continuing with submission.",
+            variant: "destructive",
+          });
+        }
+      }
+      
       const rmaData = {
         ...data,
         userId: currentUser?.id,
         emailChanged: data.email !== originalEmail,
         trackWithCurrentUser: emailChangeDecision === 'track' || data.email === originalEmail,
-        fileAttachment: uploadedFile ? {
-          name: uploadedFile.name,
-          size: uploadedFile.size,
-          type: uploadedFile.type
-        } : null
+        fileAttachment: fileAttachmentData
       };
 
       // Submit RMA request (creates request log, not actual RMA)

@@ -1015,6 +1015,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           name: z.string(),
           size: z.number(),
           type: z.string(),
+          data: z.string().optional(), // Base64 encoded file data
         }).nullable().optional(),
       });
       
@@ -2570,6 +2571,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           inHouseSerialNumber: request.inHouseSerialNumber,
           faultDescription: request.faultDescription,
         }],
+        fileAttachment: request.fileAttachment || null,
         status: request.status,
         createdAt: request.createdAt,
         timestamp: new Date().toISOString()
