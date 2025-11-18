@@ -1011,27 +1011,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
         userId: z.number().optional(),
         emailChanged: z.boolean().optional(),
         trackWithCurrentUser: z.boolean().optional(),
-        fileAttachment: z.object({
-          name: z.string(),
-          size: z.number(),
-          type: z.string(),
-          data: z.string().optional(), // Base64 encoded file data
+        hasAttachment: z.boolean().optional(),
+        attachmentInfo: z.object({
+          fileName: z.string().optional(),
+          fileSize: z.number().optional(),
+          fileType: z.string().optional(),
+          productCount: z.number().optional(),
         }).nullable().optional(),
       });
       
       const validatedData = warrantyClaimSchema.parse(req.body);
       
-      // Log file attachment info
-      if (validatedData.fileAttachment) {
-        console.log('📎 File attachment received:', {
-          name: validatedData.fileAttachment.name,
-          size: validatedData.fileAttachment.size,
-          type: validatedData.fileAttachment.type,
-          hasData: !!validatedData.fileAttachment.data,
-          dataLength: validatedData.fileAttachment.data?.length || 0
+      // Log attachment info
+      if (validatedData.hasAttachment) {
+        console.log('📎 Request has attachment:', {
+          hasAttachment: validatedData.hasAttachment,
+          fileName: validatedData.attachmentInfo?.fileName,
+          productCount: validatedData.attachmentInfo?.productCount,
+          fileSize: validatedData.attachmentInfo?.fileSize
         });
       } else {
-        console.log('📎 No file attachment in request');
+        console.log('📎 No attachment in request (manual entry)');
       }
       
       // Determine which user ID to use for the request
@@ -1093,7 +1093,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         inHouseSerialNumber: firstProduct.inHouseSerialNumber,
         faultDescription: firstProduct.faultDescription,
         products: validatedData.products,
-        fileAttachment: validatedData.fileAttachment || null,
+        fileAttachment: validatedData.hasAttachment && validatedData.attachmentInfo ? {
+          hasAttachment: true,
+          fileName: validatedData.attachmentInfo.fileName,
+          fileSize: validatedData.attachmentInfo.fileSize,
+          fileType: validatedData.attachmentInfo.fileType,
+          productCount: validatedData.attachmentInfo.productCount
+        } : null,
         status: "submitted",
         rmaNumber: null,
         declineReason: null,
@@ -2590,12 +2596,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         timestamp: new Date().toISOString()
       };
 
-      console.log('📤 Sending webhook with file attachment:', {
-        hasFile: !!webhookPayload.fileAttachment,
-        fileName: webhookPayload.fileAttachment?.name,
-        fileSize: webhookPayload.fileAttachment?.size,
-        hasData: !!webhookPayload.fileAttachment?.data,
-        dataLength: webhookPayload.fileAttachment?.data?.length || 0
+      console.log('📤 Sending webhook with attachment info:', {
+        hasAttachment: !!webhookPayload.fileAttachment,
+        fileName: webhookPayload.fileAttachment?.fileName,
+        productCount: webhookPayload.fileAttachment?.productCount
       });
 
       // Send HTTP POST request to webhook

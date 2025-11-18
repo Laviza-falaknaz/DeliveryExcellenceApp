@@ -521,51 +521,24 @@ export default function WarrantyClaim() {
     try {
       setIsSubmitting(true);
       
-      // Convert file to base64 if present
-      let fileAttachmentData = null;
-      if (uploadedFile) {
-        console.log('Converting uploaded file to base64:', uploadedFile.name);
-        try {
-          const base64Data = await new Promise<string>((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = () => {
-              const result = reader.result as string;
-              // Extract base64 data (remove data:type;base64, prefix)
-              const base64 = result.split(',')[1];
-              resolve(base64);
-            };
-            reader.onerror = reject;
-            reader.readAsDataURL(uploadedFile);
-          });
-          
-          fileAttachmentData = {
-            name: uploadedFile.name,
-            size: uploadedFile.size,
-            type: uploadedFile.type,
-            data: base64Data
-          };
-          console.log('File converted to base64 successfully. Size:', fileAttachmentData.data.length, 'characters');
-        } catch (error) {
-          console.error('Failed to convert file to base64:', error);
-          toast({
-            title: "File Upload Warning",
-            description: "Failed to process uploaded file, but continuing with submission.",
-            variant: "destructive",
-          });
-        }
-      } else {
-        console.log('No file uploaded');
-      }
+      // Flag if products came from an uploaded Excel file
+      const hasAttachment = isFileUploadMode && uploadedFile !== null;
       
       const rmaData = {
         ...data,
         userId: currentUser?.id,
         emailChanged: data.email !== originalEmail,
         trackWithCurrentUser: emailChangeDecision === 'track' || data.email === originalEmail,
-        fileAttachment: fileAttachmentData
+        hasAttachment,
+        attachmentInfo: hasAttachment ? {
+          fileName: uploadedFile?.name,
+          fileSize: uploadedFile?.size,
+          fileType: uploadedFile?.type,
+          productCount: uploadedProductCount
+        } : null
       };
 
-      console.log('Submitting RMA with file attachment:', fileAttachmentData ? 'YES' : 'NO');
+      console.log('Submitting RMA with hasAttachment:', hasAttachment);
 
       // Submit RMA request (creates request log, not actual RMA)
       const response: any = await apiRequest("POST", "/api/rmas", rmaData);

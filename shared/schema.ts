@@ -203,9 +203,11 @@ export const rmaRequestLogs = pgTable("rma_request_logs", {
     faultDescription: string;
   }>>(),
   fileAttachment: json("file_attachment").$type<{
-    name: string;
-    size: number;
-    type: string;
+    hasAttachment?: boolean;
+    fileName?: string;
+    fileSize?: number;
+    fileType?: string;
+    productCount?: number;
   } | null>(),
   status: rmaRequestStatusEnum("status").notNull().default("submitted"),
   rmaNumber: text("rma_number"), // Populated when request is approved and RMA is created
