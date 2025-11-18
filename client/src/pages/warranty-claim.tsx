@@ -858,11 +858,9 @@ export default function WarrantyClaim() {
                     <h3 className="text-lg font-medium text-neutral-900">Upload Product List (Optional)</h3>
                     <Button
                       type="button"
-                      variant="outline"
-                      size="sm"
                       onClick={downloadTemplateExcel}
                       data-testid="button-download-template"
-                      className="border-[#08ABAB] text-[#08ABAB] hover:bg-[#08ABAB] hover:text-white transition-colors"
+                      className="bg-[#08ABAB] text-white hover:bg-[#FF9E1C] hover:text-black transition-colors"
                     >
                       <FileText className="h-4 w-4 mr-2" />
                       Download Template
@@ -943,9 +941,8 @@ export default function WarrantyClaim() {
                       </div>
                       <Button
                         type="button"
-                        variant="outline"
                         onClick={switchToManualEntry}
-                        className="w-full border-green-300 text-green-700 hover:bg-green-100"
+                        className="w-full bg-[#08ABAB] text-white hover:bg-[#FF9E1C] hover:text-black transition-colors"
                       >
                         <Plus className="h-4 w-4 mr-2" />
                         Add Products Manually Instead
