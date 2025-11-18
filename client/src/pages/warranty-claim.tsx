@@ -554,6 +554,39 @@ export default function WarrantyClaim() {
     });
   };
 
+  const downloadTemplateExcel = () => {
+    // Create a template Excel file with correct column headers
+    const templateData = [
+      {
+        'Manufacturer Serial': 'SN12345678',
+        'Inhouse Serial': '1HP840G7I516256W11',
+        'Product': 'HP 840 G7',
+        'Fault': 'Screen displays flickering and intermittent black screen issues when laptop is opened beyond 90 degrees'
+      }
+    ];
+
+    // Create a new workbook and worksheet
+    const worksheet = XLSX.utils.json_to_sheet(templateData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'RMA Template');
+
+    // Set column widths for better readability
+    worksheet['!cols'] = [
+      { wch: 20 }, // Manufacturer Serial
+      { wch: 20 }, // Inhouse Serial
+      { wch: 15 }, // Product
+      { wch: 50 }  // Fault
+    ];
+
+    // Generate and download the file
+    XLSX.writeFile(workbook, 'RMA_Template.xlsx');
+
+    toast({
+      title: "Template Downloaded",
+      description: "RMA template Excel file has been downloaded. You can now edit it and upload with your product details.",
+    });
+  };
+
   async function onSubmit(data: WarrantyClaimFormValues) {
     // Check if email has been changed
     if (data.email !== originalEmail && originalEmail) {
@@ -821,7 +854,20 @@ export default function WarrantyClaim() {
               {/* File Upload - Placed before products for Excel import - Hide when in file upload mode */}
               {!isFileUploadMode && (
                 <div className="space-y-4">
-                  <h3 className="text-lg font-medium text-neutral-900">Upload Product List (Optional)</h3>
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-medium text-neutral-900">Upload Product List (Optional)</h3>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={downloadTemplateExcel}
+                      data-testid="button-download-template"
+                      className="border-[#08ABAB] text-[#08ABAB] hover:bg-[#08ABAB] hover:text-white transition-colors"
+                    >
+                      <FileText className="h-4 w-4 mr-2" />
+                      Download Template
+                    </Button>
+                  </div>
                   <p className="text-sm text-neutral-600">Upload an Excel file with product details to auto-populate the form. The file should include columns for Manufacturer Serial, Inhouse Serial, Product Description, and Fault Description.</p>
                   
                   <div className="border-2 border-dashed border-neutral-300 rounded-lg p-6 text-center">
