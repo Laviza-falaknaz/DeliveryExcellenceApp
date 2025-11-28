@@ -709,51 +709,82 @@ export default function Warranty() {
                   <h3 className="font-semibold text-lg">Return to Base (RTB) Warranty</h3>
                 </div>
                 
-                <div className="bg-neutral-50 rounded-lg p-4 border">
-                  <h4 className="font-medium mb-3">Return to Base Process</h4>
-                  <ol className="text-sm text-neutral-700 space-y-2 list-decimal list-inside">
-                    <li>You identify a problem</li>
-                    <li>Register and claim the warranty on our website: <a href="https://my-warranty.com" target="_blank" rel="noreferrer" className="text-primary hover:underline">my-warranty.com</a></li>
-                    <li>Our returns team in the UK will respond within 8 working-hours</li>
-                    <li>If we cannot remedy the problem, a returns process begins and you are given an RMA number</li>
-                    <li>The claimed unit(s) must be returned to our designated address</li>
-                    <li>We will notify you when the parcel has been received</li>
-                    <li>The unit(s) will be diagnosed and we will inform you if it will be repaired, replaced or credited within 5 working days</li>
-                    <li>If credited, we will provide your original reseller/distributor with the credit note. If replaced or repaired, we will confirm address and send back</li>
-                    <li>Next business day, our courier will send you an estimated arrival time</li>
-                    <li>Courier will ask for proof of delivery signature</li>
-                    <li>Once delivery is confirmed, we'll send a customer satisfaction survey</li>
-                  </ol>
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="border rounded-lg p-3 bg-green-50">
-                    <h5 className="font-medium text-green-800 text-sm mb-1">Covered Areas</h5>
-                    <p className="text-sm text-green-700">UK and Europe*
-                    *Customs fee apply on RTB RMAs from Europe</p>
+                {/* Key Info Grid */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  <div className="text-center p-3 bg-green-50 rounded-lg border border-green-200">
+                    <p className="text-xs text-green-600 font-medium uppercase tracking-wide">Coverage</p>
+                    <p className="text-sm font-semibold text-green-800 mt-1">UK & Europe</p>
                   </div>
-                  <div className="border rounded-lg p-3 bg-blue-50">
-                    <h5 className="font-medium text-blue-800 text-sm mb-1">Turnaround Time</h5>
-                    <p className="text-sm text-blue-700">5-day TAT for repairs from delivery date*</p>
+                  <div className="text-center p-3 bg-blue-50 rounded-lg border border-blue-200">
+                    <p className="text-xs text-blue-600 font-medium uppercase tracking-wide">Turnaround</p>
+                    <p className="text-sm font-semibold text-blue-800 mt-1">5 Working Days*</p>
                   </div>
-                  <div className="border rounded-lg p-3 bg-neutral-100">
-                    <h5 className="font-medium text-neutral-800 text-sm mb-1">Return Postage</h5>
-                    <p className="text-sm text-neutral-700">Borne by customer; return shipment covered by us</p>
+                  <div className="text-center p-3 bg-purple-50 rounded-lg border border-purple-200">
+                    <p className="text-xs text-purple-600 font-medium uppercase tracking-wide">Outcome</p>
+                    <p className="text-sm font-semibold text-purple-800 mt-1">Repair, Replace or Credit</p>
+                  </div>
+                  <div className="text-center p-3 bg-neutral-100 rounded-lg border border-neutral-200">
+                    <p className="text-xs text-neutral-600 font-medium uppercase tracking-wide">Insurance</p>
+                    <p className="text-sm font-semibold text-neutral-800 mt-1">Fully Covered</p>
                   </div>
                 </div>
                 
-                <div className="border rounded-lg p-3 bg-neutral-50">
-                  <h5 className="font-medium text-sm mb-1">Return Address</h5>
-                  <p className="text-sm text-neutral-700">A2C Services Ltd, Unit E Railway Triangle, Walton Road, Portsmouth PO6 1TY, UK</p>
+                {/* Process Steps - Collapsible or Compact */}
+                <details className="bg-neutral-50 rounded-lg border group">
+                  <summary className="p-4 cursor-pointer font-medium flex items-center justify-between hover:bg-neutral-100 transition-colors rounded-lg">
+                    <span>View RTB Process Steps</span>
+                    <i className="ri-arrow-down-s-line text-lg group-open:rotate-180 transition-transform"></i>
+                  </summary>
+                  <div className="px-4 pb-4">
+                    <ol className="text-sm text-neutral-700 space-y-1.5 list-decimal list-inside">
+                      <li>Identify a problem with your device</li>
+                      <li>Register your claim at <a href="https://my-warranty.com" target="_blank" rel="noreferrer" className="text-primary hover:underline">my-warranty.com</a></li>
+                      <li>Our UK returns team responds within 8 working-hours</li>
+                      <li>If unresolved, you receive an RMA number</li>
+                      <li>Return unit(s) to our designated address</li>
+                      <li>We confirm receipt of your parcel</li>
+                      <li>Diagnosis completed within 5 working days</li>
+                      <li>Unit repaired, replaced, or credited accordingly</li>
+                      <li>Return shipment arranged with ETA notification</li>
+                      <li>Proof of delivery signature required</li>
+                      <li>Customer satisfaction survey sent</li>
+                    </ol>
+                  </div>
+                </details>
+                
+                {/* Shipping & Address Info */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div className="p-3 bg-neutral-50 rounded-lg border">
+                    <div className="flex items-center gap-2 mb-2">
+                      <i className="ri-map-pin-line text-neutral-600"></i>
+                      <h5 className="font-medium text-sm">Return Address</h5>
+                    </div>
+                    <p className="text-sm text-neutral-700">A2C Services Ltd, Unit E Railway Triangle, Walton Road, Portsmouth PO6 1TY, UK</p>
+                  </div>
+                  <div className="p-3 bg-neutral-50 rounded-lg border">
+                    <div className="flex items-center gap-2 mb-2">
+                      <i className="ri-truck-line text-neutral-600"></i>
+                      <h5 className="font-medium text-sm">Shipping Costs</h5>
+                    </div>
+                    <p className="text-sm text-neutral-700">Return postage: <span className="font-medium">Customer</span> | Return shipment: <span className="font-medium">Covered by us</span></p>
+                  </div>
                 </div>
                 
-                <Alert className="bg-amber-50 border-amber-200">
-                  <AlertCircle className="h-4 w-4 text-amber-600" />
-                  <AlertTitle className="text-amber-800">Note: Customs Fees for Europe</AlertTitle>
-                  <AlertDescription className="text-amber-700 text-sm">
-                    Due to Brexit terms, incoming and outbound RMAs from Europe might incur customs fees and VAT on RTB Services. These costs are borne by the customer.
-                  </AlertDescription>
-                </Alert>
+                {/* Insurance Note */}
+                <div className="flex items-start gap-2 p-3 bg-blue-50/50 rounded-lg border border-blue-100 text-sm">
+                  <i className="ri-shield-check-line text-blue-600 mt-0.5"></i>
+                  <p className="text-blue-800"><span className="font-medium">Insurance:</span> We are legally obligated to insure your RTB stock to the full value of the original sales order whilst it is in our control.</p>
+                </div>
+                
+                {/* Brexit Note */}
+                <div className="flex items-start gap-2 p-3 bg-amber-50/50 rounded-lg border border-amber-200 text-sm">
+                  <AlertCircle className="h-4 w-4 text-amber-600 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <p className="text-amber-800"><span className="font-medium">Note for Europe:</span> Due to Brexit terms, incoming and outbound RMAs from Europe might incur customs fees and VAT. These costs are borne by the customer.</p>
+                  </div>
+                </div>
+                
+                <p className="text-xs text-neutral-500 italic">*Multiple unit claims may take longer than the targeted 5-day TAT to process.</p>
               </div>
               
               <Separator />
