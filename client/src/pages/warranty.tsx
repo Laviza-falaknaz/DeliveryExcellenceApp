@@ -630,44 +630,51 @@ export default function Warranty() {
             </>
           )}
           
-          {/* Quick Summary Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <Card className="bg-primary/5 border-primary/20">
-              <CardContent className="p-4 text-center">
-                <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-2">
-                  <i className="ri-shield-check-line text-primary text-xl"></i>
+          {/* Standard Warranty Card */}
+          <Card className="bg-gradient-to-r from-primary/5 to-primary/10 border-primary/20 mb-6">
+            <CardContent className="p-5">
+              <div className="flex items-start gap-4">
+                <div className="h-12 w-12 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
+                  <i className="ri-shield-check-line text-primary text-2xl"></i>
                 </div>
-                <h4 className="font-semibold text-primary">1-Year Warranty</h4>
-                <p className="text-xs text-neutral-600 mt-1">Standard coverage on all devices</p>
-              </CardContent>
-            </Card>
-            <Card className="bg-green-50 border-green-200">
-              <CardContent className="p-4 text-center">
-                <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-2">
-                  <i className="ri-refresh-line text-green-600 text-xl"></i>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-lg text-primary">Circular Computing Comprehensive Warranty</h3>
+                  <p className="text-sm text-neutral-700 mt-1">
+                    All Circular Computing remanufactured laptops come with a comprehensive <span className="font-semibold">1-year warranty</span> as standard. This industry-leading coverage reflects our confidence in the quality of our carbon-neutral remanufacturing process.
+                  </p>
+                  <div className="flex items-center gap-4 mt-3">
+                    <Badge className="bg-primary/10 text-primary border-primary/20">1-Year Standard</Badge>
+                    <Badge variant="outline" className="text-neutral-600">All Devices Covered</Badge>
+                  </div>
                 </div>
-                <h4 className="font-semibold text-green-700">Advanced Replacement</h4>
-                <p className="text-xs text-neutral-600 mt-1">Next-day swap service (UK)</p>
-              </CardContent>
-            </Card>
-            <Card className="bg-blue-50 border-blue-200">
-              <CardContent className="p-4 text-center">
-                <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-2">
-                  <i className="ri-arrow-go-back-line text-blue-600 text-xl"></i>
-                </div>
-                <h4 className="font-semibold text-blue-700">Return to Base</h4>
-                <p className="text-xs text-neutral-600 mt-1">5-day turnaround (UK & Europe)</p>
-              </CardContent>
-            </Card>
-          </div>
+              </div>
+            </CardContent>
+          </Card>
 
-          {/* Warranty Types - Accordion Style */}
+          {/* Extended Warranty Services */}
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-lg">Warranty Services</CardTitle>
-              <CardDescription>Choose the service type that applies to your situation</CardDescription>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <i className="ri-vip-crown-line text-amber-500"></i>
+                Warranty Service Options
+              </CardTitle>
+              <CardDescription>Choose how you'd like your warranty claim to be processed</CardDescription>
             </CardHeader>
             <CardContent className="pt-0">
+              {/* Service Type Quick Comparison */}
+              <div className="grid grid-cols-2 gap-3 mb-4">
+                <div className="p-3 bg-green-50 rounded-lg border border-green-200 text-center">
+                  <i className="ri-refresh-line text-green-600 text-xl"></i>
+                  <h5 className="font-semibold text-green-800 text-sm mt-1">Advanced Replacement</h5>
+                  <p className="text-xs text-green-700">Next-day swap (UK Mainland)</p>
+                </div>
+                <div className="p-3 bg-blue-50 rounded-lg border border-blue-200 text-center">
+                  <i className="ri-arrow-go-back-line text-blue-600 text-xl"></i>
+                  <h5 className="font-semibold text-blue-800 text-sm mt-1">Return to Base</h5>
+                  <p className="text-xs text-blue-700">5-day turnaround (UK & Europe)</p>
+                </div>
+              </div>
+              
               <Accordion type="multiple" defaultValue={["coverage", "sustainability"]} className="w-full">
                 {/* Advanced Replacement */}
                 <AccordionItem value="advanced-replacement" className="border rounded-lg mb-3 px-4">
