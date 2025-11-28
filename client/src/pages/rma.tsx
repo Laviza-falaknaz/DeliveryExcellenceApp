@@ -358,66 +358,11 @@ export default function RMA() {
             <Skeleton className="h-20 w-full" />
           </div>
         ) : (rmas && rmas.length > 0) || (requestLogs && requestLogs.length > 0) ? (
-          <Tabs defaultValue="requests" className="w-full">
+          <Tabs defaultValue="active" className="w-full">
             <TabsList className="mb-4">
-              <TabsTrigger value="requests">Submitted Requests ({pendingRequestLogs.length})</TabsTrigger>
               <TabsTrigger value="active">In Progress ({activeRmas.length})</TabsTrigger>
               <TabsTrigger value="completed">Completed ({completedRmas.length + approvedRequestLogs.length})</TabsTrigger>
             </TabsList>
-            <TabsContent value="requests">
-              {pendingRequestLogs.length > 0 ? (
-                <div className="space-y-4">
-                  {pendingRequestLogs.map((request) => (
-                    <Card key={request.id} className="cursor-pointer hover:border-accent/50 transition-colors" onClick={() => handleRequestClick(request)}>
-                      <CardContent className="p-4">
-                        <div className="flex flex-col md:flex-row md:items-start md:justify-between mb-3">
-                          <div className="flex-1">
-                            <div className="flex items-center mb-2">
-                              <h3 className="font-medium">Request #{request.requestNumber}</h3>
-                              <Badge className={`ml-3 ${getStatusColor(request.status)}`}>
-                                {getStatusLabel(request.status)}
-                              </Badge>
-                            </div>
-                            <p className="text-sm text-neutral-600 mb-2">
-                              {request.productMakeModel} • Serial: {request.manufacturerSerialNumber}
-                            </p>
-                            <div className="text-xs bg-neutral-50 px-2 py-1 rounded space-y-0.5">
-                              <div className="text-neutral-700">
-                                <span className="font-medium">Email:</span> {request.email}
-                              </div>
-                              <div className="text-neutral-500">
-                                Issue: {request.faultDescription.substring(0, 80)}{request.faultDescription.length > 80 ? '...' : ''}
-                              </div>
-                              {request.status === 'approved' && request.rmaNumber && (
-                                <div className="text-emerald-600 font-medium">
-                                  Approved - RMA #{request.rmaNumber} created
-                                </div>
-                              )}
-                              {request.status === 'declined' && request.declineReason && (
-                                <div className="text-red-600 font-medium">
-                                  Declined: {request.declineReason}
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                          <div className="mt-2 md:mt-0 md:ml-4 text-sm text-neutral-500">
-                            {request.createdAt && `Submitted ${formatDate(request.createdAt)}`}
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              ) : (
-                <div className="p-8 text-center bg-white rounded-xl shadow-sm border border-neutral-200">
-                  <h3 className="text-lg font-medium text-neutral-700">No submitted requests</h3>
-                  <p className="text-neutral-500 mt-2">You haven't submitted any warranty claim requests yet.</p>
-                  <Button variant="outline" className="mt-4" asChild>
-                    <Link href="/warranty-claim">Create New Request</Link>
-                  </Button>
-                </div>
-              )}
-            </TabsContent>
             <TabsContent value="active">
               {activeRmas.length > 0 ? (
                 <div className="space-y-4">
