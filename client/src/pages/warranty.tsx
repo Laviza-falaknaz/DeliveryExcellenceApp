@@ -660,25 +660,30 @@ export default function Warranty() {
                   The customer will be sent a replacement unit once the RMA is approved, either using a Swap IT exchange service (if the address is covered), or the replacement will be delivered with a separate collection arranged for the original unit.
                 </p>
                 
-                <div className="bg-neutral-50 rounded-lg p-4 border">
-                  <h4 className="font-medium mb-3">Advanced Replacement Process</h4>
-                  <ol className="text-sm text-neutral-700 space-y-2 list-decimal list-inside">
-                    <li>You identify a problem</li>
-                    <li>Register and claim the warranty on our warranty website: <a href="https://my-warranty.com" target="_blank" rel="noreferrer" className="text-primary hover:underline">my-warranty.com</a></li>
-                    <li>Our Returns team in the UK will respond within 8 working-hours</li>
-                    <li>If we cannot remedy the problem, a returns process begins and you will be given an RMA number</li>
-                    <li>Your replacement machine will begin its way to your location (home, work or service provider)</li>
-                    <li>We will provide tracking details so you can follow the ETA</li>
-                    <li>The courier will deliver the parcel with proof of delivery signature required</li>
-                    <li>Once received, our team will contact you to organise collection of the original laptop</li>
-                    <li>Ensure the laptop is safely packed and ready for collection</li>
-                    <li>Collection will be booked for the next day after replacement delivery</li>
-                    <li>We will email you the label to affix to the parcel</li>
-                    <li>Tracking numbers with ETA will be provided</li>
-                    <li>Once delivery is confirmed, we'll send a customer satisfaction survey</li>
-                  </ol>
-                  <p className="text-xs text-neutral-500 mt-3 italic">* Warranties for multiple unit claims can take longer than our targeted next day TAT to process.</p>
-                </div>
+                <details className="bg-neutral-50 rounded-lg border group">
+                  <summary className="p-4 cursor-pointer font-medium flex items-center justify-between hover:bg-neutral-100 transition-colors rounded-lg">
+                    <span>View Advanced Replacement Process Steps</span>
+                    <i className="ri-arrow-down-s-line text-lg group-open:rotate-180 transition-transform"></i>
+                  </summary>
+                  <div className="px-4 pb-4">
+                    <ol className="text-sm text-neutral-700 space-y-1.5 list-decimal list-inside">
+                      <li>Identify a problem with your device</li>
+                      <li>Register your claim at <a href="https://my-warranty.com" target="_blank" rel="noreferrer" className="text-primary hover:underline">my-warranty.com</a></li>
+                      <li>Our UK returns team responds within 8 working-hours</li>
+                      <li>If unresolved, you receive an RMA number</li>
+                      <li>Replacement machine shipped to your location</li>
+                      <li>Tracking details provided to follow ETA</li>
+                      <li>Courier delivers with proof of delivery signature</li>
+                      <li>Our team contacts you to arrange collection of original laptop</li>
+                      <li>Ensure laptop is safely packed for collection</li>
+                      <li>Collection booked for next day after replacement delivery</li>
+                      <li>Label emailed to affix to parcel</li>
+                      <li>Tracking numbers with ETA provided</li>
+                      <li>Customer satisfaction survey sent on confirmation</li>
+                    </ol>
+                    <p className="text-xs text-neutral-500 mt-3 italic">* Multiple unit claims may take longer than our targeted next day TAT.</p>
+                  </div>
+                </details>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="border rounded-lg p-3 bg-green-50">
