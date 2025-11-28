@@ -16,7 +16,7 @@ import { Separator } from "@/components/ui/separator";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
-import { AlertCircle, CheckCircle, HelpCircle, Search, Camera, X, ShoppingCart, Trash2, Plus } from "lucide-react";
+import { AlertCircle, CheckCircle, HelpCircle, Search, Camera, X, ShoppingCart, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { BrowserMultiFormatReader, NotFoundException } from "@zxing/library";
@@ -390,19 +390,6 @@ export default function Warranty() {
         </div>
         <div className="mt-4 md:mt-0 flex gap-2">
           <Button 
-            onClick={() => setShowBasket(true)}
-            variant="outline"
-            className="relative"
-          >
-            <ShoppingCart className="h-4 w-4 mr-2" />
-            <span>RMA Basket</span>
-            {rmaBasket.length > 0 && (
-              <Badge className="absolute -top-2 -right-2 h-5 w-5 p-0 flex items-center justify-center bg-[#FF9E1C] text-black">
-                {rmaBasket.length}
-              </Badge>
-            )}
-          </Button>
-          <Button 
             onClick={() => window.open('https://circularcomputing.com/contact/', '_blank')}
             variant="outline"
           >
@@ -587,29 +574,40 @@ export default function Warranty() {
                       )}
                     </div>
                   </CardContent>
-                  <CardFooter className="flex justify-between">
-                    <div className="flex gap-2">
-                      <Button variant="outline" onClick={() => {
-                        serialForm.reset();
-                        setSearchPerformed(false);
-                        setWarrantyInfo(null);
-                        checkStatusRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                        setTimeout(() => serialForm.setFocus('serialNumber'), 500);
-                      }}>
-                        Check Another Product
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        onClick={addToRmaBasket}
-                        className="bg-[#08ABAB] text-white border-[#08ABAB] hover:bg-[#FF9E1C] hover:text-black hover:border-[#FF9E1C] transition-colors"
-                      >
-                        <Plus className="h-4 w-4 mr-2" />
-                        Add to RMA Request
-                      </Button>
-                    </div>
-                    <Button onClick={() => setActiveTab("troubleshooting")}>
+                  <CardFooter className="flex flex-wrap gap-2">
+                    <Button variant="outline" onClick={() => {
+                      serialForm.reset();
+                      setSearchPerformed(false);
+                      setWarrantyInfo(null);
+                      checkStatusRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                      setTimeout(() => serialForm.setFocus('serialNumber'), 500);
+                    }}>
+                      Check Another Product
+                    </Button>
+                    <Button variant="outline" onClick={() => setActiveTab("troubleshooting")}>
                       Troubleshooting Guide
                     </Button>
+                    <Button 
+                      variant="outline" 
+                      onClick={addToRmaBasket}
+                      disabled={warrantyInfo.warrantyStatus === 'Expired'}
+                      className="bg-[#08ABAB] text-white border-[#08ABAB] hover:bg-[#FF9E1C] hover:text-black hover:border-[#FF9E1C] transition-colors disabled:bg-neutral-300 disabled:text-neutral-500 disabled:border-neutral-300 disabled:cursor-not-allowed"
+                    >
+                      Add to RMA Request
+                    </Button>
+                    {rmaBasket.length > 0 && (
+                      <Button 
+                        onClick={() => setShowBasket(true)}
+                        variant="outline"
+                        className="relative"
+                      >
+                        <ShoppingCart className="h-4 w-4 mr-2" />
+                        <span>RMA Basket</span>
+                        <Badge className="ml-2 h-5 w-5 p-0 flex items-center justify-center bg-[#FF9E1C] text-black">
+                          {rmaBasket.length}
+                        </Badge>
+                      </Button>
+                    )}
                   </CardFooter>
                 </Card>
               ) : (
