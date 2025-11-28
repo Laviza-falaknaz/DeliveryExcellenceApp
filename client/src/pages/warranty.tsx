@@ -398,7 +398,6 @@ export default function Warranty() {
           </Button>
         </div>
       </div>
-
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger 
@@ -695,9 +694,7 @@ export default function Warranty() {
                 <Alert className="bg-blue-50 border-blue-200">
                   <AlertCircle className="h-4 w-4 text-blue-600" />
                   <AlertTitle className="text-blue-800">Uncovered Areas & Europe</AlertTitle>
-                  <AlertDescription className="text-blue-700 text-sm">
-                    For areas where Swap IT service is not covered, we will supply an advance replacement and collect original units as two separate processes. We will replace the unit with a like-for-like or better product at our discretion based on existing stock.
-                  </AlertDescription>
+                  <AlertDescription className="text-blue-700 text-sm">For areas where Swap IT service is not covered, we will supply an advance replacement and collect original units as two separate processes. We will replace the unit with a like-for-like or better product at our discretion based on existing stock. For the breakdown of the services please refer to the link for their respective collateral.</AlertDescription>
                 </Alert>
               </div>
               
@@ -1038,7 +1035,6 @@ export default function Warranty() {
               </Card>
         </TabsContent>
       </Tabs>
-      
       {/* RMA Basket Dialog */}
       <Dialog open={showBasket} onOpenChange={setShowBasket}>
         <DialogContent className="sm:max-w-[700px]">
@@ -1119,7 +1115,6 @@ export default function Warranty() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      
       {/* Office Manuals Dialog */}
       <Dialog open={showManualsDialog} onOpenChange={setShowManualsDialog}>
         <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto">
@@ -1207,7 +1202,6 @@ export default function Warranty() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      
       {/* Battery Health Analysis Dialog */}
       <Dialog open={showBatteryDialog} onOpenChange={setShowBatteryDialog}>
         <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto">
