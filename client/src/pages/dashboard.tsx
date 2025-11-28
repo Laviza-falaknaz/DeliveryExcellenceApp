@@ -17,6 +17,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 
+const formatNumber = (num: number): string => {
+  return num.toLocaleString('en-US');
+};
+
 interface User {
   id: number;
   name: string;
@@ -320,11 +324,11 @@ export default function Dashboard() {
                       <Leaf className="h-5 w-5 text-green-700" />
                     </div>
                     <div className="text-2xl font-bold text-gray-900 mb-0.5">
-                      {((impact?.carbonSaved || 0) / 1000).toFixed(0)} kg
+                      {formatNumber(Math.round((impact?.carbonSaved || 0) / 1000))} kg
                     </div>
                     <div className="text-sm text-gray-600 mb-1">CO₂ Prevented</div>
                     <div className="text-xs text-green-700 font-medium">
-                      +{Math.floor(((impact?.carbonSaved || 0) / 1000) * 0.1)}% this month
+                      +{formatNumber(Math.floor(((impact?.carbonSaved || 0) / 1000) * 0.1))}% this month
                     </div>
                   </CardContent>
                 </Card>
@@ -335,11 +339,11 @@ export default function Dashboard() {
                       <Droplet className="h-5 w-5 text-blue-700" />
                     </div>
                     <div className="text-2xl font-bold text-gray-900 mb-0.5">
-                      {((impact?.waterSaved || 0) / 1000).toFixed(0)} kL
+                      {formatNumber(Math.round((impact?.waterSaved || 0) / 1000))} kL
                     </div>
                     <div className="text-sm text-gray-600 mb-1">Water Saved</div>
                     <div className="text-xs text-blue-700 font-medium">
-                      +{Math.floor(((impact?.waterSaved || 0) / 1000) * 0.08)}% this month
+                      +{formatNumber(Math.floor(((impact?.waterSaved || 0) / 1000) * 0.08))}% this month
                     </div>
                   </CardContent>
                 </Card>
@@ -350,11 +354,11 @@ export default function Dashboard() {
                       <Recycle className="h-5 w-5 text-amber-700" />
                     </div>
                     <div className="text-2xl font-bold text-gray-900 mb-0.5">
-                      {((impact?.mineralsSaved || 0) / 1000).toFixed(0)} kg
+                      {formatNumber(Math.round((impact?.mineralsSaved || 0) / 1000))} kg
                     </div>
                     <div className="text-sm text-gray-600 mb-1">Materials Saved</div>
                     <div className="text-xs text-amber-700 font-medium">
-                      +{Math.floor(((impact?.mineralsSaved || 0) / 1000) * 0.12)}% this month
+                      +{formatNumber(Math.floor(((impact?.mineralsSaved || 0) / 1000) * 0.12))}% this month
                     </div>
                   </CardContent>
                 </Card>
@@ -365,7 +369,7 @@ export default function Dashboard() {
                       <Users className="h-5 w-5 text-sky-700" />
                     </div>
                     <div className="text-2xl font-bold text-gray-900 mb-0.5">
-                      {impact?.waterProvided || 0} L
+                      {formatNumber(impact?.waterProvided || 0)} L
                     </div>
                     <div className="text-sm text-gray-600 mb-1">Clean Water Provided</div>
                     <div className="text-xs text-sky-700 font-medium">
