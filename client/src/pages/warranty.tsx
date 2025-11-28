@@ -729,7 +729,8 @@ export default function Warranty() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="border rounded-lg p-3 bg-green-50">
                     <h5 className="font-medium text-green-800 text-sm mb-1">Covered Areas</h5>
-                    <p className="text-sm text-green-700">UK and Europe</p>
+                    <p className="text-sm text-green-700">UK and Europe*
+                    *Customs fee apply on RTB RMAs from Europe</p>
                   </div>
                   <div className="border rounded-lg p-3 bg-blue-50">
                     <h5 className="font-medium text-blue-800 text-sm mb-1">Turnaround Time</h5>
