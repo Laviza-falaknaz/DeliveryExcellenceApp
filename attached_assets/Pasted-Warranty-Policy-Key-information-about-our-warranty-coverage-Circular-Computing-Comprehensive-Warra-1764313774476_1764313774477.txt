@@ -1,0 +1,78 @@
+Warranty Policy
+Key information about our warranty coverage
+Circular Computing Comprehensive Warranty
+All Circular Computing remanufactured laptops come with a comprehensive 1-year warranty as standard. This industry-leading coverage reflects our confidence in the quality of our carbon-neutral remanufacturing process.
+Extended Warranty & Protection Plans – DELETE THIS SECTION
+Add the following text on warranties to this section:
+Advanced Replacement Warranty 
+The customer will be sent a replacement unit once the RMA is approved, either using a Swap IT exchange service, if the address is covered as per details below. Or, in the case of the address not being covered, the replacement will be delivered, but we will arrange a separate collection for the original unit.
+Advanced replacement steps:
+1. You identify a problem.
+2. Register and claim the warranty on our warranty website: my-warranty.com.
+3. Our Returns team in the UK will respond within 8 working-hours.
+4. If we cannot remedy the problem, a returns process begins, and you will be given a Returns Management Authority (RMA) number.
+5. Your replacement machine will begin its way to your location – be it home, work or your service provider – your choice. *
+6. We will provide you with the tracking details of the parcel, and you can follow the ETA.
+7. The courier will deliver the parcel, ask for you to sign for proof of delivery and for us to ensure our service levels are adhered to.
+8. Once the replacement has been received our team will contact you to organise the collection of the original laptop.
+9. Ensure the laptop is safely packed and the parcel is ready for collection.
+10. The collection will be booked for the next day after the replacement has been delivered. *
+11. After we book the collection, we will email you the label to affix to the parcel.
+12. We will provide you the tracking numbers with ETA for the day it has been booked.
+13. Once your delivery is confirmed our team will send you a customer satisfaction survey to be complete with your feedback.
+* Any warranties for multiple unit claims can take longer than our targeted next day TAT to process.
+Covered areas: UK Mainland and Isle of Wight
+Uncovered areas in the UK: Northern Ireland, Channel Islands, Isle of Man, Scottish Highlands and Islands, Scilly Isles
+Advance Replacement for UK Swap IT uncovered areas and Europe
+For the areas that the Swap IT service is not covered we will supply an advance replacement and collect the original units as two separate processes. We will replace the unit with a like-for-like or better product which will be at our discretion based on existing stock.
+For the breakdown of the services please refer to the link for their respective collateral.
+
+RTB Warranty
+Return to base steps:
+1. You identify a problem
+2. Register and claim the warranty on our website: my-warranty.com
+3. You will be contacted back by our returns team in the UK within 8 working-hours
+4. If we cannot remedy the problem, a returns process begins and you are given a Returns Management Authority (RMA) number
+5. The claimed unit(s) must be returned to our designated address
+6. We will let you know when the parcel has been received on our premises
+7. The unit(s) will be diagnosed and we will inform you if the unit will be repaired, replaced or credited within 5 working days
+8. If the RMA has been credited, we will provide your original reseller/distributor with the credit note to be cascaded down
+8.1 If the RMA is replaced or repaired, we will confirm the address and send the parcel back to you
+9. The next business day, our courier will send you an estimated arrival time (a time window of an hour)
+10. The courier will ask for you to sign for proof of delivery and to ensure our service levels are adhered to
+11. Once your delivery is confirmed our team will send you a customer satisfaction survey to be complete with your feedback
+Covered Areas: UK and Europe
+Where practicable we aim to work on a 5-day turnaround time (TAT) for repairs from the date of delivery to us for any individual units *.
+If we are unable to repair, we will replace or offer a credit.
+Return postage on RTB is borne by the customer, shipment back is covered by us.
+Insurance: We are legally obligated to insure your RTB stock to the full value of the original sales order whilst it is in our control.
+Return address: A2C Services Ltd, Unit E Railway Triangle, Walton Road, Portsmouth PO6 1TY, UK.
+Note: Customs fee on RTB RMAs from Europe
+Due to Brexit terms incoming and outbound RMAs from Europe might incur customs fee and VAT on RTB Services and these costs are borne by the customer.
+*Any warranties for multiple unit claims can take longer than our targeted 5-day TAT to process.
+
+What's Covered Under Our Standard Warranties
+•	Hardware defects in materials and workmanship
+•	System component failures (motherboard, RAM, storage)
+•	Display and graphics issues (including backlight and LCD)
+•	Keyboard and touchpad functionality
+•	Battery performance and defects (within first 12 months)
+•	Power adapters 
+•	Pre-installed operating system recovery
+
+What's Not Covered Under Our Standard Warranties
+•	Customer Induced Damage (CID) which includes accidental damage, drops, spills, water damage and cracked screens. 
+•	Normal wear and tear beyond expected usage.
+•	Cosmetic damage that doesn't affect functionality.
+•	Software issues not related to hardware.
+•	Third-party software or applications.
+•	Unauthorised modifications or repairs.
+•	Lost or stolen devices.
+•	Damage from improper use or environment (extreme temperatures, dust, etc.).
+•	Battery faults after one year of use from the point of sale. 
+
+Our Sustainability Commitment
+As part of our sustainability commitment, we offer free recycling of your old devices when you return a product when no longer covered by our warranty. All returned units are either repaired for reuse or responsibly recycled following WEEE standards, ensuring zero e-waste to landfill.
+
+Warranty Verification
+For warranty details specific to your product model and purchase date, please use the serial number lookup tool above. All warranty services must be initiated through our authorised service process.

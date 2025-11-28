@@ -638,69 +638,231 @@ export default function Warranty() {
                 Key information about our warranty coverage
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <h3 className="font-medium">Circular Computing Comprehensive Warranty</h3>
+            <CardContent className="space-y-6">
+              {/* Comprehensive Warranty Overview */}
+              <div className="bg-primary/5 rounded-lg p-4 border border-primary/20">
+                <h3 className="font-semibold text-lg text-primary mb-2">Circular Computing Comprehensive Warranty</h3>
                 <p className="text-neutral-700">
-                  All Circular Computing remanufactured laptops come with a comprehensive 3-year warranty as standard - longer than many new devices. This industry-leading coverage reflects our confidence in the quality of our carbon-neutral remanufacturing process.
+                  All Circular Computing remanufactured laptops come with a comprehensive 1-year warranty as standard. This industry-leading coverage reflects our confidence in the quality of our carbon-neutral remanufacturing process.
                 </p>
               </div>
               
-              <div className="space-y-2">
-                <h3 className="font-medium">Extended Warranty & Protection Plans</h3>
+              <Separator />
+              
+              {/* Advanced Replacement Warranty */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <div className="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center">
+                    <CheckCircle className="h-4 w-4 text-green-600" />
+                  </div>
+                  <h3 className="font-semibold text-lg">Advanced Replacement Warranty</h3>
+                </div>
                 <p className="text-neutral-700">
-                  Enhance your coverage with our premium protection options:
+                  The customer will be sent a replacement unit once the RMA is approved, either using a Swap IT exchange service (if the address is covered), or the replacement will be delivered with a separate collection arranged for the original unit.
                 </p>
-                <ul className="list-disc list-inside text-neutral-700 space-y-1">
-                  <li>Accidental Damage Protection (covers drops, spills, and electrical surges)</li>
-                  <li>Next Business Day Replacement Service</li>
-                  <li>Premium Support with dedicated technical advisor</li>
-                  <li>International Coverage Option for global organizations</li>
-                </ul>
-                <p className="text-neutral-700 mt-2">
-                  Contact your account manager or visit <a href="https://circularcomputing.com/warranty/" target="_blank" rel="noreferrer" className="text-primary hover:underline">circularcomputing.com/warranty/</a> to learn more.
-                </p>
+                
+                <div className="bg-neutral-50 rounded-lg p-4 border">
+                  <h4 className="font-medium mb-3">Advanced Replacement Process</h4>
+                  <ol className="text-sm text-neutral-700 space-y-2 list-decimal list-inside">
+                    <li>You identify a problem</li>
+                    <li>Register and claim the warranty on our warranty website: <a href="https://my-warranty.com" target="_blank" rel="noreferrer" className="text-primary hover:underline">my-warranty.com</a></li>
+                    <li>Our Returns team in the UK will respond within 8 working-hours</li>
+                    <li>If we cannot remedy the problem, a returns process begins and you will be given an RMA number</li>
+                    <li>Your replacement machine will begin its way to your location (home, work or service provider)</li>
+                    <li>We will provide tracking details so you can follow the ETA</li>
+                    <li>The courier will deliver the parcel with proof of delivery signature required</li>
+                    <li>Once received, our team will contact you to organise collection of the original laptop</li>
+                    <li>Ensure the laptop is safely packed and ready for collection</li>
+                    <li>Collection will be booked for the next day after replacement delivery</li>
+                    <li>We will email you the label to affix to the parcel</li>
+                    <li>Tracking numbers with ETA will be provided</li>
+                    <li>Once delivery is confirmed, we'll send a customer satisfaction survey</li>
+                  </ol>
+                  <p className="text-xs text-neutral-500 mt-3 italic">* Warranties for multiple unit claims can take longer than our targeted next day TAT to process.</p>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="border rounded-lg p-3 bg-green-50">
+                    <h5 className="font-medium text-green-800 text-sm mb-1">Covered Areas</h5>
+                    <p className="text-sm text-green-700">UK Mainland and Isle of Wight</p>
+                  </div>
+                  <div className="border rounded-lg p-3 bg-amber-50">
+                    <h5 className="font-medium text-amber-800 text-sm mb-1">Uncovered Areas (UK)</h5>
+                    <p className="text-sm text-amber-700">Northern Ireland, Channel Islands, Isle of Man, Scottish Highlands and Islands, Scilly Isles</p>
+                  </div>
+                </div>
+                
+                <Alert className="bg-blue-50 border-blue-200">
+                  <AlertCircle className="h-4 w-4 text-blue-600" />
+                  <AlertTitle className="text-blue-800">Uncovered Areas & Europe</AlertTitle>
+                  <AlertDescription className="text-blue-700 text-sm">
+                    For areas where Swap IT service is not covered, we will supply an advance replacement and collect original units as two separate processes. We will replace the unit with a like-for-like or better product at our discretion based on existing stock.
+                  </AlertDescription>
+                </Alert>
               </div>
               
-              <div className="space-y-2">
-                <h3 className="font-medium">What's Covered Under Standard Warranty</h3>
-                <ul className="list-disc list-inside text-neutral-700 space-y-1">
-                  <li>Hardware defects in materials and workmanship</li>
-                  <li>System component failures (motherboard, RAM, storage)</li>
-                  <li>Display and graphics issues (including backlight and LCD)</li>
-                  <li>Keyboard and touchpad functionality</li>
-                  <li>Battery defects and performance issues (within first 12 months)</li>
-                  <li>Power adapters and included peripherals</li>
-                  <li>Pre-installed operating system recovery</li>
-                </ul>
+              <Separator />
+              
+              {/* RTB Warranty */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
+                    <i className="ri-arrow-go-back-line text-blue-600"></i>
+                  </div>
+                  <h3 className="font-semibold text-lg">Return to Base (RTB) Warranty</h3>
+                </div>
+                
+                <div className="bg-neutral-50 rounded-lg p-4 border">
+                  <h4 className="font-medium mb-3">Return to Base Process</h4>
+                  <ol className="text-sm text-neutral-700 space-y-2 list-decimal list-inside">
+                    <li>You identify a problem</li>
+                    <li>Register and claim the warranty on our website: <a href="https://my-warranty.com" target="_blank" rel="noreferrer" className="text-primary hover:underline">my-warranty.com</a></li>
+                    <li>Our returns team in the UK will respond within 8 working-hours</li>
+                    <li>If we cannot remedy the problem, a returns process begins and you are given an RMA number</li>
+                    <li>The claimed unit(s) must be returned to our designated address</li>
+                    <li>We will notify you when the parcel has been received</li>
+                    <li>The unit(s) will be diagnosed and we will inform you if it will be repaired, replaced or credited within 5 working days</li>
+                    <li>If credited, we will provide your original reseller/distributor with the credit note. If replaced or repaired, we will confirm address and send back</li>
+                    <li>Next business day, our courier will send you an estimated arrival time</li>
+                    <li>Courier will ask for proof of delivery signature</li>
+                    <li>Once delivery is confirmed, we'll send a customer satisfaction survey</li>
+                  </ol>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="border rounded-lg p-3 bg-green-50">
+                    <h5 className="font-medium text-green-800 text-sm mb-1">Covered Areas</h5>
+                    <p className="text-sm text-green-700">UK and Europe</p>
+                  </div>
+                  <div className="border rounded-lg p-3 bg-blue-50">
+                    <h5 className="font-medium text-blue-800 text-sm mb-1">Turnaround Time</h5>
+                    <p className="text-sm text-blue-700">5-day TAT for repairs from delivery date*</p>
+                  </div>
+                  <div className="border rounded-lg p-3 bg-neutral-100">
+                    <h5 className="font-medium text-neutral-800 text-sm mb-1">Return Postage</h5>
+                    <p className="text-sm text-neutral-700">Borne by customer; return shipment covered by us</p>
+                  </div>
+                </div>
+                
+                <div className="border rounded-lg p-3 bg-neutral-50">
+                  <h5 className="font-medium text-sm mb-1">Return Address</h5>
+                  <p className="text-sm text-neutral-700">A2C Services Ltd, Unit E Railway Triangle, Walton Road, Portsmouth PO6 1TY, UK</p>
+                </div>
+                
+                <Alert className="bg-amber-50 border-amber-200">
+                  <AlertCircle className="h-4 w-4 text-amber-600" />
+                  <AlertTitle className="text-amber-800">Note: Customs Fees for Europe</AlertTitle>
+                  <AlertDescription className="text-amber-700 text-sm">
+                    Due to Brexit terms, incoming and outbound RMAs from Europe might incur customs fees and VAT on RTB Services. These costs are borne by the customer.
+                  </AlertDescription>
+                </Alert>
               </div>
               
-              <div className="space-y-2">
-                <h3 className="font-medium">What's Not Covered</h3>
-                <ul className="list-disc list-inside text-neutral-700 space-y-1">
-                  <li>Accidental damage (drops, spills) without ADP coverage</li>
-                  <li>Normal wear and tear beyond expected usage</li>
-                  <li>Cosmetic damage that doesn't affect functionality</li>
-                  <li>Software issues not related to hardware</li>
-                  <li>Third-party software or applications</li>
-                  <li>Unauthorized modifications or repairs</li>
-                  <li>Lost or stolen devices</li>
-                  <li>Damage from improper use or environment (extreme temperatures, dust, etc.)</li>
-                </ul>
+              <Separator />
+              
+              {/* What's Covered / Not Covered */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="border rounded-lg p-4 bg-green-50/50">
+                  <div className="flex items-center gap-2 mb-3">
+                    <CheckCircle className="h-5 w-5 text-green-600" />
+                    <h3 className="font-semibold">What's Covered</h3>
+                  </div>
+                  <ul className="text-sm text-neutral-700 space-y-2">
+                    <li className="flex items-start gap-2">
+                      <span className="text-green-600 mt-0.5">•</span>
+                      <span>Hardware defects in materials and workmanship</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-green-600 mt-0.5">•</span>
+                      <span>System component failures (motherboard, RAM, storage)</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-green-600 mt-0.5">•</span>
+                      <span>Display and graphics issues (including backlight and LCD)</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-green-600 mt-0.5">•</span>
+                      <span>Keyboard and touchpad functionality</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-green-600 mt-0.5">•</span>
+                      <span>Battery performance and defects (within first 12 months)</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-green-600 mt-0.5">•</span>
+                      <span>Power adapters</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-green-600 mt-0.5">•</span>
+                      <span>Pre-installed operating system recovery</span>
+                    </li>
+                  </ul>
+                </div>
+                
+                <div className="border rounded-lg p-4 bg-red-50/50">
+                  <div className="flex items-center gap-2 mb-3">
+                    <AlertCircle className="h-5 w-5 text-red-600" />
+                    <h3 className="font-semibold">What's Not Covered</h3>
+                  </div>
+                  <ul className="text-sm text-neutral-700 space-y-2">
+                    <li className="flex items-start gap-2">
+                      <span className="text-red-600 mt-0.5">•</span>
+                      <span>Customer Induced Damage (CID) including drops, spills, water damage, cracked screens</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-red-600 mt-0.5">•</span>
+                      <span>Normal wear and tear beyond expected usage</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-red-600 mt-0.5">•</span>
+                      <span>Cosmetic damage that doesn't affect functionality</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-red-600 mt-0.5">•</span>
+                      <span>Software issues not related to hardware</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-red-600 mt-0.5">•</span>
+                      <span>Third-party software or applications</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-red-600 mt-0.5">•</span>
+                      <span>Unauthorised modifications or repairs</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-red-600 mt-0.5">•</span>
+                      <span>Lost or stolen devices</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-red-600 mt-0.5">•</span>
+                      <span>Damage from improper use or environment</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-red-600 mt-0.5">•</span>
+                      <span>Battery faults after one year from point of sale</span>
+                    </li>
+                  </ul>
+                </div>
               </div>
               
-              <div className="space-y-2">
-                <h3 className="font-medium">Our Sustainability Commitment</h3>
+              <Separator />
+              
+              {/* Sustainability Commitment */}
+              <div className="bg-[#08ABAB]/5 rounded-lg p-4 border border-[#08ABAB]/20">
+                <div className="flex items-center gap-2 mb-2">
+                  <i className="ri-leaf-line text-[#08ABAB] text-xl"></i>
+                  <h3 className="font-semibold text-lg text-[#08ABAB]">Our Sustainability Commitment</h3>
+                </div>
                 <p className="text-neutral-700">
-                  As part of our sustainability commitment, we offer free recycling of your old devices when you return a product under warranty. All returned units are either repaired for reuse or responsibly recycled following WEEE standards, ensuring zero e-waste to landfill.
+                  As part of our sustainability commitment, we offer free recycling of your old devices when you return a product when no longer covered by our warranty. All returned units are either repaired for reuse or responsibly recycled following WEEE standards, ensuring zero e-waste to landfill.
                 </p>
               </div>
               
-              <Alert className="mt-4 bg-secondary/5 border-secondary/20">
+              <Alert className="bg-secondary/5 border-secondary/20">
                 <HelpCircle className="h-4 w-4 text-secondary" />
                 <AlertTitle>Warranty Verification</AlertTitle>
                 <AlertDescription>
-                  For complete warranty details specific to your product model and purchase date, use the serial number lookup tool above. All warranty services must be initiated through our authorized service process.
+                  For warranty details specific to your product model and purchase date, please use the serial number lookup tool above. All warranty services must be initiated through our authorised service process.
                 </AlertDescription>
               </Alert>
             </CardContent>
