@@ -6,29 +6,75 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
-import { AlertCircle, CheckCircle, HelpCircle, Search, Camera, X, ShoppingCart, Trash2 } from "lucide-react";
+import {
+  AlertCircle,
+  CheckCircle,
+  HelpCircle,
+  Search,
+  Camera,
+  X,
+  ShoppingCart,
+  Trash2,
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { BrowserMultiFormatReader, NotFoundException } from "@zxing/library";
 import { Link, useLocation } from "wouter";
 
 const serialNumberSchema = z.object({
-  serialNumber: z.string().min(5, "Serial number must be at least 5 characters"),
+  serialNumber: z
+    .string()
+    .min(5, "Serial number must be at least 5 characters"),
 });
 
 const troubleshootingFormSchema = z.object({
   issueType: z.string().min(1, "Please select an issue type"),
-  description: z.string().min(10, "Please provide more details about your issue"),
+  description: z
+    .string()
+    .min(10, "Please provide more details about your issue"),
   stepsTaken: z.string().optional(),
 });
 
@@ -39,42 +85,43 @@ export default function Warranty() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
   const [scannerError, setScannerError] = useState<string | null>(null);
-  
+
   // Mock data for warranty lookup
   const [warrantyInfo, setWarrantyInfo] = useState<any>(null);
-  
+
   // RMA Basket state
   const [rmaBasket, setRmaBasket] = useState<any[]>([]);
   const [showBasket, setShowBasket] = useState(false);
-  
+
   // Dialog states for content
   const [showManualsDialog, setShowManualsDialog] = useState(false);
   const [showBatteryDialog, setShowBatteryDialog] = useState(false);
-  
+
   // Scanner refs
   const videoRef = useRef<HTMLVideoElement>(null);
   const codeReader = useRef<BrowserMultiFormatReader | null>(null);
   const checkStatusRef = useRef<HTMLDivElement>(null);
-  
+
   // Fetch support phone number
   const { data: supportSettings } = useQuery<{ supportPhoneNumber: string }>({
     queryKey: ["/api/settings/support"],
   });
-  const supportPhoneNumber = supportSettings?.supportPhoneNumber || '+971581317591';
-  
+  const supportPhoneNumber =
+    supportSettings?.supportPhoneNumber || "+971581317591";
+
   // Helper function for traffic light badge color
   const getWarrantyBadgeClass = (status: string, daysRemaining?: number) => {
-    if (status === 'Expired') {
-      return 'bg-red-100 text-red-800 hover:bg-red-100'; // Red for expired
-    } else if (status === 'Active' && daysRemaining !== undefined) {
+    if (status === "Expired") {
+      return "bg-red-100 text-red-800 hover:bg-red-100"; // Red for expired
+    } else if (status === "Active" && daysRemaining !== undefined) {
       if (daysRemaining <= 30) {
-        return 'bg-amber-100 text-amber-800 hover:bg-amber-100'; // Amber for expiring soon
+        return "bg-amber-100 text-amber-800 hover:bg-amber-100"; // Amber for expiring soon
       }
-      return 'bg-green-100 text-green-800 hover:bg-green-100'; // Green for active with time
+      return "bg-green-100 text-green-800 hover:bg-green-100"; // Green for active with time
     }
-    return 'bg-green-100 text-green-800 hover:bg-green-100'; // Default green
+    return "bg-green-100 text-green-800 hover:bg-green-100"; // Default green
   };
-  
+
   // Initialize scanner
   useEffect(() => {
     codeReader.current = new BrowserMultiFormatReader();
@@ -84,13 +131,15 @@ export default function Warranty() {
       }
     };
   }, []);
-  
+
   // RMA Basket functions
   const addToRmaBasket = () => {
     if (!warrantyInfo) return;
-    
+
     // Check if device already in basket
-    const alreadyExists = rmaBasket.find(item => item.serialNumber === warrantyInfo.serialNumber);
+    const alreadyExists = rmaBasket.find(
+      (item) => item.serialNumber === warrantyInfo.serialNumber,
+    );
     if (alreadyExists) {
       toast({
         title: "Device Already Added",
@@ -99,30 +148,30 @@ export default function Warranty() {
       });
       return;
     }
-    
+
     const basketItem = {
       id: Date.now().toString(),
       ...warrantyInfo,
-      addedAt: new Date().toISOString()
+      addedAt: new Date().toISOString(),
     };
-    
-    setRmaBasket(prev => [...prev, basketItem]);
+
+    setRmaBasket((prev) => [...prev, basketItem]);
     toast({
       title: "Added to RMA Request",
       description: `${warrantyInfo.productName} (${warrantyInfo.serialNumber}) added to your RMA basket.`,
     });
   };
-  
+
   const removeFromRmaBasket = (id: string) => {
-    setRmaBasket(prev => prev.filter(item => item.id !== id));
+    setRmaBasket((prev) => prev.filter((item) => item.id !== id));
     toast({
       title: "Removed from RMA Request",
       description: "Device removed from your RMA basket.",
     });
   };
-  
+
   const [, setLocation] = useLocation();
-  
+
   const submitRmaRequest = () => {
     if (rmaBasket.length === 0) {
       toast({
@@ -132,125 +181,133 @@ export default function Warranty() {
       });
       return;
     }
-    
+
     // Prepare basket data for transfer to warranty-claim page
-    const basketData = rmaBasket.map(device => ({
-      manufacturerSerialNumber: device.manufacturerSerialNumber || '',
-      inhouseSerialNumber: device.serialNumber || '',
+    const basketData = rmaBasket.map((device) => ({
+      manufacturerSerialNumber: device.manufacturerSerialNumber || "",
+      inhouseSerialNumber: device.serialNumber || "",
       productName: device.productName,
-      warrantyStatus: device.warrantyStatus
+      warrantyStatus: device.warrantyStatus,
     }));
-    
+
     // Encode basket data as URL search params
     const searchParams = new URLSearchParams();
-    searchParams.set('basket', JSON.stringify(basketData));
-    
+    searchParams.set("basket", JSON.stringify(basketData));
+
     // Navigate to warranty-claim page with basket data
     setLocation(`/warranty-claim?${searchParams.toString()}`);
-    
+
     // Clear basket since we're transferring to the form
     setRmaBasket([]);
     setShowBasket(false);
-    
+
     toast({
       title: "Redirecting to RMA Form",
       description: `Transferring ${basketData.length} device(s) to the RMA request form.`,
     });
   };
-  
+
   const startScanner = async () => {
     if (!codeReader.current || !videoRef.current) return;
-    
+
     try {
       setIsScanning(true);
       setScannerError(null);
-      
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: { 
-          facingMode: 'environment',
+
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: "environment",
           width: { ideal: 1280 },
-          height: { ideal: 720 }
-        } 
+          height: { ideal: 720 },
+        },
       });
-      
+
       videoRef.current.srcObject = stream;
-      
-      codeReader.current.decodeFromVideoDevice(null, videoRef.current, (result, error) => {
-        if (result) {
-          const scannedText = result.getText();
-          // Handle both QR codes and alphanumeric serial numbers
-          // QR codes may contain URLs or JSON, extract serial number if needed
-          let serialNumber = scannedText;
-          
-          // If it's a URL, try to extract serial number from query params
-          if (scannedText.startsWith('http')) {
-            try {
-              const url = new URL(scannedText);
-              const serialFromUrl = url.searchParams.get('serial') || url.searchParams.get('sn');
-              if (serialFromUrl) {
-                serialNumber = serialFromUrl;
+
+      codeReader.current.decodeFromVideoDevice(
+        null,
+        videoRef.current,
+        (result, error) => {
+          if (result) {
+            const scannedText = result.getText();
+            // Handle both QR codes and alphanumeric serial numbers
+            // QR codes may contain URLs or JSON, extract serial number if needed
+            let serialNumber = scannedText;
+
+            // If it's a URL, try to extract serial number from query params
+            if (scannedText.startsWith("http")) {
+              try {
+                const url = new URL(scannedText);
+                const serialFromUrl =
+                  url.searchParams.get("serial") || url.searchParams.get("sn");
+                if (serialFromUrl) {
+                  serialNumber = serialFromUrl;
+                }
+              } catch (e) {
+                // If URL parsing fails, use the original text
               }
-            } catch (e) {
-              // If URL parsing fails, use the original text
+            }
+
+            // If it's JSON, try to extract serial number
+            if (scannedText.startsWith("{")) {
+              try {
+                const parsed = JSON.parse(scannedText);
+                if (parsed.serial || parsed.serialNumber || parsed.sn) {
+                  serialNumber =
+                    parsed.serial || parsed.serialNumber || parsed.sn;
+                }
+              } catch (e) {
+                // If JSON parsing fails, use the original text
+              }
+            }
+
+            // Validate if it looks like a serial number (alphanumeric, at least 5 characters)
+            if (/^[A-Za-z0-9]{5,}$/.test(serialNumber)) {
+              serialForm.setValue("serialNumber", serialNumber);
+              stopScanner();
+              toast({
+                title: "Code Scanned Successfully",
+                description: `Serial number captured: ${serialNumber}`,
+              });
+            } else {
+              toast({
+                title: "Invalid Code",
+                description:
+                  "Please scan a valid QR code or barcode containing a serial number",
+                variant: "destructive",
+              });
             }
           }
-          
-          // If it's JSON, try to extract serial number
-          if (scannedText.startsWith('{')) {
-            try {
-              const parsed = JSON.parse(scannedText);
-              if (parsed.serial || parsed.serialNumber || parsed.sn) {
-                serialNumber = parsed.serial || parsed.serialNumber || parsed.sn;
-              }
-            } catch (e) {
-              // If JSON parsing fails, use the original text
-            }
+
+          if (error && !(error instanceof NotFoundException)) {
+            console.warn("Scanner error:", error);
           }
-          
-          // Validate if it looks like a serial number (alphanumeric, at least 5 characters)
-          if (/^[A-Za-z0-9]{5,}$/.test(serialNumber)) {
-            serialForm.setValue('serialNumber', serialNumber);
-            stopScanner();
-            toast({
-              title: "Code Scanned Successfully",
-              description: `Serial number captured: ${serialNumber}`,
-            });
-          } else {
-            toast({
-              title: "Invalid Code",
-              description: "Please scan a valid QR code or barcode containing a serial number",
-              variant: "destructive",
-            });
-          }
-        }
-        
-        if (error && !(error instanceof NotFoundException)) {
-          console.warn('Scanner error:', error);
-        }
-      });
-      
+        },
+      );
     } catch (error) {
-      console.error('Failed to start scanner:', error);
-      setScannerError('Failed to access camera. Please ensure camera permissions are granted.');
+      console.error("Failed to start scanner:", error);
+      setScannerError(
+        "Failed to access camera. Please ensure camera permissions are granted.",
+      );
       setIsScanning(false);
     }
   };
-  
+
   const stopScanner = () => {
     if (codeReader.current) {
       codeReader.current.reset();
     }
-    
+
     if (videoRef.current && videoRef.current.srcObject) {
       const stream = videoRef.current.srcObject as MediaStream;
-      stream.getTracks().forEach(track => track.stop());
+      stream.getTracks().forEach((track) => track.stop());
       videoRef.current.srcObject = null;
     }
-    
+
     setIsScanning(false);
     setScannerError(null);
   };
-  
+
   const { data: user, isLoading: isUserLoading } = useQuery({
     queryKey: ["/api/auth/me"],
   });
@@ -262,7 +319,9 @@ export default function Warranty() {
     },
   });
 
-  const troubleshootingForm = useForm<z.infer<typeof troubleshootingFormSchema>>({
+  const troubleshootingForm = useForm<
+    z.infer<typeof troubleshootingFormSchema>
+  >({
     resolver: zodResolver(troubleshootingFormSchema),
     defaultValues: {
       issueType: "",
@@ -274,11 +333,13 @@ export default function Warranty() {
   async function onSerialSubmit(data: z.infer<typeof serialNumberSchema>) {
     try {
       setIsSubmitting(true);
-      
+
       // Call the actual API to fetch warranty info
-      const response = await fetch(`/api/warranties/search?q=${encodeURIComponent(data.serialNumber)}`);
+      const response = await fetch(
+        `/api/warranties/search?q=${encodeURIComponent(data.serialNumber)}`,
+      );
       const result = await response.json();
-      
+
       if (result.found && result.warranty) {
         // Map API response to UI format
         setWarrantyInfo({
@@ -287,8 +348,12 @@ export default function Warranty() {
           productName: result.warranty.productDescription,
           purchaseDate: result.warranty.startDate,
           warrantyEnd: result.warranty.endDate,
-          warrantyStatus: result.warranty.status === 'active' ? 'Active' : 
-                        result.warranty.status === 'expired' ? 'Expired' : 'Upcoming',
+          warrantyStatus:
+            result.warranty.status === "active"
+              ? "Active"
+              : result.warranty.status === "expired"
+                ? "Expired"
+                : "Upcoming",
           additionalCoverage: result.warranty.warrantyDescription,
           registrationStatus: "Registered",
           daysRemaining: result.warranty.daysRemaining,
@@ -297,13 +362,13 @@ export default function Warranty() {
         // No warranty found
         setWarrantyInfo(null);
       }
-      
+
       setSearchPerformed(true);
-      
     } catch (error) {
       toast({
         title: "Error",
-        description: "Unable to retrieve warranty information. Please try again.",
+        description:
+          "Unable to retrieve warranty information. Please try again.",
         variant: "destructive",
       });
       setWarrantyInfo(null);
@@ -313,19 +378,21 @@ export default function Warranty() {
     }
   }
 
-  async function onTroubleshootingSubmit(data: z.infer<typeof troubleshootingFormSchema>) {
+  async function onTroubleshootingSubmit(
+    data: z.infer<typeof troubleshootingFormSchema>,
+  ) {
     try {
       setIsSubmitting(true);
       // In a real implementation, we would submit this to an API
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       toast({
         title: "Troubleshooting Request Submitted",
-        description: "Our technical team will review your issue and provide assistance shortly.",
+        description:
+          "Our technical team will review your issue and provide assistance shortly.",
       });
-      
+
       troubleshootingForm.reset();
-      
     } catch (error) {
       toast({
         title: "Error",
@@ -342,55 +409,75 @@ export default function Warranty() {
     {
       id: "battery",
       title: "Battery Issues",
-      content: "If your Circular Computing laptop battery is not charging or draining quickly, try these steps:\n\n1. Check power connections and adapter\n2. Ensure the AC adapter is properly connected to both the laptop and power outlet\n3. Verify the charging light indicator is on when plugged in\n4. Restart your laptop with the adapter connected\n5. Update power management drivers from the manufacturer's website\n6. Run the Battery Health Diagnostic tool (accessible via BIOS on most models)\n7. If battery shows <80% capacity after 12 months, you may qualify for a replacement under warranty\n8. For persistent issues, visit my-warranty.com/troubleshoot/ for advanced diagnostics"
+      content:
+        "If your Circular Computing laptop battery is not charging or is draining quickly, try these steps:\n\n1. Check power connections and adapter.\n2. Ensure the AC adapter is properly connected to both the laptop and power outlet. \n3. Verify the charging light indicator is on when plugged in. \n4.Restart your laptop with the adapter connected. \n5. Update power management drivers from the manufacturer's website. \n6. Run the Battery Health Diagnostic tool (accessible via BIOS on most models). \n7. For persistent battery issues please reach out to our team for further support.",
     },
     {
       id: "performance",
       title: "Performance Issues",
-      content: "For slow performance or system lag on your remanufactured laptop:\n\n1. Restart your laptop to clear temporary memory issues\n2. Check Task Manager (Ctrl+Shift+Esc) to identify resource-intensive processes\n3. Ensure you have at least 20% free storage space on your drive\n4. Update your operating system and all drivers\n5. Scan for malware using the pre-installed security solution\n6. Clear temporary files using Disk Cleanup utility\n7. Consider upgrading RAM or storage if consistently facing performance issues\n8. Our remanufactured laptops support component upgrades without voiding warranty\n9. Visit my-warranty.com/performance for model-specific optimization guides"
+      content:
+        "For slow performance or system lag on your remanufactured laptop:\n1. Restart your laptop to clear temporary memory issues.\n2. Check Task Manager (Ctrl+Shift+Esc) to identify resource-intensive processes.\n3. Ensure you have at least 20% free storage space on your drive (recommended).\n4. Update your operating system and all drivers.\n5. Scan for malware using the pre-installed security solution.\n6. Clear temporary files using Disk Cleanup utility.\n7. Consider upgrading RAM or storage if consistently facing performance issues.\n8. Our remanufactured laptops support component upgrades without voiding warranty upon authorisation.\n9. Visit my-warranty.com/performance for model-specific optimisation guides.\n10. For persistent performance issues please reach out to our team for further support.",
     },
     {
       id: "display",
       title: "Display Problems",
-      content: "For screen flickering, distortion, or no display on your Circular Computing laptop:\n\n1. Update graphics drivers from the original manufacturer's website\n2. Test with an external monitor to determine if the issue is with the screen or graphics card\n3. Run hardware diagnostics (F12 at startup on most models)\n4. For LED displays, check for loose cable connections (if comfortable opening the case)\n5. Adjust brightness and display settings in Control Panel\n6. For ghost images or burn-in on LCD screens, use a pixel repair utility\n7. Our remanufactured screens undergo 3-stage testing and are covered under full warranty\n8. If issues persist after basic troubleshooting, you may qualify for free repair service"
+      content:
+        "For screen flickering, distortion, or no display on your Circular Computing laptop:\n1. Update graphics drivers from the original manufacturer's website.\n2. Test with an external monitor to determine if the issue is with the screen or graphics card.\n3. Run hardware diagnostics (F12 at startup on most models).\n4. For LED displays, check for loose cable connections (if comfortable opening the case).\n5. Adjust brightness and display settings in Control Panel.\n6. For ghost images or burn-in on LCD screens, use a pixel repair utility.\n7. Our remanufactured screens undergo 3-stage testing and are covered under full warranty.\n8. For persistent display issues please reach out to our team for further support.",
     },
     {
       id: "connectivity",
       title: "Wi-Fi & Connectivity",
-      content: "For internet connection issues on your sustainable laptop:\n\n1. Ensure Wi-Fi is enabled (check physical switch or function key)\n2. Restart your router and laptop\n3. Forget the network and reconnect with correct credentials\n4. Update wireless drivers from the original manufacturer's website\n5. Run the Network Troubleshooter (Settings > Network & Internet > Status > Network Troubleshooter)\n6. Reset the TCP/IP stack using Command Prompt as Administrator: 'netsh winsock reset' and 'netsh int ip reset'\n7. If Bluetooth connectivity issues occur, update chipset drivers\n8. Our remanufactured laptops feature upgraded Wi-Fi cards in most models\n9. For persistent connectivity issues, visit my-warranty.com/network-solutions"
+      content:
+        "For internet connection issues on your sustainable laptop:\n1. Ensure Wi-Fi is enabled (check physical switch or function key).\n2. Restart your router and laptop.\n3. Forget the network and reconnect with correct credentials.\n4. Update wireless drivers from the original manufacturer's website.\n5. Run the Network Troubleshooter (Settings > Network & Internet > Status > Network Troubleshooter).\n6. Reset the TCP/IP stack using Command Prompt as Administrator: 'netsh winsock reset' and 'netsh int ip reset'.\n7. If Bluetooth connectivity issues occur, update chipset drivers.\n8. If Wi-Fi and connectivity issues persist please reach out to our team for further support.",
     },
     {
       id: "keyboard",
       title: "Keyboard & Touchpad",
-      content: "For keyboard or touchpad issues on your Circular Computing device:\n\n1. Restart the system to reset input devices\n2. Update input device drivers from original manufacturer's site\n3. Check for debris or damage - our keyboards are thoroughly sanitized and tested\n4. Use compressed air to remove dust from between keys\n5. Adjust sensitivity settings in Control Panel > Mouse or Touchpad settings\n6. Test with an external keyboard/mouse to isolate hardware vs software issues\n7. For backlight issues, check function key combinations (usually Fn+F5 or similar)\n8. All our remanufactured keyboards undergo double-stroke testing and are covered by warranty\n9. For key replacement kits, visit my-warranty.com/keyboard-support"
+      content:
+        "For keyboard or touchpad issues on your Circular Computing device:\n1. Restart the system to reset input devices.\n2. Boot into BIOS to confirm whether the issue persists – persistence indicates a hardware fault; absence suggests a software issue.\n3. Update input device drivers from original manufacturer's site.\n4. Check for debris or damage – our keyboards are thoroughly sanitised and tested.\n5. Use compressed air to remove dust from between keys.\n6. Adjust sensitivity settings in Control Panel > Mouse or Touchpad settings.\n7. Test with an external keyboard/mouse to isolate hardware vs software issues.\n8. Check the laptop with and without the charger plugged in to see if this is causing a problem.\n9. All our remanufactured keyboards undergo double-stroke testing and are covered by warranty.\n10. For persistent keyboard or touchpad issues please reach out to our team for further support.",
     },
     {
       id: "software",
       title: "Operating System & Software",
-      content: "For software issues on your sustainable remanufactured laptop:\n\n1. Ensure all updates are installed for your operating system\n2. Check for software conflicts in Event Viewer\n3. Test in Safe Mode to determine if issues are software or hardware related\n4. Use System Restore to return to a previous working state\n5. Our laptops come with a clean OS install and minimal bloatware\n6. For driver issues, always use manufacturer-approved drivers\n7. If experiencing blue screens, note the error code and visit my-warranty.com/bsod-solutions\n8. Software support is available for the first 90 days after purchase\n9. Consider refreshing your OS using the built-in reset options if persistent issues occur"
+      content:
+        "For software issues on your sustainable remanufactured laptop:\n1. Ensure all updates are installed for your operating system.\n2. Check for software conflicts in Event Viewer.\n3. Test in Safe Mode to determine if issues are software or hardware related.\n4. Use System Restore to return to a previous working state.\n5. For driver issues, always use manufacturer-approved drivers which can be found via the OEM diagnostic tools linked at the bottom of this page.\n6. If a blue screen occurs, make a note of the error code and perform an online search for that code to locate the relevant solution.\n7. Consider refreshing your OS using the built-in reset options if persistent issues occur.\n8. Whilst we don’t cover software-related issues under our warranty terms, if you are still experiencing issues, please reach out to our team who will signpost you accordingly.",
     },
     {
       id: "cooling",
       title: "Overheating & Cooling",
-      content: "If your Circular Computing laptop is running hot or shutting down due to temperature:\n\n1. Ensure vents are clean and not blocked when using the laptop\n2. Use on hard surfaces rather than soft surfaces like beds or couches\n3. Check that internal fans are running properly (listen for unusual noises)\n4. All our remanufactured laptops undergo thermal paste replacement and cooling system cleaning\n5. Update BIOS and chipset drivers from the manufacturer's website\n6. Use a laptop cooling pad for extended high-performance usage\n7. Check CPU usage in Task Manager for runaway processes causing heat\n8. Our thermal optimization process ensures optimal performance within safe temperature ranges\n9. For persistent heating issues, you may qualify for a cooling system inspection under warranty"
+      content:
+        "If your Circular Computing laptop is running hot or shutting down due to temperature:\n1. Ensure vents are clean and not blocked when using the laptop.\n2. Use on hard surfaces rather than soft surfaces like beds or couches.\n3. Check that internal fans are running properly (listen for unusual noises).\n4. Update BIOS and chipset drivers from the manufacturer's website.\n5. Use a laptop cooling pad for extended high-performance usage.\n6. Check CPU usage in Task Manager for runaway processes causing heat.\n7. Our thermal optimisation process ensures optimal performance within safe temperature ranges.\n8. For persistent heating issues please reach out to our team for further support.",
     },
     {
       id: "audio",
       title: "Audio & Microphone Issues",
-      content: "For sound or microphone problems on your sustainable laptop:\n\n1. Check volume controls and ensure the device is not muted\n2. Update audio drivers from the original manufacturer's website\n3. Test with headphones to isolate speaker issues\n4. Run the Windows Audio Troubleshooter\n5. Check Device Manager for yellow exclamation marks on audio devices\n6. Test microphone levels in Sound Control Panel\n7. For conferencing issues, test in different applications to isolate the problem\n8. Our remanufacturing process includes thorough testing of all audio components\n9. For model-specific audio enhancements, visit my-warranty.com/audio-solutions"
-    }
+      content:
+        "For sound, microphone or webcam problems on your sustainable laptop:\n1. Check volume controls and ensure the device is not muted.\n2. Update audio drivers from the original manufacturer's website.\n3. Test with headphones to isolate speaker issues.\n4. Run the Windows Audio Troubleshooter.\n5. Check Device Manager for yellow exclamation marks on audio devices.\n6. Test microphone levels in Sound Control Panel.\n7. For conferencing issues, test in different applications to isolate the problem.\n8. Check to see if the webcam is being detected in the Windows Camera app.\n9. Check for conflicting software.\n10. For persistent audio, microphone or webcam issues please reach out to our team for further support.",
+    },
+    {
+      id: "storage",
+      title: "Storage/SSD",
+      content:
+        "For issues where storage is concerned with your sustainable laptop:\n1. Run a hardware diagnostic test on the hard drive to detect any bad sectors.\n2. If SSD is not detected, please check the SSD is plugged in.\n3. If SSD is being detected, please try installing a new OS.\n4. If the SSD is plugged in and not being detected please reach out to our team for support.\n5. If the SSD has been detected but the OS is failing to boot correctly, please reinstall the OS and try again.\n6. If storage issues persist please reach out to our team for further support.",
+    },
   ];
 
   return (
     <div className="py-6 px-4 md:px-8 max-w-7xl mx-auto">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold font-poppins text-neutral-900">Warranty & Troubleshooting</h1>
-          <p className="text-neutral-600">Check your warranty status and get support for your product</p>
+          <h1 className="text-2xl font-bold font-poppins text-neutral-900">
+            Warranty & Troubleshooting
+          </h1>
+          <p className="text-neutral-600">
+            Check your warranty status and get support for your product
+          </p>
         </div>
         <div className="mt-4 md:mt-0 flex gap-2">
-          <Button 
-            onClick={() => window.open('https://circularcomputing.com/contact/', '_blank')}
+          <Button
+            onClick={() =>
+              window.open("https://circularcomputing.com/contact/", "_blank")
+            }
             variant="outline"
           >
             <i className="ri-phone-line mr-2"></i>
@@ -400,20 +487,20 @@ export default function Warranty() {
       </div>
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger 
-            value="warranty" 
+          <TabsTrigger
+            value="warranty"
             className="hover:bg-neutral-100 transition-colors data-[state=active]:bg-[#08ABAB] data-[state=active]:text-white data-[state=active]:hover:bg-[#08ABAB]"
           >
             Warranty Checker
           </TabsTrigger>
-          <TabsTrigger 
-            value="troubleshooting" 
+          <TabsTrigger
+            value="troubleshooting"
             className="hover:bg-neutral-100 transition-colors data-[state=active]:bg-[#08ABAB] data-[state=active]:text-white data-[state=active]:hover:bg-[#08ABAB]"
           >
             Troubleshooting Guide
           </TabsTrigger>
         </TabsList>
-        
+
         {/* Warranty Information Tab */}
         <TabsContent value="warranty" className="space-y-6">
           <Card ref={checkStatusRef}>
@@ -425,7 +512,10 @@ export default function Warranty() {
             </CardHeader>
             <CardContent>
               <Form {...serialForm}>
-                <form onSubmit={serialForm.handleSubmit(onSerialSubmit)} className="space-y-4">
+                <form
+                  onSubmit={serialForm.handleSubmit(onSerialSubmit)}
+                  className="space-y-4"
+                >
                   <FormField
                     control={serialForm.control}
                     name="serialNumber"
@@ -436,7 +526,7 @@ export default function Warranty() {
                           <FormControl>
                             <Input placeholder="e.g. CC21XG45T" {...field} />
                           </FormControl>
-                          <Button 
+                          <Button
                             type="button"
                             onClick={isScanning ? stopScanner : startScanner}
                             variant="outline"
@@ -454,8 +544,8 @@ export default function Warranty() {
                               </>
                             )}
                           </Button>
-                          <Button 
-                            type="submit" 
+                          <Button
+                            type="submit"
                             disabled={isSubmitting}
                             variant="outline"
                             className="bg-[#08ABAB] border-[#08ABAB] text-white hover:bg-[#FF9E1C] hover:text-black hover:border-[#FF9E1C] transition-all duration-200 shrink-0"
@@ -464,7 +554,9 @@ export default function Warranty() {
                           </Button>
                         </div>
                         <FormDescription>
-                          Scan QR codes or barcodes containing serial numbers, or enter the serial number manually. The serial number is usually found on the bottom of your device.
+                          Scan QR codes or barcodes containing serial numbers,
+                          or enter the serial number manually. The serial number
+                          is usually found on the bottom of your device.
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
@@ -472,7 +564,7 @@ export default function Warranty() {
                   />
                 </form>
               </Form>
-              
+
               {/* Scanner Display */}
               {isScanning && (
                 <div className="mt-4">
@@ -485,16 +577,19 @@ export default function Warranty() {
                     />
                     <div className="absolute inset-0 flex items-center justify-center">
                       <div className="w-48 h-32 border-2 border-primary bg-primary/10 rounded-lg flex items-center justify-center">
-                        <span className="text-primary text-sm font-medium">Position QR code or barcode here</span>
+                        <span className="text-primary text-sm font-medium">
+                          Position QR code or barcode here
+                        </span>
                       </div>
                     </div>
                   </div>
                   <p className="text-sm text-neutral-600 mt-2 text-center">
-                    Position your device's QR code, barcode, or serial number label within the highlighted area
+                    Position your device's QR code, barcode, or serial number
+                    label within the highlighted area
                   </p>
                 </div>
               )}
-              
+
               {/* Scanner Error */}
               {scannerError && (
                 <Alert className="mt-4" variant="destructive">
@@ -512,90 +607,142 @@ export default function Warranty() {
               {warrantyInfo ? (
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-xl font-semibold">Warranty Details</CardTitle>
-                    <Badge 
+                    <CardTitle className="text-xl font-semibold">
+                      Warranty Details
+                    </CardTitle>
+                    <Badge
                       variant="secondary"
-                      className={getWarrantyBadgeClass(warrantyInfo.warrantyStatus, warrantyInfo.daysRemaining)}
+                      className={getWarrantyBadgeClass(
+                        warrantyInfo.warrantyStatus,
+                        warrantyInfo.daysRemaining,
+                      )}
                     >
                       {warrantyInfo.warrantyStatus}
-                      {warrantyInfo.warrantyStatus === "Active" && warrantyInfo.daysRemaining <= 30 && warrantyInfo.daysRemaining > 0 && (
-                        <span className="ml-1">({warrantyInfo.daysRemaining} days left)</span>
-                      )}
+                      {warrantyInfo.warrantyStatus === "Active" &&
+                        warrantyInfo.daysRemaining <= 30 &&
+                        warrantyInfo.daysRemaining > 0 && (
+                          <span className="ml-1">
+                            ({warrantyInfo.daysRemaining} days left)
+                          </span>
+                        )}
                     </Badge>
                   </CardHeader>
                   <CardContent className="pt-4">
                     <div className="space-y-4">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                          <h4 className="text-sm font-medium text-neutral-500">Product</h4>
-                          <p className="text-base">{warrantyInfo.productName}</p>
+                          <h4 className="text-sm font-medium text-neutral-500">
+                            Product
+                          </h4>
+                          <p className="text-base">
+                            {warrantyInfo.productName}
+                          </p>
                         </div>
                         <div>
-                          <h4 className="text-sm font-medium text-neutral-500">Serial Number</h4>
-                          <p className="text-base">{warrantyInfo.serialNumber}</p>
+                          <h4 className="text-sm font-medium text-neutral-500">
+                            Serial Number
+                          </h4>
+                          <p className="text-base">
+                            {warrantyInfo.serialNumber}
+                          </p>
                         </div>
                       </div>
-                      
+
                       <Separator />
-                      
+
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                          <h4 className="text-sm font-medium text-neutral-500">Purchase Date</h4>
-                          <p className="text-base">{new Date(warrantyInfo.purchaseDate).toLocaleDateString()}</p>
+                          <h4 className="text-sm font-medium text-neutral-500">
+                            Purchase Date
+                          </h4>
+                          <p className="text-base">
+                            {new Date(
+                              warrantyInfo.purchaseDate,
+                            ).toLocaleDateString()}
+                          </p>
                         </div>
                         <div>
-                          <h4 className="text-sm font-medium text-neutral-500">Warranty End Date</h4>
-                          <p className="text-base">{new Date(warrantyInfo.warrantyEnd).toLocaleDateString()}</p>
+                          <h4 className="text-sm font-medium text-neutral-500">
+                            Warranty End Date
+                          </h4>
+                          <p className="text-base">
+                            {new Date(
+                              warrantyInfo.warrantyEnd,
+                            ).toLocaleDateString()}
+                          </p>
                         </div>
                       </div>
-                      
+
                       <div>
-                        <h4 className="text-sm font-medium text-neutral-500">Additional Coverage</h4>
-                        <p className="text-base">{warrantyInfo.additionalCoverage || "None"}</p>
+                        <h4 className="text-sm font-medium text-neutral-500">
+                          Additional Coverage
+                        </h4>
+                        <p className="text-base">
+                          {warrantyInfo.additionalCoverage || "None"}
+                        </p>
                       </div>
-                      
-                      {warrantyInfo.warrantyStatus === 'Expired' ? (
+
+                      {warrantyInfo.warrantyStatus === "Expired" ? (
                         <Alert className="bg-red-50 border-red-200">
                           <AlertCircle className="h-4 w-4 text-red-600" />
-                          <AlertTitle className="text-red-800">Registration Status</AlertTitle>
+                          <AlertTitle className="text-red-800">
+                            Registration Status
+                          </AlertTitle>
                           <AlertDescription className="text-red-700">
-                            Your warranty has expired and your product is no longer covered.
+                            Your warranty has expired and your product is no
+                            longer covered.
                           </AlertDescription>
                         </Alert>
                       ) : (
                         <Alert className="bg-primary/5 border-primary/20">
                           <CheckCircle className="h-4 w-4 text-primary" />
-                          <AlertTitle>Registration Status: {warrantyInfo.registrationStatus}</AlertTitle>
+                          <AlertTitle>
+                            Registration Status:{" "}
+                            {warrantyInfo.registrationStatus}
+                          </AlertTitle>
                           <AlertDescription>
-                            Your product is fully registered and covered under our warranty policy.
+                            Your product is fully registered and covered under
+                            our warranty policy.
                           </AlertDescription>
                         </Alert>
                       )}
                     </div>
                   </CardContent>
                   <CardFooter className="flex flex-wrap gap-2">
-                    <Button variant="outline" onClick={() => {
-                      serialForm.reset();
-                      setSearchPerformed(false);
-                      setWarrantyInfo(null);
-                      checkStatusRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                      setTimeout(() => serialForm.setFocus('serialNumber'), 500);
-                    }}>
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        serialForm.reset();
+                        setSearchPerformed(false);
+                        setWarrantyInfo(null);
+                        checkStatusRef.current?.scrollIntoView({
+                          behavior: "smooth",
+                          block: "start",
+                        });
+                        setTimeout(
+                          () => serialForm.setFocus("serialNumber"),
+                          500,
+                        );
+                      }}
+                    >
                       Check Another Product
                     </Button>
-                    <Button variant="outline" onClick={() => setActiveTab("troubleshooting")}>
+                    <Button
+                      variant="outline"
+                      onClick={() => setActiveTab("troubleshooting")}
+                    >
                       Troubleshooting Guide
                     </Button>
-                    <Button 
-                      variant="outline" 
+                    <Button
+                      variant="outline"
                       onClick={addToRmaBasket}
-                      disabled={warrantyInfo.warrantyStatus === 'Expired'}
+                      disabled={warrantyInfo.warrantyStatus === "Expired"}
                       className="bg-[#08ABAB] text-white border-[#08ABAB] hover:bg-[#FF9E1C] hover:text-black hover:border-[#FF9E1C] transition-colors disabled:bg-neutral-300 disabled:text-neutral-500 disabled:border-neutral-300 disabled:cursor-not-allowed"
                     >
                       Add to RMA Request
                     </Button>
                     {rmaBasket.length > 0 && (
-                      <Button 
+                      <Button
                         onClick={() => setShowBasket(true)}
                         variant="outline"
                         className="relative"
@@ -616,11 +763,18 @@ export default function Warranty() {
                       <div className="h-12 w-12 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 mb-4">
                         <AlertCircle className="h-6 w-6" />
                       </div>
-                      <h3 className="text-lg font-medium mb-2">No Warranty Information Found</h3>
+                      <h3 className="text-lg font-medium mb-2">
+                        No Warranty Information Found
+                      </h3>
                       <p className="text-neutral-600 text-center mb-4">
-                        We couldn't find warranty information for the specified serial number. Please double-check the number and try again.
+                        We couldn't find warranty information for the specified
+                        serial number. Please double-check the number and try
+                        again.
                       </p>
-                      <Button variant="outline" onClick={() => serialForm.reset()}>
+                      <Button
+                        variant="outline"
+                        onClick={() => serialForm.reset()}
+                      >
                         Try Again
                       </Button>
                     </div>
@@ -629,7 +783,7 @@ export default function Warranty() {
               )}
             </>
           )}
-          
+
           {/* Standard Warranty Card */}
           <Card className="bg-gradient-to-r from-primary/5 to-primary/10 border-primary/20 mb-6">
             <CardContent className="p-5">
@@ -638,13 +792,24 @@ export default function Warranty() {
                   <i className="ri-shield-check-line text-primary text-2xl"></i>
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-semibold text-lg text-primary">Circular Computing Comprehensive Warranty</h3>
+                  <h3 className="font-semibold text-lg text-primary">
+                    Circular Computing Comprehensive Warranty
+                  </h3>
                   <p className="text-sm text-neutral-700 mt-1">
-                    All Circular Computing remanufactured laptops come with a comprehensive <span className="font-semibold">1-year warranty</span> as standard. This industry-leading coverage reflects our confidence in the quality of our carbon-neutral remanufacturing process.
+                    All Circular Computing remanufactured laptops come with a
+                    comprehensive{" "}
+                    <span className="font-semibold">1-year warranty</span> as
+                    standard. This industry-leading coverage reflects our
+                    confidence in the quality of our carbon-neutral
+                    remanufacturing process.
                   </p>
                   <div className="flex items-center gap-4 mt-3">
-                    <Badge className="bg-primary/10 text-primary border-primary/20">1-Year Standard</Badge>
-                    <Badge variant="outline" className="text-neutral-600">All Devices Covered</Badge>
+                    <Badge className="bg-primary/10 text-primary border-primary/20">
+                      1-Year Standard
+                    </Badge>
+                    <Badge variant="outline" className="text-neutral-600">
+                      All Devices Covered
+                    </Badge>
                   </div>
                 </div>
               </div>
@@ -658,54 +823,86 @@ export default function Warranty() {
                 <i className="ri-vip-crown-line text-amber-500"></i>
                 Warranty Service Options
               </CardTitle>
-              <CardDescription>Choose how you'd like your warranty claim to be processed</CardDescription>
+              <CardDescription>
+                Choose how you'd like your warranty claim to be processed
+              </CardDescription>
             </CardHeader>
             <CardContent className="pt-0">
               {/* Service Type Quick Comparison */}
               <div className="grid grid-cols-2 gap-3 mb-4">
                 <div className="p-3 bg-green-50 rounded-lg border border-green-200 text-center">
                   <i className="ri-refresh-line text-green-600 text-xl"></i>
-                  <h5 className="font-semibold text-green-800 text-sm mt-1">Advanced Replacement</h5>
-                  <p className="text-xs text-green-700">Next-day swap (UK Mainland)</p>
+                  <h5 className="font-semibold text-green-800 text-sm mt-1">
+                    Advanced Replacement
+                  </h5>
+                  <p className="text-xs text-green-700">
+                    Next-day swap (UK Mainland)
+                  </p>
                 </div>
                 <div className="p-3 bg-blue-50 rounded-lg border border-blue-200 text-center">
                   <i className="ri-arrow-go-back-line text-blue-600 text-xl"></i>
-                  <h5 className="font-semibold text-blue-800 text-sm mt-1">Return to Base</h5>
-                  <p className="text-xs text-blue-700">5-day turnaround (UK & Europe)</p>
+                  <h5 className="font-semibold text-blue-800 text-sm mt-1">
+                    Return to Base
+                  </h5>
+                  <p className="text-xs text-blue-700">
+                    5-day turnaround (UK & Europe)
+                  </p>
                 </div>
               </div>
-              
-              <Accordion type="multiple" defaultValue={["coverage", "sustainability"]} className="w-full">
+
+              <Accordion
+                type="multiple"
+                defaultValue={["coverage", "sustainability"]}
+                className="w-full"
+              >
                 {/* Advanced Replacement */}
-                <AccordionItem value="advanced-replacement" className="border rounded-lg mb-3 px-4">
+                <AccordionItem
+                  value="advanced-replacement"
+                  className="border rounded-lg mb-3 px-4"
+                >
                   <AccordionTrigger className="hover:no-underline py-4">
                     <div className="flex items-center gap-3 text-left">
                       <div className="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
                         <i className="ri-refresh-line text-green-600"></i>
                       </div>
                       <div>
-                        <h4 className="font-semibold">Advanced Replacement Warranty</h4>
-                        <p className="text-xs text-neutral-500 font-normal">Swap IT service - UK Mainland & Isle of Wight</p>
+                        <h4 className="font-semibold">
+                          Advanced Replacement Warranty
+                        </h4>
+                        <p className="text-xs text-neutral-500 font-normal">
+                          Swap IT service - UK Mainland & Isle of Wight
+                        </p>
                       </div>
                     </div>
                   </AccordionTrigger>
                   <AccordionContent className="pb-4">
                     <div className="space-y-4 pt-2">
                       <p className="text-sm text-neutral-700">
-                        Receive a replacement unit once your RMA is approved. We use our Swap IT exchange service for covered areas, or arrange separate delivery and collection for other locations.
+                        Receive a replacement unit once your RMA is approved. We
+                        use our Swap IT exchange service for covered areas, or
+                        arrange separate delivery and collection for other
+                        locations.
                       </p>
-                      
+
                       <div className="grid grid-cols-2 gap-3">
                         <div className="p-3 bg-green-50 rounded-lg border border-green-200">
-                          <p className="text-xs text-green-600 font-medium mb-1">Covered</p>
-                          <p className="text-sm text-green-800">UK Mainland, Isle of Wight</p>
+                          <p className="text-xs text-green-600 font-medium mb-1">
+                            Covered
+                          </p>
+                          <p className="text-sm text-green-800">
+                            UK Mainland, Isle of Wight
+                          </p>
                         </div>
                         <div className="p-3 bg-amber-50 rounded-lg border border-amber-200">
-                          <p className="text-xs text-amber-600 font-medium mb-1">Separate Process</p>
-                          <p className="text-sm text-amber-800">NI, Channel Islands, Scotland Highlands, Europe</p>
+                          <p className="text-xs text-amber-600 font-medium mb-1">
+                            Separate Process
+                          </p>
+                          <p className="text-sm text-amber-800">
+                            NI, Channel Islands, Scotland Highlands, Europe
+                          </p>
                         </div>
                       </div>
-                      
+
                       <details className="bg-neutral-50 rounded-lg border group">
                         <summary className="p-3 cursor-pointer text-sm font-medium flex items-center justify-between hover:bg-neutral-100 transition-colors rounded-lg">
                           <span>View Process Steps</span>
@@ -713,14 +910,27 @@ export default function Warranty() {
                         </summary>
                         <div className="px-3 pb-3">
                           <ol className="text-xs text-neutral-600 space-y-1 list-decimal list-inside">
-                            <li>Register claim at <a href="https://my-warranty.com" target="_blank" rel="noreferrer" className="text-primary hover:underline">my-warranty.com</a></li>
+                            <li>
+                              Register claim at{" "}
+                              <a
+                                href="https://my-warranty.com"
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-primary hover:underline"
+                              >
+                                my-warranty.com
+                              </a>
+                            </li>
                             <li>UK team responds within 8 working hours</li>
                             <li>RMA number issued if unresolved</li>
                             <li>Replacement shipped to your location</li>
                             <li>Collection arranged for original laptop</li>
                             <li>Satisfaction survey sent on completion</li>
                           </ol>
-                          <p className="text-xs text-neutral-400 mt-2 italic">*Multiple unit claims may take longer than next-day TAT</p>
+                          <p className="text-xs text-neutral-400 mt-2 italic">
+                            *Multiple unit claims may take longer than next-day
+                            TAT
+                          </p>
                         </div>
                       </details>
                     </div>
@@ -728,15 +938,22 @@ export default function Warranty() {
                 </AccordionItem>
 
                 {/* Return to Base */}
-                <AccordionItem value="rtb" className="border rounded-lg mb-3 px-4">
+                <AccordionItem
+                  value="rtb"
+                  className="border rounded-lg mb-3 px-4"
+                >
                   <AccordionTrigger className="hover:no-underline py-4">
                     <div className="flex items-center gap-3 text-left">
                       <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
                         <i className="ri-arrow-go-back-line text-blue-600"></i>
                       </div>
                       <div>
-                        <h4 className="font-semibold">Return to Base (RTB) Warranty</h4>
-                        <p className="text-xs text-neutral-500 font-normal">5-day turnaround - UK & Europe</p>
+                        <h4 className="font-semibold">
+                          Return to Base (RTB) Warranty
+                        </h4>
+                        <p className="text-xs text-neutral-500 font-normal">
+                          5-day turnaround - UK & Europe
+                        </p>
                       </div>
                     </div>
                   </AccordionTrigger>
@@ -744,44 +961,82 @@ export default function Warranty() {
                     <div className="space-y-4 pt-2">
                       <div className="grid grid-cols-4 gap-2">
                         <div className="text-center p-2 bg-green-50 rounded-lg border border-green-200">
-                          <p className="text-[10px] text-green-600 font-medium uppercase">Coverage</p>
-                          <p className="text-xs font-semibold text-green-800 mt-0.5">UK & Europe</p>
+                          <p className="text-[10px] text-green-600 font-medium uppercase">
+                            Coverage
+                          </p>
+                          <p className="text-xs font-semibold text-green-800 mt-0.5">
+                            UK & Europe
+                          </p>
                         </div>
                         <div className="text-center p-2 bg-blue-50 rounded-lg border border-blue-200">
-                          <p className="text-[10px] text-blue-600 font-medium uppercase">Turnaround</p>
-                          <p className="text-xs font-semibold text-blue-800 mt-0.5">5 Days*</p>
+                          <p className="text-[10px] text-blue-600 font-medium uppercase">
+                            Turnaround
+                          </p>
+                          <p className="text-xs font-semibold text-blue-800 mt-0.5">
+                            5 Days*
+                          </p>
                         </div>
                         <div className="text-center p-2 bg-purple-50 rounded-lg border border-purple-200">
-                          <p className="text-[10px] text-purple-600 font-medium uppercase">Outcome</p>
-                          <p className="text-xs font-semibold text-purple-800 mt-0.5">Repair/Replace</p>
+                          <p className="text-[10px] text-purple-600 font-medium uppercase">
+                            Outcome
+                          </p>
+                          <p className="text-xs font-semibold text-purple-800 mt-0.5">
+                            Repair/Replace
+                          </p>
                         </div>
                         <div className="text-center p-2 bg-neutral-100 rounded-lg border border-neutral-200">
-                          <p className="text-[10px] text-neutral-600 font-medium uppercase">Insurance</p>
-                          <p className="text-xs font-semibold text-neutral-800 mt-0.5">Full Cover</p>
+                          <p className="text-[10px] text-neutral-600 font-medium uppercase">
+                            Insurance
+                          </p>
+                          <p className="text-xs font-semibold text-neutral-800 mt-0.5">
+                            Full Cover
+                          </p>
                         </div>
                       </div>
-                      
+
                       <div className="grid grid-cols-2 gap-3">
                         <div className="p-3 bg-neutral-50 rounded-lg border text-sm">
-                          <p className="font-medium text-xs text-neutral-500 mb-1"><i className="ri-map-pin-line mr-1"></i>Return Address</p>
-                          <p className="text-neutral-700 text-xs">A2C Services Ltd, Unit E Railway Triangle, Walton Road, Portsmouth PO6 1TY, UK</p>
+                          <p className="font-medium text-xs text-neutral-500 mb-1">
+                            <i className="ri-map-pin-line mr-1"></i>Return
+                            Address
+                          </p>
+                          <p className="text-neutral-700 text-xs">
+                            A2C Services Ltd, Unit E Railway Triangle, Walton
+                            Road, Portsmouth PO6 1TY, UK
+                          </p>
                         </div>
                         <div className="p-3 bg-neutral-50 rounded-lg border text-sm">
-                          <p className="font-medium text-xs text-neutral-500 mb-1"><i className="ri-truck-line mr-1"></i>Shipping</p>
-                          <p className="text-neutral-700 text-xs">Outbound: <span className="font-medium">Customer pays</span><br/>Return: <span className="font-medium">We cover</span></p>
+                          <p className="font-medium text-xs text-neutral-500 mb-1">
+                            <i className="ri-truck-line mr-1"></i>Shipping
+                          </p>
+                          <p className="text-neutral-700 text-xs">
+                            Outbound:{" "}
+                            <span className="font-medium">Customer pays</span>
+                            <br />
+                            Return:{" "}
+                            <span className="font-medium">We cover</span>
+                          </p>
                         </div>
                       </div>
-                      
+
                       <div className="flex items-start gap-2 p-2 bg-blue-50/50 rounded-lg border border-blue-100 text-xs">
                         <i className="ri-shield-check-line text-blue-600 mt-0.5"></i>
-                        <p className="text-blue-800"><span className="font-medium">Insurance:</span> Your stock is fully insured to original order value while in our control.</p>
+                        <p className="text-blue-800">
+                          <span className="font-medium">Insurance:</span> Your
+                          stock is fully insured to original order value while
+                          in our control.
+                        </p>
                       </div>
-                      
+
                       <div className="flex items-start gap-2 p-2 bg-amber-50/50 rounded-lg border border-amber-200 text-xs">
                         <AlertCircle className="h-3 w-3 text-amber-600 mt-0.5 flex-shrink-0" />
-                        <p className="text-amber-800"><span className="font-medium">Europe:</span> Brexit customs fees and VAT may apply (customer responsibility).</p>
+                        <p className="text-amber-800">
+                          <span className="font-medium">Europe:</span> Brexit
+                          customs fees and VAT may apply (customer
+                          responsibility).
+                        </p>
                       </div>
-                      
+
                       <details className="bg-neutral-50 rounded-lg border group">
                         <summary className="p-3 cursor-pointer text-sm font-medium flex items-center justify-between hover:bg-neutral-100 transition-colors rounded-lg">
                           <span>View Process Steps</span>
@@ -789,7 +1044,17 @@ export default function Warranty() {
                         </summary>
                         <div className="px-3 pb-3">
                           <ol className="text-xs text-neutral-600 space-y-1 list-decimal list-inside">
-                            <li>Register claim at <a href="https://my-warranty.com" target="_blank" rel="noreferrer" className="text-primary hover:underline">my-warranty.com</a></li>
+                            <li>
+                              Register claim at{" "}
+                              <a
+                                href="https://my-warranty.com"
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-primary hover:underline"
+                              >
+                                my-warranty.com
+                              </a>
+                            </li>
                             <li>UK team responds within 8 working hours</li>
                             <li>RMA number issued if unresolved</li>
                             <li>Return unit to our address</li>
@@ -797,7 +1062,9 @@ export default function Warranty() {
                             <li>Repair, replace, or credit issued</li>
                             <li>Return shipment with tracking</li>
                           </ol>
-                          <p className="text-xs text-neutral-400 mt-2 italic">*Multiple unit claims may take longer</p>
+                          <p className="text-xs text-neutral-400 mt-2 italic">
+                            *Multiple unit claims may take longer
+                          </p>
                         </div>
                       </details>
                     </div>
@@ -805,7 +1072,10 @@ export default function Warranty() {
                 </AccordionItem>
 
                 {/* Coverage Details */}
-                <AccordionItem value="coverage" className="border rounded-lg mb-3 px-4">
+                <AccordionItem
+                  value="coverage"
+                  className="border rounded-lg mb-3 px-4"
+                >
                   <AccordionTrigger className="hover:no-underline py-4">
                     <div className="flex items-center gap-3 text-left">
                       <div className="h-8 w-8 rounded-full bg-neutral-100 flex items-center justify-center flex-shrink-0">
@@ -813,7 +1083,9 @@ export default function Warranty() {
                       </div>
                       <div>
                         <h4 className="font-semibold">Coverage Details</h4>
-                        <p className="text-xs text-neutral-500 font-normal">What's covered and what's not</p>
+                        <p className="text-xs text-neutral-500 font-normal">
+                          What's covered and what's not
+                        </p>
                       </div>
                     </div>
                   </AccordionTrigger>
@@ -822,11 +1094,15 @@ export default function Warranty() {
                       <div className="p-3 bg-green-50/50 rounded-lg border border-green-200">
                         <div className="flex items-center gap-2 mb-2">
                           <CheckCircle className="h-4 w-4 text-green-600" />
-                          <h5 className="font-medium text-sm text-green-800">Covered</h5>
+                          <h5 className="font-medium text-sm text-green-800">
+                            Covered
+                          </h5>
                         </div>
                         <ul className="text-xs text-neutral-700 space-y-1">
                           <li>• Hardware defects & workmanship</li>
-                          <li>• Component failures (motherboard, RAM, storage)</li>
+                          <li>
+                            • Component failures (motherboard, RAM, storage)
+                          </li>
                           <li>• Display & graphics issues</li>
                           <li>• Keyboard & touchpad</li>
                           <li>• Battery (first 12 months)</li>
@@ -837,7 +1113,9 @@ export default function Warranty() {
                       <div className="p-3 bg-red-50/50 rounded-lg border border-red-200">
                         <div className="flex items-center gap-2 mb-2">
                           <AlertCircle className="h-4 w-4 text-red-600" />
-                          <h5 className="font-medium text-sm text-red-800">Not Covered</h5>
+                          <h5 className="font-medium text-sm text-red-800">
+                            Not Covered
+                          </h5>
                         </div>
                         <ul className="text-xs text-neutral-700 space-y-1">
                           <li>• Customer damage (drops, spills, cracks)</li>
@@ -854,38 +1132,50 @@ export default function Warranty() {
                 </AccordionItem>
 
                 {/* Sustainability */}
-                <AccordionItem value="sustainability" className="border rounded-lg px-4 border-[#08ABAB]/30">
+                <AccordionItem
+                  value="sustainability"
+                  className="border rounded-lg px-4 border-[#08ABAB]/30"
+                >
                   <AccordionTrigger className="hover:no-underline py-4">
                     <div className="flex items-center gap-3 text-left">
                       <div className="h-8 w-8 rounded-full bg-[#08ABAB]/10 flex items-center justify-center flex-shrink-0">
                         <i className="ri-leaf-line text-[#08ABAB]"></i>
                       </div>
                       <div>
-                        <h4 className="font-semibold text-[#08ABAB]">Sustainability Commitment</h4>
-                        <p className="text-xs text-neutral-500 font-normal">Free recycling & zero e-waste policy</p>
+                        <h4 className="font-semibold text-[#08ABAB]">
+                          Sustainability Commitment
+                        </h4>
+                        <p className="text-xs text-neutral-500 font-normal">
+                          Free recycling & zero e-waste policy
+                        </p>
                       </div>
                     </div>
                   </AccordionTrigger>
                   <AccordionContent className="pb-4">
                     <p className="text-sm text-neutral-700 pt-2">
-                      We offer free recycling of your old devices when you return a product no longer covered by warranty. All returned units are either repaired for reuse or responsibly recycled following WEEE standards, ensuring zero e-waste to landfill.
+                      We offer free recycling of your old devices when you
+                      return a product no longer covered by warranty. All
+                      returned units are either repaired for reuse or
+                      responsibly recycled following WEEE standards, ensuring
+                      zero e-waste to landfill.
                     </p>
                   </AccordionContent>
                 </AccordionItem>
               </Accordion>
             </CardContent>
           </Card>
-          
+
           {/* Warranty Verification Note */}
           <Alert className="bg-secondary/5 border-secondary/20 mt-4">
             <HelpCircle className="h-4 w-4 text-secondary" />
             <AlertTitle>Need to verify your warranty?</AlertTitle>
             <AlertDescription className="text-sm">
-              Use the serial number lookup tool above to check your specific product warranty status and coverage dates.
+              Use the serial number lookup tool above to check your specific
+              product warranty status and coverage dates.
             </AlertDescription>
           </Alert>
         </TabsContent>
-        
+
         {/* Troubleshooting Guide Tab */}
         <TabsContent value="troubleshooting" className="space-y-6">
           <Card>
@@ -900,76 +1190,101 @@ export default function Warranty() {
                 <div className="border rounded-lg p-4 bg-primary/5">
                   <h3 className="font-medium text-lg mb-2">Official Manuals</h3>
                   <p className="text-sm text-neutral-700 mb-4">
-                    Access comprehensive documentation and user guides for your remanufactured laptop from the original manufacturers:
+                    Access comprehensive documentation and user guides for your
+                    remanufactured laptop from the original manufacturers:
                   </p>
                   <div className="space-y-2">
-                    <a 
-                      href="https://www.dell.com/support/home/en-uk/Products/?app=manuals&search_redirect=product%2Bmanuals" 
-                      target="_blank" 
-                      rel="noreferrer" 
+                    <a
+                      href="https://www.dell.com/support/home/en-uk/Products/?app=manuals&search_redirect=product%2Bmanuals"
+                      target="_blank"
+                      rel="noreferrer"
                       className="flex items-center gap-3 p-2 rounded-lg hover:bg-primary/10 transition-colors group"
                     >
                       <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
                         <i className="ri-external-link-line text-blue-600"></i>
                       </div>
                       <div className="flex-1">
-                        <span className="font-medium text-sm text-neutral-800 group-hover:text-primary">Dell Laptops</span>
-                        <p className="text-xs text-neutral-500">Service manuals & troubleshooting guides</p>
+                        <span className="font-medium text-sm text-neutral-800 group-hover:text-primary">
+                          Dell Laptops
+                        </span>
+                        <p className="text-xs text-neutral-500">
+                          Service manuals & troubleshooting guides
+                        </p>
                       </div>
                       <i className="ri-arrow-right-s-line text-neutral-400 group-hover:text-primary"></i>
                     </a>
-                    <a 
-                      href="https://support.lenovo.com/gb/en/solutions/ht077589-how-to-find-and-view-manuals-for-lenovo-products-thinkpad-thinkcentre-ideapad-ideacentre" 
-                      target="_blank" 
-                      rel="noreferrer" 
+                    <a
+                      href="https://support.lenovo.com/gb/en/solutions/ht077589-how-to-find-and-view-manuals-for-lenovo-products-thinkpad-thinkcentre-ideapad-ideacentre"
+                      target="_blank"
+                      rel="noreferrer"
                       className="flex items-center gap-3 p-2 rounded-lg hover:bg-primary/10 transition-colors group"
                     >
                       <div className="h-8 w-8 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
                         <i className="ri-external-link-line text-red-600"></i>
                       </div>
                       <div className="flex-1">
-                        <span className="font-medium text-sm text-neutral-800 group-hover:text-primary">Lenovo Laptops</span>
-                        <p className="text-xs text-neutral-500">Official documentation & support resources</p>
+                        <span className="font-medium text-sm text-neutral-800 group-hover:text-primary">
+                          Lenovo Laptops
+                        </span>
+                        <p className="text-xs text-neutral-500">
+                          Official documentation & support resources
+                        </p>
                       </div>
                       <i className="ri-arrow-right-s-line text-neutral-400 group-hover:text-primary"></i>
                     </a>
-                    <a 
-                      href="https://support.hp.com/us-en/products" 
-                      target="_blank" 
-                      rel="noreferrer" 
+                    <a
+                      href="https://support.hp.com/us-en/products"
+                      target="_blank"
+                      rel="noreferrer"
                       className="flex items-center gap-3 p-2 rounded-lg hover:bg-primary/10 transition-colors group"
                     >
                       <div className="h-8 w-8 rounded-full bg-cyan-100 flex items-center justify-center flex-shrink-0">
                         <i className="ri-external-link-line text-cyan-600"></i>
                       </div>
                       <div className="flex-1">
-                        <span className="font-medium text-sm text-neutral-800 group-hover:text-primary">HP Laptops</span>
-                        <p className="text-xs text-neutral-500">User manuals & technical specifications</p>
+                        <span className="font-medium text-sm text-neutral-800 group-hover:text-primary">
+                          HP Laptops
+                        </span>
+                        <p className="text-xs text-neutral-500">
+                          User manuals & technical specifications
+                        </p>
                       </div>
                       <i className="ri-arrow-right-s-line text-neutral-400 group-hover:text-primary"></i>
                     </a>
                   </div>
                 </div>
-                
+
                 <div className="border rounded-lg p-4 bg-secondary/5">
-                  <h3 className="font-medium text-lg mb-2">Battery Health Analysis</h3>
+                  <h3 className="font-medium text-lg mb-2">
+                    Battery Health Analysis
+                  </h3>
                   <p className="text-neutral-700 mb-3">
-                    Check your battery's health and performance with our specialized tool.
+                    Check your battery's health and performance with our
+                    specialized tool.
                   </p>
                   <ul className="list-disc list-inside text-neutral-700 space-y-1 mb-3">
                     <li>Access via BIOS (F2 at startup on most models)</li>
-                    <li>Navigate to "Power Management" or "Battery Information"</li>
+                    <li>
+                      Navigate to "Power Management" or "Battery Information"
+                    </li>
                     <li>View current capacity compared to design capacity</li>
-                    <li>Batteries at less than 80% capacity within warranty period may qualify for replacement</li>
+                    <li>
+                      Batteries at less than 80% capacity within warranty period
+                      may qualify for replacement
+                    </li>
                   </ul>
-                  <Button variant="link" className="text-secondary hover:underline text-sm p-0 h-auto" onClick={() => setShowBatteryDialog(true)}>
+                  <Button
+                    variant="link"
+                    className="text-secondary hover:underline text-sm p-0 h-auto"
+                    onClick={() => setShowBatteryDialog(true)}
+                  >
                     <span>Check battery health status</span>
                   </Button>
                 </div>
               </div>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader>
               <CardTitle>Common Troubleshooting Solutions</CardTitle>
@@ -992,104 +1307,218 @@ export default function Warranty() {
               </Accordion>
             </CardContent>
           </Card>
-          
+
           <Card>
-                <CardHeader>
-                  <CardTitle>OEM Diagnostic Tools</CardTitle>
-                  <CardDescription>
-                    Official diagnostic software from original equipment manufacturers
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="border rounded-lg p-4">
-                      <div className="flex items-start">
-                        <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mr-3 mt-[0px] mb-[0px] pl-[10px] pr-[10px]">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
-                        </div>
-                        <div>
-                          <h3 className="font-medium">Lenovo Vantage</h3>
-                          <p className="text-sm text-neutral-600 mt-1 mb-3">
-                            Comprehensive system management and diagnostic tool for Lenovo devices
-                          </p>
-                          <a href="https://www.lenovo.com/us/en/software/vantage?msockid=360b390aad6b67251ad52acbac8f66c9" target="_blank" rel="noreferrer" className="text-sm text-blue-600 hover:underline inline-flex items-center">
-                            <span>Download Lenovo Vantage</span>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-1"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
-                          </a>
-                        </div>
-                      </div>
+            <CardHeader>
+              <CardTitle>OEM Diagnostic Tools</CardTitle>
+              <CardDescription>
+                Official diagnostic software from original equipment
+                manufacturers
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="border rounded-lg p-4">
+                  <div className="flex items-start">
+                    <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mr-3 mt-[0px] mb-[0px] pl-[10px] pr-[10px]">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <rect
+                          x="2"
+                          y="3"
+                          width="20"
+                          height="14"
+                          rx="2"
+                          ry="2"
+                        ></rect>
+                        <line x1="8" y1="21" x2="16" y2="21"></line>
+                        <line x1="12" y1="17" x2="12" y2="21"></line>
+                      </svg>
                     </div>
-                    
-                    <div className="border rounded-lg p-4">
-                      <div className="flex items-start">
-                        <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center text-green-600 mr-3 pl-[10px] pr-[10px]">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
-                        </div>
-                        <div>
-                          <h3 className="font-medium">HP Support Assistant</h3>
-                          <p className="text-sm text-neutral-600 mt-1 mb-3">
-                            Built-in troubleshooting and maintenance tool for HP laptops
-                          </p>
-                          <a href="https://support.hp.com/us-en/help/hp-support-assistant" target="_blank" rel="noreferrer" className="text-sm text-green-600 hover:underline inline-flex items-center">
-                            <span>Get HP Support Assistant</span>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-1"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
-                          </a>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="border rounded-lg p-4">
-                      <div className="flex items-start">
-                        <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-800 mr-3 pl-[10px] pr-[10px]">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
-                        </div>
-                        <div>
-                          <h3 className="font-medium">Dell SupportAssist</h3>
-                          <p className="text-sm text-neutral-600 mt-1 mb-3">
-                            Automated support technology for proactive system maintenance
-                          </p>
-                          <a href="https://www.dell.com/support/contents/en-uk/category/product-support/self-support-knowledgebase/software-and-downloads/support-assist?msockid=360b390aad6b67251ad52acbac8f66c9" target="_blank" rel="noreferrer" className="text-sm text-blue-800 hover:underline inline-flex items-center">
-                            <span>Download SupportAssist</span>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-1"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
-                          </a>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardContent className="pt-6">
-                  <div className="flex flex-col items-center text-center">
-                    <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-4">
-                      <HelpCircle className="h-6 w-6" />
-                    </div>
-                    <h3 className="font-medium mb-2">Still Need Help?</h3>
-                    <p className="text-neutral-600 mb-4">
-                      Contact our technical support team directly for immediate assistance
-                    </p>
-                    <div className="space-y-2 w-full">
-                      <Button variant="outline" className="w-full" asChild>
-                        <a href={`tel:${supportPhoneNumber}`}>
-                          <i className="ri-phone-line mr-2"></i>
-                          Call Support
-                        </a>
-                      </Button>
-                      <Button variant="outline" className="w-full">
-                        <i className="ri-chat-1-line mr-2"></i>
-                        Live Chat
-                      </Button>
-                      <Button variant="outline" className="w-full" asChild>
-                        <Link href="/warranty-claim">
-                          <i className="ri-tools-line mr-2"></i>
-                          Create RMA
-                        </Link>
-                      </Button>
+                    <div>
+                      <h3 className="font-medium">Lenovo Vantage</h3>
+                      <p className="text-sm text-neutral-600 mt-1 mb-3">
+                        Comprehensive system management and diagnostic tool for
+                        Lenovo devices
+                      </p>
+                      <a
+                        href="https://www.lenovo.com/us/en/software/vantage?msockid=360b390aad6b67251ad52acbac8f66c9"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-sm text-blue-600 hover:underline inline-flex items-center"
+                      >
+                        <span>Download Lenovo Vantage</span>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="14"
+                          height="14"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className="ml-1"
+                        >
+                          <line x1="7" y1="17" x2="17" y2="7"></line>
+                          <polyline points="7 7 17 7 17 17"></polyline>
+                        </svg>
+                      </a>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+
+                <div className="border rounded-lg p-4">
+                  <div className="flex items-start">
+                    <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center text-green-600 mr-3 pl-[10px] pr-[10px]">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <rect
+                          x="2"
+                          y="3"
+                          width="20"
+                          height="14"
+                          rx="2"
+                          ry="2"
+                        ></rect>
+                        <line x1="8" y1="21" x2="16" y2="21"></line>
+                        <line x1="12" y1="17" x2="12" y2="21"></line>
+                      </svg>
+                    </div>
+                    <div>
+                      <h3 className="font-medium">HP Support Assistant</h3>
+                      <p className="text-sm text-neutral-600 mt-1 mb-3">
+                        Built-in troubleshooting and maintenance tool for HP
+                        laptops
+                      </p>
+                      <a
+                        href="https://support.hp.com/us-en/help/hp-support-assistant"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-sm text-green-600 hover:underline inline-flex items-center"
+                      >
+                        <span>Get HP Support Assistant</span>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="14"
+                          height="14"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className="ml-1"
+                        >
+                          <line x1="7" y1="17" x2="17" y2="7"></line>
+                          <polyline points="7 7 17 7 17 17"></polyline>
+                        </svg>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="border rounded-lg p-4">
+                  <div className="flex items-start">
+                    <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-800 mr-3 pl-[10px] pr-[10px]">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <rect
+                          x="2"
+                          y="3"
+                          width="20"
+                          height="14"
+                          rx="2"
+                          ry="2"
+                        ></rect>
+                        <line x1="8" y1="21" x2="16" y2="21"></line>
+                        <line x1="12" y1="17" x2="12" y2="21"></line>
+                      </svg>
+                    </div>
+                    <div>
+                      <h3 className="font-medium">Dell SupportAssist</h3>
+                      <p className="text-sm text-neutral-600 mt-1 mb-3">
+                        Automated support technology for proactive system
+                        maintenance
+                      </p>
+                      <a
+                        href="https://www.dell.com/support/contents/en-uk/category/product-support/self-support-knowledgebase/software-and-downloads/support-assist?msockid=360b390aad6b67251ad52acbac8f66c9"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-sm text-blue-800 hover:underline inline-flex items-center"
+                      >
+                        <span>Download SupportAssist</span>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="14"
+                          height="14"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className="ml-1"
+                        >
+                          <line x1="7" y1="17" x2="17" y2="7"></line>
+                          <polyline points="7 7 17 7 17 17"></polyline>
+                        </svg>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-primary/5 border-primary/20">
+            <CardContent className="py-4">
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary flex-shrink-0">
+                    <HelpCircle className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <h3 className="font-medium text-sm">Still Need Help?</h3>
+                    <p className="text-xs text-neutral-600">Start a warranty claim request</p>
+                  </div>
+                </div>
+                <Button asChild className="bg-primary hover:bg-primary/90">
+                  <Link href="/warranty-claim">
+                    <i className="ri-tools-line mr-2"></i>
+                    Create RMA
+                  </Link>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
       {/* RMA Basket Dialog */}
@@ -1098,24 +1527,32 @@ export default function Warranty() {
           <DialogHeader>
             <DialogTitle>RMA Request Basket</DialogTitle>
             <DialogDescription>
-              Review the devices you want to include in your RMA request. You can add more devices by checking their warranty status.
+              Review the devices you want to include in your RMA request. You
+              can add more devices by checking their warranty status.
             </DialogDescription>
           </DialogHeader>
-          
+
           <div className="py-4">
             {rmaBasket.length === 0 ? (
               <div className="text-center py-8">
                 <ShoppingCart className="h-12 w-12 mx-auto text-neutral-400 mb-4" />
-                <h3 className="text-lg font-medium text-neutral-700 mb-2">No devices in basket</h3>
-                <p className="text-neutral-500">Check warranty status of your devices and add them to create an RMA request.</p>
+                <h3 className="text-lg font-medium text-neutral-700 mb-2">
+                  No devices in basket
+                </h3>
+                <p className="text-neutral-500">
+                  Check warranty status of your devices and add them to create
+                  an RMA request.
+                </p>
               </div>
             ) : (
               <div className="space-y-4">
                 <div className="flex items-center justify-between mb-4">
-                  <h4 className="font-medium">{rmaBasket.length} device(s) ready for RMA</h4>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
+                  <h4 className="font-medium">
+                    {rmaBasket.length} device(s) ready for RMA
+                  </h4>
+                  <Button
+                    variant="outline"
+                    size="sm"
                     onClick={() => setRmaBasket([])}
                     className="text-red-600 hover:text-red-700"
                   >
@@ -1123,28 +1560,44 @@ export default function Warranty() {
                     Clear All
                   </Button>
                 </div>
-                
+
                 {rmaBasket.map((device) => (
-                  <div key={device.id} className="border rounded-lg p-4 bg-neutral-50">
+                  <div
+                    key={device.id}
+                    className="border rounded-lg p-4 bg-neutral-50"
+                  >
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
-                        <h4 className="font-medium text-sm">{device.productName}</h4>
-                        <p className="text-sm text-neutral-600 mt-1">Serial: {device.serialNumber}</p>
+                        <h4 className="font-medium text-sm">
+                          {device.productName}
+                        </h4>
+                        <p className="text-sm text-neutral-600 mt-1">
+                          Serial: {device.serialNumber}
+                        </p>
                         <div className="flex items-center gap-4 mt-2">
-                          <Badge 
-                            variant={device.warrantyStatus === "Active" ? "default" : "secondary"}
-                            className={device.warrantyStatus === "Active" ? "bg-green-100 text-green-800" : ""}
+                          <Badge
+                            variant={
+                              device.warrantyStatus === "Active"
+                                ? "default"
+                                : "secondary"
+                            }
+                            className={
+                              device.warrantyStatus === "Active"
+                                ? "bg-green-100 text-green-800"
+                                : ""
+                            }
                           >
                             {device.warrantyStatus}
                           </Badge>
                           <span className="text-xs text-neutral-500">
-                            Added: {new Date(device.addedAt).toLocaleDateString()}
+                            Added:{" "}
+                            {new Date(device.addedAt).toLocaleDateString()}
                           </span>
                         </div>
                       </div>
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
+                      <Button
+                        variant="ghost"
+                        size="sm"
                         onClick={() => removeFromRmaBasket(device.id)}
                         className="text-red-600 hover:text-red-700"
                       >
@@ -1156,17 +1609,18 @@ export default function Warranty() {
               </div>
             )}
           </div>
-          
+
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowBasket(false)}>
               Continue Adding Devices
             </Button>
             {rmaBasket.length > 0 && (
-              <Button 
+              <Button
                 onClick={submitRmaRequest}
                 className="bg-[#08ABAB] text-white border-[#08ABAB] hover:bg-[#FF9E1C] hover:text-black hover:border-[#FF9E1C] transition-colors"
               >
-                Continue to RMA Form ({rmaBasket.length} device{rmaBasket.length > 1 ? 's' : ''})
+                Continue to RMA Form ({rmaBasket.length} device
+                {rmaBasket.length > 1 ? "s" : ""})
               </Button>
             )}
           </DialogFooter>
@@ -1178,17 +1632,23 @@ export default function Warranty() {
           <DialogHeader>
             <DialogTitle>Official Manuals & Documentation</DialogTitle>
             <DialogDescription>
-              Access comprehensive documentation and user guides for your remanufactured laptop
+              Access comprehensive documentation and user guides for your
+              remanufactured laptop
             </DialogDescription>
           </DialogHeader>
-          
+
           <div className="space-y-6 py-4">
             <div>
-              <h3 className="font-semibold text-lg mb-3">Manufacturer-Specific Manuals</h3>
+              <h3 className="font-semibold text-lg mb-3">
+                Manufacturer-Specific Manuals
+              </h3>
               <div className="space-y-4">
                 <div className="border rounded-lg p-4">
                   <h4 className="font-medium mb-2">Dell Laptops</h4>
-                  <p className="text-sm text-neutral-600 mb-2">Complete service manuals and troubleshooting guides for all Dell models</p>
+                  <p className="text-sm text-neutral-600 mb-2">
+                    Complete service manuals and troubleshooting guides for all
+                    Dell models
+                  </p>
                   <ul className="text-sm text-neutral-700 list-disc list-inside space-y-1">
                     <li>Hardware service manuals with diagrams</li>
                     <li>Setup and quick start guides</li>
@@ -1196,10 +1656,13 @@ export default function Warranty() {
                     <li>Driver and software installation guides</li>
                   </ul>
                 </div>
-                
+
                 <div className="border rounded-lg p-4">
                   <h4 className="font-medium mb-2">Lenovo Laptops</h4>
-                  <p className="text-sm text-neutral-600 mb-2">Official documentation and support resources for Lenovo devices</p>
+                  <p className="text-sm text-neutral-600 mb-2">
+                    Official documentation and support resources for Lenovo
+                    devices
+                  </p>
                   <ul className="text-sm text-neutral-700 list-disc list-inside space-y-1">
                     <li>ThinkPad and IdeaPad user manuals</li>
                     <li>Hardware maintenance manuals</li>
@@ -1207,10 +1670,12 @@ export default function Warranty() {
                     <li>Specifications and feature documentation</li>
                   </ul>
                 </div>
-                
+
                 <div className="border rounded-lg p-4">
                   <h4 className="font-medium mb-2">HP Laptops</h4>
-                  <p className="text-sm text-neutral-600 mb-2">Comprehensive user manuals and technical specifications</p>
+                  <p className="text-sm text-neutral-600 mb-2">
+                    Comprehensive user manuals and technical specifications
+                  </p>
                   <ul className="text-sm text-neutral-700 list-disc list-inside space-y-1">
                     <li>EliteBook and ProBook documentation</li>
                     <li>Component replacement guides</li>
@@ -1220,21 +1685,28 @@ export default function Warranty() {
                 </div>
               </div>
             </div>
-            
+
             <div>
               <h3 className="font-semibold text-lg mb-3">General Guides</h3>
               <ul className="space-y-2 text-sm text-neutral-700">
                 <li className="flex items-start">
                   <CheckCircle className="h-4 w-4 text-green-600 mr-2 mt-0.5 flex-shrink-0" />
-                  <span>Model-specific guides for optimal performance and maintenance</span>
+                  <span>
+                    Model-specific guides for optimal performance and
+                    maintenance
+                  </span>
                 </li>
                 <li className="flex items-start">
                   <CheckCircle className="h-4 w-4 text-green-600 mr-2 mt-0.5 flex-shrink-0" />
-                  <span>Installation and setup instructions for all components</span>
+                  <span>
+                    Installation and setup instructions for all components
+                  </span>
                 </li>
                 <li className="flex items-start">
                   <CheckCircle className="h-4 w-4 text-green-600 mr-2 mt-0.5 flex-shrink-0" />
-                  <span>Troubleshooting flowcharts and diagnostic procedures</span>
+                  <span>
+                    Troubleshooting flowcharts and diagnostic procedures
+                  </span>
                 </li>
                 <li className="flex items-start">
                   <CheckCircle className="h-4 w-4 text-green-600 mr-2 mt-0.5 flex-shrink-0" />
@@ -1242,18 +1714,24 @@ export default function Warranty() {
                 </li>
               </ul>
             </div>
-            
+
             <Alert className="bg-blue-50 border-blue-200">
               <HelpCircle className="h-4 w-4 text-blue-600" />
-              <AlertTitle className="text-blue-800">Need a Specific Manual?</AlertTitle>
+              <AlertTitle className="text-blue-800">
+                Need a Specific Manual?
+              </AlertTitle>
               <AlertDescription className="text-blue-700">
-                Contact our support team with your laptop model number to receive the exact manual you need.
+                Contact our support team with your laptop model number to
+                receive the exact manual you need.
               </AlertDescription>
             </Alert>
           </div>
-          
+
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowManualsDialog(false)}>
+            <Button
+              variant="outline"
+              onClick={() => setShowManualsDialog(false)}
+            >
               Close
             </Button>
           </DialogFooter>
@@ -1268,33 +1746,54 @@ export default function Warranty() {
               Learn how to check and maintain your laptop battery's health
             </DialogDescription>
           </DialogHeader>
-          
+
           <div className="space-y-6 py-4">
             <div>
-              <h3 className="font-semibold text-lg mb-3">How to Access Battery Diagnostics</h3>
+              <h3 className="font-semibold text-lg mb-3">
+                How to Access Battery Diagnostics
+              </h3>
               <div className="space-y-4">
                 <div className="border rounded-lg p-4 bg-neutral-50">
-                  <h4 className="font-medium mb-2">Method 1: BIOS Diagnostics (Recommended)</h4>
+                  <h4 className="font-medium mb-2">
+                    Method 1: BIOS Diagnostics (Recommended)
+                  </h4>
                   <ol className="text-sm text-neutral-700 list-decimal list-inside space-y-1">
                     <li>Restart your laptop</li>
-                    <li>Press F2 (or Del/F10 depending on manufacturer) during startup to enter BIOS</li>
-                    <li>Navigate to "Power Management" or "Battery Information" section</li>
+                    <li>
+                      Press F2 (or Del/F10 depending on manufacturer) during
+                      startup to enter BIOS
+                    </li>
+                    <li>
+                      Navigate to "Power Management" or "Battery Information"
+                      section
+                    </li>
                     <li>View current capacity compared to design capacity</li>
                     <li>Check cycle count and health status</li>
                   </ol>
                 </div>
-                
+
                 <div className="border rounded-lg p-4 bg-neutral-50">
-                  <h4 className="font-medium mb-2">Method 2: Built-in Diagnostic Tools</h4>
+                  <h4 className="font-medium mb-2">
+                    Method 2: Built-in Diagnostic Tools
+                  </h4>
                   <ul className="text-sm text-neutral-700 list-disc list-inside space-y-1">
-                    <li><strong>Dell:</strong> Run Dell SupportAssist and select "Battery Check"</li>
-                    <li><strong>Lenovo:</strong> Use Lenovo Vantage {'->'} Hardware Settings {'->'} Power</li>
-                    <li><strong>HP:</strong> Open HP Support Assistant {'->'} Troubleshooting {'->'} Battery Test</li>
+                    <li>
+                      <strong>Dell:</strong> Run Dell SupportAssist and select
+                      "Battery Check"
+                    </li>
+                    <li>
+                      <strong>Lenovo:</strong> Use Lenovo Vantage {"->"}{" "}
+                      Hardware Settings {"->"} Power
+                    </li>
+                    <li>
+                      <strong>HP:</strong> Open HP Support Assistant {"->"}{" "}
+                      Troubleshooting {"->"} Battery Test
+                    </li>
                   </ul>
                 </div>
               </div>
             </div>
-            
+
             <div>
               <h3 className="font-semibold text-sm mb-3 flex items-center gap-2">
                 <i className="ri-battery-2-line text-primary"></i>
@@ -1303,56 +1802,104 @@ export default function Warranty() {
               <div className="space-y-3">
                 {/* Circular Remanufactured */}
                 <div className="border rounded-lg p-3 bg-primary/5">
-                  <h4 className="font-medium text-xs text-primary mb-2">Circular Remanufactured</h4>
+                  <h4 className="font-medium text-xs text-primary mb-2">
+                    Circular Remanufactured
+                  </h4>
                   <div className="space-y-1.5">
                     <div className="flex items-start gap-2">
                       <div className="w-16 flex-shrink-0">
-                        <span className="text-xs font-semibold text-green-700 bg-green-100 px-1.5 py-0.5 rounded">80-100%</span>
+                        <span className="text-xs font-semibold text-green-700 bg-green-100 px-1.5 py-0.5 rounded">
+                          80-100%
+                        </span>
                       </div>
-                      <p className="text-xs text-neutral-600"><span className="font-medium text-green-700">Excellent</span> - Battery is in great condition and performing as expected</p>
+                      <p className="text-xs text-neutral-600">
+                        <span className="font-medium text-green-700">
+                          Excellent
+                        </span>{" "}
+                        - Battery is in great condition and performing as
+                        expected
+                      </p>
                     </div>
                     <div className="flex items-start gap-2">
                       <div className="w-16 flex-shrink-0">
-                        <span className="text-xs font-semibold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded">60-80%</span>
+                        <span className="text-xs font-semibold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded">
+                          60-80%
+                        </span>
                       </div>
-                      <p className="text-xs text-neutral-600"><span className="font-medium text-amber-700">Fair</span> - Battery shows normal wear, still functional but may need replacement soon</p>
+                      <p className="text-xs text-neutral-600">
+                        <span className="font-medium text-amber-700">Fair</span>{" "}
+                        - Battery shows normal wear, still functional but may
+                        need replacement soon
+                      </p>
                     </div>
                     <div className="flex items-start gap-2">
                       <div className="w-16 flex-shrink-0">
-                        <span className="text-xs font-semibold text-red-700 bg-red-100 px-1.5 py-0.5 rounded">&lt;60%</span>
+                        <span className="text-xs font-semibold text-red-700 bg-red-100 px-1.5 py-0.5 rounded">
+                          &lt;60%
+                        </span>
                       </div>
-                      <p className="text-xs text-neutral-600"><span className="font-medium text-red-700">Replace</span> - Battery capacity significantly reduced, replacement may be recommended</p>
+                      <p className="text-xs text-neutral-600">
+                        <span className="font-medium text-red-700">
+                          Replace
+                        </span>{" "}
+                        - Battery capacity significantly reduced, replacement
+                        may be recommended
+                      </p>
                     </div>
                   </div>
                 </div>
-                
+
                 {/* Circular Refurbished */}
                 <div className="border rounded-lg p-3 bg-secondary/5">
-                  <h4 className="font-medium text-xs text-secondary mb-2">Circular Refurbished</h4>
+                  <h4 className="font-medium text-xs text-secondary mb-2">
+                    Circular Refurbished
+                  </h4>
                   <div className="space-y-1.5">
                     <div className="flex items-start gap-2">
                       <div className="w-16 flex-shrink-0">
-                        <span className="text-xs font-semibold text-green-700 bg-green-100 px-1.5 py-0.5 rounded">70-100%</span>
+                        <span className="text-xs font-semibold text-green-700 bg-green-100 px-1.5 py-0.5 rounded">
+                          70-100%
+                        </span>
                       </div>
-                      <p className="text-xs text-neutral-600"><span className="font-medium text-green-700">Excellent</span> - Battery is in great condition and performing as expected</p>
+                      <p className="text-xs text-neutral-600">
+                        <span className="font-medium text-green-700">
+                          Excellent
+                        </span>{" "}
+                        - Battery is in great condition and performing as
+                        expected
+                      </p>
                     </div>
                     <div className="flex items-start gap-2">
                       <div className="w-16 flex-shrink-0">
-                        <span className="text-xs font-semibold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded">60-70%</span>
+                        <span className="text-xs font-semibold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded">
+                          60-70%
+                        </span>
                       </div>
-                      <p className="text-xs text-neutral-600"><span className="font-medium text-amber-700">Fair</span> - Battery shows normal wear, still functional but may need replacement soon</p>
+                      <p className="text-xs text-neutral-600">
+                        <span className="font-medium text-amber-700">Fair</span>{" "}
+                        - Battery shows normal wear, still functional but may
+                        need replacement soon
+                      </p>
                     </div>
                     <div className="flex items-start gap-2">
                       <div className="w-16 flex-shrink-0">
-                        <span className="text-xs font-semibold text-red-700 bg-red-100 px-1.5 py-0.5 rounded">&lt;60%</span>
+                        <span className="text-xs font-semibold text-red-700 bg-red-100 px-1.5 py-0.5 rounded">
+                          &lt;60%
+                        </span>
                       </div>
-                      <p className="text-xs text-neutral-600"><span className="font-medium text-red-700">Replace</span> - Battery capacity significantly reduced, replacement may be recommended</p>
+                      <p className="text-xs text-neutral-600">
+                        <span className="font-medium text-red-700">
+                          Replace
+                        </span>{" "}
+                        - Battery capacity significantly reduced, replacement
+                        may be recommended
+                      </p>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-            
+
             <div>
               <h3 className="font-semibold text-sm mb-2 flex items-center gap-2">
                 <i className="ri-leaf-line text-green-600"></i>
@@ -1361,11 +1908,15 @@ export default function Warranty() {
               <ul className="space-y-1.5 text-xs text-neutral-700">
                 <li className="flex items-start gap-2">
                   <i className="ri-checkbox-circle-line text-green-600 mt-0.5 flex-shrink-0"></i>
-                  <span>Avoid leaving battery at 0% or 100% for extended periods.</span>
+                  <span>
+                    Avoid leaving battery at 0% or 100% for extended periods.
+                  </span>
                 </li>
                 <li className="flex items-start gap-2">
                   <i className="ri-checkbox-circle-line text-green-600 mt-0.5 flex-shrink-0"></i>
-                  <span>Keep laptop in a cool, dry environment when possible.</span>
+                  <span>
+                    Keep laptop in a cool, dry environment when possible.
+                  </span>
                 </li>
                 <li className="flex items-start gap-2">
                   <i className="ri-checkbox-circle-line text-green-600 mt-0.5 flex-shrink-0"></i>
@@ -1373,7 +1924,10 @@ export default function Warranty() {
                 </li>
                 <li className="flex items-start gap-2">
                   <i className="ri-checkbox-circle-line text-green-600 mt-0.5 flex-shrink-0"></i>
-                  <span>Perform full discharge/charge cycles monthly to calibrate battery meter.</span>
+                  <span>
+                    Perform full discharge/charge cycles monthly to calibrate
+                    battery meter.
+                  </span>
                 </li>
                 <li className="flex items-start gap-2">
                   <i className="ri-checkbox-circle-line text-green-600 mt-0.5 flex-shrink-0"></i>
@@ -1381,14 +1935,20 @@ export default function Warranty() {
                 </li>
                 <li className="flex items-start gap-2">
                   <i className="ri-checkbox-circle-line text-green-600 mt-0.5 flex-shrink-0"></i>
-                  <span>We recommend running full power cycles through normal use for all brands once newly unboxed.</span>
+                  <span>
+                    We recommend running full power cycles through normal use
+                    for all brands once newly unboxed.
+                  </span>
                 </li>
               </ul>
             </div>
           </div>
-          
+
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowBatteryDialog(false)}>
+            <Button
+              variant="outline"
+              onClick={() => setShowBatteryDialog(false)}
+            >
               Close
             </Button>
           </DialogFooter>
