@@ -1296,69 +1296,55 @@ export default function Warranty() {
             </div>
             
             <div>
-              <h3 className="font-semibold text-lg mb-3">Understanding Battery Health</h3>
-              <div className="space-y-3">
-                <div className="flex items-start gap-3">
-                  <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
-                    <CheckCircle className="h-5 w-5 text-green-600" />
-                  </div>
-                  <div>
-                    <h4 className="font-medium text-sm">80-100% Health (Excellent)</h4>
-                    <p className="text-sm text-neutral-600">Battery is in great condition and performing as expected</p>
-                  </div>
+              <h3 className="font-semibold text-sm mb-2 flex items-center gap-2">
+                <i className="ri-battery-2-line text-primary"></i>
+                Understanding Battery Health
+              </h3>
+              <div className="grid grid-cols-3 gap-2">
+                <div className="text-center p-2 bg-green-50 rounded-lg border border-green-200">
+                  <div className="text-lg font-bold text-green-700">80-100%</div>
+                  <div className="text-[10px] text-green-600 font-medium">Excellent</div>
                 </div>
-                
-                <div className="flex items-start gap-3">
-                  <div className="h-10 w-10 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
-                    <AlertCircle className="h-5 w-5 text-amber-600" />
-                  </div>
-                  <div>
-                    <h4 className="font-medium text-sm">60-80% Health (Fair)</h4>
-                    <p className="text-sm text-neutral-600">Battery shows normal wear, still functional but may need replacement soon</p>
-                  </div>
+                <div className="text-center p-2 bg-amber-50 rounded-lg border border-amber-200">
+                  <div className="text-lg font-bold text-amber-700">60-80%</div>
+                  <div className="text-[10px] text-amber-600 font-medium">Fair</div>
                 </div>
-                
-                <div className="flex items-start gap-3">
-                  <div className="h-10 w-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
-                    <AlertCircle className="h-5 w-5 text-red-600" />
-                  </div>
-                  <div>
-                    <h4 className="font-medium text-sm">Below 60% Health (Replace)</h4>
-                    <p className="text-sm text-neutral-600">Battery capacity significantly reduced, replacement recommended</p>
-                  </div>
+                <div className="text-center p-2 bg-red-50 rounded-lg border border-red-200">
+                  <div className="text-lg font-bold text-red-700">&lt;60%</div>
+                  <div className="text-[10px] text-red-600 font-medium">Replace</div>
                 </div>
               </div>
             </div>
             
             <div>
-              <h3 className="font-semibold text-lg mb-3">Warranty Coverage</h3>
-              <Alert className="bg-primary/5 border-primary/20">
-                <CheckCircle className="h-4 w-4 text-primary" />
-                <AlertTitle>Battery Warranty Terms</AlertTitle>
-                <AlertDescription>
-                  Batteries showing less than 80% capacity within the first 12 months may qualify for free replacement under warranty. Contact support to initiate a battery replacement request.
-                </AlertDescription>
-              </Alert>
-            </div>
-            
-            <div>
-              <h3 className="font-semibold text-lg mb-3">Battery Care Tips</h3>
-              <ul className="space-y-2 text-sm text-neutral-700">
-                <li className="flex items-start">
-                  <CheckCircle className="h-4 w-4 text-green-600 mr-2 mt-0.5 flex-shrink-0" />
-                  <span>Avoid leaving battery at 0% or 100% for extended periods</span>
+              <h3 className="font-semibold text-sm mb-2 flex items-center gap-2">
+                <i className="ri-leaf-line text-green-600"></i>
+                Battery Care Tips
+              </h3>
+              <ul className="space-y-1.5 text-xs text-neutral-700">
+                <li className="flex items-start gap-2">
+                  <i className="ri-checkbox-circle-line text-green-600 mt-0.5 flex-shrink-0"></i>
+                  <span>Avoid leaving battery at 0% or 100% for extended periods.</span>
                 </li>
-                <li className="flex items-start">
-                  <CheckCircle className="h-4 w-4 text-green-600 mr-2 mt-0.5 flex-shrink-0" />
-                  <span>Keep laptop in a cool, dry environment when possible</span>
+                <li className="flex items-start gap-2">
+                  <i className="ri-checkbox-circle-line text-green-600 mt-0.5 flex-shrink-0"></i>
+                  <span>Keep laptop in a cool, dry environment when possible.</span>
                 </li>
-                <li className="flex items-start">
-                  <CheckCircle className="h-4 w-4 text-green-600 mr-2 mt-0.5 flex-shrink-0" />
-                  <span>Use manufacturer-approved chargers only</span>
+                <li className="flex items-start gap-2">
+                  <i className="ri-checkbox-circle-line text-green-600 mt-0.5 flex-shrink-0"></i>
+                  <span>Use manufacturer-approved chargers only.</span>
                 </li>
-                <li className="flex items-start">
-                  <CheckCircle className="h-4 w-4 text-green-600 mr-2 mt-0.5 flex-shrink-0" />
-                  <span>Perform full discharge/charge cycles monthly to calibrate battery meter</span>
+                <li className="flex items-start gap-2">
+                  <i className="ri-checkbox-circle-line text-green-600 mt-0.5 flex-shrink-0"></i>
+                  <span>Perform full discharge/charge cycles monthly to calibrate battery meter.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <i className="ri-checkbox-circle-line text-green-600 mt-0.5 flex-shrink-0"></i>
+                  <span>Avoid leaving laptop on charge constantly.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <i className="ri-checkbox-circle-line text-green-600 mt-0.5 flex-shrink-0"></i>
+                  <span>We recommend running full power cycles through normal use for all brands once newly unboxed.</span>
                 </li>
               </ul>
             </div>
