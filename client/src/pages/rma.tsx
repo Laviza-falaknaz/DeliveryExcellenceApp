@@ -103,6 +103,16 @@ export default function RMA() {
     rma.rma.status === "completed" || rma.rma.status === "rejected"
   ) || [];
 
+  // Filter request logs: pending/submitted only (exclude approved)
+  const pendingRequestLogs = requestLogs?.filter(req => 
+    req.status === 'submitted' || req.status === 'declined'
+  ) || [];
+
+  // Approved requests for completed section
+  const approvedRequestLogs = requestLogs?.filter(req => 
+    req.status === 'approved'
+  ) || [];
+
   function getStatusColor(status: string): string {
     switch (status) {
       case "submitted":
@@ -350,14 +360,14 @@ export default function RMA() {
         ) : (rmas && rmas.length > 0) || (requestLogs && requestLogs.length > 0) ? (
           <Tabs defaultValue="requests" className="w-full">
             <TabsList className="mb-4">
-              <TabsTrigger value="requests">Submitted Requests ({requestLogs?.length || 0})</TabsTrigger>
+              <TabsTrigger value="requests">Submitted Requests ({pendingRequestLogs.length})</TabsTrigger>
               <TabsTrigger value="active">In Progress ({activeRmas.length})</TabsTrigger>
-              <TabsTrigger value="completed">Completed ({completedRmas.length})</TabsTrigger>
+              <TabsTrigger value="completed">Completed ({completedRmas.length + approvedRequestLogs.length})</TabsTrigger>
             </TabsList>
             <TabsContent value="requests">
-              {requestLogs && requestLogs.length > 0 ? (
+              {pendingRequestLogs.length > 0 ? (
                 <div className="space-y-4">
-                  {requestLogs.map((request) => (
+                  {pendingRequestLogs.map((request) => (
                     <Card key={request.id} className="cursor-pointer hover:border-accent/50 transition-colors" onClick={() => handleRequestClick(request)}>
                       <CardContent className="p-4">
                         <div className="flex flex-col md:flex-row md:items-start md:justify-between mb-3">
@@ -468,8 +478,45 @@ export default function RMA() {
               )}
             </TabsContent>
             <TabsContent value="completed">
-              {completedRmas.length > 0 ? (
+              {(completedRmas.length > 0 || approvedRequestLogs.length > 0) ? (
                 <div className="space-y-4">
+                  {/* Approved Request Logs */}
+                  {approvedRequestLogs.map((request) => (
+                    <Card key={`req-${request.id}`} className="cursor-pointer hover:border-accent/50 transition-colors" onClick={() => handleRequestClick(request)}>
+                      <CardContent className="p-4">
+                        <div className="flex flex-col md:flex-row md:items-start md:justify-between mb-3">
+                          <div className="flex-1">
+                            <div className="flex items-center mb-2">
+                              <h3 className="font-medium">Request #{request.requestNumber}</h3>
+                              <Badge className={`ml-3 ${getStatusColor(request.status)}`}>
+                                {getStatusLabel(request.status)}
+                              </Badge>
+                            </div>
+                            <p className="text-sm text-neutral-600 mb-2">
+                              {request.productMakeModel} • Serial: {request.manufacturerSerialNumber}
+                            </p>
+                            <div className="text-xs bg-neutral-50 px-2 py-1 rounded space-y-0.5">
+                              <div className="text-neutral-700">
+                                <span className="font-medium">Email:</span> {request.email}
+                              </div>
+                              <div className="text-neutral-500">
+                                Issue: {request.faultDescription.substring(0, 80)}{request.faultDescription.length > 80 ? '...' : ''}
+                              </div>
+                              {request.rmaNumber && (
+                                <div className="text-emerald-600 font-medium">
+                                  Approved - RMA #{request.rmaNumber} created
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                          <div className="mt-2 md:mt-0 md:ml-4 text-sm text-neutral-500">
+                            {request.createdAt && `Submitted ${formatDate(request.createdAt)}`}
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                  {/* Completed RMAs */}
                   {completedRmas.map((rmaData) => (
                     <Card key={rmaData.rma.id} className="cursor-pointer hover:border-accent/50 transition-colors" onClick={() => handleRmaClick(rmaData)}>
                       <CardContent className="p-4">
