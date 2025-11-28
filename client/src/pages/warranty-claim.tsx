@@ -17,6 +17,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import * as XLSX from 'xlsx';
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Link } from "wouter";
 
 // Product schema - updated to make serial numbers conditionally required
 const productSchema = z.object({
@@ -1223,7 +1224,15 @@ export default function WarrantyClaim() {
                       </FormControl>
                       <div className="space-y-1 leading-none">
                         <FormLabel>
-                          I understand the warranty terms and conditions *
+                          I understand the{" "}
+                          <Link 
+                            href="/warranty" 
+                            className="text-[#08ABAB] underline hover:text-[#FF9E1C] transition-colors"
+                            data-testid="link-warranty-terms"
+                          >
+                            warranty terms and conditions
+                          </Link>
+                          {" "}*
                         </FormLabel>
                         <FormMessage />
                       </div>
