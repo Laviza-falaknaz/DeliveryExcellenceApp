@@ -84,6 +84,15 @@ export default function MobileNav() {
                         <span>Your Orders</span>
                       </div>
                     </Link>
+                    <Link href="/warranty" onClick={() => setOpen(false)}>
+                      <div className={cn(
+                        "flex items-center px-2 py-2 rounded-md text-neutral-700 hover:bg-neutral-100 cursor-pointer",
+                        location === "/warranty" && "bg-primary-light/10 text-primary font-medium"
+                      )}>
+                        <i className="ri-shield-check-line text-xl mr-3"></i>
+                        <span>Warranty & Troubleshooting</span>
+                      </div>
+                    </Link>
                     <Link href="/warranty-claim" onClick={() => setOpen(false)}>
                       <div className={cn(
                         "flex items-center px-2 py-2 rounded-md text-neutral-700 hover:bg-neutral-100 cursor-pointer",
@@ -102,24 +111,14 @@ export default function MobileNav() {
                         <span>RMA Tracking</span>
                       </div>
                     </Link>
-                    <Link href="/support" onClick={() => setOpen(false)}>
-                      <div className={cn(
-                        "flex items-center px-2 py-2 rounded-md text-neutral-700 hover:bg-neutral-100 cursor-pointer",
-                        location === "/support" && "bg-primary-light/10 text-primary font-medium"
-                      )}>
-                        <i className="ri-customer-service-2-line text-xl mr-3"></i>
-                        <span>Support</span>
-                      </div>
-                    </Link>
-                    <Link href="/warranty" onClick={() => setOpen(false)}>
-                      <div className={cn(
-                        "flex items-center px-2 py-2 rounded-md text-neutral-700 hover:bg-neutral-100 cursor-pointer",
-                        location === "/warranty" && "bg-primary-light/10 text-primary font-medium"
-                      )}>
-                        <i className="ri-shield-check-line text-xl mr-3"></i>
-                        <span>Warranty & Troubleshooting</span>
-                      </div>
-                    </Link>
+                  </nav>
+                </div>
+
+                <div className="px-4 py-2 mt-2">
+                  <h3 className="text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-2">
+                    Impact
+                  </h3>
+                  <nav className="space-y-1">
                     <Link href="/remanufactured" onClick={() => setOpen(false)}>
                       <div className={cn(
                         "flex items-center px-2 py-2 rounded-md text-neutral-700 hover:bg-neutral-100 cursor-pointer",
@@ -129,14 +128,6 @@ export default function MobileNav() {
                         <span>Remanufactured Explained</span>
                       </div>
                     </Link>
-                  </nav>
-                </div>
-
-                <div className="px-4 py-2 mt-2">
-                  <h3 className="text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-2">
-                    Impact
-                  </h3>
-                  <nav className="space-y-1">
                     <Link href="/water-projects" onClick={() => setOpen(false)}>
                       <div className={cn(
                         "flex items-center px-2 py-2 rounded-md text-neutral-700 hover:bg-neutral-100 cursor-pointer",
@@ -153,15 +144,6 @@ export default function MobileNav() {
                       )}>
                         <i className="ri-leaf-line text-xl mr-3"></i>
                         <span>Your Impact</span>
-                      </div>
-                    </Link>
-                    <Link href="/esg-report" onClick={() => setOpen(false)}>
-                      <div className={cn(
-                        "flex items-center px-2 py-2 rounded-md text-neutral-700 hover:bg-neutral-100 cursor-pointer",
-                        location === "/esg-report" && "bg-primary-light/10 text-primary font-medium"
-                      )}>
-                        <i className="ri-file-chart-line text-xl mr-3"></i>
-                        <span>ESG Report</span>
                       </div>
                     </Link>
                     <Link href="/case-studies" onClick={() => setOpen(false)}>
@@ -181,6 +163,15 @@ export default function MobileNav() {
                     Account
                   </h3>
                   <nav className="space-y-1">
+                    <Link href="/support" onClick={() => setOpen(false)}>
+                      <div className={cn(
+                        "flex items-center px-2 py-2 rounded-md text-neutral-700 hover:bg-neutral-100 cursor-pointer",
+                        location === "/support" && "bg-primary-light/10 text-primary font-medium"
+                      )}>
+                        <i className="ri-customer-service-2-line text-xl mr-3"></i>
+                        <span>Support</span>
+                      </div>
+                    </Link>
                     <Link href="/profile" onClick={() => setOpen(false)}>
                       <div className={cn(
                         "flex items-center px-2 py-2 rounded-md text-neutral-700 hover:bg-neutral-100 cursor-pointer",
@@ -253,11 +244,11 @@ export default function MobileNav() {
         <NavTab href="/warranty" icon="ri-shield-check-line" active={location === "/warranty"}>
           Warranty
         </NavTab>
+        <NavTab href="/impact" icon="ri-leaf-line" active={location === "/impact"}>
+          Impact
+        </NavTab>
         <NavTab href="/support" icon="ri-customer-service-2-line" active={location === "/support"}>
           Support
-        </NavTab>
-        <NavTab href="/esg-report" icon="ri-file-chart-line" active={location === "/esg-report"}>
-          ESG
         </NavTab>
       </div>
     </header>

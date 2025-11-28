@@ -73,6 +73,13 @@ export default function Sidebar() {
             Your Orders
           </NavItem>
           <NavItem
+            href="/warranty"
+            icon="ri-shield-check-line"
+            active={location === "/warranty"}
+          >
+            Warranty & Troubleshooting
+          </NavItem>
+          <NavItem
             href="/warranty-claim"
             icon="ri-alert-line"
             active={location === "/warranty-claim"}
@@ -86,20 +93,9 @@ export default function Sidebar() {
           >
             RMA Tracking
           </NavItem>
-          <NavItem
-            href="/support"
-            icon="ri-customer-service-2-line"
-            active={location === "/support"}
-          >
-            Support
-          </NavItem>
-          <NavItem
-            href="/warranty"
-            icon="ri-shield-check-line"
-            active={location === "/warranty"}
-          >
-            Warranty & Troubleshooting
-          </NavItem>
+        </NavSection>
+
+        <NavSection title="Impact">
           <NavItem
             href="/remanufactured"
             icon="ri-recycle-line"
@@ -107,9 +103,6 @@ export default function Sidebar() {
           >
             Remanufactured Explained
           </NavItem>
-        </NavSection>
-
-        <NavSection title="Impact">
           <NavItem
             href="/water-projects"
             icon="ri-water-flash-line"
@@ -125,13 +118,6 @@ export default function Sidebar() {
             Your Impact
           </NavItem>
           <NavItem
-            href="/esg-report"
-            icon="ri-file-chart-line"
-            active={location === "/esg-report"}
-          >
-            ESG Report
-          </NavItem>
-          <NavItem
             href="/case-studies"
             icon="ri-file-text-line"
             active={location === "/case-studies"}
@@ -141,6 +127,13 @@ export default function Sidebar() {
         </NavSection>
 
         <NavSection title="Account">
+          <NavItem
+            href="/support"
+            icon="ri-customer-service-2-line"
+            active={location === "/support"}
+          >
+            Support
+          </NavItem>
           <NavItem
             href="/profile"
             icon="ri-user-settings-line"
