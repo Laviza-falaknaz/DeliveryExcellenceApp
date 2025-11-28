@@ -1296,22 +1296,59 @@ export default function Warranty() {
             </div>
             
             <div>
-              <h3 className="font-semibold text-sm mb-2 flex items-center gap-2">
+              <h3 className="font-semibold text-sm mb-3 flex items-center gap-2">
                 <i className="ri-battery-2-line text-primary"></i>
                 Understanding Battery Health
               </h3>
-              <div className="grid grid-cols-3 gap-2">
-                <div className="text-center p-2 bg-green-50 rounded-lg border border-green-200">
-                  <div className="text-lg font-bold text-green-700">80-100%</div>
-                  <div className="text-[10px] text-green-600 font-medium">Excellent</div>
+              <div className="space-y-3">
+                {/* Circular Remanufactured */}
+                <div className="border rounded-lg p-3 bg-primary/5">
+                  <h4 className="font-medium text-xs text-primary mb-2">Circular Remanufactured</h4>
+                  <div className="space-y-1.5">
+                    <div className="flex items-start gap-2">
+                      <div className="w-16 flex-shrink-0">
+                        <span className="text-xs font-semibold text-green-700 bg-green-100 px-1.5 py-0.5 rounded">80-100%</span>
+                      </div>
+                      <p className="text-xs text-neutral-600"><span className="font-medium text-green-700">Excellent</span> - Battery is in great condition and performing as expected</p>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <div className="w-16 flex-shrink-0">
+                        <span className="text-xs font-semibold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded">60-80%</span>
+                      </div>
+                      <p className="text-xs text-neutral-600"><span className="font-medium text-amber-700">Fair</span> - Battery shows normal wear, still functional but may need replacement soon</p>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <div className="w-16 flex-shrink-0">
+                        <span className="text-xs font-semibold text-red-700 bg-red-100 px-1.5 py-0.5 rounded">&lt;60%</span>
+                      </div>
+                      <p className="text-xs text-neutral-600"><span className="font-medium text-red-700">Replace</span> - Battery capacity significantly reduced, replacement may be recommended</p>
+                    </div>
+                  </div>
                 </div>
-                <div className="text-center p-2 bg-amber-50 rounded-lg border border-amber-200">
-                  <div className="text-lg font-bold text-amber-700">60-80%</div>
-                  <div className="text-[10px] text-amber-600 font-medium">Fair</div>
-                </div>
-                <div className="text-center p-2 bg-red-50 rounded-lg border border-red-200">
-                  <div className="text-lg font-bold text-red-700">&lt;60%</div>
-                  <div className="text-[10px] text-red-600 font-medium">Replace</div>
+                
+                {/* Circular Refurbished */}
+                <div className="border rounded-lg p-3 bg-secondary/5">
+                  <h4 className="font-medium text-xs text-secondary mb-2">Circular Refurbished</h4>
+                  <div className="space-y-1.5">
+                    <div className="flex items-start gap-2">
+                      <div className="w-16 flex-shrink-0">
+                        <span className="text-xs font-semibold text-green-700 bg-green-100 px-1.5 py-0.5 rounded">70-100%</span>
+                      </div>
+                      <p className="text-xs text-neutral-600"><span className="font-medium text-green-700">Excellent</span> - Battery is in great condition and performing as expected</p>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <div className="w-16 flex-shrink-0">
+                        <span className="text-xs font-semibold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded">60-70%</span>
+                      </div>
+                      <p className="text-xs text-neutral-600"><span className="font-medium text-amber-700">Fair</span> - Battery shows normal wear, still functional but may need replacement soon</p>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <div className="w-16 flex-shrink-0">
+                        <span className="text-xs font-semibold text-red-700 bg-red-100 px-1.5 py-0.5 rounded">&lt;60%</span>
+                      </div>
+                      <p className="text-xs text-neutral-600"><span className="font-medium text-red-700">Replace</span> - Battery capacity significantly reduced, replacement may be recommended</p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
