@@ -668,7 +668,7 @@ export default function Warranty() {
               <CardDescription>Choose the service type that applies to your situation</CardDescription>
             </CardHeader>
             <CardContent className="pt-0">
-              <Accordion type="single" collapsible className="w-full">
+              <Accordion type="multiple" defaultValue={["coverage", "sustainability"]} className="w-full">
                 {/* Advanced Replacement */}
                 <AccordionItem value="advanced-replacement" className="border rounded-lg mb-3 px-4">
                   <AccordionTrigger className="hover:no-underline py-4">
