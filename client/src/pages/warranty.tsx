@@ -899,19 +899,56 @@ export default function Warranty() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="border rounded-lg p-4 bg-primary/5">
                   <h3 className="font-medium text-lg mb-2">Official Manuals</h3>
-                  <p className="text-neutral-700 mb-3">
-                    Access comprehensive documentation and user guides for your remanufactured laptop from the original manufacturers.
+                  <p className="text-sm text-neutral-700 mb-4">
+                    Access comprehensive documentation and user guides for your remanufactured laptop from the original manufacturers:
                   </p>
-                  <ul className="list-disc list-inside text-neutral-700 space-y-1 mb-3">
-                    <li>Dell laptops: Complete service manuals and troubleshooting guides</li>
-                    <li>Lenovo laptops: Official documentation and support resources</li>
-                    <li>HP laptops: Comprehensive user manuals and technical specifications</li>
-                    <li>Model-specific guides for optimal performance and maintenance</li>
-                    <li>Installation and setup instructions for all components</li>
-                  </ul>
-                  <Button variant="link" className="text-primary hover:underline text-sm p-0 h-auto" onClick={() => setShowManualsDialog(true)}>
-                    <span>Browse official manuals</span>
-                  </Button>
+                  <div className="space-y-2">
+                    <a 
+                      href="https://www.dell.com/support/home/en-uk/Products/?app=manuals&search_redirect=product%2Bmanuals" 
+                      target="_blank" 
+                      rel="noreferrer" 
+                      className="flex items-center gap-3 p-2 rounded-lg hover:bg-primary/10 transition-colors group"
+                    >
+                      <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                        <i className="ri-external-link-line text-blue-600"></i>
+                      </div>
+                      <div className="flex-1">
+                        <span className="font-medium text-sm text-neutral-800 group-hover:text-primary">Dell Laptops</span>
+                        <p className="text-xs text-neutral-500">Service manuals & troubleshooting guides</p>
+                      </div>
+                      <i className="ri-arrow-right-s-line text-neutral-400 group-hover:text-primary"></i>
+                    </a>
+                    <a 
+                      href="https://support.lenovo.com/gb/en/solutions/ht077589-how-to-find-and-view-manuals-for-lenovo-products-thinkpad-thinkcentre-ideapad-ideacentre" 
+                      target="_blank" 
+                      rel="noreferrer" 
+                      className="flex items-center gap-3 p-2 rounded-lg hover:bg-primary/10 transition-colors group"
+                    >
+                      <div className="h-8 w-8 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
+                        <i className="ri-external-link-line text-red-600"></i>
+                      </div>
+                      <div className="flex-1">
+                        <span className="font-medium text-sm text-neutral-800 group-hover:text-primary">Lenovo Laptops</span>
+                        <p className="text-xs text-neutral-500">Official documentation & support resources</p>
+                      </div>
+                      <i className="ri-arrow-right-s-line text-neutral-400 group-hover:text-primary"></i>
+                    </a>
+                    <a 
+                      href="https://support.hp.com/us-en/products" 
+                      target="_blank" 
+                      rel="noreferrer" 
+                      className="flex items-center gap-3 p-2 rounded-lg hover:bg-primary/10 transition-colors group"
+                    >
+                      <div className="h-8 w-8 rounded-full bg-cyan-100 flex items-center justify-center flex-shrink-0">
+                        <i className="ri-external-link-line text-cyan-600"></i>
+                      </div>
+                      <div className="flex-1">
+                        <span className="font-medium text-sm text-neutral-800 group-hover:text-primary">HP Laptops</span>
+                        <p className="text-xs text-neutral-500">User manuals & technical specifications</p>
+                      </div>
+                      <i className="ri-arrow-right-s-line text-neutral-400 group-hover:text-primary"></i>
+                    </a>
+                  </div>
                 </div>
                 
                 <div className="border rounded-lg p-4 bg-secondary/5">
