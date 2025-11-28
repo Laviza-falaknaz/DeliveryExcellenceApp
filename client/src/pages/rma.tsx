@@ -217,8 +217,120 @@ export default function RMA() {
         </Card>
       </div>
 
+      {/* RMA's in Progress Section */}
       <div className="mb-8">
-        <h2 className="text-lg font-semibold font-poppins mb-4">Start RMA Process</h2>
+        <h2 className="text-lg font-semibold font-poppins mb-4">RMA's in Progress</h2>
+        
+        <Card>
+          <CardContent className="p-0">
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow className="border-b border-neutral-200">
+                    <TableHead className="text-left font-medium text-neutral-600 py-4 px-6 cursor-pointer hover:text-neutral-900 transition-colors">
+                      Created On ↓
+                    </TableHead>
+                    <TableHead className="text-left font-medium text-neutral-600 py-4 px-6 cursor-pointer hover:text-neutral-900 transition-colors">
+                      RMA No. ↓
+                    </TableHead>
+                    <TableHead className="text-left font-medium text-neutral-600 py-4 px-6 cursor-pointer hover:text-neutral-900 transition-colors">
+                      Topic ↓
+                    </TableHead>
+                    <TableHead className="text-left font-medium text-neutral-600 py-4 px-6 cursor-pointer hover:text-neutral-900 transition-colors">
+                      RMA Status ↓
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {isLoading ? (
+                    // Loading skeleton rows
+                    Array.from({ length: 5 }).map((_, index) => (
+                      <TableRow key={index} className="border-b border-neutral-100">
+                        <TableCell className="py-4 px-6">
+                          <Skeleton className="h-4 w-32" />
+                        </TableCell>
+                        <TableCell className="py-4 px-6">
+                          <Skeleton className="h-4 w-20" />
+                        </TableCell>
+                        <TableCell className="py-4 px-6">
+                          <Skeleton className="h-4 w-48" />
+                        </TableCell>
+                        <TableCell className="py-4 px-6">
+                          <Skeleton className="h-4 w-24" />
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : rmas && rmas.filter(rma => rma.rma.status !== 'completed' && rma.rma.status !== 'rejected').length > 0 ? (
+                    // Display in-progress RMAs
+                    rmas.filter(rma => rma.rma.status !== 'completed' && rma.rma.status !== 'rejected')
+                      .sort((a, b) => {
+                        const aDate = a.rma.createdAt ? new Date(a.rma.createdAt).getTime() : 0;
+                        const bDate = b.rma.createdAt ? new Date(b.rma.createdAt).getTime() : 0;
+                        return bDate - aDate;
+                      })
+                      .map((rmaData) => {
+                        const topic = rmaData.items.length > 0 ? 
+                          `${rmaData.items.length} item(s) - ${rmaData.items[0].errorDescription.substring(0, 40)}...` : 
+                          'No items';
+                        
+                        return (
+                          <TableRow 
+                            key={rmaData.rma.id} 
+                            className="border-b border-neutral-100 hover:bg-neutral-50 cursor-pointer transition-colors"
+                            onClick={() => handleRmaClick(rmaData)}
+                          >
+                            <TableCell className="py-4 px-6 text-sm text-neutral-700">
+                              {rmaData.rma.createdAt && new Date(rmaData.rma.createdAt).toLocaleDateString('en-GB', {
+                                day: '2-digit',
+                                month: '2-digit',
+                                year: 'numeric'
+                              })} {rmaData.rma.createdAt && new Date(rmaData.rma.createdAt).toLocaleTimeString('en-GB', {
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                hour12: false
+                              })}
+                            </TableCell>
+                            <TableCell className="py-4 px-6 text-sm">
+                              <span className="text-primary font-medium cursor-pointer hover:underline">
+                                {rmaData.rma.rmaNumber}
+                              </span>
+                            </TableCell>
+                            <TableCell className="py-4 px-6 text-sm text-neutral-700">
+                              {topic}
+                            </TableCell>
+                            <TableCell className="py-4 px-6">
+                              <Badge className={`text-xs ${getStatusColor(rmaData.rma.status)}`}>
+                                {getStatusLabel(rmaData.rma.status)}
+                              </Badge>
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })
+                  ) : (
+                    // Empty state
+                    <TableRow>
+                      <TableCell colSpan={4} className="text-center py-12">
+                        <div className="flex flex-col items-center">
+                          <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[#e0f2f2] text-[#08ABAB] mb-3">
+                            <i className="ri-inbox-line text-2xl"></i>
+                          </div>
+                          <h3 className="text-lg font-medium text-neutral-700"></h3>
+                          <p className="text-neutral-500 mt-1">
+                            You don't have any active return requests at the moment.
+                          </p>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="mb-8">
+        <h2 className="text-lg font-semibold font-poppins mb-4">RMA History</h2>
 
         {rmaError && (
           <Alert variant="destructive" className="mb-4">
@@ -419,118 +531,6 @@ export default function RMA() {
             </Button>
           </div>
         )}
-      </div>
-
-      {/* RMA's in Progress Section */}
-      <div className="mb-8">
-        <h2 className="text-lg font-semibold font-poppins mb-4">RMA's in Progress</h2>
-        
-        <Card>
-          <CardContent className="p-0">
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow className="border-b border-neutral-200">
-                    <TableHead className="text-left font-medium text-neutral-600 py-4 px-6 cursor-pointer hover:text-neutral-900 transition-colors">
-                      Created On ↓
-                    </TableHead>
-                    <TableHead className="text-left font-medium text-neutral-600 py-4 px-6 cursor-pointer hover:text-neutral-900 transition-colors">
-                      RMA No. ↓
-                    </TableHead>
-                    <TableHead className="text-left font-medium text-neutral-600 py-4 px-6 cursor-pointer hover:text-neutral-900 transition-colors">
-                      Topic ↓
-                    </TableHead>
-                    <TableHead className="text-left font-medium text-neutral-600 py-4 px-6 cursor-pointer hover:text-neutral-900 transition-colors">
-                      RMA Status ↓
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {isLoading ? (
-                    // Loading skeleton rows
-                    Array.from({ length: 5 }).map((_, index) => (
-                      <TableRow key={index} className="border-b border-neutral-100">
-                        <TableCell className="py-4 px-6">
-                          <Skeleton className="h-4 w-32" />
-                        </TableCell>
-                        <TableCell className="py-4 px-6">
-                          <Skeleton className="h-4 w-20" />
-                        </TableCell>
-                        <TableCell className="py-4 px-6">
-                          <Skeleton className="h-4 w-48" />
-                        </TableCell>
-                        <TableCell className="py-4 px-6">
-                          <Skeleton className="h-4 w-24" />
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  ) : rmas && rmas.filter(rma => rma.rma.status !== 'completed' && rma.rma.status !== 'rejected').length > 0 ? (
-                    // Display in-progress RMAs
-                    rmas.filter(rma => rma.rma.status !== 'completed' && rma.rma.status !== 'rejected')
-                      .sort((a, b) => {
-                        const aDate = a.rma.createdAt ? new Date(a.rma.createdAt).getTime() : 0;
-                        const bDate = b.rma.createdAt ? new Date(b.rma.createdAt).getTime() : 0;
-                        return bDate - aDate;
-                      })
-                      .map((rmaData) => {
-                        const topic = rmaData.items.length > 0 ? 
-                          `${rmaData.items.length} item(s) - ${rmaData.items[0].errorDescription.substring(0, 40)}...` : 
-                          'No items';
-                        
-                        return (
-                          <TableRow 
-                            key={rmaData.rma.id} 
-                            className="border-b border-neutral-100 hover:bg-neutral-50 cursor-pointer transition-colors"
-                            onClick={() => handleRmaClick(rmaData)}
-                          >
-                            <TableCell className="py-4 px-6 text-sm text-neutral-700">
-                              {rmaData.rma.createdAt && new Date(rmaData.rma.createdAt).toLocaleDateString('en-GB', {
-                                day: '2-digit',
-                                month: '2-digit',
-                                year: 'numeric'
-                              })} {rmaData.rma.createdAt && new Date(rmaData.rma.createdAt).toLocaleTimeString('en-GB', {
-                                hour: '2-digit',
-                                minute: '2-digit',
-                                hour12: false
-                              })}
-                            </TableCell>
-                            <TableCell className="py-4 px-6 text-sm">
-                              <span className="text-primary font-medium cursor-pointer hover:underline">
-                                {rmaData.rma.rmaNumber}
-                              </span>
-                            </TableCell>
-                            <TableCell className="py-4 px-6 text-sm text-neutral-700">
-                              {topic}
-                            </TableCell>
-                            <TableCell className="py-4 px-6">
-                              <Badge className={`text-xs ${getStatusColor(rmaData.rma.status)}`}>
-                                {getStatusLabel(rmaData.rma.status)}
-                              </Badge>
-                            </TableCell>
-                          </TableRow>
-                        );
-                      })
-                  ) : (
-                    // Empty state
-                    <TableRow>
-                      <TableCell colSpan={4} className="text-center py-12">
-                        <div className="flex flex-col items-center">
-                          <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[#e0f2f2] text-[#08ABAB] mb-3">
-                            <i className="ri-inbox-line text-2xl"></i>
-                          </div>
-                          <h3 className="text-lg font-medium text-neutral-700"></h3>
-                          <p className="text-neutral-500 mt-1">
-                            You don't have any active return requests at the moment.
-                          </p>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </div>
-          </CardContent>
-        </Card>
       </div>
 
       {/* RMA Details Dialog */}
