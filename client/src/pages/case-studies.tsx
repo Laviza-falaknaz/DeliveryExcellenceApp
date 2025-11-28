@@ -138,7 +138,6 @@ export default function CaseStudies() {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold font-poppins text-neutral-900">Case Studies</h1>
-          <p className="text-neutral-600">Share your sustainable success story with the world</p>
         </div>
         <div className="mt-4 md:mt-0">
           {!hasSubmitted && (
@@ -146,18 +145,14 @@ export default function CaseStudies() {
               variant="outline" 
               onClick={() => setIsDialogOpen(true)}
             >
-              <i className="ri-add-line mr-2"></i>
               <span>Join Case Study Programme</span>
             </Button>
           )}
         </div>
       </div>
 
-      {/* Featured Case Studies */}
+      {/* Case Studies Grid */}
       <section className="mb-8">
-        <h2 className="text-lg font-semibold font-poppins mb-4">Featured Case Studies</h2>
-        <p className="text-neutral-600 mb-6">See the impact Circular Computing laptops have on organisations and the Earth. We are proud to have helped organisations in the public and private sectors achieve their IT procurement and sustainability goals.</p>
-        
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           
           {/* Salvation Army Trading Company Case Study */}
