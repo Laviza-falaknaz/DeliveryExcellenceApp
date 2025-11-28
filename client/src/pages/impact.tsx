@@ -324,7 +324,7 @@ Learn more about sustainable IT solutions: circularcomputing.com
                   <div className="mt-auto text-sm flex items-center text-[#08ABAB]">
                     <TrendingUp className="h-4 w-4 mr-1" />
                     <span>
-                      Equivalent to planting {impact.treesEquivalent} trees
+                      Equivalent to planting {impact.treesEquivalent?.toLocaleString()} trees
                     </span>
                 </div>
               </CardContent>
@@ -340,7 +340,7 @@ Learn more about sustainable IT solutions: circularcomputing.com
                         Clean Water Provided
                       </h3>
                     <p className="text-3xl font-bold mt-1">
-                      {impact.familiesHelped}
+                      {impact.familiesHelped?.toLocaleString()}
                     </p>
                     <p className="text-xs text-neutral-400">families helped</p>
                     <p className="text-xs text-neutral-500 mt-1">

@@ -89,29 +89,40 @@ export function calculateOrderStages(status: string): { label: string, active: b
 }
 
 export function formatEnvironmentalImpact(value: number, unit: string): string {
+  const formatWithCommas = (num: number, decimals: number = 1): string => {
+    return num.toLocaleString('en-US', { 
+      minimumFractionDigits: decimals, 
+      maximumFractionDigits: decimals 
+    });
+  };
+
+  const formatWholeWithCommas = (num: number): string => {
+    return Math.round(num).toLocaleString('en-US');
+  };
+
   if (unit === 'kg') {
     if (value >= 1000) {
-      return `${(value / 1000).toFixed(1)} tonnes`;
+      return `${formatWithCommas(value / 1000)} tonnes`;
     }
-    return `${value} kg`;
+    return `${formatWholeWithCommas(value)} kg`;
   }
   
   if (unit === 'litres') {
     if (value >= 1000000) {
-      return `${(value / 1000000).toFixed(1)}M litres`;
+      return `${formatWithCommas(value / 1000000)}M litres`;
     }
     if (value >= 1000) {
-      return `${(value / 1000).toFixed(1)}K litres`;
+      return `${formatWithCommas(value / 1000)}K litres`;
     }
-    return `${value} litres`;
+    return `${formatWholeWithCommas(value)} litres`;
   }
   
   if (unit === 'g') {
     if (value >= 1000) {
-      return `${(value / 1000).toFixed(1)} kg`;
+      return `${formatWithCommas(value / 1000)} kg`;
     }
-    return `${value} g`;
+    return `${formatWholeWithCommas(value)} g`;
   }
   
-  return `${value} ${unit}`;
+  return `${formatWholeWithCommas(value)} ${unit}`;
 }
