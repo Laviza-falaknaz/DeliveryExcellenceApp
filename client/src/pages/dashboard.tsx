@@ -813,7 +813,7 @@ export default function Dashboard() {
                       <i className="ri-linkedin-fill text-white text-lg"></i>
                     </div>
                     <div className="flex-1 h-full bg-[#0077B5] flex items-center justify-center">
-                      <span className="text-white text-sm font-medium">LinkedIn</span>
+                      <span className="text-white font-medium text-[13px]">LinkedIn</span>
                     </div>
                   </button>
                   <button 
