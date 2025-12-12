@@ -39,31 +39,73 @@ export default function Remanufactured() {
     }
   };
 
-  // YouTube videos data from provided links
+  // YouTube videos data from Sustainable IT: In Conversation podcast playlist
   const videos = [
     {
-      id: "u7IOWNV2zFU",
-      title: "The Remanufacturing Process",
-      description: "See how we transform used laptops into like-new devices",
-      embedUrl: "https://www.youtube.com/embed/u7IOWNV2zFU"
+      id: "k5TqxEJCLyw",
+      title: "Episode 11 - Craig Smith, Group MD, ICT Reverse/Mazuma",
+      description: "Sustainable IT: In Conversation with Craig Smith",
+      embedUrl: "https://www.youtube.com/embed/k5TqxEJCLyw"
     },
     {
-      id: "6pOqhKEHiNE",
-      title: "Quality Testing & Certification", 
-      description: "Our comprehensive testing process ensures reliability",
-      embedUrl: "https://www.youtube.com/embed/6pOqhKEHiNE"
+      id: "Id23pFCdsaM",
+      title: "Episode 10 - Stefan Nilsson, Chief Sustainability Officer, Foxway",
+      description: "Sustainable IT: In Conversation with Stefan Nilsson",
+      embedUrl: "https://www.youtube.com/embed/Id23pFCdsaM"
     },
     {
-      id: "Q9Kfc9S6AOQ",
-      title: "Environmental Impact",
-      description: "How remanufactured laptops help save the planet",
-      embedUrl: "https://www.youtube.com/embed/Q9Kfc9S6AOQ"
+      id: "mOrdpC_w6Xc",
+      title: "Episode 9 - Elsa Nightingale, Principal Analyst, Canalys",
+      description: "Sustainable IT: In Conversation with Elsa Nightingale",
+      embedUrl: "https://www.youtube.com/embed/mOrdpC_w6Xc"
+    },
+    {
+      id: "G9qiUFfopNc",
+      title: "Episode 8 - Sophia Haywood, Business Unit Director, TD SYNNEX UK&I",
+      description: "Sustainable IT: In Conversation with Sophia Haywood",
+      embedUrl: "https://www.youtube.com/embed/G9qiUFfopNc"
+    },
+    {
+      id: "1mGgvnvQxAQ",
+      title: "Episode 7 - Howard Davies, CEO, CONTEXT",
+      description: "Sustainable IT: In Conversation with Howard Davies",
+      embedUrl: "https://www.youtube.com/embed/1mGgvnvQxAQ"
+    },
+    {
+      id: "HR_MdcoCvHU",
+      title: "Episode 6 - John Gladstone, Sustainability Lead, Softcat",
+      description: "Sustainable IT: In Conversation with John Gladstone",
+      embedUrl: "https://www.youtube.com/embed/HR_MdcoCvHU"
+    },
+    {
+      id: "u28YCXvdFSA",
+      title: "Episode 5 - Joost de Kluijver, Founder, Closing the Loop",
+      description: "Sustainable IT: In Conversation with Joost de Kluijver",
+      embedUrl: "https://www.youtube.com/embed/u28YCXvdFSA"
     },
     {
       id: "P8ouoPRbLiM",
-      title: "Sustainability in Action",
-      description: "Our commitment to circular economy and environmental responsibility",
+      title: "Episode 4 - Andreas Mayer, CEO, FlexIT",
+      description: "Sustainable IT: In Conversation with Andreas Mayer",
       embedUrl: "https://www.youtube.com/embed/P8ouoPRbLiM"
+    },
+    {
+      id: "Q9Kfc9S6AOQ",
+      title: "Episode 3 - Alastair Borissow, Founder & Managing Partner, ITXero",
+      description: "Sustainable IT: In Conversation with Alastair Borissow",
+      embedUrl: "https://www.youtube.com/embed/Q9Kfc9S6AOQ"
+    },
+    {
+      id: "6pOqhKEHiNE",
+      title: "Episode 2 - Alexander Thiele, Senior Manager, Bechtle",
+      description: "Sustainable IT: In Conversation with Alexander Thiele",
+      embedUrl: "https://www.youtube.com/embed/6pOqhKEHiNE"
+    },
+    {
+      id: "u7IOWNV2zFU",
+      title: "Episode 1 - Mat Jordan, CEO, Procurri",
+      description: "Sustainable IT: In Conversation with Mat Jordan",
+      embedUrl: "https://www.youtube.com/embed/u7IOWNV2zFU"
     }
   ];
 
