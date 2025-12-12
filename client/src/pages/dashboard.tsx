@@ -833,7 +833,7 @@ export default function Dashboard() {
                       <i className="ri-instagram-line text-white text-lg"></i>
                     </div>
                     <div className="flex-1 h-full bg-gradient-to-r from-[#E1306C] via-[#FD1D1D] to-[#F77737] flex items-center justify-center">
-                      <span className="text-white text-sm font-medium">Instagram</span>
+                      <span className="text-white font-medium text-[13px]">Instagram</span>
                     </div>
                   </button>
                 </div>
