@@ -10,7 +10,7 @@ import {
   TrendingUp, Droplet, Leaf, Recycle, Users, 
   ChevronRight, FileText, MessageSquare, Clock,
   Zap, Star, BarChart3, Brain, Gamepad2, AlertCircle, Truck, Rocket,
-  RotateCcw, HelpCircle, Book, BookOpen, Phone, Play, Share2, ExternalLink
+  RotateCcw, HelpCircle, Book, BookOpen, Phone, Play, Share2, ExternalLink, Lightbulb
 } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -419,10 +419,21 @@ export default function Dashboard() {
             {/* Tips for Setting Up Remanufactured Laptops */}
             <Card className="shadow-md border-0">
               <CardHeader className="border-b bg-gradient-to-r from-teal-50 to-cyan-50 pb-3 pt-3">
-                <CardTitle className="text-base font-semibold text-gray-900">Tips for Setting Up Remanufactured Laptops</CardTitle>
-                <CardDescription className="text-sm text-gray-600">
-                  Quick tips if you're new to the world of remanufactured laptops
-                </CardDescription>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-base font-semibold text-gray-900 flex items-center gap-2">
+                    <Lightbulb className="h-5 w-5 text-teal-600" />
+                    Tips for Remanufactured Laptops
+                  </CardTitle>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="text-teal-600 hover:text-teal-700 hover:bg-teal-50"
+                    onClick={() => setLocation('/remanufactured')}
+                    data-testid="button-learn-more-tips"
+                  >
+                    Learn More
+                  </Button>
+                </div>
               </CardHeader>
               <CardContent className="p-4">
                 <div className="relative">
