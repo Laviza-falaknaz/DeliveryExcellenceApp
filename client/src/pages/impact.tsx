@@ -200,14 +200,6 @@ Learn more about sustainable IT solutions: circularcomputing.com
           </p>
         </div>
         <div className="mt-4 md:mt-0 flex gap-2">
-          {user?.isAdmin && (
-            <Button 
-              variant="outline"
-            >
-              <i className="ri-download-line mr-2"></i>
-              <span>Download Report</span>
-            </Button>
-          )}
           <Button 
             variant="outline"
             asChild
