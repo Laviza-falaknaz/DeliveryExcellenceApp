@@ -170,43 +170,6 @@ export default function RMA() {
         </div>
       </div>
 
-      {/* Return to Base Warranty Overview Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
-        <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
-          <p className="text-xs text-green-600 font-medium uppercase">
-            Coverage
-          </p>
-          <p className="text-sm font-semibold text-green-800 mt-1">
-            UK & Europe
-          </p>
-        </div>
-        <div className="text-center p-4 bg-blue-50 rounded-lg border border-blue-200">
-          <p className="text-xs text-blue-600 font-medium uppercase">
-            Turnaround
-          </p>
-          <p className="text-sm font-semibold text-blue-800 mt-1">
-            5 Days*
-          </p>
-        </div>
-        <div className="text-center p-4 bg-purple-50 rounded-lg border border-purple-200">
-          <p className="text-xs text-purple-600 font-medium uppercase">
-            Outcome
-          </p>
-          <p className="text-sm font-semibold text-purple-800 mt-1">
-            Repair/Replace
-          </p>
-        </div>
-        <div className="text-center p-4 bg-neutral-100 rounded-lg border border-neutral-200">
-          <p className="text-xs text-neutral-600 font-medium uppercase">
-            Insurance
-          </p>
-          <p className="text-sm font-semibold text-neutral-800 mt-1">
-            Full Cover
-          </p>
-        </div>
-      </div>
-
-      {/* Process Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <Card>
           <CardContent className="p-6">

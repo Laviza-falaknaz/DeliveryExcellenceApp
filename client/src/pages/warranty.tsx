@@ -881,21 +881,37 @@ export default function Warranty() {
                         Receive a replacement unit once your RMA is approved using our swap service. For locations where we are unable to complete the swap service, we deliver a replacement device and arrange collection of the faulty device at a later date convenient to you.
                       </p>
 
-                      <div className="grid grid-cols-2 gap-3">
-                        <div className="p-3 bg-green-50 rounded-lg border border-green-200">
-                          <p className="text-xs text-green-600 font-medium mb-1">
-                            Covered
+                      <div className="grid grid-cols-4 gap-2">
+                        <div className="text-center p-2 bg-green-50 rounded-lg border border-green-200">
+                          <p className="text-[10px] text-green-600 font-medium uppercase">
+                            Coverage
                           </p>
-                          <p className="text-sm text-green-800">
-                            UK Mainland, Isle of Wight
+                          <p className="text-xs font-semibold text-green-800 mt-0.5">
+                            UK Mainland
                           </p>
                         </div>
-                        <div className="p-3 bg-amber-50 rounded-lg border border-amber-200">
-                          <p className="text-xs text-amber-600 font-medium mb-1">
-                            Separate Process
+                        <div className="text-center p-2 bg-blue-50 rounded-lg border border-blue-200">
+                          <p className="text-[10px] text-blue-600 font-medium uppercase">
+                            Turnaround
                           </p>
-                          <p className="text-sm text-amber-800">
-                            NI, Channel Islands, Scotland Highlands, Europe
+                          <p className="text-xs font-semibold text-blue-800 mt-0.5">
+                            Next Day*
+                          </p>
+                        </div>
+                        <div className="text-center p-2 bg-purple-50 rounded-lg border border-purple-200">
+                          <p className="text-[10px] text-purple-600 font-medium uppercase">
+                            Outcome
+                          </p>
+                          <p className="text-xs font-semibold text-purple-800 mt-0.5">
+                            Swap/Replace
+                          </p>
+                        </div>
+                        <div className="text-center p-2 bg-neutral-100 rounded-lg border border-neutral-200">
+                          <p className="text-[10px] text-neutral-600 font-medium uppercase">
+                            Insurance
+                          </p>
+                          <p className="text-xs font-semibold text-neutral-800 mt-0.5">
+                            Full Cover
                           </p>
                         </div>
                       </div>
