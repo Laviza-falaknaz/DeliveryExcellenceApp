@@ -410,11 +410,11 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Main Grid - 70/30 Split */}
-        <div className="grid grid-cols-1 lg:grid-cols-10 gap-4">
+        {/* Main Grid - 75/25 Split to match sustainability cards */}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
           
-          {/* Left Column - 70% width */}
-          <div className="lg:col-span-7 space-y-4">
+          {/* Left Column - 75% width (3 of 4 columns) */}
+          <div className="lg:col-span-3 space-y-4">
             
             {/* Tips for Setting Up Remanufactured Laptops */}
             <Card className="shadow-md border-0">
@@ -663,8 +663,8 @@ export default function Dashboard() {
             </Card>
           </div>
 
-          {/* Right Column - 30% width */}
-          <div className="lg:col-span-3 space-y-4">
+          {/* Right Column - 25% width (1 of 4 columns, matches sustainability card width) */}
+          <div className="lg:col-span-1 space-y-4">
             
             {/* Charity Water Card */}
             <Card 
