@@ -95,31 +95,14 @@ const getAchievementEmoji = (iconName: string): string => {
   return iconMap[iconName] || '🏆';
 };
 
-interface Tip {
-  id: number;
-  title: string;
-  content: string;
-  category: string;
-  categoryColor: string;
-  icon: string;
-}
-
 export default function Dashboard() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [showRocket, setShowRocket] = useState(false);
-  const [currentTip, setCurrentTip] = useState(0);
   
   const { data: user } = useQuery<User>({
     queryKey: ["/api/auth/me"],
   });
-  
-  const { data: tips = [], isLoading: tipsLoading } = useQuery<Tip[]>({
-    queryKey: ["/api/remanufacturing-tips"],
-  });
-  
-  const nextTip = () => setCurrentTip((prev) => (prev + 1) % (tips.length || 1));
-  const prevTip = () => setCurrentTip((prev) => (prev - 1 + (tips.length || 1)) % (tips.length || 1));
   
   const { data: userProgress } = useQuery<UserProgress>({
     queryKey: ["/api/gamification/user-progress"],
@@ -452,108 +435,6 @@ export default function Dashboard() {
                       </Link>
                     ))}
                   </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Setup Tips Carousel */}
-            {!tipsLoading && tips.length > 0 && (
-              <Card className="shadow-md border-0">
-                <CardHeader className="border-b bg-gradient-to-r from-teal-50 to-cyan-50 pb-2 pt-2">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-base font-semibold text-gray-900 flex items-center gap-2">
-                      <Zap className="h-5 w-5 text-[#08ABAB]" />
-                      Setup Tips
-                    </CardTitle>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="text-[#08ABAB] hover:text-[#08ABAB]/80 hover:bg-teal-50"
-                      onClick={() => setLocation('/remanufactured')}
-                    >
-                      View All
-                    </Button>
-                  </div>
-                </CardHeader>
-                <CardContent className="p-3">
-                  <div className="relative overflow-hidden rounded-lg">
-                    <div 
-                      className="flex transition-transform duration-300 ease-in-out"
-                      style={{ transform: `translateX(-${currentTip * 100}%)` }}
-                    >
-                      {tips.map((tip) => {
-                        const color = tip.categoryColor || "#08ABAB";
-                        return (
-                          <div key={tip.id} className="w-full flex-shrink-0">
-                            <div 
-                              className="p-3 rounded-lg border"
-                              style={{ 
-                                backgroundColor: `${color}0D`,
-                                borderColor: `${color}33`
-                              }}
-                            >
-                              <div className="flex items-start gap-3">
-                                <div 
-                                  className="h-9 w-9 rounded-full flex items-center justify-center text-white flex-shrink-0"
-                                  style={{ backgroundColor: color }}
-                                >
-                                  <i className={`${tip.icon} text-base`}></i>
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                  <div className="flex items-center gap-2 mb-1">
-                                    <h4 className="font-medium text-sm text-gray-900 truncate">{tip.title}</h4>
-                                    <span 
-                                      className="text-[10px] font-medium px-1.5 py-0.5 rounded-full flex-shrink-0"
-                                      style={{ 
-                                        backgroundColor: `${color}33`,
-                                        color: color
-                                      }}
-                                    >
-                                      {tip.category}
-                                    </span>
-                                  </div>
-                                  <p className="text-xs text-gray-600 line-clamp-2">{tip.content}</p>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                  {tips.length > 1 && (
-                    <div className="flex items-center justify-between mt-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={prevTip}
-                        className="h-7 text-xs text-gray-600 hover:text-[#08ABAB]"
-                      >
-                        <ChevronRight className="h-3 w-3 rotate-180 mr-1" />
-                        Prev
-                      </Button>
-                      <div className="flex gap-1">
-                        {tips.map((_, index) => (
-                          <button
-                            key={index}
-                            onClick={() => setCurrentTip(index)}
-                            className={`w-1.5 h-1.5 rounded-full transition-colors ${
-                              index === currentTip ? 'bg-[#08ABAB]' : 'bg-gray-300'
-                            }`}
-                          />
-                        ))}
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={nextTip}
-                        className="h-7 text-xs text-gray-600 hover:text-[#08ABAB]"
-                      >
-                        Next
-                        <ChevronRight className="h-3 w-3 ml-1" />
-                      </Button>
-                    </div>
-                  )}
                 </CardContent>
               </Card>
             )}
