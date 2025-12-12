@@ -16,7 +16,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { getRmaStatusColor } from "@/lib/utils";
+import { getRmaStatusColor, getOrderStatusColor } from "@/lib/utils";
 
 const formatNumber = (num: number): string => {
   return num.toLocaleString('en-US');
@@ -558,8 +558,8 @@ export default function Dashboard() {
                               <span className="font-medium text-gray-900 text-sm">
                                 {order.orderNumber}
                               </span>
-                              <Badge className="bg-teal-100 text-teal-700 hover:bg-teal-100 text-xs">
-                                {order.status}
+                              <Badge className={`${getOrderStatusColor(order.status)} text-xs`}>
+                                {order.status.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
                               </Badge>
                             </div>
                             <div className="text-xs text-gray-600">
