@@ -793,7 +793,7 @@ export default function Dashboard() {
                       <i className="ri-twitter-fill text-white text-lg"></i>
                     </div>
                     <div className="flex-1 h-full bg-[#1DA1F2] flex items-center justify-center">
-                      <span className="text-white font-medium text-[13px]">Twitter</span>
+                      <span className="text-white font-medium text-[13px] text-left">Twitter</span>
                     </div>
                   </button>
                   <button 
@@ -813,7 +813,7 @@ export default function Dashboard() {
                       <i className="ri-linkedin-fill text-white text-lg"></i>
                     </div>
                     <div className="flex-1 h-full bg-[#0077B5] flex items-center justify-center">
-                      <span className="text-white font-medium text-[13px]">LinkedIn</span>
+                      <span className="text-white font-medium text-[13px] text-left">LinkedIn</span>
                     </div>
                   </button>
                   <button 
