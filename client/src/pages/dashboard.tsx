@@ -314,67 +314,82 @@ export default function Dashboard() {
             {/* Sustainability Metrics */}
             <div>
               <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                <TrendingUp className="h-5 w-5 text-teal-600" />
+                <TrendingUp className="h-5 w-5 text-[#08ABAB]" />
                 Sustainability Metrics
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                 
-                <Card className="shadow-md border-0 bg-gradient-to-br from-green-50 to-emerald-50">
-                  <CardContent className="p-4">
-                    <div className="bg-green-100 w-10 h-10 rounded-lg flex items-center justify-center mb-2">
-                      <Leaf className="h-5 w-5 text-green-700" />
+                {/* Total Carbon Saved - Teal */}
+                <Card className="shadow-md border-0 bg-[#08ABAB] text-white overflow-hidden">
+                  <CardContent className="p-3">
+                    <div className="flex justify-end mb-1">
+                      <div className="bg-white/20 w-8 h-8 rounded-full flex items-center justify-center">
+                        <Leaf className="h-4 w-4 text-white" />
+                      </div>
                     </div>
-                    <div className="text-2xl font-bold text-gray-900 mb-0.5">
+                    <div className="text-xs font-medium text-white/80 mb-1">Total Carbon Saved</div>
+                    <div className="text-xl font-bold mb-1">
                       {formatNumber(Math.round((impact?.carbonSaved || 0) / 1000))} kg
                     </div>
-                    <div className="text-sm text-gray-600 mb-1">CO₂ Prevented</div>
-                    <div className="text-xs text-green-700 font-medium">
-                      +{formatNumber(Math.floor(((impact?.carbonSaved || 0) / 1000) * 0.1))}% this month
+                    <div className="text-[10px] text-white/70">
+                      Equivalent to planting {formatNumber(Math.round((impact?.carbonSaved || 0) / 21))} trees
                     </div>
                   </CardContent>
                 </Card>
 
-                <Card className="shadow-md border-0 bg-gradient-to-br from-blue-50 to-cyan-50">
-                  <CardContent className="p-4">
-                    <div className="bg-blue-100 w-10 h-10 rounded-lg flex items-center justify-center mb-2">
-                      <Droplet className="h-5 w-5 text-blue-700" />
+                {/* Clean Water Provided - Navy */}
+                <Card className="shadow-md border-0 bg-[#305269] text-white overflow-hidden">
+                  <CardContent className="p-3">
+                    <div className="flex justify-end mb-1">
+                      <div className="bg-white/20 w-8 h-8 rounded-full flex items-center justify-center">
+                        <Users className="h-4 w-4 text-white" />
+                      </div>
                     </div>
-                    <div className="text-2xl font-bold text-gray-900 mb-0.5">
-                      {formatNumber(Math.round((impact?.waterSaved || 0) / 1000))} kL
+                    <div className="text-xs font-medium text-white/80 mb-1">Clean Water Provided</div>
+                    <div className="text-xl font-bold mb-1">
+                      {formatNumber(impact?.familiesHelped || 0)}
                     </div>
-                    <div className="text-sm text-gray-600 mb-1">Water Saved</div>
-                    <div className="text-xs text-blue-700 font-medium">
-                      +{formatNumber(Math.floor(((impact?.waterSaved || 0) / 1000) * 0.08))}% this month
+                    <div className="text-[10px] text-white/70">
+                      families helped
+                    </div>
+                    <div className="text-[10px] text-white/60 mt-0.5">
+                      {formatNumber(Math.round((impact?.familiesHelped || 0) * 1.2))}M litres volume
                     </div>
                   </CardContent>
                 </Card>
 
-                <Card className="shadow-md border-0 bg-gradient-to-br from-amber-50 to-yellow-50">
-                  <CardContent className="p-4">
-                    <div className="bg-amber-100 w-10 h-10 rounded-lg flex items-center justify-center mb-2">
-                      <Recycle className="h-5 w-5 text-amber-700" />
+                {/* Resource Preservation - Gold */}
+                <Card className="shadow-md border-0 bg-[#FF9E1C] text-white overflow-hidden">
+                  <CardContent className="p-3">
+                    <div className="flex justify-end mb-1">
+                      <div className="bg-white/20 w-8 h-8 rounded-full flex items-center justify-center">
+                        <Recycle className="h-4 w-4 text-white" />
+                      </div>
                     </div>
-                    <div className="text-2xl font-bold text-gray-900 mb-0.5">
+                    <div className="text-xs font-medium text-white/80 mb-1">Resource Preservation</div>
+                    <div className="text-xl font-bold mb-1">
                       {formatNumber(Math.round((impact?.mineralsSaved || 0) / 1000))} kg
                     </div>
-                    <div className="text-sm text-gray-600 mb-1">Materials Saved</div>
-                    <div className="text-xs text-amber-700 font-medium">
-                      +{formatNumber(Math.floor(((impact?.mineralsSaved || 0) / 1000) * 0.12))}% this month
+                    <div className="text-[10px] text-white/70">
+                      Mining impact reduced
                     </div>
                   </CardContent>
                 </Card>
 
-                <Card className="shadow-md border-0 bg-gradient-to-br from-sky-50 to-blue-50">
-                  <CardContent className="p-4">
-                    <div className="bg-sky-100 w-10 h-10 rounded-lg flex items-center justify-center mb-2">
-                      <Users className="h-5 w-5 text-sky-700" />
+                {/* Water Saved - Purple */}
+                <Card className="shadow-md border-0 bg-[#663366] text-white overflow-hidden">
+                  <CardContent className="p-3">
+                    <div className="flex justify-end mb-1">
+                      <div className="bg-white/20 w-8 h-8 rounded-full flex items-center justify-center">
+                        <Droplet className="h-4 w-4 text-white" />
+                      </div>
                     </div>
-                    <div className="text-2xl font-bold text-gray-900 mb-0.5">
-                      {formatNumber(impact?.waterProvided || 0)} L
+                    <div className="text-xs font-medium text-white/80 mb-1">Water Saved</div>
+                    <div className="text-xl font-bold mb-1">
+                      {formatNumber(Math.round((impact?.waterSaved || 0) / 1000000))}M litres
                     </div>
-                    <div className="text-sm text-gray-600 mb-1">Clean Water Provided</div>
-                    <div className="text-xs text-sky-700 font-medium">
-                      Supporting clean water projects
+                    <div className="text-[10px] text-white/70">
+                      Water conservation via reuse
                     </div>
                   </CardContent>
                 </Card>
