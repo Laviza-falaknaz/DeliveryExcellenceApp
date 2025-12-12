@@ -166,7 +166,7 @@ function OrderConfirmedAnimation({ isActive, isCompleted }: { isActive: boolean;
   );
 }
 
-// Stage 2: Sent to Warehouse - Eco-Crate on Conveyor with Robotic Arm
+// Stage 2: Sent to Warehouse - Warehouse Icon
 function SentToWarehouseAnimation({ isActive, isCompleted }: { isActive: boolean; isCompleted: boolean }) {
   return (
     <div className="relative w-32 h-32">
@@ -179,128 +179,72 @@ function SentToWarehouseAnimation({ isActive, isCompleted }: { isActive: boolean
             ? "linear-gradient(135deg, #305269 0%, #243d4f 100%)"
             : "linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%)"
         }}
+        initial={{ scale: 0.9 }}
+        animate={isActive ? {
+          scale: [1, 1.1, 1],
+        } : { scale: 1 }}
+        transition={{ duration: 1.5, repeat: isActive ? Infinity : 0 }}
       >
         {(isActive || isCompleted) && <GlowRing color="#305269" intensity={isActive ? 1.5 : 0.8} />}
         
-        {/* Conveyor Belt */}
-        <svg width="120" height="120" viewBox="0 0 120 120" className="absolute">
-          <motion.line
-            x1="20"
-            y1="80"
-            x2="100"
-            y2="80"
-            stroke={isActive || isCompleted ? "#1d4ed8" : "#6b7280"}
-            strokeWidth="3"
-            strokeDasharray="8 4"
-            animate={isActive ? { strokeDashoffset: [0, -12] } : {}}
-            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-          />
-        </svg>
-
-        {/* Robotic Arm */}
-        {isActive && (
-          <motion.svg
-            width="80"
-            height="80"
-            viewBox="0 0 80 80"
-            className="absolute"
-            style={{ right: "10%", top: "10%" }}
-            animate={{
-              rotate: [0, -15, 0]
-            }}
-            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-          >
-            <motion.line
-              x1="60"
-              y1="20"
-              x2="60"
-              y2="50"
-              stroke="#6b7280"
-              strokeWidth="4"
-              strokeLinecap="round"
-              animate={{ y2: [50, 60, 50] }}
-              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-            />
-            <motion.line
-              x1="60"
-              y1="50"
-              x2="40"
-              y2="60"
-              stroke="#9ca3af"
-              strokeWidth="4"
-              strokeLinecap="round"
-              animate={{ x2: [40, 30, 40], y2: [60, 70, 60] }}
-              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-            />
-            <motion.circle
-              cx="40"
-              cy="60"
-              r="4"
-              fill="#3b82f6"
-              animate={{ cx: [40, 30, 40], cy: [60, 70, 60] }}
-              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-            />
-          </motion.svg>
-        )}
-
-        {/* Eco-Crate */}
+        {/* Warehouse Icon Box */}
         <motion.div
-          className="relative"
-          initial={{ x: -40, y: 10 }}
+          className="relative w-16 h-16 rounded-xl flex items-center justify-center"
+          style={{
+            background: isActive || isCompleted ? "rgba(255, 255, 255, 0.9)" : "#f3f4f6",
+            boxShadow: isActive || isCompleted ? "0 8px 20px rgba(48, 82, 105, 0.3)" : "0 2px 8px rgba(0, 0, 0, 0.08)"
+          }}
           animate={isActive ? {
-            x: [-40, 0],
-            y: [10, 0]
-          } : { x: 0, y: 0 }}
-          transition={isActive ? {
-            duration: 1.5,
-            repeat: Infinity,
-            repeatDelay: 1.5,
-            ease: "easeInOut"
+            y: [0, -3, 0],
           } : {}}
+          transition={{ duration: 0.8, repeat: isActive ? Infinity : 0 }}
         >
-          <svg width="48" height="48" viewBox="0 0 48 48">
-            <rect
-              x="8"
-              y="12"
-              width="32"
-              height="24"
-              rx="2"
-              fill={isActive || isCompleted ? "#10b981" : "#9ca3af"}
-              opacity="0.9"
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+            <path
+              d="M4 14L16 6L28 14M6 13V26H26V13M11 26V18H21V26"
+              stroke={isActive || isCompleted ? "#305269" : "#6b7280"}
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             />
-            <rect x="12" y="16" width="10" height="8" fill={isActive || isCompleted ? "#fff" : "#6b7280"} opacity="0.4" />
-            <rect x="26" y="16" width="10" height="8" fill={isActive || isCompleted ? "#fff" : "#6b7280"} opacity="0.4" />
-            <path d="M16 12 L24 8 L32 12" stroke={isActive || isCompleted ? "#047857" : "#4b5563"} strokeWidth="2.5" fill="none" />
-            <circle cx="24" cy="22" r="4" fill="#fbbf24" />
           </svg>
         </motion.div>
 
-        {/* Energy Trail */}
+        {/* Spark Effects */}
         {isActive && (
-          <motion.div
-            className="absolute w-16 h-1 rounded-full"
-            style={{
-              background: "linear-gradient(90deg, transparent 0%, #10b981 50%, #3b82f6 100%)",
-              left: "20%",
-              top: "50%"
-            }}
-            animate={{
-              x: [-20, 40],
-              opacity: [0, 1, 0]
-            }}
-            transition={{
-              duration: 1.5,
-              repeat: Infinity,
-              ease: "linear"
-            }}
-          />
+          <>
+            {[...Array(6)].map((_, i) => (
+              <motion.div
+                key={i}
+                className="absolute w-1 h-1 rounded-full"
+                style={{
+                  left: "50%",
+                  top: "50%",
+                  backgroundColor: "#305269",
+                  boxShadow: "0 0 4px #305269"
+                }}
+                animate={{
+                  x: Math.cos((i / 6) * Math.PI * 2) * 50,
+                  y: Math.sin((i / 6) * Math.PI * 2) * 50,
+                  opacity: [1, 0],
+                  scale: [1, 0]
+                }}
+                transition={{
+                  duration: 1,
+                  repeat: Infinity,
+                  delay: i * 0.15,
+                  ease: "easeOut"
+                }}
+              />
+            ))}
+          </>
         )}
       </motion.div>
     </div>
   );
 }
 
-// Stage 3: Dispatched - Electric Truck/Drone Zoom with Camera Shake
+// Stage 3: Dispatched - Truck Icon
 function DispatchedAnimation({ isActive, isCompleted }: { isActive: boolean; isCompleted: boolean }) {
   return (
     <div className="relative w-32 h-32">
@@ -313,85 +257,60 @@ function DispatchedAnimation({ isActive, isCompleted }: { isActive: boolean; isC
             ? "linear-gradient(135deg, #663366 0%, #4d264d 100%)"
             : "linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%)"
         }}
+        initial={{ scale: 0.9 }}
         animate={isActive ? {
-          rotate: [0, 3, -3, 2, -2, 0],
-          x: [0, 2, -2, 1, -1, 0],
-          y: [0, -1, 1, -1, 1, 0]
-        } : {}}
-        transition={{ duration: 0.5, repeat: isActive ? Infinity : 0, repeatDelay: 1 }}
+          scale: [1, 1.1, 1],
+        } : { scale: 1 }}
+        transition={{ duration: 1.5, repeat: isActive ? Infinity : 0 }}
       >
         {(isActive || isCompleted) && <GlowRing color="#663366" intensity={isActive ? 1.5 : 0.8} />}
         
-        {/* Electric Truck */}
-        <motion.svg
-          width="64"
-          height="64"
-          viewBox="0 0 64 64"
-          initial={{ x: -80 }}
+        {/* Truck Icon Box */}
+        <motion.div
+          className="relative w-16 h-16 rounded-xl flex items-center justify-center"
+          style={{
+            background: isActive || isCompleted ? "rgba(255, 255, 255, 0.9)" : "#f3f4f6",
+            boxShadow: isActive || isCompleted ? "0 8px 20px rgba(102, 51, 102, 0.3)" : "0 2px 8px rgba(0, 0, 0, 0.08)"
+          }}
           animate={isActive ? {
-            x: [-80, 0, 80, -80],
-          } : { x: 0 }}
-          transition={isActive ? {
-            duration: 2.5,
-            repeat: Infinity,
-            ease: [0.65, 0, 0.35, 1]
+            y: [0, -3, 0],
           } : {}}
+          transition={{ duration: 0.8, repeat: isActive ? Infinity : 0 }}
         >
-          {/* Truck Body */}
-          <rect x="16" y="20" width="32" height="18" rx="2" fill={isActive || isCompleted ? "#10b981" : "#9ca3af"} />
-          <rect x="48" y="24" width="10" height="12" rx="1" fill={isActive || isCompleted ? "#059669" : "#6b7280"} />
-          <rect x="20" y="24" width="24" height="10" fill={isActive || isCompleted ? "#047857" : "#6b7280"} opacity="0.4" />
-          
-          {/* Windshield */}
-          <path d="M50 25 L54 25 L54 33 L50 33" fill="#a5f3fc" opacity="0.7" />
-          
-          {/* Lightning Bolt (Electric) */}
-          <path d="M32 26 L30 30 L32 30 L30 34 L34 30 L32 30 L34 26 Z" fill="#fbbf24" />
-          
-          {/* Wheels */}
-          <motion.circle
-            cx="26"
-            cy="40"
-            r="5"
-            fill="#1f2937"
-            animate={isActive ? { rotate: 360 } : {}}
-            transition={{ duration: 0.5, repeat: Infinity, ease: "linear" }}
-          />
-          <circle cx="26" cy="40" r="3" fill="#6b7280" />
-          
-          <motion.circle
-            cx="52"
-            cy="40"
-            r="5"
-            fill="#1f2937"
-            animate={isActive ? { rotate: 360 } : {}}
-            transition={{ duration: 0.5, repeat: Infinity, ease: "linear" }}
-          />
-          <circle cx="52" cy="40" r="3" fill="#6b7280" />
-        </motion.svg>
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+            <path
+              d="M2 8H20V22H2V8ZM20 12H26L30 16V22H20V12ZM7 24C8.65685 24 10 22.6569 10 21C10 19.3431 8.65685 18 7 18C5.34315 18 4 19.3431 4 21C4 22.6569 5.34315 24 7 24ZM25 24C26.6569 24 28 22.6569 28 21C28 19.3431 26.6569 18 25 18C23.3431 18 22 19.3431 22 21C22 22.6569 23.3431 24 25 24Z"
+              stroke={isActive || isCompleted ? "#663366" : "#6b7280"}
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </motion.div>
 
-        {/* Exhaust/Energy Trail */}
+        {/* Spark Effects */}
         {isActive && (
           <>
-            {[...Array(4)].map((_, i) => (
+            {[...Array(6)].map((_, i) => (
               <motion.div
                 key={i}
-                className="absolute w-3 h-3 rounded-full"
+                className="absolute w-1 h-1 rounded-full"
                 style={{
-                  background: "radial-gradient(circle, #10b981 0%, transparent 70%)",
-                  left: "20%",
-                  top: "50%"
+                  left: "50%",
+                  top: "50%",
+                  backgroundColor: "#663366",
+                  boxShadow: "0 0 4px #663366"
                 }}
                 animate={{
-                  x: [-30, -60],
-                  y: [0, -10],
-                  scale: [0.5, 1.5],
-                  opacity: [0.8, 0]
+                  x: Math.cos((i / 6) * Math.PI * 2) * 50,
+                  y: Math.sin((i / 6) * Math.PI * 2) * 50,
+                  opacity: [1, 0],
+                  scale: [1, 0]
                 }}
                 transition={{
-                  duration: 0.8,
+                  duration: 1,
                   repeat: Infinity,
-                  delay: i * 0.2,
+                  delay: i * 0.15,
                   ease: "easeOut"
                 }}
               />
@@ -403,7 +322,7 @@ function DispatchedAnimation({ isActive, isCompleted }: { isActive: boolean; isC
   );
 }
 
-// Stage 4: Invoice Sent - Holographic Envelope
+// Stage 4: Invoice Sent - Envelope Icon
 function InvoiceSentAnimation({ isActive, isCompleted }: { isActive: boolean; isCompleted: boolean }) {
   return (
     <div className="relative w-32 h-32">
@@ -416,87 +335,72 @@ function InvoiceSentAnimation({ isActive, isCompleted }: { isActive: boolean; is
             ? "linear-gradient(135deg, #f38aad 0%, #e86799 100%)"
             : "linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%)"
         }}
+        initial={{ scale: 0.9 }}
+        animate={isActive ? {
+          scale: [1, 1.1, 1],
+        } : { scale: 1 }}
+        transition={{ duration: 1.5, repeat: isActive ? Infinity : 0 }}
       >
         {(isActive || isCompleted) && <GlowRing color="#f38aad" intensity={isActive ? 1.5 : 0.8} />}
         
-        {/* Envelope with Arc Motion - Multi-Keyframe Path */}
-        <motion.svg
-          width="56"
-          height="56"
-          viewBox="0 0 56 56"
-          initial={{ x: 80, y: -40, rotate: 25, opacity: 0 }}
-          animate={isActive || isCompleted ? {
-            x: [80, 40, 10, 0],
-            y: [-40, -50, -20, 0],
-            rotate: [25, 15, 5, 0],
-            opacity: [0, 0.7, 0.9, 1]
-          } : {
-            x: 80,
-            y: -40,
-            rotate: 25,
-            opacity: 0.3
+        {/* Envelope Icon Box */}
+        <motion.div
+          className="relative w-16 h-16 rounded-xl flex items-center justify-center"
+          style={{
+            background: isActive || isCompleted ? "rgba(255, 255, 255, 0.9)" : "#f3f4f6",
+            boxShadow: isActive || isCompleted ? "0 8px 20px rgba(243, 138, 173, 0.3)" : "0 2px 8px rgba(0, 0, 0, 0.08)"
           }}
-          transition={{
-            duration: 1.2,
-            ease: [0.34, 1.56, 0.64, 1],
-            times: [0, 0.3, 0.7, 1]
-          }}
+          animate={isActive ? {
+            y: [0, -3, 0],
+          } : {}}
+          transition={{ duration: 0.8, repeat: isActive ? Infinity : 0 }}
         >
-          {/* Envelope Body */}
-          <rect
-            x="8"
-            y="16"
-            width="40"
-            height="28"
-            rx="2"
-            fill={isActive || isCompleted ? "#fff" : "#e5e7eb"}
-            stroke={isActive || isCompleted ? "#f59e0b" : "#9ca3af"}
-            strokeWidth="2"
-          />
-          
-          {/* Envelope Flap */}
-          <motion.path
-            d="M8 16 L28 32 L48 16"
-            fill="none"
-            stroke={isActive || isCompleted ? "#f59e0b" : "#9ca3af"}
-            strokeWidth="2"
-            strokeLinecap="round"
-            initial={{ pathLength: 0 }}
-            animate={{ pathLength: isActive || isCompleted ? 1 : 0.3 }}
-            transition={{ duration: 0.8, delay: 0.3 }}
-          />
-          
-          {/* Document Lines */}
-          <line x1="14" y1="24" x2="42" y2="24" stroke={isActive || isCompleted ? "#d97706" : "#9ca3af"} strokeWidth="2" opacity="0.6" />
-          <line x1="14" y1="30" x2="42" y2="30" stroke={isActive || isCompleted ? "#d97706" : "#9ca3af"} strokeWidth="2" opacity="0.6" />
-          <line x1="14" y1="36" x2="35" y2="36" stroke={isActive || isCompleted ? "#d97706" : "#9ca3af"} strokeWidth="2" opacity="0.6" />
-        </motion.svg>
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+            <path
+              d="M4 8H28V24H4V8ZM4 8L16 18L28 8"
+              stroke={isActive || isCompleted ? "#f38aad" : "#6b7280"}
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </motion.div>
 
-        {/* Light Burst on Open */}
+        {/* Spark Effects */}
         {isActive && (
-          <motion.div
-            className="absolute w-20 h-20 rounded-full"
-            style={{
-              background: "radial-gradient(circle, #fbbf24 0%, transparent 70%)",
-              opacity: 0.6
-            }}
-            animate={{
-              scale: [0, 1.5],
-              opacity: [0.8, 0]
-            }}
-            transition={{
-              duration: 1.5,
-              repeat: Infinity,
-              ease: "easeOut"
-            }}
-          />
+          <>
+            {[...Array(6)].map((_, i) => (
+              <motion.div
+                key={i}
+                className="absolute w-1 h-1 rounded-full"
+                style={{
+                  left: "50%",
+                  top: "50%",
+                  backgroundColor: "#f38aad",
+                  boxShadow: "0 0 4px #f38aad"
+                }}
+                animate={{
+                  x: Math.cos((i / 6) * Math.PI * 2) * 50,
+                  y: Math.sin((i / 6) * Math.PI * 2) * 50,
+                  opacity: [1, 0],
+                  scale: [1, 0]
+                }}
+                transition={{
+                  duration: 1,
+                  repeat: Infinity,
+                  delay: i * 0.15,
+                  ease: "easeOut"
+                }}
+              />
+            ))}
+          </>
         )}
       </motion.div>
     </div>
   );
 }
 
-// Stage 5: Payment Confirmed - Credit Card Flip & Pulse
+// Stage 5: Payment Confirmed - Credit Card Icon
 function PaymentConfirmedAnimation({ isActive, isCompleted }: { isActive: boolean; isCompleted: boolean }) {
   return (
     <div className="relative w-32 h-32">
@@ -509,69 +413,61 @@ function PaymentConfirmedAnimation({ isActive, isCompleted }: { isActive: boolea
             ? "linear-gradient(135deg, #FF9E1C 0%, #e88a0f 100%)"
             : "linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%)"
         }}
+        initial={{ scale: 0.9 }}
         animate={isActive ? {
           scale: [1, 1.1, 1],
-        } : {}}
+        } : { scale: 1 }}
         transition={{ duration: 1.5, repeat: isActive ? Infinity : 0 }}
       >
         {(isActive || isCompleted) && <GlowRing color="#FF9E1C" intensity={isActive ? 1.5 : 0.8} />}
         
-        {/* Credit Card */}
+        {/* Credit Card Icon Box */}
         <motion.div
-          style={{ perspective: "1000px" }}
-          className="relative"
+          className="relative w-16 h-16 rounded-xl flex items-center justify-center"
+          style={{
+            background: isActive || isCompleted ? "rgba(255, 255, 255, 0.9)" : "#f3f4f6",
+            boxShadow: isActive || isCompleted ? "0 8px 20px rgba(255, 158, 28, 0.3)" : "0 2px 8px rgba(0, 0, 0, 0.08)"
+          }}
+          animate={isActive ? {
+            y: [0, -3, 0],
+          } : {}}
+          transition={{ duration: 0.8, repeat: isActive ? Infinity : 0 }}
         >
-          <motion.svg
-            width="64"
-            height="40"
-            viewBox="0 0 64 40"
-            style={{ transformStyle: "preserve-3d" }}
-            animate={isActive ? {
-              rotateY: [0, 180, 360],
-            } : {}}
-            transition={{
-              duration: 2,
-              repeat: isActive ? Infinity : 0,
-              ease: "easeInOut"
-            }}
-          >
-            <rect
-              x="2"
-              y="2"
-              width="60"
-              height="36"
-              rx="4"
-              fill={isActive || isCompleted ? "#fff" : "#e5e7eb"}
-              stroke={isActive || isCompleted ? "#ec4899" : "#9ca3af"}
-              strokeWidth="2"
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+            <path
+              d="M4 8H28V24H4V8ZM4 12H28M8 18H12M18 18H24"
+              stroke={isActive || isCompleted ? "#FF9E1C" : "#6b7280"}
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             />
-            <rect x="2" y="8" width="60" height="8" fill={isActive || isCompleted ? "#1f2937" : "#6b7280"} />
-            <rect x="8" y="22" width="16" height="10" rx="2" fill={isActive || isCompleted ? "#fbbf24" : "#9ca3af"} />
-            <circle cx="52" cy="27" r="6" fill={isActive || isCompleted ? "#ec4899" : "#9ca3af"} opacity="0.4" />
-          </motion.svg>
+          </svg>
         </motion.div>
 
-        {/* Floating Particles */}
+        {/* Spark Effects */}
         {isActive && (
           <>
-            {[...Array(8)].map((_, i) => (
+            {[...Array(6)].map((_, i) => (
               <motion.div
                 key={i}
-                className="absolute w-1 h-1 rounded-full bg-pink-300"
+                className="absolute w-1 h-1 rounded-full"
                 style={{
                   left: "50%",
-                  top: "50%"
+                  top: "50%",
+                  backgroundColor: "#FF9E1C",
+                  boxShadow: "0 0 4px #FF9E1C"
                 }}
                 animate={{
-                  x: Math.cos((i / 8) * Math.PI * 2) * (20 + Math.random() * 10),
-                  y: Math.sin((i / 8) * Math.PI * 2) * (20 + Math.random() * 10) - 10,
-                  opacity: [0, 1, 0],
+                  x: Math.cos((i / 6) * Math.PI * 2) * 50,
+                  y: Math.sin((i / 6) * Math.PI * 2) * 50,
+                  opacity: [1, 0],
+                  scale: [1, 0]
                 }}
                 transition={{
-                  duration: 2,
+                  duration: 1,
                   repeat: Infinity,
-                  delay: i * 0.2,
-                  ease: "easeInOut"
+                  delay: i * 0.15,
+                  ease: "easeOut"
                 }}
               />
             ))}
@@ -582,7 +478,7 @@ function PaymentConfirmedAnimation({ isActive, isCompleted }: { isActive: boolea
   );
 }
 
-// Stage 6: Fulfilled - Laptop Powers On with Green Aura
+// Stage 6: Fulfilled - Laptop Icon
 function FulfilledAnimation({ isActive, isCompleted }: { isActive: boolean; isCompleted: boolean }) {
   return (
     <div className="relative w-32 h-32">
@@ -596,90 +492,59 @@ function FulfilledAnimation({ isActive, isCompleted }: { isActive: boolean; isCo
             : "linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%)"
         }}
         initial={{ scale: 0.9 }}
-        animate={(isActive || isCompleted) ? {
-          scale: [1, 1.15, 1],
-        } : {}}
-        transition={{ duration: 2, repeat: (isActive || isCompleted) ? Infinity : 0 }}
+        animate={isActive ? {
+          scale: [1, 1.1, 1],
+        } : { scale: 1 }}
+        transition={{ duration: 1.5, repeat: isActive ? Infinity : 0 }}
       >
         {(isActive || isCompleted) && <GlowRing color="#08ABAB" intensity={isActive ? 1.8 : 1.2} />}
         
-        {/* Laptop */}
-        <motion.svg
-          width="64"
-          height="64"
-          viewBox="0 0 64 64"
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={(isActive || isCompleted) ? {
-            opacity: 1,
-            scale: 1
-          } : {
-            opacity: 0.3,
-            scale: 0.8
+        {/* Laptop Icon Box */}
+        <motion.div
+          className="relative w-16 h-16 rounded-xl flex items-center justify-center"
+          style={{
+            background: isActive || isCompleted ? "rgba(255, 255, 255, 0.9)" : "#f3f4f6",
+            boxShadow: isActive || isCompleted ? "0 8px 20px rgba(8, 171, 171, 0.3)" : "0 2px 8px rgba(0, 0, 0, 0.08)"
           }}
-          transition={{ duration: 1, ease: "easeOut" }}
+          animate={isActive ? {
+            y: [0, -3, 0],
+          } : {}}
+          transition={{ duration: 0.8, repeat: isActive ? Infinity : 0 }}
         >
-          {/* Laptop Base */}
-          <path
-            d="M12 38 L52 38 L52 26 L12 26 Z"
-            fill={isCompleted ? "#a5f3d0" : "#e5e7eb"}
-            stroke={isCompleted ? "#059669" : "#9ca3af"}
-            strokeWidth="2"
-          />
-          
-          {/* Screen Glow */}
-          {(isActive || isCompleted) && (
-            <rect
-              x="16"
-              y="28"
-              width="32"
-              height="8"
-              fill="#10b981"
-              opacity="0.6"
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+            <path
+              d="M4 8H28V22H4V8ZM2 24H30M12 14L15 17L20 12"
+              stroke={isActive || isCompleted ? "#08ABAB" : "#6b7280"}
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             />
-          )}
-          
-          {/* Keyboard Base */}
-          <path
-            d="M8 38 L12 38 L52 38 L56 38 L58 44 L6 44 Z"
-            fill={(isActive || isCompleted) ? "#047857" : "#6b7280"}
-          />
-          
-          {/* Power Button */}
-          <motion.circle
-            cx="32"
-            cy="32"
-            r="3"
-            fill={(isActive || isCompleted) ? "#10b981" : "#6b7280"}
-            animate={(isActive || isCompleted) ? {
-              opacity: [1, 0.5, 1],
-            } : {}}
-            transition={{ duration: 1.5, repeat: Infinity }}
-          />
-        </motion.svg>
+          </svg>
+        </motion.div>
 
-        {/* Holographic Light Rays */}
-        {(isActive || isCompleted) && (
+        {/* Spark Effects */}
+        {isActive && (
           <>
             {[...Array(6)].map((_, i) => (
               <motion.div
                 key={i}
-                className="absolute w-0.5 h-16 rounded-full"
+                className="absolute w-1 h-1 rounded-full"
                 style={{
-                  background: "linear-gradient(180deg, #10b981 0%, transparent 100%)",
                   left: "50%",
                   top: "50%",
-                  transformOrigin: "bottom",
-                  rotate: `${i * 60}deg`
+                  backgroundColor: "#08ABAB",
+                  boxShadow: "0 0 4px #08ABAB"
                 }}
-                initial={{ scaleY: 0, opacity: 0 }}
                 animate={{
-                  scaleY: [0, 1, 0],
-                  opacity: [0, 0.8, 0]
+                  x: Math.cos((i / 6) * Math.PI * 2) * 50,
+                  y: Math.sin((i / 6) * Math.PI * 2) * 50,
+                  opacity: [1, 0],
+                  scale: [1, 0]
                 }}
                 transition={{
-                  duration: 2,
+                  duration: 1,
                   repeat: Infinity,
-                  delay: i * 0.2,
+                  delay: i * 0.15,
                   ease: "easeOut"
                 }}
               />
@@ -928,14 +793,14 @@ export default function OrderJourney({ timeline, environmentalImpact }: OrderJou
               }}
               className="relative flex flex-col items-center"
             >
-              {/* Stage Number with Custom Colors */}
+              {/* Stage Number with 60% Transparent Colors */}
               <motion.div
                 className="absolute -top-6 w-12 h-12 rounded-full flex items-center justify-center text-sm font-bold z-10 border-2"
                 style={{
-                  background: `linear-gradient(135deg, ${stageColor.bg} 0%, ${stageColor.bg}dd 100%)`,
-                  borderColor: stageColor.border,
+                  background: `linear-gradient(135deg, ${stageColor.bg}99 0%, ${stageColor.bg}80 100%)`,
+                  borderColor: `${stageColor.border}99`,
                   color: "#fff",
-                  boxShadow: `0 6px 20px ${stageColor.shadow}, 0 0 0 3px ${stageColor.shadow}`
+                  boxShadow: `0 6px 20px ${stageColor.shadow.replace('0.4', '0.24')}, 0 0 0 3px ${stageColor.shadow.replace('0.4', '0.15')}`
                 }}
                 whileHover={{ scale: 1.15 }}
                 transition={{ type: "spring", stiffness: 400 }}
