@@ -101,6 +101,14 @@ export default function Warranty() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const codeReader = useRef<BrowserMultiFormatReader | null>(null);
   const checkStatusRef = useRef<HTMLDivElement>(null);
+  const serialInputRef = useRef<HTMLInputElement>(null);
+
+  const scrollToWarrantyChecker = () => {
+    checkStatusRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    setTimeout(() => {
+      serialInputRef.current?.focus();
+    }, 500);
+  };
 
   // Fetch support phone number
   const { data: supportSettings } = useQuery<{ supportPhoneNumber: string }>({
@@ -524,7 +532,7 @@ export default function Warranty() {
                         <FormLabel>Serial Number</FormLabel>
                         <div className="flex gap-2">
                           <FormControl>
-                            <Input placeholder="e.g. CC21XG45T" {...field} />
+                            <Input {...field} ref={serialInputRef} placeholder="e.g. CC21XG45T" />
                           </FormControl>
                           <Button
                             type="button"
@@ -1180,12 +1188,15 @@ export default function Warranty() {
           </Card>
 
           {/* Warranty Verification Note */}
-          <Alert className="bg-secondary/5 border-secondary/20 mt-4">
+          <Alert 
+            className="bg-secondary/5 border-secondary/20 mt-4 cursor-pointer hover:bg-secondary/10 transition-colors"
+            onClick={scrollToWarrantyChecker}
+          >
             <HelpCircle className="h-4 w-4 text-secondary" />
             <AlertTitle>Need to verify your warranty?</AlertTitle>
             <AlertDescription className="text-sm">
               Use the serial number lookup tool above to check your specific
-              product warranty status and coverage dates.
+              product warranty status and coverage dates. <span className="text-secondary font-medium underline">Click here to check now</span>
             </AlertDescription>
           </Alert>
         </TabsContent>
