@@ -755,63 +755,9 @@ export default function Dashboard() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-4">
-                <div className="grid grid-cols-2 gap-3">
-                  <Button 
-                    className="h-12 rounded-xl bg-gradient-to-br from-[#0077B5] to-[#005885] border-0 text-white hover:shadow-lg hover:scale-105 transition-all duration-200 flex items-center justify-center gap-2"
-                    onClick={() => {
-                      setLocation('/impact');
-                      setTimeout(() => {
-                        const shareSection = document.getElementById('share-section');
-                        if (shareSection) {
-                          shareSection.scrollIntoView({ behavior: 'smooth' });
-                        }
-                      }, 100);
-                    }}
-                    data-testid="button-share-linkedin"
-                  >
-                    <div className="h-7 w-7 rounded-full bg-white/20 flex items-center justify-center">
-                      <i className="ri-linkedin-fill text-lg"></i>
-                    </div>
-                    <span className="text-sm font-medium">LinkedIn</span>
-                  </Button>
-                  <Button 
-                    className="h-12 rounded-xl bg-gradient-to-br from-[#833AB4] via-[#FD1D1D] to-[#F77737] border-0 text-white hover:shadow-lg hover:scale-105 transition-all duration-200 flex items-center justify-center gap-2"
-                    onClick={() => {
-                      setLocation('/impact');
-                      setTimeout(() => {
-                        const shareSection = document.getElementById('share-section');
-                        if (shareSection) {
-                          shareSection.scrollIntoView({ behavior: 'smooth' });
-                        }
-                      }, 100);
-                    }}
-                    data-testid="button-share-instagram"
-                  >
-                    <div className="h-7 w-7 rounded-full bg-white/20 flex items-center justify-center">
-                      <i className="ri-instagram-line text-lg"></i>
-                    </div>
-                    <span className="text-sm font-medium">Instagram</span>
-                  </Button>
-                  <Button 
-                    className="h-12 rounded-xl bg-gradient-to-br from-[#1DA1F2] to-[#0c85d0] border-0 text-white hover:shadow-lg hover:scale-105 transition-all duration-200 flex items-center justify-center gap-2"
-                    onClick={() => {
-                      setLocation('/impact');
-                      setTimeout(() => {
-                        const shareSection = document.getElementById('share-section');
-                        if (shareSection) {
-                          shareSection.scrollIntoView({ behavior: 'smooth' });
-                        }
-                      }, 100);
-                    }}
-                    data-testid="button-share-twitter"
-                  >
-                    <div className="h-7 w-7 rounded-full bg-white/20 flex items-center justify-center">
-                      <i className="ri-twitter-x-fill text-lg"></i>
-                    </div>
-                    <span className="text-sm font-medium">Twitter/X</span>
-                  </Button>
-                  <Button 
-                    className="h-12 rounded-xl bg-gradient-to-br from-[#4267B2] to-[#365899] border-0 text-white hover:shadow-lg hover:scale-105 transition-all duration-200 flex items-center justify-center gap-2"
+                <div className="flex flex-col gap-2">
+                  <button 
+                    className="w-full h-10 flex items-center rounded-md overflow-hidden hover:shadow-lg hover:scale-[1.02] transition-all duration-200"
                     onClick={() => {
                       setLocation('/impact');
                       setTimeout(() => {
@@ -823,11 +769,73 @@ export default function Dashboard() {
                     }}
                     data-testid="button-share-facebook"
                   >
-                    <div className="h-7 w-7 rounded-full bg-white/20 flex items-center justify-center">
-                      <i className="ri-facebook-fill text-lg"></i>
+                    <div className="h-full w-10 bg-[#3b5998] flex items-center justify-center">
+                      <i className="ri-facebook-fill text-white text-lg"></i>
                     </div>
-                    <span className="text-sm font-medium">Facebook</span>
-                  </Button>
+                    <div className="flex-1 h-full bg-[#4267B2] flex items-center justify-center">
+                      <span className="text-white text-sm font-medium">Facebook</span>
+                    </div>
+                  </button>
+                  <button 
+                    className="w-full h-10 flex items-center rounded-md overflow-hidden hover:shadow-lg hover:scale-[1.02] transition-all duration-200"
+                    onClick={() => {
+                      setLocation('/impact');
+                      setTimeout(() => {
+                        const shareSection = document.getElementById('share-section');
+                        if (shareSection) {
+                          shareSection.scrollIntoView({ behavior: 'smooth' });
+                        }
+                      }, 100);
+                    }}
+                    data-testid="button-share-twitter"
+                  >
+                    <div className="h-full w-10 bg-[#1a8cd8] flex items-center justify-center">
+                      <i className="ri-twitter-fill text-white text-lg"></i>
+                    </div>
+                    <div className="flex-1 h-full bg-[#1DA1F2] flex items-center justify-center">
+                      <span className="text-white text-sm font-medium">Twitter</span>
+                    </div>
+                  </button>
+                  <button 
+                    className="w-full h-10 flex items-center rounded-md overflow-hidden hover:shadow-lg hover:scale-[1.02] transition-all duration-200"
+                    onClick={() => {
+                      setLocation('/impact');
+                      setTimeout(() => {
+                        const shareSection = document.getElementById('share-section');
+                        if (shareSection) {
+                          shareSection.scrollIntoView({ behavior: 'smooth' });
+                        }
+                      }, 100);
+                    }}
+                    data-testid="button-share-linkedin"
+                  >
+                    <div className="h-full w-10 bg-[#005885] flex items-center justify-center">
+                      <i className="ri-linkedin-fill text-white text-lg"></i>
+                    </div>
+                    <div className="flex-1 h-full bg-[#0077B5] flex items-center justify-center">
+                      <span className="text-white text-sm font-medium">LinkedIn</span>
+                    </div>
+                  </button>
+                  <button 
+                    className="w-full h-10 flex items-center rounded-md overflow-hidden hover:shadow-lg hover:scale-[1.02] transition-all duration-200"
+                    onClick={() => {
+                      setLocation('/impact');
+                      setTimeout(() => {
+                        const shareSection = document.getElementById('share-section');
+                        if (shareSection) {
+                          shareSection.scrollIntoView({ behavior: 'smooth' });
+                        }
+                      }, 100);
+                    }}
+                    data-testid="button-share-instagram"
+                  >
+                    <div className="h-full w-10 bg-gradient-to-br from-[#833AB4] via-[#C13584] to-[#E1306C] flex items-center justify-center">
+                      <i className="ri-instagram-line text-white text-lg"></i>
+                    </div>
+                    <div className="flex-1 h-full bg-gradient-to-r from-[#E1306C] via-[#FD1D1D] to-[#F77737] flex items-center justify-center">
+                      <span className="text-white text-sm font-medium">Instagram</span>
+                    </div>
+                  </button>
                 </div>
               </CardContent>
             </Card>
