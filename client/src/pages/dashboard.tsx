@@ -312,15 +312,10 @@ export default function Dashboard() {
                 
                 {/* Total Carbon Saved - Teal with gradient */}
                 <Card className="shadow-lg border-0 bg-gradient-to-br from-[#06989a] via-[#0BC5C5] to-[#08ABAB] text-white overflow-hidden relative">
-                  <div className="absolute bottom-2 right-2 opacity-15">
-                    <Leaf className="h-16 w-16 text-white" />
+                  <div className="absolute top-1 right-1 opacity-15">
+                    <Leaf className="h-14 w-14 text-white" />
                   </div>
                   <CardContent className="p-3 relative z-10">
-                    <div className="flex justify-end mb-1">
-                      <div className="bg-white/25 w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-sm">
-                        <Leaf className="h-4 w-4 text-white" />
-                      </div>
-                    </div>
                     <div className="text-xs font-medium text-white/90 mb-1">Total Carbon Saved</div>
                     <div className="text-xl font-bold mb-1">
                       {formatNumber(Math.round((impact?.carbonSaved || 0) / 1000))} kg
@@ -333,15 +328,10 @@ export default function Dashboard() {
 
                 {/* Clean Water Provided - Navy with gradient */}
                 <Card className="shadow-lg border-0 bg-gradient-to-br from-[#243d4d] via-[#3d6580] to-[#305269] text-white overflow-hidden relative">
-                  <div className="absolute bottom-2 right-2 opacity-15">
-                    <Users className="h-16 w-16 text-white" />
+                  <div className="absolute top-1 right-1 opacity-15">
+                    <Users className="h-14 w-14 text-white" />
                   </div>
                   <CardContent className="p-3 relative z-10">
-                    <div className="flex justify-end mb-1">
-                      <div className="bg-white/25 w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-sm">
-                        <Users className="h-4 w-4 text-white" />
-                      </div>
-                    </div>
                     <div className="text-xs font-medium text-white/90 mb-1">Clean Water Provided</div>
                     <div className="text-xl font-bold mb-1">
                       {formatNumber(impact?.familiesHelped || 0)}
@@ -357,15 +347,10 @@ export default function Dashboard() {
 
                 {/* Resource Preservation - Gold with gradient */}
                 <Card className="shadow-lg border-0 bg-gradient-to-br from-[#e88a0c] via-[#FFB347] to-[#FF9E1C] text-white overflow-hidden relative">
-                  <div className="absolute bottom-2 right-2 opacity-15">
-                    <Recycle className="h-16 w-16 text-white" />
+                  <div className="absolute top-1 right-1 opacity-15">
+                    <Recycle className="h-14 w-14 text-white" />
                   </div>
                   <CardContent className="p-3 relative z-10">
-                    <div className="flex justify-end mb-1">
-                      <div className="bg-white/25 w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-sm">
-                        <Recycle className="h-4 w-4 text-white" />
-                      </div>
-                    </div>
                     <div className="text-xs font-medium text-white/90 mb-1">Resource Preservation</div>
                     <div className="text-xl font-bold mb-1">
                       {formatNumber(Math.round((impact?.mineralsSaved || 0) / 1000))} kg
@@ -378,15 +363,10 @@ export default function Dashboard() {
 
                 {/* Water Saved - Purple with gradient */}
                 <Card className="shadow-lg border-0 bg-gradient-to-br from-[#4d264d] via-[#7a4d7a] to-[#663366] text-white overflow-hidden relative">
-                  <div className="absolute bottom-2 right-2 opacity-15">
-                    <Droplet className="h-16 w-16 text-white" />
+                  <div className="absolute top-1 right-1 opacity-15">
+                    <Droplet className="h-14 w-14 text-white" />
                   </div>
                   <CardContent className="p-3 relative z-10">
-                    <div className="flex justify-end mb-1">
-                      <div className="bg-white/25 w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-sm">
-                        <Droplet className="h-4 w-4 text-white" />
-                      </div>
-                    </div>
                     <div className="text-xs font-medium text-white/90 mb-1">Water Saved</div>
                     <div className="text-xl font-bold mb-1">
                       {formatNumber(Math.round((impact?.waterSaved || 0) / 1000000))}M litres
