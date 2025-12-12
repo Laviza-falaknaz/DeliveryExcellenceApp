@@ -690,7 +690,7 @@ export default function Warranty() {
                           </AlertTitle>
                           <AlertDescription className="text-red-700">
                             Your warranty has expired and your product is no
-                            longer covered.
+                            longer covered. Please contact support@my-warranty.com if you think this is an error.
                           </AlertDescription>
                         </Alert>
                       ) : (
@@ -769,7 +769,7 @@ export default function Warranty() {
                       <p className="text-neutral-600 text-center mb-4">
                         We couldn't find warranty information for the specified
                         serial number. Please double-check the number and try
-                        again.
+                        again. Or, please contact support@my-warranty.com if you think this is an error.
                       </p>
                       <Button
                         variant="outline"
@@ -870,7 +870,7 @@ export default function Warranty() {
                           Advanced Replacement Warranty
                         </h4>
                         <p className="text-xs text-neutral-500 font-normal">
-                          Swap IT service - UK Mainland & Isle of Wight
+                          Swap service – UK mainland only
                         </p>
                       </div>
                     </div>
@@ -878,10 +878,7 @@ export default function Warranty() {
                   <AccordionContent className="pb-4">
                     <div className="space-y-4 pt-2">
                       <p className="text-sm text-neutral-700">
-                        Receive a replacement unit once your RMA is approved. We
-                        use our Swap IT exchange service for covered areas, or
-                        arrange separate delivery and collection for other
-                        locations.
+                        Receive a replacement unit once your RMA is approved using our swap service. For locations where we are unable to complete the swap service, we deliver a replacement device and arrange collection of the faulty device at a later date convenient to you.
                       </p>
 
                       <div className="grid grid-cols-2 gap-3">
