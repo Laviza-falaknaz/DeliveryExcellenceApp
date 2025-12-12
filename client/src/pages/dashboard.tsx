@@ -812,7 +812,7 @@ export default function Dashboard() {
                     <div className="h-full w-10 bg-[#005885] flex items-center justify-center">
                       <i className="ri-linkedin-fill text-white text-lg"></i>
                     </div>
-                    <div className="flex-1 h-full bg-[#0077B5] flex items-center justify-center">
+                    <div className="flex-1 h-full bg-[#0077B5] flex items-center justify-center text-[14px] text-left">
                       <span className="text-white font-medium text-[13px] text-left">LinkedIn</span>
                     </div>
                   </button>
@@ -832,7 +832,7 @@ export default function Dashboard() {
                     <div className="h-full w-10 bg-gradient-to-br from-[#833AB4] via-[#C13584] to-[#E1306C] flex items-center justify-center">
                       <i className="ri-instagram-line text-white text-lg"></i>
                     </div>
-                    <div className="flex-1 h-full bg-gradient-to-r from-[#E1306C] via-[#FD1D1D] to-[#F77737] flex items-center justify-center">
+                    <div className="flex-1 h-full bg-gradient-to-r from-[#E1306C] via-[#FD1D1D] to-[#F77737] flex items-center justify-center text-[14px] text-left">
                       <span className="text-white font-medium text-[13px] text-left">Instagram</span>
                     </div>
                   </button>
