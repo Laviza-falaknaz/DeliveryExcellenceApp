@@ -906,6 +906,16 @@ export default function OrderJourney({ timeline, environmentalImpact }: OrderJou
           const isCompleted = isStageCompleted(index);
           const isCurrent = index === currentStageIndex && !isComplete;
           
+          const stageColors = [
+            { bg: "#08ABAB", border: "#06d6d6", shadow: "rgba(8, 171, 171, 0.4)", glow: "#08ABAB" },
+            { bg: "#305269", border: "#3d6a87", shadow: "rgba(48, 82, 105, 0.4)", glow: "#305269" },
+            { bg: "#663366", border: "#804080", shadow: "rgba(102, 51, 102, 0.4)", glow: "#663366" },
+            { bg: "#f38aad", border: "#f6a5c0", shadow: "rgba(243, 138, 173, 0.4)", glow: "#f38aad" },
+            { bg: "#FF9E1C", border: "#ffb347", shadow: "rgba(255, 158, 28, 0.4)", glow: "#FF9E1C" },
+            { bg: "#08ABAB", border: "#06d6d6", shadow: "rgba(8, 171, 171, 0.4)", glow: "#08ABAB" }
+          ];
+          const stageColor = stageColors[index];
+          
           return (
             <motion.div
               key={stage.id}
@@ -953,14 +963,20 @@ export default function OrderJourney({ timeline, environmentalImpact }: OrderJou
                 )}
               </div>
 
-              {/* Stage Info - Enhanced Card */}
+              {/* Stage Info - Enhanced Card with Custom Colors */}
               <motion.div
-                className={`
-                  relative p-4 md:p-5 rounded-2xl text-center min-h-[180px] w-full transition-all duration-300 flex flex-col justify-between
-                  ${isCompleted || isCurrent
-                    ? "bg-gradient-to-br from-white to-emerald-50/30 backdrop-blur-sm border-2 border-emerald-400 shadow-xl"
-                    : "bg-white/70 backdrop-blur-sm border-2 border-neutral-300 shadow-md"}
-                `}
+                className="relative p-4 md:p-5 rounded-2xl text-center min-h-[180px] w-full transition-all duration-300 flex flex-col"
+                style={{
+                  background: isCompleted || isCurrent 
+                    ? `linear-gradient(135deg, ${stageColor.bg} 0%, ${stageColor.bg}dd 100%)`
+                    : "linear-gradient(135deg, #f5f5f5 0%, #e5e5e5 100%)",
+                  borderWidth: "2px",
+                  borderStyle: "solid",
+                  borderColor: isCompleted || isCurrent ? stageColor.border : "#d4d4d4",
+                  boxShadow: isCompleted || isCurrent 
+                    ? `0 8px 25px ${stageColor.shadow}, 0 0 0 3px ${stageColor.shadow}`
+                    : "0 2px 8px rgba(0, 0, 0, 0.08)"
+                }}
                 whileHover={isCompleted || isCurrent ? { y: -6, scale: 1.03 } : { y: -2 }}
                 transition={{ type: "spring", stiffness: 300 }}
               >
@@ -968,51 +984,62 @@ export default function OrderJourney({ timeline, environmentalImpact }: OrderJou
                 {(isCompleted || isCurrent) && (
                   <>
                     <div
-                      className="absolute inset-0 rounded-2xl opacity-30"
+                      className="absolute inset-0 rounded-2xl opacity-20"
                       style={{
-                        boxShadow: "inset 0 0 30px #10b981"
+                        boxShadow: `inset 0 0 30px ${stageColor.glow}`
                       }}
                     />
-                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-emerald-400/5 to-teal-400/5" />
                   </>
                 )}
 
-                <div className="flex-1 flex flex-col justify-center">
+                <div className="flex-1 flex flex-col justify-center min-h-[100px]">
                   <h4 className={`
                     text-sm md:text-base font-bold mb-2
-                    ${isCompleted || isCurrent ? "text-neutral-900" : "text-neutral-600"}
+                    ${isCompleted || isCurrent ? "text-white" : "text-neutral-600"}
                   `}>
                     {stage.label}
                   </h4>
                   
                   <p className={`
                     text-xs md:text-sm mb-3 leading-relaxed
-                    ${isCompleted || isCurrent ? "text-neutral-700" : "text-neutral-500"}
+                    ${isCompleted || isCurrent ? "text-white/90" : "text-neutral-500"}
                   `}>
                     {stage.subtitle}
                   </p>
                 </div>
 
                 {/* Enhanced Date or Status */}
-                <div className="mt-auto">
+                <div className="mt-auto pt-2">
                   {isCompleted && stage.date && (
-                    <div className="text-xs md:text-sm font-semibold text-emerald-700 bg-gradient-to-r from-emerald-50 to-emerald-100 px-3 py-1.5 rounded-full inline-block shadow-sm border border-emerald-200">
+                    <div 
+                      className="text-xs md:text-sm font-semibold px-3 py-1.5 rounded-full inline-block shadow-sm"
+                      style={{
+                        backgroundColor: "rgba(255, 255, 255, 0.25)",
+                        color: "#fff",
+                        border: "1px solid rgba(255, 255, 255, 0.4)"
+                      }}
+                    >
                       {formatDate(stage.date)}
                     </div>
                   )}
                   
                   {isCurrent && (
                     <motion.div
-                      animate={{ opacity: [0.6, 1, 0.6] }}
+                      animate={{ opacity: [0.7, 1, 0.7] }}
                       transition={{ duration: 2, repeat: Infinity }}
-                      className="text-xs md:text-sm font-bold text-teal-700 bg-gradient-to-r from-teal-50 to-cyan-50 px-3 py-1.5 rounded-full inline-block shadow-sm border border-teal-300"
+                      className="text-xs md:text-sm font-bold px-3 py-1.5 rounded-full inline-block shadow-sm"
+                      style={{
+                        backgroundColor: "rgba(255, 255, 255, 0.3)",
+                        color: "#fff",
+                        border: "1px solid rgba(255, 255, 255, 0.5)"
+                      }}
                     >
                       In Progress...
                     </motion.div>
                   )}
 
                   {!isCompleted && !isCurrent && (
-                    <div className="text-xs md:text-sm font-medium text-neutral-500 bg-neutral-100 px-3 py-1.5 rounded-full inline-block border border-neutral-200">
+                    <div className="text-xs md:text-sm font-medium text-neutral-500 bg-neutral-200 px-3 py-1.5 rounded-full inline-block border border-neutral-300">
                       Pending
                     </div>
                   )}
