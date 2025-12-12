@@ -33,15 +33,31 @@ export function formatDateTime(date: string | Date): string {
 
 export function getOrderStatusColor(status: string): string {
   const colors: Record<string, string> = {
-    placed: 'bg-blue-100 text-blue-800',
-    processing: 'bg-yellow-100 text-yellow-800',
-    in_production: 'bg-green-100 text-green-800',
-    quality_check: 'bg-purple-100 text-purple-800',
-    shipped: 'bg-indigo-100 text-indigo-800',
-    delivered: 'bg-teal-100 text-teal-800',
-    completed: 'bg-gray-100 text-gray-800',
-    cancelled: 'bg-red-100 text-red-800',
-    returned: 'bg-orange-100 text-orange-800',
+    placed: 'bg-[#305269] text-white',
+    processing: 'bg-[#C2adc2] text-[#305269]',
+    in_production: 'bg-[#663366] text-white',
+    quality_check: 'bg-[#ffd8a4] text-[#305269]',
+    shipped: 'bg-[#FF9E1C] text-white',
+    delivered: 'bg-[#9cdddd] text-[#305269]',
+    completed: 'bg-[#08ABAB] text-white',
+    cancelled: 'bg-[#f38aad] text-white',
+    returned: 'bg-[#fad0de] text-[#305269]',
+  };
+
+  return colors[status] || 'bg-gray-100 text-gray-800';
+}
+
+export function getRmaStatusColor(status: string): string {
+  const colors: Record<string, string> = {
+    submitted: 'bg-[#305269] text-white',
+    requested: 'bg-[#305269] text-white',
+    approved: 'bg-[#08ABAB] text-white',
+    declined: 'bg-[#f38aad] text-white',
+    in_transit: 'bg-[#663366] text-white',
+    received: 'bg-[#9cdddd] text-[#305269]',
+    processing: 'bg-[#C2adc2] text-[#305269]',
+    completed: 'bg-[#08ABAB] text-white',
+    rejected: 'bg-[#f38aad] text-white',
   };
 
   return colors[status] || 'bg-gray-100 text-gray-800';

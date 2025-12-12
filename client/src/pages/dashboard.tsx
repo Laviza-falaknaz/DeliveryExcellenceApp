@@ -16,6 +16,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
+import { getRmaStatusColor } from "@/lib/utils";
 
 const formatNumber = (num: number): string => {
   return num.toLocaleString('en-US');
@@ -492,8 +493,8 @@ export default function Dashboard() {
                                 <span className="font-medium text-gray-900 text-sm">
                                   {rma.rmaNumber}
                                 </span>
-                                <Badge className="bg-orange-100 text-orange-700 hover:bg-orange-100 text-xs">
-                                  {rma.status}
+                                <Badge className={`${getRmaStatusColor(rma.status)} text-xs`}>
+                                  {rma.status.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
                                 </Badge>
                               </div>
                               <div className="text-xs text-gray-600">
