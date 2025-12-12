@@ -244,22 +244,12 @@ export default function Dashboard() {
         </AnimatePresence>
 
         {/* Header */}
-        <div className="mb-4 flex items-start justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Welcome to Your Sustainable IT Hub</h1>
-          </div>
-          <Button
-            onClick={handleShootRocket}
-            disabled={recalculateMutation.isPending}
-            className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white shadow-lg hover:shadow-xl transition-all"
-            data-testid="button-shoot-rocket"
-          >
-            <Rocket className="mr-2 h-5 w-5" />
-            {recalculateMutation.isPending ? "Charging..." : "Power up the EV"}
-          </Button>
+        <div className="mb-4">
+          <h1 className="text-3xl font-bold text-gray-900">Welcome, {user?.name?.split(' ')[0] || 'User'}</h1>
         </div>
 
-        {/* Tier Banner */}
+        {/* Tier Banner - Hidden */}
+        {false && (
         <Card className="mb-4 overflow-hidden shadow-lg border-0">
           <div className="bg-gradient-to-r from-teal-600 via-teal-500 to-emerald-600 text-white p-5">
             <div className="flex items-start justify-between">
@@ -304,6 +294,7 @@ export default function Dashboard() {
             </div>
           </div>
         </Card>
+        )}
 
         {/* Main Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
