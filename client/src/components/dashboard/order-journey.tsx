@@ -93,13 +93,13 @@ function GlowRing({ color, intensity = 1 }: { color: string; intensity?: number 
 function OrderConfirmedAnimation({ isActive, isCompleted }: { isActive: boolean; isCompleted: boolean }) {
   return (
     <div className="relative w-32 h-32">
-      {(isActive || isCompleted) && <ParticleBurst color="#10b981" density={8} />}
+      {(isActive || isCompleted) && <ParticleBurst color="#08ABAB" density={8} />}
       
       <motion.div
         className="relative w-full h-full rounded-full flex items-center justify-center"
         style={{
           background: isActive || isCompleted
-            ? "linear-gradient(135deg, #10b981 0%, #059669 100%)"
+            ? "linear-gradient(135deg, #08ABAB 0%, #069999 100%)"
             : "linear-gradient(135deg, #d1d5db 0%, #9ca3af 100%)"
         }}
         initial={{ scale: 0.9 }}
@@ -108,14 +108,14 @@ function OrderConfirmedAnimation({ isActive, isCompleted }: { isActive: boolean;
         } : { scale: 1 }}
         transition={{ duration: 1.5, repeat: isActive ? Infinity : 0 }}
       >
-        {(isActive || isCompleted) && <GlowRing color="#10b981" intensity={isActive ? 1.5 : 0.8} />}
+        {(isActive || isCompleted) && <GlowRing color="#08ABAB" intensity={isActive ? 1.5 : 0.8} />}
         
         {/* Purchase Button */}
         <motion.div
           className="relative w-16 h-16 rounded-xl flex items-center justify-center"
           style={{
             background: isActive || isCompleted ? "#fff" : "#f3f4f6",
-            boxShadow: isActive || isCompleted ? "0 8px 20px rgba(16, 185, 129, 0.3)" : "0 2px 8px rgba(0, 0, 0, 0.08)"
+            boxShadow: isActive || isCompleted ? "0 8px 20px rgba(8, 171, 171, 0.3)" : "0 2px 8px rgba(0, 0, 0, 0.08)"
           }}
           animate={isActive ? {
             y: [0, -3, 0],
@@ -125,7 +125,7 @@ function OrderConfirmedAnimation({ isActive, isCompleted }: { isActive: boolean;
           <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
             <path
               d="M6 8L8 4H24L26 8M6 8H26M6 8L8 24H24L26 8M12 12V20M16 12V20M20 12V20"
-              stroke={isActive || isCompleted ? "#10b981" : "#6b7280"}
+              stroke={isActive || isCompleted ? "#08ABAB" : "#6b7280"}
               strokeWidth="2.5"
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -170,17 +170,17 @@ function OrderConfirmedAnimation({ isActive, isCompleted }: { isActive: boolean;
 function SentToWarehouseAnimation({ isActive, isCompleted }: { isActive: boolean; isCompleted: boolean }) {
   return (
     <div className="relative w-32 h-32">
-      {(isActive || isCompleted) && <ParticleBurst color="#3b82f6" density={10} />}
+      {(isActive || isCompleted) && <ParticleBurst color="#305269" density={10} />}
       
       <motion.div
         className="relative w-full h-full rounded-full flex items-center justify-center"
         style={{
           background: isActive || isCompleted
-            ? "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)"
+            ? "linear-gradient(135deg, #305269 0%, #243d4f 100%)"
             : "linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%)"
         }}
       >
-        {(isActive || isCompleted) && <GlowRing color="#3b82f6" intensity={isActive ? 1.5 : 0.8} />}
+        {(isActive || isCompleted) && <GlowRing color="#305269" intensity={isActive ? 1.5 : 0.8} />}
         
         {/* Conveyor Belt */}
         <svg width="120" height="120" viewBox="0 0 120 120" className="absolute">
@@ -304,13 +304,13 @@ function SentToWarehouseAnimation({ isActive, isCompleted }: { isActive: boolean
 function DispatchedAnimation({ isActive, isCompleted }: { isActive: boolean; isCompleted: boolean }) {
   return (
     <div className="relative w-32 h-32">
-      {(isActive || isCompleted) && <ParticleBurst color="#06b6d4" density={12} />}
+      {(isActive || isCompleted) && <ParticleBurst color="#663366" density={12} />}
       
       <motion.div
         className="relative w-full h-full rounded-full flex items-center justify-center"
         style={{
           background: isActive || isCompleted
-            ? "linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)"
+            ? "linear-gradient(135deg, #663366 0%, #4d264d 100%)"
             : "linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%)"
         }}
         animate={isActive ? {
@@ -320,7 +320,7 @@ function DispatchedAnimation({ isActive, isCompleted }: { isActive: boolean; isC
         } : {}}
         transition={{ duration: 0.5, repeat: isActive ? Infinity : 0, repeatDelay: 1 }}
       >
-        {(isActive || isCompleted) && <GlowRing color="#06b6d4" intensity={isActive ? 1.5 : 0.8} />}
+        {(isActive || isCompleted) && <GlowRing color="#663366" intensity={isActive ? 1.5 : 0.8} />}
         
         {/* Electric Truck */}
         <motion.svg
@@ -407,17 +407,17 @@ function DispatchedAnimation({ isActive, isCompleted }: { isActive: boolean; isC
 function InvoiceSentAnimation({ isActive, isCompleted }: { isActive: boolean; isCompleted: boolean }) {
   return (
     <div className="relative w-32 h-32">
-      {(isActive || isCompleted) && <ParticleBurst color="#f59e0b" density={10} />}
+      {(isActive || isCompleted) && <ParticleBurst color="#f38aad" density={10} />}
       
       <motion.div
         className="relative w-full h-full rounded-full flex items-center justify-center"
         style={{
           background: isActive || isCompleted
-            ? "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)"
+            ? "linear-gradient(135deg, #f38aad 0%, #e86799 100%)"
             : "linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%)"
         }}
       >
-        {(isActive || isCompleted) && <GlowRing color="#f59e0b" intensity={isActive ? 1.5 : 0.8} />}
+        {(isActive || isCompleted) && <GlowRing color="#f38aad" intensity={isActive ? 1.5 : 0.8} />}
         
         {/* Envelope with Arc Motion - Multi-Keyframe Path */}
         <motion.svg
@@ -500,13 +500,13 @@ function InvoiceSentAnimation({ isActive, isCompleted }: { isActive: boolean; is
 function PaymentConfirmedAnimation({ isActive, isCompleted }: { isActive: boolean; isCompleted: boolean }) {
   return (
     <div className="relative w-32 h-32">
-      {(isActive || isCompleted) && <ParticleBurst color="#ec4899" density={12} />}
+      {(isActive || isCompleted) && <ParticleBurst color="#FF9E1C" density={12} />}
       
       <motion.div
         className="relative w-full h-full rounded-full flex items-center justify-center"
         style={{
           background: isActive || isCompleted
-            ? "linear-gradient(135deg, #ec4899 0%, #db2777 100%)"
+            ? "linear-gradient(135deg, #FF9E1C 0%, #e88a0f 100%)"
             : "linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%)"
         }}
         animate={isActive ? {
@@ -514,7 +514,7 @@ function PaymentConfirmedAnimation({ isActive, isCompleted }: { isActive: boolea
         } : {}}
         transition={{ duration: 1.5, repeat: isActive ? Infinity : 0 }}
       >
-        {(isActive || isCompleted) && <GlowRing color="#ec4899" intensity={isActive ? 1.5 : 0.8} />}
+        {(isActive || isCompleted) && <GlowRing color="#FF9E1C" intensity={isActive ? 1.5 : 0.8} />}
         
         {/* Credit Card */}
         <motion.div
@@ -586,13 +586,13 @@ function PaymentConfirmedAnimation({ isActive, isCompleted }: { isActive: boolea
 function FulfilledAnimation({ isActive, isCompleted }: { isActive: boolean; isCompleted: boolean }) {
   return (
     <div className="relative w-32 h-32">
-      {(isActive || isCompleted) && <ParticleBurst color="#10b981" density={16} />}
+      {(isActive || isCompleted) && <ParticleBurst color="#08ABAB" density={16} />}
       
       <motion.div
         className="relative w-full h-full rounded-full flex items-center justify-center"
         style={{
           background: (isActive || isCompleted)
-            ? "linear-gradient(135deg, #10b981 0%, #059669 100%)"
+            ? "linear-gradient(135deg, #08ABAB 0%, #069999 100%)"
             : "linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%)"
         }}
         initial={{ scale: 0.9 }}
@@ -601,7 +601,7 @@ function FulfilledAnimation({ isActive, isCompleted }: { isActive: boolean; isCo
         } : {}}
         transition={{ duration: 2, repeat: (isActive || isCompleted) ? Infinity : 0 }}
       >
-        {(isActive || isCompleted) && <GlowRing color="#10b981" intensity={isActive ? 1.8 : 1.2} />}
+        {(isActive || isCompleted) && <GlowRing color="#08ABAB" intensity={isActive ? 1.8 : 1.2} />}
         
         {/* Laptop */}
         <motion.svg
