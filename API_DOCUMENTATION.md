@@ -139,6 +139,7 @@ Create or update orders and automatically link them to users via email. Supports
   "orders": [
     {
       "orderNumber": "ORD-2024-12345",
+      "purchaseOrderNumber": "PO-2024-00123",
       "email": "john.doe@company.com",
       "customerName": "John Doe",
       "orderDate": "2024-10-15T10:30:00.000Z",
@@ -180,6 +181,7 @@ Create or update orders and automatically link them to users via email. Supports
 
 **Field Requirements:**
 - `orderNumber` (required): Unique order identifier
+- `purchaseOrderNumber` (optional): Customer's purchase order reference number for their internal tracking
 - `email` (required): Customer email (must match a user in the system)
 - `customerName` (optional): Customer display name
 - `orderDate` (required): ISO 8601 date format

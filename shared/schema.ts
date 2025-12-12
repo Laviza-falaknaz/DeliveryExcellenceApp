@@ -49,6 +49,7 @@ export const orderStatusEnum = pgEnum("order_status", [
 export const orders = pgTable("orders", {
   id: serial("id").primaryKey(),
   orderNumber: text("order_number").notNull().unique(),
+  purchaseOrderNumber: text("purchase_order_number"), // Customer's PO number for reference
   userId: integer("user_id").notNull().references(() => users.id),
   status: orderStatusEnum("status").notNull().default("placed"),
   totalAmount: numeric("total_amount", { precision: 10, scale: 2 }).notNull(), // Decimal amount (e.g., 999.99)

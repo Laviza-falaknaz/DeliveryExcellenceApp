@@ -2407,7 +2407,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const orderId = parseInt(req.params.id);
       const updateSchema = z.object({
-        status: z.string().optional(),
+        status: z.enum(["placed", "processing", "in_production", "quality_check", "shipped", "delivered", "completed", "cancelled", "returned"]).optional(),
         userId: z.number().optional(),
         isActive: z.boolean().optional(),
       });

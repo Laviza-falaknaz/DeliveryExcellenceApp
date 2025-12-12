@@ -455,6 +455,15 @@ export default function Orders() {
                     <Separator />
                     
                     <div>
+                      <Label className="text-xs text-neutral-500">Purchase Order Number</Label>
+                      <p className="text-sm font-medium mt-1">
+                        {selectedOrder?.purchaseOrderNumber || 'Not provided'}
+                      </p>
+                    </div>
+                    
+                    <Separator />
+                    
+                    <div>
                       <Label className="text-xs text-neutral-500">Shipping Address</Label>
                       {selectedOrder?.shippingAddress ? (
                         <div className="text-sm mt-1">
