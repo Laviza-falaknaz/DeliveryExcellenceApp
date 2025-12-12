@@ -1180,18 +1180,7 @@ export default function Warranty() {
           </Card>
 
           {/* Warranty Verification Note */}
-          <Alert 
-            className="bg-secondary/5 border-secondary/20 mt-4 cursor-pointer hover:bg-secondary/10 transition-colors"
-            onClick={() => {
-              checkStatusRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-              setTimeout(() => {
-                const serialInput = document.querySelector('input[name="serialNumber"]') as HTMLInputElement;
-                if (serialInput) {
-                  serialInput.focus();
-                }
-              }, 500);
-            }}
-          >
+          <Alert className="bg-secondary/5 border-secondary/20 mt-4">
             <HelpCircle className="h-4 w-4 text-secondary" />
             <AlertTitle>Need to verify your warranty?</AlertTitle>
             <AlertDescription className="text-sm">
