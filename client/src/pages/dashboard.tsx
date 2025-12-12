@@ -2,7 +2,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { useImpact } from "@/hooks/use-impact";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Link, useLocation } from "wouter";
 import { Progress } from "@/components/ui/progress";
 import { 
@@ -10,13 +10,26 @@ import {
   TrendingUp, Droplet, Leaf, Recycle, Users, 
   ChevronRight, FileText, MessageSquare, Clock,
   Zap, Star, BarChart3, Brain, Gamepad2, AlertCircle, Truck, Rocket,
-  RotateCcw, HelpCircle, Book, BookOpen, Phone
+  RotateCcw, HelpCircle, Book, BookOpen, Phone, Play, Share2, ExternalLink
 } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { getRmaStatusColor, getOrderStatusColor } from "@/lib/utils";
+import charityWaterLogo from "@assets/cw_long_color_1765522853672.png";
+import charityWaterBg from "@assets/image_1765522883941.png";
+
+type RemanufacturedTip = {
+  id: number;
+  title: string;
+  content: string;
+  icon: string;
+  category: string;
+  categoryColor: string;
+  displayOrder: number;
+  isActive: boolean;
+};
 
 const formatNumber = (num: number): string => {
   return num.toLocaleString('en-US');
@@ -99,6 +112,7 @@ export default function Dashboard() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [showRocket, setShowRocket] = useState(false);
+  const [currentTip, setCurrentTip] = useState(0);
   
   const { data: user } = useQuery<User>({
     queryKey: ["/api/auth/me"],
@@ -122,7 +136,29 @@ export default function Dashboard() {
     queryKey: ["/api/rma"],
   });
   
+  const { data: tips = [], isLoading: tipsLoading } = useQuery<RemanufacturedTip[]>({
+    queryKey: ["/api/remanufactured-tips"],
+  });
+  
   const { impact } = useImpact();
+
+  const nextTip = () => {
+    if (tips.length > 0) {
+      setCurrentTip((prev) => (prev + 1) % tips.length);
+    }
+  };
+
+  const prevTip = () => {
+    if (tips.length > 0) {
+      setCurrentTip((prev) => (prev - 1 + tips.length) % tips.length);
+    }
+  };
+
+  const podcastVideo = {
+    id: "u7IOWNV2zFU",
+    title: "The Remanufacturing Process",
+    thumbnailUrl: `https://img.youtube.com/vi/u7IOWNV2zFU/mqdefault.jpg`
+  };
   
   const recentOrders = orders.slice(0, 3);
   const activeRmas = rmas.filter(r => !['completed', 'rejected'].includes(r.rma.status)).slice(0, 3);
@@ -296,140 +332,202 @@ export default function Dashboard() {
         </Card>
         )}
 
-        {/* Main Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          
-          {/* Left Column - 2/3 width */}
-          <div className="lg:col-span-2 space-y-4">
+        {/* Sustainability Metrics - Full Width */}
+        <div className="mb-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
+            <TrendingUp className="h-5 w-5 text-[#08ABAB]" />
+            Sustainability Metrics
+          </h3>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
             
-            {/* Sustainability Metrics */}
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                <TrendingUp className="h-5 w-5 text-[#08ABAB]" />
-                Sustainability Metrics
-              </h3>
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-                
-                {/* Total Carbon Saved - Teal with gradient */}
-                <Card className="shadow-lg border-0 bg-gradient-to-br from-[#06989a] via-[#0BC5C5] to-[#08ABAB] text-white overflow-hidden relative">
-                  <div className="absolute top-1 right-1 opacity-15">
-                    <Leaf className="h-14 w-14 text-white" />
-                  </div>
-                  <CardContent className="p-3 relative z-10">
-                    <div className="text-xs font-medium text-white/90 mb-1">Total Carbon Saved</div>
-                    <div className="text-xl font-bold mb-1">
-                      {formatNumber(Math.round((impact?.carbonSaved || 0) / 1000))} kg
-                    </div>
-                    <div className="text-[10px] text-white/80">
-                      Equivalent to planting {formatNumber(Math.round((impact?.carbonSaved || 0) / 21))} trees
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Clean Water Provided - Navy with gradient */}
-                <Card className="shadow-lg border-0 bg-gradient-to-br from-[#243d4d] via-[#3d6580] to-[#305269] text-white overflow-hidden relative">
-                  <div className="absolute top-1 right-1 opacity-15">
-                    <Users className="h-14 w-14 text-white" />
-                  </div>
-                  <CardContent className="p-3 relative z-10">
-                    <div className="text-xs font-medium text-white/90 mb-1">Clean Water Provided</div>
-                    <div className="text-xl font-bold mb-1">
-                      {formatNumber(impact?.familiesHelped || 0)}
-                    </div>
-                    <div className="text-[10px] text-white/80">
-                      families helped
-                    </div>
-                    <div className="text-[10px] text-white/70 mt-0.5">
-                      {formatNumber(Math.round((impact?.familiesHelped || 0) * 1.2))}M litres volume
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Resource Preservation - Gold with gradient */}
-                <Card className="shadow-lg border-0 bg-gradient-to-br from-[#e88a0c] via-[#FFB347] to-[#FF9E1C] text-white overflow-hidden relative">
-                  <div className="absolute top-1 right-1 opacity-15">
-                    <Recycle className="h-14 w-14 text-white" />
-                  </div>
-                  <CardContent className="p-3 relative z-10">
-                    <div className="text-xs font-medium text-white/90 mb-1">Resource Preservation</div>
-                    <div className="text-xl font-bold mb-1">
-                      {formatNumber(Math.round((impact?.mineralsSaved || 0) / 1000))} kg
-                    </div>
-                    <div className="text-[10px] text-white/80">
-                      Mining impact reduced
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Water Saved - Purple with gradient */}
-                <Card className="shadow-lg border-0 bg-gradient-to-br from-[#4d264d] via-[#7a4d7a] to-[#663366] text-white overflow-hidden relative">
-                  <div className="absolute top-1 right-1 opacity-15">
-                    <Droplet className="h-14 w-14 text-white" />
-                  </div>
-                  <CardContent className="p-3 relative z-10">
-                    <div className="text-xs font-medium text-white/90 mb-1">Water Saved</div>
-                    <div className="text-xl font-bold mb-1">
-                      {formatNumber(Math.round((impact?.waterSaved || 0) / 1000000))}M litres
-                    </div>
-                    <div className="text-[10px] text-white/80">
-                      Water conservation via reuse
-                    </div>
-                  </CardContent>
-                </Card>
+            {/* Total Carbon Saved - Teal with gradient */}
+            <Card className="shadow-lg border-0 bg-gradient-to-br from-[#06989a] via-[#0BC5C5] to-[#08ABAB] text-white overflow-hidden relative">
+              <div className="absolute top-1 right-1 opacity-15">
+                <Leaf className="h-14 w-14 text-white" />
               </div>
-            </div>
+              <CardContent className="p-3 relative z-10">
+                <div className="text-xs font-medium text-white/90 mb-1">Total Carbon Saved</div>
+                <div className="text-xl font-bold mb-1">
+                  {formatNumber(Math.round((impact?.carbonSaved || 0) / 1000))} kg
+                </div>
+                <div className="text-[10px] text-white/80">
+                  Equivalent to planting {formatNumber(Math.round((impact?.carbonSaved || 0) / 21))} trees
+                </div>
+              </CardContent>
+            </Card>
 
-            {/* Active RMA Items */}
-            {activeRmas.length > 0 && (
-              <Card className="shadow-md border-0">
-                <CardHeader className="border-b bg-gradient-to-r from-orange-50 to-amber-50 pb-3 pt-3">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-base font-semibold text-gray-900 flex items-center gap-2">
-                      <AlertCircle className="h-5 w-5 text-orange-600" />
-                      Active RMA Requests
-                    </CardTitle>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="text-teal-600 hover:text-teal-700 hover:bg-teal-50"
-                      onClick={() => setLocation('/rma')}
-                      data-testid="button-view-all-rmas"
-                    >
-                      View All
-                    </Button>
-                  </div>
-                </CardHeader>
-                <CardContent className="p-0">
-                  <div className="divide-y">
-                    {activeRmas.map(({ rma }) => (
-                      <Link key={rma.id} href={`/rma`}>
-                        <div 
-                          className="p-3 hover:bg-orange-50/50 transition-colors cursor-pointer"
-                          data-testid={`rma-${rma.id}`}
-                        >
-                          <div className="flex items-center justify-between">
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2 mb-1">
-                                <span className="font-medium text-gray-900 text-sm">
-                                  {rma.rmaNumber}
-                                </span>
-                                <Badge className={`${getRmaStatusColor(rma.status)} text-xs`}>
-                                  {rma.status.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
-                                </Badge>
-                              </div>
-                              <div className="text-xs text-gray-600">
-                                {new Date(rma.createdAt).toLocaleDateString()} • {rma.email}
+            {/* Clean Water Provided - Navy with gradient */}
+            <Card className="shadow-lg border-0 bg-gradient-to-br from-[#243d4d] via-[#3d6580] to-[#305269] text-white overflow-hidden relative">
+              <div className="absolute top-1 right-1 opacity-15">
+                <Users className="h-14 w-14 text-white" />
+              </div>
+              <CardContent className="p-3 relative z-10">
+                <div className="text-xs font-medium text-white/90 mb-1">Clean Water Provided</div>
+                <div className="text-xl font-bold mb-1">
+                  {formatNumber(impact?.familiesHelped || 0)}
+                </div>
+                <div className="text-[10px] text-white/80">
+                  families helped
+                </div>
+                <div className="text-[10px] text-white/70 mt-0.5">
+                  {formatNumber(Math.round((impact?.familiesHelped || 0) * 1.2))}M litres volume
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Resource Preservation - Gold with gradient */}
+            <Card className="shadow-lg border-0 bg-gradient-to-br from-[#e88a0c] via-[#FFB347] to-[#FF9E1C] text-white overflow-hidden relative">
+              <div className="absolute top-1 right-1 opacity-15">
+                <Recycle className="h-14 w-14 text-white" />
+              </div>
+              <CardContent className="p-3 relative z-10">
+                <div className="text-xs font-medium text-white/90 mb-1">Resource Preservation</div>
+                <div className="text-xl font-bold mb-1">
+                  {formatNumber(Math.round((impact?.mineralsSaved || 0) / 1000))} kg
+                </div>
+                <div className="text-[10px] text-white/80">
+                  Mining impact reduced
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Water Saved - Purple with gradient */}
+            <Card className="shadow-lg border-0 bg-gradient-to-br from-[#4d264d] via-[#7a4d7a] to-[#663366] text-white overflow-hidden relative">
+              <div className="absolute top-1 right-1 opacity-15">
+                <Droplet className="h-14 w-14 text-white" />
+              </div>
+              <CardContent className="p-3 relative z-10">
+                <div className="text-xs font-medium text-white/90 mb-1">Water Saved</div>
+                <div className="text-xl font-bold mb-1">
+                  {formatNumber(Math.round((impact?.waterSaved || 0) / 1000000))}M litres
+                </div>
+                <div className="text-[10px] text-white/80">
+                  Water conservation via reuse
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        {/* Main Grid - 70/30 Split */}
+        <div className="grid grid-cols-1 lg:grid-cols-10 gap-4">
+          
+          {/* Left Column - 70% width */}
+          <div className="lg:col-span-7 space-y-4">
+            
+            {/* Tips for Setting Up Remanufactured Laptops */}
+            <Card className="shadow-md border-0">
+              <CardHeader className="border-b bg-gradient-to-r from-teal-50 to-cyan-50 pb-3 pt-3">
+                <CardTitle className="text-base font-semibold text-gray-900">Tips for Setting Up Remanufactured Laptops</CardTitle>
+                <CardDescription className="text-sm text-gray-600">
+                  Quick tips if you're new to the world of remanufactured laptops
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="p-4">
+                <div className="relative">
+                  {/* Carousel Container */}
+                  <div className="overflow-hidden rounded-lg">
+                    {tipsLoading ? (
+                      <div className="bg-gray-100 p-4 rounded-lg border border-gray-200">
+                        <div className="flex items-center justify-center py-6">
+                          <p className="text-gray-500">Loading tips...</p>
+                        </div>
+                      </div>
+                    ) : tips.length === 0 ? (
+                      <div className="bg-gray-100 p-4 rounded-lg border border-gray-200">
+                        <div className="flex items-center justify-center py-6">
+                          <p className="text-gray-500">No tips available at the moment.</p>
+                        </div>
+                      </div>
+                    ) : (
+                      <div 
+                        className="flex transition-transform duration-300 ease-in-out"
+                        style={{ transform: `translateX(-${currentTip * 100}%)` }}
+                      >
+                        {tips.map((tip) => {
+                          const color = tip.categoryColor || "#08ABAB";
+                          return (
+                          <div key={tip.id} className="w-full flex-shrink-0">
+                            <div 
+                              className="bg-gradient-to-br p-4 rounded-lg border"
+                              style={{ 
+                                backgroundColor: `${color}0D`,
+                                borderColor: `${color}33`
+                              }}
+                            >
+                              <div className="flex items-start space-x-3">
+                                <div 
+                                  className="h-10 w-10 rounded-full flex items-center justify-center text-white flex-shrink-0"
+                                  style={{ backgroundColor: color }}
+                                >
+                                  <i className={`${tip.icon} text-lg`}></i>
+                                </div>
+                                <div className="flex-1">
+                                  <div className="flex items-center justify-between mb-1">
+                                    <h4 className="font-semibold text-base text-neutral-900">{tip.title}</h4>
+                                    <span 
+                                      className="text-xs font-medium px-2 py-0.5 rounded-full"
+                                      style={{ 
+                                        backgroundColor: `${color}33`,
+                                        color: color
+                                      }}
+                                    >
+                                      {tip.category}
+                                    </span>
+                                  </div>
+                                  <p className="text-neutral-700 text-sm leading-relaxed">{tip.content}</p>
+                                </div>
                               </div>
                             </div>
-                            <ChevronRight className="h-4 w-4 text-gray-400" />
                           </div>
-                        </div>
-                      </Link>
-                    ))}
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
-                </CardContent>
-              </Card>
-            )}
+                  
+                  {/* Navigation Controls */}
+                  {!tipsLoading && tips.length > 0 && (
+                  <div className="flex items-center justify-between mt-3">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={prevTip}
+                      className="flex items-center space-x-1 bg-[#08ABAB] border-[#08ABAB] text-white hover:bg-[#FF9E1C] hover:text-black hover:border-[#FF9E1C] transition-colors h-7 text-xs"
+                    >
+                      <i className="ri-arrow-left-line"></i>
+                      <span>Previous</span>
+                    </Button>
+                    
+                    {/* Dots Indicator */}
+                    <div className="flex space-x-1.5">
+                      {tips.map((_, index) => (
+                        <button
+                          key={index}
+                          onClick={() => setCurrentTip(index)}
+                          className={`w-2 h-2 rounded-full transition-colors ${
+                            index === currentTip 
+                              ? 'bg-[#08ABAB]' 
+                              : 'bg-neutral-300 hover:bg-neutral-400'
+                          }`}
+                        />
+                      ))}
+                    </div>
+                    
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={nextTip}
+                      className="flex items-center space-x-1 bg-[#08ABAB] border-[#08ABAB] text-white hover:bg-[#FF9E1C] hover:text-black hover:border-[#FF9E1C] transition-colors h-7 text-xs"
+                    >
+                      <span>Next</span>
+                      <i className="ri-arrow-right-line"></i>
+                    </Button>
+                  </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
 
             {/* Recent Orders */}
             <Card className="shadow-md border-0">
@@ -505,79 +603,182 @@ export default function Dashboard() {
                 )}
               </CardContent>
             </Card>
+
+            {/* Active RMA Items */}
+            <Card className="shadow-md border-0">
+              <CardHeader className="border-b bg-gradient-to-r from-orange-50 to-amber-50 pb-3 pt-3">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-base font-semibold text-gray-900 flex items-center gap-2">
+                    <AlertCircle className="h-5 w-5 text-orange-600" />
+                    Recent RMA Requests
+                  </CardTitle>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="text-teal-600 hover:text-teal-700 hover:bg-teal-50"
+                    onClick={() => setLocation('/rma')}
+                    data-testid="button-view-all-rmas"
+                  >
+                    View All
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent className="p-0">
+                {activeRmas.length === 0 ? (
+                  <div className="p-6 text-center text-gray-500">
+                    <RotateCcw className="h-10 w-10 mx-auto mb-2 opacity-20" />
+                    <p className="text-sm">No active RMA requests</p>
+                  </div>
+                ) : (
+                  <div className="divide-y">
+                    {activeRmas.map(({ rma }) => (
+                      <Link key={rma.id} href={`/rma`}>
+                        <div 
+                          className="p-3 hover:bg-orange-50/50 transition-colors cursor-pointer"
+                          data-testid={`rma-${rma.id}`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-1">
+                                <span className="font-medium text-gray-900 text-sm">
+                                  {rma.rmaNumber}
+                                </span>
+                                <Badge className={`${getRmaStatusColor(rma.status)} text-xs`}>
+                                  {rma.status.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
+                                </Badge>
+                              </div>
+                              <div className="text-xs text-gray-600">
+                                {new Date(rma.createdAt).toLocaleDateString()} • {rma.email}
+                              </div>
+                            </div>
+                            <ChevronRight className="h-4 w-4 text-gray-400" />
+                          </div>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </div>
 
-          {/* Right Column - 1/3 width */}
-          <div className="space-y-4">
+          {/* Right Column - 30% width */}
+          <div className="lg:col-span-3 space-y-4">
             
-            {/* Quick Actions */}
+            {/* Charity Water Card */}
+            <Card 
+              className="shadow-md border-0 overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
+              onClick={() => setLocation('/impact?tab=water')}
+              data-testid="card-charity-water"
+            >
+              <div 
+                className="relative h-40 bg-cover bg-center"
+                style={{ backgroundImage: `url(${charityWaterBg})` }}
+              >
+                <div className="absolute inset-0 bg-black/40" />
+                <div className="absolute inset-0 flex flex-col items-center justify-center p-4">
+                  <p className="text-white text-sm font-medium mb-2">We are supporting</p>
+                  <img src={charityWaterLogo} alt="charity: water" className="h-8 object-contain" />
+                  <p className="text-white/90 text-xs mt-2 text-center">Click to see your water impact</p>
+                </div>
+              </div>
+            </Card>
+
+            {/* Case Studies Card */}
+            <Card 
+              className="shadow-md border-0 cursor-pointer hover:shadow-lg transition-shadow"
+              onClick={() => setLocation('/case-studies')}
+              data-testid="card-case-studies"
+            >
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <div className="h-12 w-12 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0">
+                    <Book className="h-6 w-6 text-indigo-600" />
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-semibold text-gray-900">Case Studies</h4>
+                    <p className="text-sm text-gray-600">See how others are making an impact</p>
+                  </div>
+                  <ChevronRight className="h-5 w-5 text-gray-400" />
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Podcast Card */}
+            <Card 
+              className="shadow-md border-0 cursor-pointer hover:shadow-lg transition-shadow overflow-hidden"
+              onClick={() => setLocation('/remanufactured#podcasts')}
+              data-testid="card-podcast"
+            >
+              <div className="relative">
+                <img 
+                  src={podcastVideo.thumbnailUrl} 
+                  alt={podcastVideo.title}
+                  className="w-full h-24 object-cover"
+                />
+                <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                  <div className="h-10 w-10 rounded-full bg-white/90 flex items-center justify-center">
+                    <Play className="h-5 w-5 text-gray-900 ml-0.5" />
+                  </div>
+                </div>
+              </div>
+              <CardContent className="p-3">
+                <h4 className="font-semibold text-gray-900 text-sm">Sustainable IT Podcast</h4>
+                <p className="text-xs text-gray-600">Watch our latest conversations</p>
+              </CardContent>
+            </Card>
+
+            {/* Social Sharing Section */}
             <Card className="shadow-md border-0">
-              <CardHeader className="border-b bg-gray-50 pb-2 pt-2">
-                <CardTitle className="text-base font-semibold text-gray-900">Quick Actions</CardTitle>
+              <CardHeader className="pb-2 pt-3">
+                <CardTitle className="text-sm font-semibold text-gray-900 flex items-center gap-2">
+                  <Share2 className="h-4 w-4" />
+                  Share Your Impact
+                </CardTitle>
               </CardHeader>
-              <CardContent className="p-3 space-y-2">
-                <Button 
-                  className="w-full justify-start bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white text-sm h-9 shadow-sm"
-                  onClick={() => setLocation('/orders')}
-                  data-testid="button-track-order"
-                >
-                  <Package className="h-4 w-4 mr-2" />
-                  Track Order
-                </Button>
-                
-                <Button 
-                  className="w-full justify-start bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white text-sm h-9 shadow-sm"
-                  onClick={() => setLocation('/rma')}
-                  data-testid="button-create-rma"
-                >
-                  <RotateCcw className="h-4 w-4 mr-2" />
-                  Create RMA
-                </Button>
-
-                <Button 
-                  className="w-full justify-start bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white text-sm h-9 shadow-sm"
-                  onClick={() => setLocation('/impact')}
-                  data-testid="button-view-impact"
-                >
-                  <Leaf className="h-4 w-4 mr-2" />
-                  View Impact
-                </Button>
-
-                <Button 
-                  className="w-full justify-start bg-gradient-to-r from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600 text-white text-sm h-9 shadow-sm"
-                  onClick={() => setLocation('/support')}
-                  data-testid="button-troubleshooting"
-                >
-                  <HelpCircle className="h-4 w-4 mr-2" />
-                  Troubleshooting
-                </Button>
-
-                <Button 
-                  className="w-full justify-start bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-600 hover:to-cyan-600 text-white text-sm h-9 shadow-sm"
-                  onClick={() => setLocation('/impact?tab=remanufacturing')}
-                  data-testid="button-about-remanufacturing"
-                >
-                  <BookOpen className="h-4 w-4 mr-2" />
-                  About Remanufacturing
-                </Button>
-
-                <Button 
-                  className="w-full justify-start bg-gradient-to-r from-indigo-500 to-blue-600 hover:from-indigo-600 hover:to-blue-700 text-white text-sm h-9 shadow-sm"
-                  onClick={() => setLocation('/impact?tab=case-studies')}
-                  data-testid="button-case-studies"
-                >
-                  <Book className="h-4 w-4 mr-2" />
-                  Case Studies
-                </Button>
-
-                <Button 
-                  className="w-full justify-start bg-gradient-to-r from-fuchsia-500 to-pink-500 hover:from-fuchsia-600 hover:to-pink-600 text-white text-sm h-9 shadow-sm"
-                  onClick={() => setLocation('/support')}
-                  data-testid="button-contact"
-                >
-                  <Phone className="h-4 w-4 mr-2" />
-                  Contact
-                </Button>
+              <CardContent className="p-3 pt-0">
+                <div className="grid grid-cols-2 gap-2">
+                  <Button 
+                    variant="outline"
+                    size="sm"
+                    className="h-9 text-xs bg-[#0077B5] border-[#0077B5] text-white hover:bg-[#005885] hover:text-white"
+                    onClick={() => setLocation('/impact?tab=share')}
+                    data-testid="button-share-linkedin"
+                  >
+                    <i className="ri-linkedin-fill mr-1.5"></i>
+                    LinkedIn
+                  </Button>
+                  <Button 
+                    variant="outline"
+                    size="sm"
+                    className="h-9 text-xs bg-gradient-to-r from-[#833AB4] via-[#FD1D1D] to-[#F77737] border-0 text-white hover:opacity-90"
+                    onClick={() => setLocation('/impact?tab=share')}
+                    data-testid="button-share-instagram"
+                  >
+                    <i className="ri-instagram-line mr-1.5"></i>
+                    Instagram
+                  </Button>
+                  <Button 
+                    variant="outline"
+                    size="sm"
+                    className="h-9 text-xs bg-[#1DA1F2] border-[#1DA1F2] text-white hover:bg-[#0c85d0] hover:text-white"
+                    onClick={() => setLocation('/impact?tab=share')}
+                    data-testid="button-share-twitter"
+                  >
+                    <i className="ri-twitter-x-fill mr-1.5"></i>
+                    Twitter/X
+                  </Button>
+                  <Button 
+                    variant="outline"
+                    size="sm"
+                    className="h-9 text-xs bg-[#4267B2] border-[#4267B2] text-white hover:bg-[#365899] hover:text-white"
+                    onClick={() => setLocation('/impact?tab=share')}
+                    data-testid="button-share-facebook"
+                  >
+                    <i className="ri-facebook-fill mr-1.5"></i>
+                    Facebook
+                  </Button>
+                </div>
               </CardContent>
             </Card>
 
