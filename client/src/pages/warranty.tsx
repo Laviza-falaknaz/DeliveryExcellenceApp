@@ -887,7 +887,7 @@ export default function Warranty() {
                             Coverage
                           </p>
                           <p className="text-xs font-semibold text-green-800 mt-0.5">
-                            UK Mainland
+                            UK Mainland only
                           </p>
                         </div>
                         <div className="text-center p-2 bg-blue-50 rounded-lg border border-blue-200">
@@ -895,7 +895,7 @@ export default function Warranty() {
                             Turnaround
                           </p>
                           <p className="text-xs font-semibold text-blue-800 mt-0.5">
-                            Next Day*
+                            24-48 Hours
                           </p>
                         </div>
                         <div className="text-center p-2 bg-purple-50 rounded-lg border border-purple-200">
@@ -903,7 +903,7 @@ export default function Warranty() {
                             Outcome
                           </p>
                           <p className="text-xs font-semibold text-purple-800 mt-0.5">
-                            Swap/Replace
+                            Repair/Replace/Credit
                           </p>
                         </div>
                         <div className="text-center p-2 bg-neutral-100 rounded-lg border border-neutral-200">
@@ -1071,7 +1071,7 @@ export default function Warranty() {
                             <li>UK team responds within 8 working hours</li>
                             <li>RMA number issued if unresolved</li>
                             <li>Return unit to our address</li>
-                            <li>Diagnosis within 5 working days</li>
+                            <li>Inspection and repair within 5 working days</li>
                             <li>Repair, replace, or credit issued</li>
                             <li>Return shipment with tracking</li>
                           </ol>
@@ -1120,7 +1120,7 @@ export default function Warranty() {
                           <li>• Keyboard & touchpad</li>
                           <li>• Battery (first 12 months)</li>
                           <li>• Power adapters</li>
-                          <li>• OS recovery</li>
+                          <li>• Pre-installed OS recovery</li>
                         </ul>
                       </div>
                       <div className="p-3 bg-red-50/50 rounded-lg border border-red-200">
@@ -1131,13 +1131,14 @@ export default function Warranty() {
                           </h5>
                         </div>
                         <ul className="text-xs text-neutral-700 space-y-1">
-                          <li>• Customer damage (drops, spills, cracks)</li>
+                          <li>• Customer damage (drops, spills, cracks, water damage and accidental damage)</li>
                           <li>• Normal wear and tear</li>
                           <li>• Cosmetic damage</li>
                           <li>• Software issues</li>
                           <li>• Unauthorized modifications</li>
                           <li>• Lost/stolen devices</li>
                           <li>• Battery faults after 12 months</li>
+                          <li>Damage from improper use or environmental impact</li>
                         </ul>
                       </div>
                     </div>
@@ -1179,7 +1180,18 @@ export default function Warranty() {
           </Card>
 
           {/* Warranty Verification Note */}
-          <Alert className="bg-secondary/5 border-secondary/20 mt-4">
+          <Alert 
+            className="bg-secondary/5 border-secondary/20 mt-4 cursor-pointer hover:bg-secondary/10 transition-colors"
+            onClick={() => {
+              checkStatusRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              setTimeout(() => {
+                const serialInput = document.querySelector('input[name="serialNumber"]') as HTMLInputElement;
+                if (serialInput) {
+                  serialInput.focus();
+                }
+              }, 500);
+            }}
+          >
             <HelpCircle className="h-4 w-4 text-secondary" />
             <AlertTitle>Need to verify your warranty?</AlertTitle>
             <AlertDescription className="text-sm">
