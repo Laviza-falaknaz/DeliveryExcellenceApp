@@ -755,9 +755,9 @@ export default function Dashboard() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-4">
-                <div className="flex flex-col gap-2">
+                <div className="grid grid-cols-2 gap-2">
                   <button 
-                    className="w-full h-10 flex items-center rounded-md overflow-hidden hover:shadow-lg hover:scale-[1.02] transition-all duration-200"
+                    className="w-full h-10 flex items-center rounded-xl overflow-hidden hover:shadow-lg hover:scale-[1.02] transition-all duration-200"
                     onClick={() => {
                       setLocation('/impact');
                       setTimeout(() => {
@@ -777,7 +777,7 @@ export default function Dashboard() {
                     </div>
                   </button>
                   <button 
-                    className="w-full h-10 flex items-center rounded-md overflow-hidden hover:shadow-lg hover:scale-[1.02] transition-all duration-200"
+                    className="w-full h-10 flex items-center rounded-xl overflow-hidden hover:shadow-lg hover:scale-[1.02] transition-all duration-200"
                     onClick={() => {
                       setLocation('/impact');
                       setTimeout(() => {
@@ -797,7 +797,7 @@ export default function Dashboard() {
                     </div>
                   </button>
                   <button 
-                    className="w-full h-10 flex items-center rounded-md overflow-hidden hover:shadow-lg hover:scale-[1.02] transition-all duration-200"
+                    className="w-full h-10 flex items-center rounded-xl overflow-hidden hover:shadow-lg hover:scale-[1.02] transition-all duration-200"
                     onClick={() => {
                       setLocation('/impact');
                       setTimeout(() => {
@@ -817,7 +817,7 @@ export default function Dashboard() {
                     </div>
                   </button>
                   <button 
-                    className="w-full h-10 flex items-center rounded-md overflow-hidden hover:shadow-lg hover:scale-[1.02] transition-all duration-200"
+                    className="w-full h-10 flex items-center rounded-xl overflow-hidden hover:shadow-lg hover:scale-[1.02] transition-all duration-200"
                     onClick={() => {
                       setLocation('/impact');
                       setTimeout(() => {
