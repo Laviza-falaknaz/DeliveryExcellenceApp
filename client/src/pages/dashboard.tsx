@@ -17,8 +17,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { getRmaStatusColor, getOrderStatusColor } from "@/lib/utils";
-import charityWaterLogo from "@assets/cw_long_color_1765522853672.png";
+import charityWaterLogo from "@assets/cw_long_white.png";
 import charityWaterBg from "@assets/image_1765522883941.png";
+import caseStudyBg from "@assets/Case Study - Image_1759311266301.jpg";
 
 type RemanufacturedTip = {
   id: number;
@@ -667,116 +668,165 @@ export default function Dashboard() {
             
             {/* Charity Water Card */}
             <Card 
-              className="shadow-md border-0 overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
-              onClick={() => setLocation('/impact?tab=water')}
+              className="shadow-md border-0 overflow-hidden cursor-pointer hover:shadow-xl hover:scale-[1.02] transition-all duration-300"
+              onClick={() => setLocation('/water-projects')}
               data-testid="card-charity-water"
             >
               <div 
-                className="relative h-40 bg-cover bg-center"
+                className="relative h-48 bg-cover bg-center"
                 style={{ backgroundImage: `url(${charityWaterBg})` }}
               >
-                <div className="absolute inset-0 bg-black/40" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-black/20" />
                 <div className="absolute inset-0 flex flex-col items-center justify-center p-4">
-                  <p className="text-white text-sm font-medium mb-2">We are supporting</p>
-                  <img src={charityWaterLogo} alt="charity: water" className="h-8 object-contain" />
-                  <p className="text-white/90 text-xs mt-2 text-center">Click to see your water impact</p>
+                  <p className="text-[#08ABAB] text-base font-bold mb-3">We are supporting</p>
+                  <img src={charityWaterLogo} alt="charity: water" className="h-10 object-contain" />
+                  <p className="text-white/90 text-sm mt-3 text-center">Click to see your water impact</p>
                 </div>
               </div>
             </Card>
 
             {/* Case Studies Card */}
             <Card 
-              className="shadow-md border-0 cursor-pointer hover:shadow-lg transition-shadow"
+              className="shadow-md border-0 overflow-hidden cursor-pointer hover:shadow-xl hover:scale-[1.02] transition-all duration-300"
               onClick={() => setLocation('/case-studies')}
               data-testid="card-case-studies"
             >
-              <CardContent className="p-4">
-                <div className="flex items-center gap-3">
-                  <div className="h-12 w-12 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0">
-                    <Book className="h-6 w-6 text-indigo-600" />
+              <div 
+                className="relative h-48 bg-cover bg-center"
+                style={{ backgroundImage: `url(${caseStudyBg})` }}
+              >
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-black/20" />
+                <div className="absolute inset-0 flex flex-col justify-end p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="h-10 w-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                      <Book className="h-5 w-5 text-white" />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-white text-lg">Case Studies</h4>
+                      <p className="text-white/80 text-sm">See how others are making an impact</p>
+                    </div>
                   </div>
-                  <div className="flex-1">
-                    <h4 className="font-semibold text-gray-900">Case Studies</h4>
-                    <p className="text-sm text-gray-600">See how others are making an impact</p>
-                  </div>
-                  <ChevronRight className="h-5 w-5 text-gray-400" />
                 </div>
-              </CardContent>
+              </div>
             </Card>
 
             {/* Podcast Card */}
             <Card 
-              className="shadow-md border-0 cursor-pointer hover:shadow-lg transition-shadow overflow-hidden"
-              onClick={() => setLocation('/remanufactured#podcasts')}
+              className="shadow-md border-0 cursor-pointer hover:shadow-xl hover:scale-[1.02] transition-all duration-300 overflow-hidden"
+              onClick={() => {
+                setLocation('/remanufactured');
+                setTimeout(() => {
+                  const podcastSection = document.getElementById('podcasts');
+                  if (podcastSection) {
+                    podcastSection.scrollIntoView({ behavior: 'smooth' });
+                  }
+                }, 100);
+              }}
               data-testid="card-podcast"
             >
-              <div className="relative">
+              <div className="relative h-48">
                 <img 
                   src={podcastVideo.thumbnailUrl} 
                   alt={podcastVideo.title}
-                  className="w-full h-24 object-cover"
+                  className="w-full h-full object-cover"
                 />
-                <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
-                  <div className="h-10 w-10 rounded-full bg-white/90 flex items-center justify-center">
-                    <Play className="h-5 w-5 text-gray-900 ml-0.5" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent flex flex-col justify-between p-4">
+                  <div className="flex justify-center items-center flex-1">
+                    <div className="h-14 w-14 rounded-full bg-white/90 hover:bg-white flex items-center justify-center shadow-lg transition-all">
+                      <Play className="h-7 w-7 text-[#08ABAB] ml-1" />
+                    </div>
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-white text-lg">Sustainable IT Podcast</h4>
+                    <p className="text-white/80 text-sm">Watch our latest conversations</p>
                   </div>
                 </div>
               </div>
-              <CardContent className="p-3">
-                <h4 className="font-semibold text-gray-900 text-sm">Sustainable IT Podcast</h4>
-                <p className="text-xs text-gray-600">Watch our latest conversations</p>
-              </CardContent>
             </Card>
 
             {/* Social Sharing Section */}
-            <Card className="shadow-md border-0">
-              <CardHeader className="pb-2 pt-3">
-                <CardTitle className="text-sm font-semibold text-gray-900 flex items-center gap-2">
-                  <Share2 className="h-4 w-4" />
+            <Card className="shadow-md border-0 overflow-hidden">
+              <CardHeader className="pb-3 pt-4 bg-gradient-to-r from-gray-50 to-slate-50">
+                <CardTitle className="text-base font-semibold text-gray-900 flex items-center gap-2">
+                  <div className="h-8 w-8 rounded-full bg-[#08ABAB] flex items-center justify-center">
+                    <Share2 className="h-4 w-4 text-white" />
+                  </div>
                   Share Your Impact
                 </CardTitle>
               </CardHeader>
-              <CardContent className="p-3 pt-0">
-                <div className="grid grid-cols-2 gap-2">
+              <CardContent className="p-4">
+                <div className="grid grid-cols-2 gap-3">
                   <Button 
-                    variant="outline"
-                    size="sm"
-                    className="h-9 text-xs bg-[#0077B5] border-[#0077B5] text-white hover:bg-[#005885] hover:text-white"
-                    onClick={() => setLocation('/impact?tab=share')}
+                    className="h-12 rounded-xl bg-gradient-to-br from-[#0077B5] to-[#005885] border-0 text-white hover:shadow-lg hover:scale-105 transition-all duration-200 flex items-center justify-center gap-2"
+                    onClick={() => {
+                      setLocation('/impact');
+                      setTimeout(() => {
+                        const shareSection = document.getElementById('share-section');
+                        if (shareSection) {
+                          shareSection.scrollIntoView({ behavior: 'smooth' });
+                        }
+                      }, 100);
+                    }}
                     data-testid="button-share-linkedin"
                   >
-                    <i className="ri-linkedin-fill mr-1.5"></i>
-                    LinkedIn
+                    <div className="h-7 w-7 rounded-full bg-white/20 flex items-center justify-center">
+                      <i className="ri-linkedin-fill text-lg"></i>
+                    </div>
+                    <span className="text-sm font-medium">LinkedIn</span>
                   </Button>
                   <Button 
-                    variant="outline"
-                    size="sm"
-                    className="h-9 text-xs bg-gradient-to-r from-[#833AB4] via-[#FD1D1D] to-[#F77737] border-0 text-white hover:opacity-90"
-                    onClick={() => setLocation('/impact?tab=share')}
+                    className="h-12 rounded-xl bg-gradient-to-br from-[#833AB4] via-[#FD1D1D] to-[#F77737] border-0 text-white hover:shadow-lg hover:scale-105 transition-all duration-200 flex items-center justify-center gap-2"
+                    onClick={() => {
+                      setLocation('/impact');
+                      setTimeout(() => {
+                        const shareSection = document.getElementById('share-section');
+                        if (shareSection) {
+                          shareSection.scrollIntoView({ behavior: 'smooth' });
+                        }
+                      }, 100);
+                    }}
                     data-testid="button-share-instagram"
                   >
-                    <i className="ri-instagram-line mr-1.5"></i>
-                    Instagram
+                    <div className="h-7 w-7 rounded-full bg-white/20 flex items-center justify-center">
+                      <i className="ri-instagram-line text-lg"></i>
+                    </div>
+                    <span className="text-sm font-medium">Instagram</span>
                   </Button>
                   <Button 
-                    variant="outline"
-                    size="sm"
-                    className="h-9 text-xs bg-[#1DA1F2] border-[#1DA1F2] text-white hover:bg-[#0c85d0] hover:text-white"
-                    onClick={() => setLocation('/impact?tab=share')}
+                    className="h-12 rounded-xl bg-gradient-to-br from-[#1DA1F2] to-[#0c85d0] border-0 text-white hover:shadow-lg hover:scale-105 transition-all duration-200 flex items-center justify-center gap-2"
+                    onClick={() => {
+                      setLocation('/impact');
+                      setTimeout(() => {
+                        const shareSection = document.getElementById('share-section');
+                        if (shareSection) {
+                          shareSection.scrollIntoView({ behavior: 'smooth' });
+                        }
+                      }, 100);
+                    }}
                     data-testid="button-share-twitter"
                   >
-                    <i className="ri-twitter-x-fill mr-1.5"></i>
-                    Twitter/X
+                    <div className="h-7 w-7 rounded-full bg-white/20 flex items-center justify-center">
+                      <i className="ri-twitter-x-fill text-lg"></i>
+                    </div>
+                    <span className="text-sm font-medium">Twitter/X</span>
                   </Button>
                   <Button 
-                    variant="outline"
-                    size="sm"
-                    className="h-9 text-xs bg-[#4267B2] border-[#4267B2] text-white hover:bg-[#365899] hover:text-white"
-                    onClick={() => setLocation('/impact?tab=share')}
+                    className="h-12 rounded-xl bg-gradient-to-br from-[#4267B2] to-[#365899] border-0 text-white hover:shadow-lg hover:scale-105 transition-all duration-200 flex items-center justify-center gap-2"
+                    onClick={() => {
+                      setLocation('/impact');
+                      setTimeout(() => {
+                        const shareSection = document.getElementById('share-section');
+                        if (shareSection) {
+                          shareSection.scrollIntoView({ behavior: 'smooth' });
+                        }
+                      }, 100);
+                    }}
                     data-testid="button-share-facebook"
                   >
-                    <i className="ri-facebook-fill mr-1.5"></i>
-                    Facebook
+                    <div className="h-7 w-7 rounded-full bg-white/20 flex items-center justify-center">
+                      <i className="ri-facebook-fill text-lg"></i>
+                    </div>
+                    <span className="text-sm font-medium">Facebook</span>
                   </Button>
                 </div>
               </CardContent>

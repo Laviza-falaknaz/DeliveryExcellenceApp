@@ -475,7 +475,7 @@ export default function Remanufactured() {
         </Card>
         
         {/* YouTube Videos Carousel */}
-        <Card>
+        <Card id="podcasts">
           <CardHeader>
             <CardTitle>Sustainable IT in Conversation - The Podcast</CardTitle>
             <CardDescription>

@@ -872,7 +872,7 @@ Learn more about sustainable IT solutions: circularcomputing.com
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div id="share-section" className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* LinkedIn Post Preview */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
