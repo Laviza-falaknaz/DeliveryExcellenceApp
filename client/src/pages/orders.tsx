@@ -93,27 +93,27 @@ export default function Orders() {
     });
   }
 
-  // Get status color based on order status
+  // Get status color based on order status (using brand color palette)
   function getStatusColor(status: string): string {
     switch (status.toLowerCase()) {
       case "placed":
-        return "bg-blue-100 text-blue-800";
+        return "bg-[#305269] text-white";
       case "processing":
-        return "bg-yellow-100 text-yellow-800";
+        return "bg-[#C2adc2] text-[#305269]";
       case "in_production":
-        return "bg-orange-100 text-orange-800";
+        return "bg-[#663366] text-white";
       case "quality_check":
-        return "bg-purple-100 text-purple-800";
+        return "bg-[#ffd8a4] text-[#305269]";
       case "shipped":
-        return "bg-indigo-100 text-indigo-800";
+        return "bg-[#FF9E1C] text-white";
       case "delivered":
-        return "bg-green-100 text-green-800";
+        return "bg-[#9cdddd] text-[#305269]";
       case "completed":
-        return "bg-neutral-100 text-neutral-800";
+        return "bg-[#08ABAB] text-white";
       case "cancelled":
-        return "bg-red-100 text-red-800";
+        return "bg-[#f38aad] text-white";
       case "returned":
-        return "bg-red-100 text-red-800";
+        return "bg-[#fad0de] text-[#305269]";
       default:
         return "bg-neutral-100 text-neutral-800";
     }

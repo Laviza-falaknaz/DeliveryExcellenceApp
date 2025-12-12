@@ -116,23 +116,23 @@ export default function RMA() {
   function getStatusColor(status: string): string {
     switch (status) {
       case "submitted":
-        return "bg-blue-100 text-blue-800";
+        return "bg-[#305269] text-white";
       case "requested":
-        return "bg-blue-100 text-blue-800";
+        return "bg-[#305269] text-white";
       case "approved":
-        return "bg-green-100 text-green-800";
+        return "bg-[#08ABAB] text-white";
       case "declined":
-        return "bg-red-100 text-red-800";
+        return "bg-[#f38aad] text-white";
       case "in_transit":
-        return "bg-purple-100 text-purple-800";
+        return "bg-[#663366] text-white";
       case "received":
-        return "bg-indigo-100 text-indigo-800";
+        return "bg-[#9cdddd] text-[#305269]";
       case "processing":
-        return "bg-amber-100 text-amber-800";
+        return "bg-[#C2adc2] text-[#305269]";
       case "completed":
-        return "bg-neutral-100 text-neutral-800";
+        return "bg-[#08ABAB] text-white";
       case "rejected":
-        return "bg-red-100 text-red-800";
+        return "bg-[#f38aad] text-white";
       default:
         return "bg-neutral-100 text-neutral-800";
     }
