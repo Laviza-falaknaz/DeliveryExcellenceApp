@@ -772,7 +772,7 @@ export default function Dashboard() {
                     <div className="h-full w-10 bg-[#3b5998] flex items-center justify-center">
                       <i className="ri-facebook-fill text-white text-lg"></i>
                     </div>
-                    <div className="flex-1 h-full bg-[#4267B2] flex items-center justify-center text-[14px]">
+                    <div className="flex-1 h-full bg-[#4267B2] flex items-center justify-center text-[14px] text-left">
                       <span className="text-white font-medium text-[13px] text-left">Facebook</span>
                     </div>
                   </button>
