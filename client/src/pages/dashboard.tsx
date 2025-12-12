@@ -311,9 +311,10 @@ export default function Dashboard() {
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                 
                 {/* Total Carbon Saved - Teal with gradient */}
-                <Card className="shadow-lg border-0 bg-gradient-to-br from-[#08ABAB] via-[#0BC5C5] to-[#08ABAB] text-white overflow-hidden relative">
-                  <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-8 translate-x-8" />
-                  <div className="absolute bottom-0 left-0 w-16 h-16 bg-white/5 rounded-full translate-y-6 -translate-x-6" />
+                <Card className="shadow-lg border-0 bg-gradient-to-br from-[#06989a] via-[#0BC5C5] to-[#08ABAB] text-white overflow-hidden relative">
+                  <div className="absolute bottom-2 right-2 opacity-15">
+                    <Leaf className="h-16 w-16 text-white" />
+                  </div>
                   <CardContent className="p-3 relative z-10">
                     <div className="flex justify-end mb-1">
                       <div className="bg-white/25 w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-sm">
@@ -331,9 +332,10 @@ export default function Dashboard() {
                 </Card>
 
                 {/* Clean Water Provided - Navy with gradient */}
-                <Card className="shadow-lg border-0 bg-gradient-to-br from-[#305269] via-[#3d6580] to-[#305269] text-white overflow-hidden relative">
-                  <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full -translate-y-6 translate-x-6" />
-                  <div className="absolute bottom-0 left-0 w-12 h-12 bg-white/5 rounded-full translate-y-4 -translate-x-4" />
+                <Card className="shadow-lg border-0 bg-gradient-to-br from-[#243d4d] via-[#3d6580] to-[#305269] text-white overflow-hidden relative">
+                  <div className="absolute bottom-2 right-2 opacity-15">
+                    <Users className="h-16 w-16 text-white" />
+                  </div>
                   <CardContent className="p-3 relative z-10">
                     <div className="flex justify-end mb-1">
                       <div className="bg-white/25 w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-sm">
@@ -354,9 +356,10 @@ export default function Dashboard() {
                 </Card>
 
                 {/* Resource Preservation - Gold with gradient */}
-                <Card className="shadow-lg border-0 bg-gradient-to-br from-[#FF9E1C] via-[#FFB347] to-[#FF9E1C] text-white overflow-hidden relative">
-                  <div className="absolute top-0 right-0 w-24 h-24 bg-white/15 rounded-full -translate-y-10 translate-x-10" />
-                  <div className="absolute bottom-0 left-0 w-14 h-14 bg-white/10 rounded-full translate-y-5 -translate-x-5" />
+                <Card className="shadow-lg border-0 bg-gradient-to-br from-[#e88a0c] via-[#FFB347] to-[#FF9E1C] text-white overflow-hidden relative">
+                  <div className="absolute bottom-2 right-2 opacity-15">
+                    <Recycle className="h-16 w-16 text-white" />
+                  </div>
                   <CardContent className="p-3 relative z-10">
                     <div className="flex justify-end mb-1">
                       <div className="bg-white/25 w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-sm">
@@ -374,9 +377,10 @@ export default function Dashboard() {
                 </Card>
 
                 {/* Water Saved - Purple with gradient */}
-                <Card className="shadow-lg border-0 bg-gradient-to-br from-[#663366] via-[#7a4d7a] to-[#663366] text-white overflow-hidden relative">
-                  <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full -translate-y-8 translate-x-8" />
-                  <div className="absolute bottom-0 left-0 w-16 h-16 bg-white/5 rounded-full translate-y-6 -translate-x-6" />
+                <Card className="shadow-lg border-0 bg-gradient-to-br from-[#4d264d] via-[#7a4d7a] to-[#663366] text-white overflow-hidden relative">
+                  <div className="absolute bottom-2 right-2 opacity-15">
+                    <Droplet className="h-16 w-16 text-white" />
+                  </div>
                   <CardContent className="p-3 relative z-10">
                     <div className="flex justify-end mb-1">
                       <div className="bg-white/25 w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-sm">
