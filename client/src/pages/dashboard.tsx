@@ -793,7 +793,7 @@ export default function Dashboard() {
                       <i className="ri-twitter-fill text-white text-lg"></i>
                     </div>
                     <div className="flex-1 h-full bg-[#1DA1F2] flex items-center justify-center">
-                      <span className="text-white text-sm font-medium">Twitter</span>
+                      <span className="text-white font-medium text-[13px]">Twitter</span>
                     </div>
                   </button>
                   <button 
