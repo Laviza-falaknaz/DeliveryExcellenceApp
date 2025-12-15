@@ -11,7 +11,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Upload, FileText, X, Camera, QrCode, AlertTriangle, Plus, Trash2, Search, CheckCircle2, Loader2, AlertCircle } from "lucide-react";
+import { Upload, FileText, X, Camera, QrCode, AlertTriangle, Plus, Trash2, Search, CheckCircle2, Loader2, AlertCircle, ImagePlus } from "lucide-react";
 import { BrowserMultiFormatReader, NotFoundException } from "@zxing/library";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
@@ -27,6 +27,7 @@ const productSchema = z.object({
   faultDescription: z.string().min(10, "Fault description must be at least 10 characters"),
   isAutoFilled: z.boolean().optional().default(false),
   isCrmMiss: z.boolean().optional().default(false),
+  image: z.string().optional(), // base64 encoded image for manual products
 }).refine((data) => {
   // At least one serial number must be provided
   return (data.manufacturerSerialNumber && data.manufacturerSerialNumber.trim() !== '') || 
@@ -145,6 +146,7 @@ export default function WarrantyClaim() {
         faultDescription: "",
         isAutoFilled: false,
         isCrmMiss: false,
+        image: undefined,
       }],
       consent: false,
     },
@@ -173,6 +175,7 @@ export default function WarrantyClaim() {
         faultDescription: "",
         isAutoFilled: false,
         isCrmMiss: false,
+        image: undefined,
       }));
       
       form.setValue('products', products);
@@ -548,11 +551,43 @@ export default function WarrantyClaim() {
       faultDescription: "",
       isAutoFilled: false,
       isCrmMiss: false,
+      image: undefined,
     }]);
     toast({
       title: "Switched to Manual Entry",
       description: "You can now add products manually.",
     });
+  };
+  
+  // Handle image upload for a product
+  const handleImageUpload = (productIndex: number, file: File) => {
+    if (file.size > 5 * 1024 * 1024) { // 5MB limit
+      toast({
+        title: "Image Too Large",
+        description: "Please select an image under 5MB.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    const reader = new FileReader();
+    reader.onload = () => {
+      const base64String = reader.result as string;
+      form.setValue(`products.${productIndex}.image`, base64String);
+    };
+    reader.onerror = () => {
+      toast({
+        title: "Upload Failed",
+        description: "Failed to read the image file.",
+        variant: "destructive",
+      });
+    };
+    reader.readAsDataURL(file);
+  };
+  
+  // Remove image from a product
+  const removeProductImage = (productIndex: number) => {
+    form.setValue(`products.${productIndex}.image`, undefined);
   };
 
   const downloadTemplateExcel = () => {
@@ -1130,6 +1165,60 @@ export default function WarrantyClaim() {
                           </FormItem>
                         )}
                       />
+                      
+                      {/* Product Image Upload - Only for manually added products */}
+                      {!isFileUploadMode && (
+                        <div className="space-y-2">
+                          <FormLabel>Product Image (Optional)</FormLabel>
+                          <div className="flex items-start gap-3">
+                            {product.image ? (
+                              <div className="relative">
+                                <img 
+                                  src={product.image} 
+                                  alt={`Product ${index + 1}`}
+                                  className="w-24 h-24 object-cover rounded-lg border"
+                                  data-testid={`img-product-preview-${index}`}
+                                />
+                                <Button
+                                  type="button"
+                                  variant="destructive"
+                                  size="icon"
+                                  className="absolute -top-2 -right-2 h-6 w-6"
+                                  onClick={() => removeProductImage(index)}
+                                  data-testid={`button-remove-image-${index}`}
+                                >
+                                  <X className="h-3 w-3" />
+                                </Button>
+                              </div>
+                            ) : (
+                              <label 
+                                htmlFor={`product-image-${index}`}
+                                className="flex flex-col items-center justify-center w-24 h-24 border-2 border-dashed border-neutral-300 rounded-lg cursor-pointer hover:border-teal-500 hover:bg-teal-50 transition-colors"
+                                data-testid={`button-upload-image-${index}`}
+                              >
+                                <ImagePlus className="h-6 w-6 text-neutral-400" />
+                                <span className="text-xs text-neutral-500 mt-1">Add Image</span>
+                                <input
+                                  id={`product-image-${index}`}
+                                  type="file"
+                                  accept="image/*"
+                                  className="hidden"
+                                  onChange={(e) => {
+                                    const file = e.target.files?.[0];
+                                    if (file) {
+                                      handleImageUpload(index, file);
+                                    }
+                                    e.target.value = ''; // Reset input
+                                  }}
+                                />
+                              </label>
+                            )}
+                            <p className="text-xs text-neutral-500">
+                              Upload a photo of the product or issue (max 5MB)
+                            </p>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </Card>
                 ))}
@@ -1148,6 +1237,7 @@ export default function WarrantyClaim() {
                       faultDescription: "",
                       isAutoFilled: false,
                       isCrmMiss: false,
+                      image: undefined,
                     }]);
                   }}
                   data-testid="button-add-product"

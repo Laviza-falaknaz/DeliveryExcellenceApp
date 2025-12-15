@@ -162,6 +162,7 @@ export const rmaItems = pgTable("rma_items", {
   reasonForReturn: text("reason_for_return").notNull(),
   productDetails: text("product_details").notNull(),
   relatedOrder: text("related_order"),
+  image: text("image"), // base64 encoded product image
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -202,6 +203,7 @@ export const rmaRequestLogs = pgTable("rma_request_logs", {
     manufacturerSerialNumber: string;
     inHouseSerialNumber: string;
     faultDescription: string;
+    image?: string; // base64 encoded product image
   }>>(),
   fileAttachment: json("file_attachment").$type<{
     hasAttachment?: boolean;
