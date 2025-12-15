@@ -1012,6 +1012,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           manufacturerSerialNumber: z.string(),
           inHouseSerialNumber: z.string(),
           faultDescription: z.string(),
+          image: z.string().optional(), // base64 encoded product image
         })).min(1),
         consent: z.boolean(),
         userId: z.number().optional(),
